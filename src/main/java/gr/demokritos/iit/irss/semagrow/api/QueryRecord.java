@@ -6,8 +6,10 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface QueryRecord {
 
-    long getCardinality();
 
-    void getResultSet();
+
+    Rectangle getRectangle();
+
+    QueryResult getResultSet();
 
 }

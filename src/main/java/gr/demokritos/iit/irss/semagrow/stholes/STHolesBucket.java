@@ -15,7 +15,6 @@ public class STHolesBucket {
         throw new NotImplementedException();
     }
 
-
     public long getFrequency() {
         throw new NotImplementedException();
     }
@@ -24,7 +23,6 @@ public class STHolesBucket {
         return null;
     }
 
-
     public STHolesBucket parent() {
         return null;
     }
@@ -32,7 +30,6 @@ public class STHolesBucket {
     public static STHolesBucket merge(STHolesBucket bucket1, STHolesBucket bucket2) {
         return null;
     }
-
 
     public static STHolesBucket shrink() {
         return null;
