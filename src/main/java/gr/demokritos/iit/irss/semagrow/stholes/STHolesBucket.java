@@ -27,6 +27,8 @@ public class STHolesBucket {
         return null;
     }
 
+    public void addChild(STHolesBucket bucket) { }
+
     public static STHolesBucket merge(STHolesBucket bucket1, STHolesBucket bucket2) {
         return null;
     }

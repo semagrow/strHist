@@ -23,17 +23,17 @@ public class STHolesHistogram implements STHistogram {
 
     public void refine(QueryRecord queryRecord) {
 
-
         // get all c
         Iterable<STHolesBucket> candidateBuckets = getCandidateBuckets(queryRecord);
 
         for (STHolesBucket b : candidateBuckets) {
 
-            // shrink
+            STHolesBucket c = STHolesBucket.shrink();
+            //long tc = countMatchingTuples(c, queryRecord);
             //long tb = countMatchingTuples(b, queryRecord);
 
             //if (inaccurateEstimation())
-            //    drillHole();
+            //    drillHole(b, c, tc);
         }
 
         // check if histogram must be compacted after refinement
@@ -46,6 +46,10 @@ public class STHolesHistogram implements STHistogram {
      * @return
      */
     private Iterable<STHolesBucket> getCandidateBuckets(QueryRecord queryRecord) {
+        Rectangle queryBox = queryRecord.getRectangle();
+
+        // check if there are bucket with boxes that intersect with the rectangle of the query
+
         return null;
     }
 
@@ -63,7 +67,7 @@ public class STHolesHistogram implements STHistogram {
      * Create a hole (i.e. a child STHolesBucket) inside an existing bucket
      */
     private void drillHole(STHolesBucket parentBucket, Rectangle holeBoundaries, int holeFrequency) {
-
+        
     }
 
     private void compact() {

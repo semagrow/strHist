@@ -6,6 +6,15 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface Rectangle {
 
-    void getDimensions();
+    void getDimension(int i);
 
+    void clone();
+
+    void union(Rectangle rec);
+
+    void intersection(Rectangle rec);
+
+    boolean contains(Rectangle rec);
+
+    boolean contains(Point point);
 }
