@@ -6,8 +6,6 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface QueryRecord {
 
-
-
     Rectangle getRectangle();
 
     QueryResult getResultSet();

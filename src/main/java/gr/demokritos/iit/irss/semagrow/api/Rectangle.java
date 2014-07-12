@@ -6,9 +6,11 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface Rectangle {
 
-    void getDimension(int i);
-
-    void clone();
+    /**
+     * Return number of total dimensions
+     * @return
+     */
+    int getDimensionality();
 
     void union(Rectangle rec);
 
