@@ -7,20 +7,19 @@ package gr.demokritos.iit.irss.semagrow.api;
 public class PrefixRange implements Range<String> {
 
     private String prefix;
+
     public PrefixRange(String prefix) {
         this.prefix = prefix;
     }
 
     @Override
     public boolean contains(String item) {
-        boolean res = item.startsWith(prefix);
-        return res;
+        return item.startsWith(prefix);
     }
 
     @Override
     public boolean contains(Range<String> range) {
-        boolean res = ((PrefixRange) range).getPrefix().startsWith(prefix);
-        return res;
+        return ((PrefixRange) range).getPrefix().startsWith(prefix);
     }
 
     @Override
@@ -50,6 +49,7 @@ public class PrefixRange implements Range<String> {
             return new PrefixRange(prefix);
         }
         //TODO Union of non intersecting prefixes
+        // Return CollectionRange or allow PrefixRange to be a list of prefixes?
         return null;
     }
 
@@ -71,12 +71,12 @@ public class PrefixRange implements Range<String> {
         // Test getters
         System.out.println("My range is " + myRange.getPrefix());
         //Test contains item method
-        if (res1 == true)
+        if (res1)
             System.out.println("My range contains " + item1);
         else
             System.out.println("Test failed");
 
-        if (res2 == false)
+        if (!res2 )
             System.out.println("My range does not contain " + item2);
         else
             System.out.println("Test failed");
@@ -98,16 +98,19 @@ public class PrefixRange implements Range<String> {
         PrefixRange testRange3 = new PrefixRange("http://b");
 
 
-        PrefixRange intersection1 = (PrefixRange) myRange.intersect(testRange1);
-        PrefixRange intersection2 = (PrefixRange) myRange.intersect(testRange2);
-        PrefixRange intersection3 = (PrefixRange) myRange.intersect(testRange3);
+        PrefixRange intersection1 = (PrefixRange) myRange.intersect(
+                testRange1);
+        PrefixRange intersection2 = (PrefixRange) myRange.intersect(
+                testRange2);
+        PrefixRange intersection3 = (PrefixRange) myRange.intersect(
+                testRange3);
 
-        System.out.println("Intersection of range " + myRange.toString() + " and " +
-                "range " + testRange1.toString() + ": " + intersection1);
-        System.out.println("Intersection of range " + myRange.toString() + " and " +
-                "range " + testRange2.toString() + ": " + intersection2);
-        System.out.println("Intersection of range " + myRange.toString() + " and " +
-                "range " + testRange3.toString() + ": "  + intersection3);
+        System.out.println("Intersection of range " + myRange.toString() +
+                " and range " + testRange1.toString() + ": " + intersection1);
+        System.out.println("Intersection of range " + myRange.toString() +
+                " and range " + testRange2.toString() + ": " + intersection2);
+        System.out.println("Intersection of range " + myRange.toString() +
+                " and range " + testRange3.toString() + ": "  + intersection3);
 
         //Test union method
         PrefixRange union1 = (PrefixRange) myRange.union(testRange1);

@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
-import java.lang.Math.*;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 /**
  * Defines a set of numbers that lies on an interval
@@ -18,23 +19,21 @@ public class IntervalRange implements Range<Integer> {
 
     @Override
     public boolean contains(Integer item) {
-        boolean res = (item >= low) && (item <= high);
-        return res;
+        return (item >= low) && (item <= high);
     }
 
     @Override
     public boolean contains(Range<Integer> range) {
-        boolean res = ( ((IntervalRange) range).getLow() >= low) &&
+        return ( ((IntervalRange) range).getLow() >= low) &&
                 (((IntervalRange) range).getHigh() <= high);
-        return res;
     }
 
     @Override
     public Range<Integer> intersect(Range<Integer> range) {
         IntervalRange res;
 
-        int nLow = Math.max(low, ((IntervalRange) range).getLow());
-        int nHigh = Math.min(high, ((IntervalRange) range).getHigh());
+        int nLow = max(low, ((IntervalRange) range).getLow());
+        int nHigh = min(high, ((IntervalRange) range).getHigh());
 
         if (nLow <= nHigh) {
             res = new IntervalRange(nLow, nHigh);
@@ -49,8 +48,8 @@ public class IntervalRange implements Range<Integer> {
     public Range<Integer> union(Range<Integer> range) {
         IntervalRange res;
 
-        int nLow = Math.min(low, ((IntervalRange) range).getLow());
-        int nHigh = Math.max(high, ((IntervalRange) range).getHigh());
+        int nLow = min(low, ((IntervalRange) range).getLow());
+        int nHigh = max(high, ((IntervalRange) range).getHigh());
         res = new IntervalRange(nLow,nHigh);
         return res;
     }
@@ -78,12 +77,12 @@ public class IntervalRange implements Range<Integer> {
         System.out.println("My range is (" + myRange.getLow() + "," +
                 myRange.getHigh() + ")");
         //Test contains item method
-        if (res1 == true)
+        if (res1)
             System.out.println("My range contains " + item1);
         else
             System.out.println("Test failed");
 
-        if (res2 == false)
+        if (!res2)
             System.out.println("My range does not contain " + item2);
         else
             System.out.println("Test failed");
@@ -105,16 +104,19 @@ public class IntervalRange implements Range<Integer> {
         IntervalRange testRange3 = new IntervalRange(8,10);
 
 
-        IntervalRange intersection1 = (IntervalRange) myRange.intersect(testRange1);
-        IntervalRange intersection2 = (IntervalRange) myRange.intersect(testRange2);
-        IntervalRange intersection3 = (IntervalRange) myRange.intersect(testRange3);
+        IntervalRange intersection1 = (IntervalRange) myRange.intersect(
+                testRange1);
+        IntervalRange intersection2 = (IntervalRange) myRange.intersect(
+                testRange2);
+        IntervalRange intersection3 = (IntervalRange) myRange.intersect(
+                testRange3);
 
-        System.out.println("Intersection of range " + myRange.toString() + " and " +
-                "range " + testRange1.toString() + ":" + intersection1);
-        System.out.println("Intersection of range " + myRange.toString() + " and " +
-                "range " + testRange2.toString() + ":" + intersection2);
-        System.out.println("Intersection of range " + myRange.toString() + " and " +
-                "range " + testRange3.toString() + ":" + intersection3);
+        System.out.println("Intersection of range " + myRange.toString() +
+                " and range " + testRange1.toString() + ":" + intersection1);
+        System.out.println("Intersection of range " + myRange.toString() +
+                " and range " + testRange2.toString() + ":" + intersection2);
+        System.out.println("Intersection of range " + myRange.toString() +
+                " and range " + testRange3.toString() + ":" + intersection3);
 
         //Test union method
         IntervalRange union1 = (IntervalRange) myRange.union(testRange1);
