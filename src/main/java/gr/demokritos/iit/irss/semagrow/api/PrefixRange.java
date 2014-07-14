@@ -12,17 +12,14 @@ public class PrefixRange implements Range<String> {
         this.prefix = prefix;
     }
 
-    @Override
     public boolean contains(String item) {
         return item.startsWith(prefix);
     }
 
-    @Override
     public boolean contains(Range<String> range) {
         return ((PrefixRange) range).getPrefix().startsWith(prefix);
     }
 
-    @Override
     public Range<String> intersect(Range<String> range) {
 
         String otherPrefix = ((PrefixRange) range).getPrefix();
@@ -37,7 +34,6 @@ public class PrefixRange implements Range<String> {
         return null;
     }
 
-    @Override
     public Range<String> union(Range<String> range) {
 
         String otherPrefix = ((PrefixRange) range).getPrefix();
