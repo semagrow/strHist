@@ -19,38 +19,46 @@ public class PrefixRange implements Range<String> {
 
     @Override
     public boolean contains(Range<String> range) {
-        return ((PrefixRange) range).getPrefix().startsWith(prefix);
+
+        if (range instanceof PrefixRange) {
+            return ((PrefixRange) range).getPrefix().startsWith(prefix);
+        }
+        return false;
     }
 
     @Override
     public Range<String> intersect(Range<String> range) {
 
-        String otherPrefix = ((PrefixRange) range).getPrefix();
 
-        if (prefix.startsWith(otherPrefix)) {
-            return new PrefixRange(prefix);
-        }
-        else if (otherPrefix.startsWith(prefix)) {
-            return new PrefixRange(otherPrefix);
+        if (range instanceof PrefixRange) {
+            String otherPrefix = ((PrefixRange) range).getPrefix();
+
+            if (prefix.startsWith(otherPrefix)) {
+                return new PrefixRange(prefix);
+            } else if (otherPrefix.startsWith(prefix)) {
+                return new PrefixRange(otherPrefix);
+            }
         }
 
-        return null;
+        return range;
     }
 
     @Override
     public Range<String> union(Range<String> range) {
 
-        String otherPrefix = ((PrefixRange) range).getPrefix();
+        if (range instanceof PrefixRange) {
 
-        if (prefix.startsWith(otherPrefix)) {
-            return new PrefixRange(otherPrefix);
+            String otherPrefix = ((PrefixRange) range).getPrefix();
+
+            if (prefix.startsWith(otherPrefix)) {
+                return new PrefixRange(otherPrefix);
+            } else if (otherPrefix.startsWith(prefix)) {
+                return new PrefixRange(prefix);
+            }
+            //TODO Union of non intersecting prefixes
+            // Return CollectionRange or allow PrefixRange to be a list of prefixes?
         }
-        else if (otherPrefix.startsWith(prefix)) {
-            return new PrefixRange(prefix);
-        }
-        //TODO Union of non intersecting prefixes
-        // Return CollectionRange or allow PrefixRange to be a list of prefixes?
-        return null;
+        return range;
     }
 
 

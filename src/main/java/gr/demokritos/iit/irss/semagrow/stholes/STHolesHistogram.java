@@ -5,6 +5,7 @@ import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by angel on 7/11/14.
@@ -100,7 +101,7 @@ public class STHolesHistogram implements STHistogram {
      * Create a hole (i.e. a child STHolesBucket) inside an existing bucket
      */
     private void drillHole(STHolesBucket parentBucket, Rectangle holeBoundaries, long holeFrequency,
-                           ArrayList<Long> distinct) {
+                           Collection<Long> distinct) {
         /*
         if (parentBucket.getBox().equals(holeBoundaries)){
             parentBucket.setFrequency(holeFrequency);

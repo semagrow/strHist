@@ -24,34 +24,45 @@ public class IntervalRange implements Range<Integer> {
 
     @Override
     public boolean contains(Range<Integer> range) {
-        return ( ((IntervalRange) range).getLow() >= low) &&
-                (((IntervalRange) range).getHigh() <= high);
+
+        if (range instanceof  IntervalRange) {
+            return (((IntervalRange) range).getLow() >= low) &&
+                    (((IntervalRange) range).getHigh() <= high);
+        }
+        return false;
     }
 
     @Override
     public Range<Integer> intersect(Range<Integer> range) {
-        IntervalRange res;
 
-        int nLow = max(low, ((IntervalRange) range).getLow());
-        int nHigh = min(high, ((IntervalRange) range).getHigh());
+        if (range instanceof IntervalRange) {
+            IntervalRange res;
 
-        if (nLow <= nHigh) {
-            res = new IntervalRange(nLow, nHigh);
+            int nLow = max(low, ((IntervalRange) range).getLow());
+            int nHigh = min(high, ((IntervalRange) range).getHigh());
+
+            if (nLow <= nHigh) {
+                res = new IntervalRange(nLow, nHigh);
+            } else {
+                res = null;
+            }
+            return res;
         }
-        else {
-            res = null;
-        }
-        return res;
+        return range;
     }
 
     @Override
     public Range<Integer> union(Range<Integer> range) {
-        IntervalRange res;
 
-        int nLow = min(low, ((IntervalRange) range).getLow());
-        int nHigh = max(high, ((IntervalRange) range).getHigh());
-        res = new IntervalRange(nLow,nHigh);
-        return res;
+        if (range instanceof IntervalRange) {
+            IntervalRange res;
+
+            int nLow = min(low, ((IntervalRange) range).getLow());
+            int nHigh = max(high, ((IntervalRange) range).getHigh());
+            res = new IntervalRange(nLow, nHigh);
+            return res;
+        }
+        return range;
     }
 
     /*@Override
