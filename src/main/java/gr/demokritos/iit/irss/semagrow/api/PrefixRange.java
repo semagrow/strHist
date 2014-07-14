@@ -12,12 +12,10 @@ public class PrefixRange implements Range<String> {
         this.prefix = prefix;
     }
 
-    @Override
     public boolean contains(String item) {
         return item.startsWith(prefix);
     }
 
-    @Override
     public boolean contains(Range<String> range) {
 
         if (range instanceof PrefixRange) {
@@ -26,7 +24,6 @@ public class PrefixRange implements Range<String> {
         return false;
     }
 
-    @Override
     public Range<String> intersect(Range<String> range) {
 
 
@@ -43,7 +40,6 @@ public class PrefixRange implements Range<String> {
         return range;
     }
 
-    @Override
     public Range<String> union(Range<String> range) {
 
         if (range instanceof PrefixRange) {
