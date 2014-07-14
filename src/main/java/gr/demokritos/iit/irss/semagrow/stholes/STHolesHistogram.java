@@ -15,14 +15,12 @@ public class STHolesHistogram implements STHistogram {
     private STHolesBucket root;
 
 
-    @Override
     public void refine(Iterable<QueryRecord> workload) {
 
         for (QueryRecord qfr : workload)
             refine(qfr);
     }
 
-    @Override
     public long estimate(Rectangle rec) {
 
         //return estimateAux(rec,root);

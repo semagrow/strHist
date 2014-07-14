@@ -17,12 +17,10 @@ public class IntervalRange implements Range<Integer> {
         this.high = high;
     }
 
-    @Override
     public boolean contains(Integer item) {
         return (item >= low) && (item <= high);
     }
 
-    @Override
     public boolean contains(Range<Integer> range) {
 
         if (range instanceof  IntervalRange) {
@@ -32,7 +30,6 @@ public class IntervalRange implements Range<Integer> {
         return false;
     }
 
-    @Override
     public Range<Integer> intersect(Range<Integer> range) {
 
         if (range instanceof IntervalRange) {
@@ -51,7 +48,6 @@ public class IntervalRange implements Range<Integer> {
         return range;
     }
 
-    @Override
     public Range<Integer> union(Range<Integer> range) {
 
         if (range instanceof IntervalRange) {

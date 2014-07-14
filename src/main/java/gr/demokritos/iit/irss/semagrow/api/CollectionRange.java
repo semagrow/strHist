@@ -19,22 +19,18 @@ public class CollectionRange<T> implements Range<T> {
         this.ranges.addAll(ranges);
     }
 
-    @Override
     public boolean contains(T item) {
         return false;
     }
 
-    @Override
     public boolean contains(Range<T> range) {
         return false;
     }
 
-    @Override
     public Range<T> intersect(Range<T> range) {
         return null;
     }
 
-    @Override
     public Range<T> union(Range<T> range) {
         return null;
     }
