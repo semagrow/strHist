@@ -75,7 +75,7 @@ public class STHolesBucket {
 
         long estimate = frequency;
         for (int i=0; i< rec.getDimensionality(); i++) {
-            if ((rec.getRange(i)).getLength() == 1) estimate *= 1 / distinct.get(i);
+            if ((rec.getRange(i)).getLength() == 1) estimate *= 1 /  distinct.get(i);
         }
 
         return estimate;

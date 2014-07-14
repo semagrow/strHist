@@ -14,7 +14,7 @@ public interface Rectangle {
 
     void union(Rectangle rec);
 
-    void intersection(Rectangle rec);
+    Rectangle intersection(Rectangle rec);
 
     boolean contains(Rectangle rec);
 
