@@ -4,6 +4,7 @@ import gr.demokritos.iit.irss.semagrow.api.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -15,36 +16,20 @@ public class STHolesHistogram implements STHistogram {
 
     private STHolesBucket root;
 
-
-    public void refine(Iterable<QueryRecord> workload) {
-
-        for (QueryRecord qfr : workload)
-            refine(qfr);
+    public STHolesHistogram() {
+        root = null;
     }
 
-    public void refine(QueryRecord queryRecord) {
-
-        // get all c
-        Iterable<STHolesBucket> candidates = getCandidateBuckets(queryRecord);
-
-        for (STHolesBucket b : candidates) {
-
-            // shrink r
-            // long tc = countMatchingTuples(c, queryRecord);
-            // long tb = countMatchingTuples(b, queryRecord);
-
-            //if (inaccurateEstimation())
-            // if (true)
-            //    drillHole(b, c, tc);
-        }
-
-        // check if histogram must be compacted after refinement
-        compact();
+    public STHolesHistogram(Iterable<QueryRecord> workload) {
+        this();
+        refine(workload);
     }
-
 
     public long estimate(Rectangle rec) {
-        return estimateAux(rec, root);
+        if (root != null)
+            return estimateAux(rec, root);
+        else
+            return 0;
     }
 
     private long estimateAux(Rectangle rec, STHolesBucket b) {
@@ -70,6 +55,53 @@ public class STHolesHistogram implements STHistogram {
             return b.getEstimate(rec);
         else
             return est;
+    }
+
+
+    public void refine(Iterable<QueryRecord> workload) {
+
+        for (QueryRecord qfr : workload)
+            refine(qfr);
+    }
+
+    public void refine(QueryRecord queryRecord) {
+
+        // get all c
+        Iterable<STHolesBucket> candidates = getCandidateBuckets(queryRecord);
+
+        for (STHolesBucket bucket : candidates) {
+
+            STHolesBucket hole = shrink(bucket, queryRecord);
+
+            //if (inaccurateEstimation())
+            if (true)
+                drillHole(bucket, hole);
+        }
+
+        // check if histogram must be compacted after refinement
+        compact();
+    }
+
+
+    /**
+     * creates a new bucket that has a rectangle that does not intersect with the children of {bucket}
+     * and contains the number of tuples that matches the queryRecord
+     * @param bucket
+     * @param queryRecord
+     * @return
+     */
+    private STHolesBucket shrink(STHolesBucket bucket, QueryRecord queryRecord) {
+
+        //TODO: create a new rectangle / this is not the way to do it!
+        Rectangle r = bucket.getBox();
+
+        //TODO: shrink in such a way that b does not intersect with the rectangles of bucket.getChildren();
+
+        long freq = countMatchingTuples(r, queryRecord);
+
+        STHolesBucket b = new STHolesBucket(r,freq,null,null,null);
+
+        return b;
     }
 
     /**
@@ -110,14 +142,13 @@ public class STHolesHistogram implements STHistogram {
     }
 
 
-
     /**
      * Count the tuples of the query result set that match the criteria of the given bucket.
      * @param bucket
      * @param queryRecord
      * @return
      */
-    private long countMatchingTuples(STHolesBucket bucket,
+    private long countMatchingTuples(Rectangle rectangle,
                                      QueryRecord queryRecord) {
         return 0;
     }
@@ -125,21 +156,21 @@ public class STHolesHistogram implements STHistogram {
     /**
      * Create a hole (i.e. a child STHolesBucket) inside an existing bucket
      */
-    private void drillHole(STHolesBucket parentBucket,
-                           Rectangle holeBoundaries,
-                           long holeFrequency, Collection<Long> distinct)
+    private void drillHole(STHolesBucket parentBucket, STHolesBucket candidateHole)
     {
 
-        if (parentBucket.getBox().equals(holeBoundaries)) {
+        if (parentBucket.getBox().equals(candidateHole.getBox())) {
 
-            parentBucket.setFrequency(holeFrequency);
-            parentBucket.setDistinct(distinct);
+            parentBucket.setFrequency(candidateHole.getFrequency());
+            parentBucket.setDistinct(candidateHole.getDistinct());
 
         }
         else {
 
-            STHolesBucket bn = new STHolesBucket(holeBoundaries,
-            holeFrequency,null,parentBucket,distinct);
+            //STHolesBucket bn = new STHolesBucket(holeBoundaries, holeFrequency,null,parentBucket,distinct);
+            STHolesBucket bn = candidateHole;
+            bn.setParent(parentBucket);
+
             parentBucket.addChild(bn);
 
             for (STHolesBucket bc : parentBucket.getChildren()) {

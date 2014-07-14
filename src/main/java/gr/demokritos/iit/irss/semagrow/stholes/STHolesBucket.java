@@ -16,20 +16,17 @@ public class STHolesBucket {
     private long frequency;
     private Collection<STHolesBucket> children;
     private STHolesBucket parent;
-    private Collection<Long> distinct;
-
-
+    private ArrayList<Long> distinct;
 
 
     public STHolesBucket(Rectangle box, long frequency,
                          Collection<STHolesBucket> children,
-                         STHolesBucket parent, Collection<Long> distinct) {
+                         STHolesBucket parent, ArrayList<Long> distinct) {
         this.box = box;
         this.frequency = frequency;
         this.children = children;
         this.parent = parent;
         this.distinct = distinct;
-
     }
 
     public Rectangle getBox() {
@@ -48,7 +45,7 @@ public class STHolesBucket {
         return parent;
     }
 
-    public Collection<Long> getDistinct() {
+    public ArrayList<Long> getDistinct() {
         return distinct;
     }
 
@@ -74,7 +71,7 @@ public class STHolesBucket {
         Rectangle newBox = bp.getBox();
         long newFreq = bp.getFrequency();
 
-        Collection<Long> newDistinct = bp.getDistinct();
+        ArrayList<Long> newDistinct = bp.getDistinct();
         STHolesBucket newParent = bp.getParent();
 
         STHolesBucket bn = new STHolesBucket(newBox, newFreq, null, newParent, newDistinct);
@@ -99,7 +96,7 @@ public class STHolesBucket {
     }
 
     public void setDistinct(Collection<Long> distinct) {
-        this.distinct = distinct;
+        this.distinct = new ArrayList(distinct);
     }
 
     public void setParent(STHolesBucket parent) {
