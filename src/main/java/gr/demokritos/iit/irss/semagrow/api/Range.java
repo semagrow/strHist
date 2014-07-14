@@ -12,4 +12,6 @@ public interface Range<T> {
     Range<T> intersect(Range<T> range);
 
     Range<T> union(Range<T> range);
+
+    //long getLength();
 }

@@ -53,6 +53,13 @@ public class PrefixRange implements Range<String> {
         return null;
     }
 
+
+    /*@Override
+    public long getLength(){
+        //if we use list of prefixes
+        //return list.size();
+    }*/
+
     public String getPrefix() {
         return prefix;
     }

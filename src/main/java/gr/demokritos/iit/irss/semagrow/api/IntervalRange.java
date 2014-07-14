@@ -54,6 +54,11 @@ public class IntervalRange implements Range<Integer> {
         return res;
     }
 
+    /*@Override
+     public long getLength() {
+        return high - low;
+    }*/
+
     public int getLow() {
         return low;
     }

@@ -19,4 +19,6 @@ public interface Rectangle {
     boolean contains(Rectangle rec);
 
     boolean contains(Point point);
+
+    boolean equals(Rectangle rec);
 }
