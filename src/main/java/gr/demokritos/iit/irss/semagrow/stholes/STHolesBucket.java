@@ -5,6 +5,7 @@ import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Vector;
 
 /**
  * Created by angel on 7/11/14.
@@ -15,12 +16,12 @@ public class STHolesBucket {
     private long frequency;
     private Collection<STHolesBucket> children;
     private STHolesBucket parent;
-    private ArrayList<Long> distinct;
+    private Collection<Long> distinct;
 
 
     public STHolesBucket(Rectangle box, long frequency,
                          Collection<STHolesBucket> children,
-                         STHolesBucket parent, ArrayList<Long> distinct) {
+                         STHolesBucket parent, Collection<Long> distinct) {
         this.box = box;
         this.frequency = frequency;
         this.children = children;
@@ -74,7 +75,7 @@ public class STHolesBucket {
 
         long estimate = frequency;
         for (int i=0; i< rec.getDimensionality(); i++) {
-            if ((rec.getRange(i)).getLength() == 1) estimate *= 1 / distinct.get(i);
+            if ((rec.getRange(i)).getLength() == 1) estimate *= 1 /  distinct.get(i);
         }
 
         return estimate;

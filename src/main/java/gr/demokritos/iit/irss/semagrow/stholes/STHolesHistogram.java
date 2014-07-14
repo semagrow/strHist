@@ -5,6 +5,8 @@ import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Created by angel on 7/11/14.
@@ -73,16 +75,35 @@ public class STHolesHistogram implements STHistogram {
     private Iterable<STHolesBucket> getCandidateBuckets(QueryRecord queryRecord) {
         Rectangle queryBox = queryRecord.getRectangle();
 
+        Iterable<STHolesBucket> candidates = new LinkedList<STHolesBucket>();
+
         // check if there are bucket with boxes that intersect with the rectangle of the query
 
         //TODO:expand root so that it contains q if necessary
+        //candidates = getCandidateBucketsAux(root, candidates, queryBox);
 
-        for (STHolesBucket b : root.getChildren() ) {
 
+        return candidates;
+    }
+
+    private Iterable<STHolesBucket> getCandidateBucketsAux(STHolesBucket b,
+                                                           Iterable<STHolesBucket> candidates, Rectangle queryBox) {
+        /*
+        Rectangle c = (b.getBox()).intersection(queryBox);
+        if (c != null) {
+            ((LinkedList) candidates).add(c);
         }
 
+        for (STHolesBucket bc : b.getChildren()) {
+            getCandidateBucketsAux(bc,candidates,queryBox);
+        }
+
+        return candidates;
+        */
         return null;
     }
+
+
 
     /**
      * Count the tuples of the query result set that match the criteria of the given bucket.
@@ -98,7 +119,7 @@ public class STHolesHistogram implements STHistogram {
      * Create a hole (i.e. a child STHolesBucket) inside an existing bucket
      */
     private void drillHole(STHolesBucket parentBucket, Rectangle holeBoundaries, long holeFrequency,
-                           ArrayList<Long> distinct) {
+                           Collection<Long> distinct) {
         /*
         if (parentBucket.getBox().equals(holeBoundaries)){
             parentBucket.setFrequency(holeFrequency);
