@@ -68,17 +68,20 @@ public class STHolesBucket {
         return null;
     }
 
-    public static STHolesBucket parentChildMerge(STHolesBucket bp,
-                                                 STHolesBucket bc) {
+    public static STHolesBucket
+        parentChildMerge(STHolesBucket bp, STHolesBucket bc) {
+
         Rectangle newBox = bp.getBox();
         long newFreq = bp.getFrequency();
+
         Collection<Long> newDistinct = bp.getDistinct();
         STHolesBucket newParent = bp.getParent();
-        STHolesBucket bn = new STHolesBucket(newBox,newFreq,null,
-                newParent,newDistinct);
-        for (STHolesBucket bi : bc.getChildren()) {
+
+        STHolesBucket bn = new STHolesBucket(newBox, newFreq, null, newParent, newDistinct);
+
+        for (STHolesBucket bi : bc.getChildren())
             bi.setParent(bn);
-        }
+
         return bn;
     }
 
@@ -95,7 +98,7 @@ public class STHolesBucket {
         this.frequency = frequency;
     }
 
-    public void setDistinct(ArrayList<Long> distinct) {
+    public void setDistinct(Collection<Long> distinct) {
         this.distinct = distinct;
     }
 
@@ -103,14 +106,16 @@ public class STHolesBucket {
         this.parent = parent;
     }
 
- /*   public long getEstimate(Rectangle rec) {
+    public long getEstimate(Rectangle rec) {
 
         long estimate = frequency;
         for (int i=0; i< rec.getDimensionality(); i++) {
-            if ((rec.getRange(i)).getLength() == 1) estimate *= 1 /  distinct.get(i);
+
+            if ((rec.getRange(i)).getLength() == 1)
+                estimate *= 1 /  distinct.get(i);
         }
 
         return estimate;
-    } */
+    }
 
 }
