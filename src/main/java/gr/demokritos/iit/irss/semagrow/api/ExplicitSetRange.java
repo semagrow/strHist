@@ -2,7 +2,6 @@ package gr.demokritos.iit.irss.semagrow.api;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -15,8 +14,7 @@ public class ExplicitSetRange<T> implements Range<T> {
 
 
 	public ExplicitSetRange(Collection<T> items) {
-		this.items = new HashSet<T>();
-		this.items.addAll(items);
+		this.items = new HashSet<T>(items);
 	}
 
 
@@ -41,7 +39,7 @@ public class ExplicitSetRange<T> implements Range<T> {
 
 			((ExplicitSetRange) esr).items.retainAll(this.items);
 
-			range = esr;
+			return esr;
 		}
 		return range;
 	}
@@ -55,7 +53,7 @@ public class ExplicitSetRange<T> implements Range<T> {
 			
 			((ExplicitSetRange) esr).items.addAll(this.items);
 			
-			range = esr;
+			return esr;
 		}
 
 		return range;
@@ -67,24 +65,27 @@ public class ExplicitSetRange<T> implements Range<T> {
     }*/
 
 
-//	@SuppressWarnings({ "rawtypes", "unchecked" })
-//	public static void main(String[] args) {
-//
-//		HashSet s1 = new HashSet<String>();
-//		s1.add('a');
-//		s1.add('b');
-//		s1.add('c');
-//		ExplicitSetRange esr1 = new ExplicitSetRange(s1);
-//		HashSet s2 = new HashSet<String>();
-//		s2.add('a');
-//		s2.add('b');
-//		s2.add('d');
-//		ExplicitSetRange esr2 = new ExplicitSetRange(s2);
-//
-//		ExplicitSetRange<String> esr = (ExplicitSetRange) esr1.intersect(esr2);
-//		Set<String> sss = ((ExplicitSetRange) esr).items;
-//		for (String i : sss)
-//			System.out.println(i);	
-//
-//	}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void main(String[] args) {
+
+		HashSet s1 = new HashSet<String>();
+		s1.add('a');
+		s1.add('b');
+		s1.add('c');
+		ExplicitSetRange esr1 = new ExplicitSetRange(s1);
+		HashSet s2 = new HashSet<String>();
+		s2.add('a');
+		s2.add('b');
+		s2.add('d');
+		ExplicitSetRange esr2 = new ExplicitSetRange(s2);
+
+		ExplicitSetRange<String> esr = (ExplicitSetRange) esr1.intersect(esr2);
+		Set<String> sss = ((ExplicitSetRange) esr).items;
+		System.out.println("Intesect: " + sss.toString());	
+		
+		esr = (ExplicitSetRange) esr1.union(esr2);
+		sss = ((ExplicitSetRange) esr).items;
+		System.out.println("Union: " + sss.toString());
+
+	}
 }
