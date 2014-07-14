@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import static java.lang.Math.abs;
+
 /**
  * Created by angel on 7/11/14.
  */
@@ -86,8 +88,9 @@ public class STHolesHistogram implements STHistogram {
         return candidates;
     }
 
-    private Iterable<STHolesBucket> getCandidateBucketsAux(STHolesBucket b,
-                                                           Iterable<STHolesBucket> candidates, Rectangle queryBox) {
+    private Iterable<STHolesBucket> getCandidateBucketsAux(
+            STHolesBucket b, Iterable<STHolesBucket> candidates,
+            Rectangle queryBox) {
         /*
         Rectangle c = (b.getBox()).intersection(queryBox);
         if (c != null) {
@@ -111,14 +114,16 @@ public class STHolesHistogram implements STHistogram {
      * @param queryRecord
      * @return
      */
-    private long countMatchingTuples(STHolesBucket bucket, QueryRecord queryRecord) {
+    private long countMatchingTuples(STHolesBucket bucket,
+                                     QueryRecord queryRecord) {
         return 0;
     }
 
     /**
      * Create a hole (i.e. a child STHolesBucket) inside an existing bucket
      */
-    private void drillHole(STHolesBucket parentBucket, Rectangle holeBoundaries, long holeFrequency,
+    private void drillHole(STHolesBucket parentBucket, Rectangle
+            holeBoundaries, long holeFrequency,
                            Collection<Long> distinct) {
         /*
         if (parentBucket.getBox().equals(holeBoundaries)){
@@ -126,7 +131,8 @@ public class STHolesHistogram implements STHistogram {
             parentBucket.setDistinct(distinct);
         }
         else {
-            STHolesBucket bn = new STHolesBucket(holeBoundaries,holeFrequency,null,parentBucket,distinct);
+            STHolesBucket bn = new STHolesBucket(holeBoundaries,
+            holeFrequency,null,parentBucket,distinct);
             parentBucket.addChild(bn);
             for (STHolesBucket bc : parentBucket.getChildren()) {
                 if (bn.getBox().contains(bc.getBox())){
@@ -139,5 +145,10 @@ public class STHolesHistogram implements STHistogram {
 
     private void compact() {
         // while too many buckets merge buckets with lowest penalty
+    }
+
+    private long getPCMergePenalty(STHolesBucket bp, STHolesBucket bc) {
+        long penalty = abs(estimate(bc.getBox()) - estimate(bp.getBox()));
+        return penalty;
     }
 }
