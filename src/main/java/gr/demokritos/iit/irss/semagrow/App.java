@@ -1,5 +1,8 @@
 package gr.demokritos.iit.irss.semagrow;
 
+import gr.demokritos.iit.irss.semagrow.api.STHistogram;
+import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
+
 /**
  * Hello world!
  *
@@ -16,7 +19,7 @@ public class App
         	
         	// filter per  
         	// TODO: construct workload
-        	h.refine( workload );
+        	// h.refine( workload );
         }
     }
 }
