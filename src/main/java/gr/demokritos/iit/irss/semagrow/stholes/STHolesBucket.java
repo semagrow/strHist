@@ -3,6 +3,7 @@ package gr.demokritos.iit.irss.semagrow.stholes;
 
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -94,7 +95,59 @@ public class STHolesBucket {
 
     public static STHolesBucket siblingSiblingMerge(STHolesBucket b1,
                                                     STHolesBucket b2) {
-        return null;
+
+        //TODO: Rectangle newBox = getSiblingSiblingBox(b1,b2);
+        // the smallest box that encloses both b1 and b2 but does not
+        // intersect partially with any other of bp
+        Rectangle newBox = b1.getBox(); //just temporary
+
+        // I contains bp's children which are enclosed by bn box
+        Collection<STHolesBucket> I = new ArrayList<STHolesBucket>();
+        STHolesBucket bp = b1.getParent();
+
+        for (STHolesBucket bi : bp.getChildren() ) {
+
+            if (bi.getBox().contains(newBox)) {
+                I.add(bi);
+            }
+        }
+
+        // parent(bn) = bp;
+        STHolesBucket newParent = bp;
+
+        // Set statistics
+        long newFrequency = b1.getFrequency() + b2.getFrequency();
+        ArrayList<Long> newDistinct = b1.getDistinct();
+        ArrayList<Long> curDistinct = b2.getDistinct();
+
+        for (int i = 0; i < newDistinct.size(); i++) {
+
+            newDistinct.set(i, Math.max(newDistinct.get(i), curDistinct.get(i)));
+        }
+
+        for (STHolesBucket bi : I) {
+
+            curDistinct = bi.getDistinct();
+            newFrequency += bi.getFrequency() ;
+
+            for (int i = 0; i < newDistinct.size(); i++) {
+
+                newDistinct.set(i,  Math.max(newDistinct.get(i), curDistinct.get(i)));
+            }
+        }
+
+        Collection<STHolesBucket> newChildren = new ArrayList<STHolesBucket>();
+        I.addAll(b1.getChildren());
+        I.addAll(b2.getChildren());
+
+        for (STHolesBucket bi : I) {
+
+            newChildren.add(bi);
+        }
+
+        STHolesBucket bn = new STHolesBucket(newBox, newFrequency, newChildren, newParent, newDistinct);
+
+        return bn;
     }
 
     public static STHolesBucket shrink() {
