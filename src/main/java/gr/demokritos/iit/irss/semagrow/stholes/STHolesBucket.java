@@ -2,12 +2,11 @@ package gr.demokritos.iit.irss.semagrow.stholes;
 
 
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.Stat;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Created by angel on 7/11/14.
@@ -20,32 +19,32 @@ public class STHolesBucket<R extends Rectangle> {
 
     private Collection<STHolesBucket<R>> children;
 
-    private STHolesBucket<R> parent;
+    private Stat statistics;
+
+    private STHolesBucket parent;
 
     private List<Long> distinct;
 
-    public STHolesBucket(R box, long frequency, List<Long> distinct) {
+    public STHolesBucket(R box, Stat statistics) {
         this.box = box;
-        this.frequency = frequency;
-        this.distinct = distinct;
+        this.statistics = statistics;
     }
 
-    public STHolesBucket(R box, long frequency,
+    public STHolesBucket(R box, Stat statistics,
                          Collection<STHolesBucket<R>> children,
-                         STHolesBucket parent, List<Long> distinct) {
+                         STHolesBucket parent) {
         this.box = box;
-        this.frequency = frequency;
+        this.statistics = statistics;
         this.children = children;
         this.parent = parent;
-        this.distinct = distinct;
     }
 
     public R getBox() {
         return box;
     }
 
-    public long getFrequency() {
-        return frequency;
+    public Stat getStatistics() {
+        return statistics;
     }
 
     public Collection<STHolesBucket<R>> getChildren() {
@@ -56,106 +55,65 @@ public class STHolesBucket<R extends Rectangle> {
         return parent;
     }
 
-    public List<Long> getDistinct() {
-        return distinct;
-    }
-
     public void addChild(STHolesBucket<R> bucket) {
         children.add(bucket);
         bucket.parent = this;
     }
 
-    public static STHolesBucket merge(STHolesBucket bucket1,
-                                      STHolesBucket bucket2) {
+    public void removeChild(STHolesBucket<R> bucket) {
+        children.remove(bucket);
+    }
+
+    public static <R extends Rectangle<R>> 
+        void merge(STHolesBucket<R> bucket1,
+                   STHolesBucket<R> bucket2, STHolesBucket<R> mergeBucket) {
         if (bucket2.getParent() == bucket1) { //or equals
-            return parentChildMerge(bucket1,bucket2);
+            parentChildMerge(bucket1, bucket2, mergeBucket);
         }
         else if (bucket2.getParent() == bucket1.getParent()) {
-            return siblingSiblingMerge(bucket1,bucket2);
+            siblingSiblingMerge(bucket1, bucket2, mergeBucket);
         }
-        return null;
     }
 
-    public static <R extends Rectangle> STHolesBucket<R>
-        parentChildMerge(STHolesBucket<R> bp, STHolesBucket<R> bc) {
+    public static <R extends Rectangle<R>> void
+        parentChildMerge(STHolesBucket<R> bp, STHolesBucket<R> bc, STHolesBucket<R> bn) {
 
-        R newBox = bp.getBox();
-        long newFreq = bp.getFrequency();
+        //Merge buckets b1, b2 into bn
+        STHolesBucket bpp = bp.getParent();
+        bpp.removeChild(bp);
+        bpp.addChild(bn);
+        bn.setParent(bpp);
 
-        List<Long> newDistinct = bp.getDistinct();
-        STHolesBucket<R> newParent = bp.getParent();
-
-        STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newFreq, null, newParent, newDistinct);
-
-        for (STHolesBucket<R> bi : bc.getChildren())
+        for (STHolesBucket bi : bc.getChildren())
             bi.setParent(bn);
 
-        return bn;
+        //return bn;
     }
 
-    public static <R extends Rectangle> STHolesBucket <R>
-        siblingSiblingMerge(STHolesBucket<R> b1, STHolesBucket<R> b2) {
+    public static <R extends Rectangle<R>> 
+        void siblingSiblingMerge(STHolesBucket<R> b1,
+                                 STHolesBucket<R> b2,
+                                 STHolesBucket<R> bn) 
+    {
+        STHolesBucket newParent = b1.getParent();
 
-        //TODO: Rectangle newBox = getSiblingSiblingBox(b1,b2);
-        // the smallest box that encloses both b1 and b2 but does not
-        // intersect partially with any other of bp
-        R newBox = b1.getBox(); //just temporary
+        // Merge buckets b1, b2 into bn
+        bn.setParent(newParent);
+        newParent.addChild(bn);
 
-        // I contains bp's children which are enclosed by bn box
-        Collection<STHolesBucket> I = new ArrayList<STHolesBucket>();
-        STHolesBucket<R> bp = b1.getParent();
+        for (STHolesBucket bi : bn.getChildren()) {
 
-        for (STHolesBucket<R> bi : bp.getChildren() ) {
-
-            if (bi.getBox().contains(newBox)) {
-                I.add(bi);
-            }
+            bi.setParent(bn);
+            newParent.removeChild(bi);
         }
-
-        // parent(bn) = bp;
-        STHolesBucket<R> newParent = bp;
-
-        // Set statistics
-        long newFrequency = b1.getFrequency() + b2.getFrequency();
-        List<Long> newDistinct = b1.getDistinct();
-        List<Long> curDistinct = b2.getDistinct();
-
-        for (int i = 0; i < newDistinct.size(); i++) {
-
-            newDistinct.set(i, Math.max(newDistinct.get(i), curDistinct.get(i)));
-        }
-
-        for (STHolesBucket bi : I) {
-
-            curDistinct = bi.getDistinct();
-            newFrequency += bi.getFrequency() ;
-
-            for (int i = 0; i < newDistinct.size(); i++) {
-
-                newDistinct.set(i,  Math.max(newDistinct.get(i), curDistinct.get(i)));
-            }
-        }
-
-        Collection<STHolesBucket<R>> newChildren = new ArrayList<STHolesBucket<R>>();
-        I.addAll(b1.getChildren());
-        I.addAll(b2.getChildren());
-
-        for (STHolesBucket bi : I) {
-
-            newChildren.add(bi);
-        }
-
-        STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newFrequency, newChildren, newParent, newDistinct);
-
-        return bn;
     }
 
     public static <R extends Rectangle> STHolesBucket<R> shrink() {
         return null;
     }
 
-    public void setFrequency(long frequency) {
-        this.frequency = frequency;
+    public void setStatistics(Stat statistics) {
+        this.statistics = statistics;
     }
 
     public void setDistinct(List<Long> distinct) {
@@ -168,12 +126,12 @@ public class STHolesBucket<R extends Rectangle> {
 
     public long getEstimate(R rec) {
 
-        long estimate = frequency;
+        long estimate = statistics.getFrequency();
 
         for (int i=0; i< rec.getDimensionality(); i++) {
 
-            if (rec.getRange(i).isUnit())
-                estimate *= 1 /  distinct.get(i);
+            if ((rec.getRange(i)).isUnit())
+                estimate *= 1 /  statistics.getDistinctCount().get(i);
         }
 
         return estimate;

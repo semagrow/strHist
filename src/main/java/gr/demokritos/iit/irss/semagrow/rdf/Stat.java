@@ -7,8 +7,28 @@ import java.util.List;
  */
 public class Stat {
 
-    public Long frequency;
+    private Long frequency;
 
-    public List<Long> distinctCount;
+    private List<Long> distinctCount;
 
+    public Stat(Long frequency, List<Long> distinctCount) {
+        this.distinctCount = distinctCount;
+        this.frequency = frequency;
+    }
+
+    public Long getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Long frequency) {
+        this.frequency = frequency;
+    }
+
+    public List<Long> getDistinctCount() {
+        return distinctCount;
+    }
+
+    public void setDistinctCount(List<Long> distinctCount) {
+        this.distinctCount = distinctCount;
+    }
 }
