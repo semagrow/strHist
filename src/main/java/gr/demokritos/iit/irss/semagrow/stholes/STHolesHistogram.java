@@ -265,7 +265,12 @@ public class STHolesHistogram implements STHistogram {
                 null);
 
         long penalty = 0;
-        AbstractMap.SimpleEntry<STHolesBucket, Long> res = new AbstractMap.SimpleEntry(bn, penalty);
+        penalty = Math.abs(b1.getEstimate(b1.getBox()) - bn.getEstimate(b1.getBox()))
+        + Math.abs(b2.getEstimate(b2.getBox())-bn.getEstimate(b2.getBox()))
+        + Math.abs(bp.getEstimate(bn.getBox()) - bn.getEstimate(bn.getBox()));
+
+        AbstractMap.SimpleEntry<STHolesBucket, Long> res =
+                new AbstractMap.SimpleEntry(bn, penalty);
 
         return res;
     }
