@@ -6,6 +6,6 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface STHistogram<R extends Rectangle<R>> extends Histogram<R> {
 
-    void refine(Iterable<QueryRecord<R>> workload);
+    void refine(Iterable<? extends QueryRecord<R>> workload);
 
 }

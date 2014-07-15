@@ -4,7 +4,8 @@ package gr.demokritos.iit.irss.semagrow.api;
  * Defines a subset of all the strings that have a common prefix.
  * Created by angel on 7/12/14.
  */
-public class PrefixRange implements Range<String> {
+public class PrefixRange
+        implements Range<String>, Rangeable<PrefixRange> {
 
     private String prefix;
 
@@ -16,44 +17,20 @@ public class PrefixRange implements Range<String> {
         return item.startsWith(prefix);
     }
 
-    public boolean contains(Range<String> range) {
-
-        if (range instanceof PrefixRange) {
-            return ((PrefixRange) range).getPrefix().startsWith(prefix);
-        }
-        return false;
+    public boolean contains(PrefixRange range) {
+        return range.getPrefix().startsWith(prefix);
     }
 
-    public Range<String> intersect(Range<String> range) {
+    public PrefixRange intersection(PrefixRange range) {
 
+        String otherPrefix = range.getPrefix();
 
-        if (range instanceof PrefixRange) {
-            String otherPrefix = ((PrefixRange) range).getPrefix();
-
-            if (prefix.startsWith(otherPrefix)) {
-                return new PrefixRange(prefix);
-            } else if (otherPrefix.startsWith(prefix)) {
-                return new PrefixRange(otherPrefix);
-            }
+        if (prefix.startsWith(otherPrefix)) {
+            return new PrefixRange(prefix);
+        } else if (otherPrefix.startsWith(prefix)) {
+            return new PrefixRange(otherPrefix);
         }
 
-        return range;
-    }
-
-    public Range<String> union(Range<String> range) {
-
-        if (range instanceof PrefixRange) {
-
-            String otherPrefix = ((PrefixRange) range).getPrefix();
-
-            if (prefix.startsWith(otherPrefix)) {
-                return new PrefixRange(otherPrefix);
-            } else if (otherPrefix.startsWith(prefix)) {
-                return new PrefixRange(prefix);
-            }
-            //TODO Union of non intersecting prefixes
-            // Return CollectionRange or allow PrefixRange to be a list of prefixes?
-        }
         return range;
     }
 
@@ -106,11 +83,11 @@ public class PrefixRange implements Range<String> {
         PrefixRange testRange3 = new PrefixRange("http://b");
 
 
-        PrefixRange intersection1 = (PrefixRange) myRange.intersect(
+        PrefixRange intersection1 = (PrefixRange) myRange.intersection(
                 testRange1);
-        PrefixRange intersection2 = (PrefixRange) myRange.intersect(
+        PrefixRange intersection2 = (PrefixRange) myRange.intersection(
                 testRange2);
-        PrefixRange intersection3 = (PrefixRange) myRange.intersect(
+        PrefixRange intersection3 = (PrefixRange) myRange.intersection(
                 testRange3);
 
         System.out.println("Intersection of range " + myRange.toString() +
@@ -120,16 +97,5 @@ public class PrefixRange implements Range<String> {
         System.out.println("Intersection of range " + myRange.toString() +
                 " and range " + testRange3.toString() + ": "  + intersection3);
 
-        //Test union method
-        PrefixRange union1 = (PrefixRange) myRange.union(testRange1);
-        PrefixRange union2 = (PrefixRange) myRange.union(testRange2);
-        PrefixRange union3 = (PrefixRange) myRange.union(testRange3);
-
-        System.out.println("Union of range " + myRange.toString() + " and " +
-                "range " + testRange1.toString() + ": " + union1);
-        System.out.println("Union of range " + myRange.toString() + " and " +
-                "range " + testRange2.toString() + ": " + union2);
-        System.out.println("Union of range " + myRange.toString() + " and " +
-                "range " + testRange3.toString() + ": " + union3);
     }
 }

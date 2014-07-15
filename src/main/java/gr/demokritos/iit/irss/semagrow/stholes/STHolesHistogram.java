@@ -56,7 +56,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             return est;
     }
 
-    public void refine(Iterable<QueryRecord<R>> workload) {
+    public void refine(Iterable<? extends QueryRecord<R>> workload) {
 
         for (QueryRecord qfr : workload)
             refine(qfr);

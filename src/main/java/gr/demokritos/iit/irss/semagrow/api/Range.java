@@ -5,8 +5,6 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface Range<T> {
 
-    boolean contains(T item);
-
     long getLength();
 
     boolean isUnit();

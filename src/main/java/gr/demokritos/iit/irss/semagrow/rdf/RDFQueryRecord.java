@@ -14,7 +14,8 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
     }
 
     @Override
-    public QueryResult getResultSet() {
+    public QueryResult<RDFRectangle> getResultSet() {
+
         return null;
     }
 
