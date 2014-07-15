@@ -3,10 +3,9 @@ package gr.demokritos.iit.irss.semagrow.stholes;
 import gr.demokritos.iit.irss.semagrow.api.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
+import gr.demokritos.iit.irss.semagrow.rdf.Stat;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 
 
 /**
@@ -95,9 +94,9 @@ public class STHolesHistogram implements STHistogram {
 
         //TODO: shrink in such a way that b does not intersect with the rectangles of bucket.getChildren();
 
-        long freq = countMatchingTuples(r, queryRecord);
+        Stat stats= countMatchingTuples(r, queryRecord);
 
-        STHolesBucket b = new STHolesBucket(r,freq,null,null,null);
+        STHolesBucket b = new STHolesBucket(r, stats, null, null);
 
         return b;
     }
@@ -146,9 +145,9 @@ public class STHolesHistogram implements STHistogram {
      * @param queryRecord
      * @return
      */
-    private long countMatchingTuples(Rectangle rectangle,
+    private Stat countMatchingTuples(Rectangle rectangle,
                                      QueryRecord queryRecord) {
-        return 0;
+        return null;
     }
 
     /**
@@ -159,8 +158,10 @@ public class STHolesHistogram implements STHistogram {
 
         if (parentBucket.getBox().equals(candidateHole.getBox())) {
 
-            parentBucket.setFrequency(candidateHole.getFrequency());
-            parentBucket.setDistinct(candidateHole.getDistinct());
+            Stat parentStats = new Stat(candidateHole.getStatistics().getFrequency(),
+                    candidateHole.getStatistics().getDistinctCount());
+           // parentBucket.setFrequency(candidateHole.getFrequency());
+           // parentBucket.setDistinct(candidateHole.getDistinct());
 
         }
         else {
@@ -182,9 +183,90 @@ public class STHolesHistogram implements STHistogram {
 
     private void compact() {
         // while too many buckets merge buckets with lowest penalty
+
+        // while too many buckets compute merge penalty for each parent-child
+        // and sibling pair, find the one with the minimum penalty and
+        // call merge(b1,b2,bn)
     }
 
-    private long getPCMergePenalty(STHolesBucket bp, STHolesBucket bc) {
-        return Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
+    private AbstractMap.SimpleEntry<STHolesBucket, Long>
+            getPCMergePenalty(STHolesBucket bp, STHolesBucket bc) {
+
+        Rectangle newBox = bp.getBox();
+        long newFreq = bp.getStatistics().getFrequency();
+        List<Long> newDistinct = bp.getStatistics().getDistinctCount();
+        STHolesBucket newParent = bp.getParent();
+        Stat newStatistics = new Stat(newFreq, newDistinct);
+
+        STHolesBucket bn = new STHolesBucket(newBox, newStatistics, null, newParent);
+        long penalty = Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
+
+        AbstractMap.SimpleEntry<STHolesBucket, Long> res = new AbstractMap.SimpleEntry(bn, penalty);
+
+        return res;
+    }
+
+    private AbstractMap.SimpleEntry<STHolesBucket, Long>
+    getSSMergePenalty(STHolesBucket b1, STHolesBucket b2) {
+
+        //TODO: Rectangle newBox = getSiblingSiblingBox(b1,b2);
+        // the smallest box that encloses both b1 and b2 but does not
+        // intersect partially with any other of bp
+        Rectangle newBox = b1.getBox(); //just temporary
+
+        // I contains bp's children which are enclosed by bn box
+        Collection<STHolesBucket> I = new ArrayList<STHolesBucket>();
+        STHolesBucket bp = b1.getParent();
+
+        for (STHolesBucket bi : bp.getChildren() ) {
+
+            if (bi.getBox().contains(newBox)) {
+                I.add(bi);
+            }
+        }
+
+        // Set statistics
+        long newFrequency = b1.getStatistics().getFrequency() + b2.getStatistics().getFrequency();
+        List<Long> newDistinct = b1.getStatistics().getDistinctCount();
+        List<Long> curDistinct = b2.getStatistics().getDistinctCount();
+
+        for (int i = 0; i < newDistinct.size(); i++) {
+
+            newDistinct.set(i, Math.max(newDistinct.get(i), curDistinct.get(i)));
+        }
+
+        for (STHolesBucket bi : I) {
+
+            curDistinct = bi.getStatistics().getDistinctCount();
+            newFrequency += bi.getStatistics().getFrequency() ;
+
+            for (int i = 0; i < newDistinct.size(); i++) {
+
+                newDistinct.set(i,  Math.max(newDistinct.get(i), curDistinct.get(i)));
+            }
+        }
+
+        //Add children
+        Collection<STHolesBucket> newChildren = new ArrayList<STHolesBucket>();
+        I.addAll(b1.getChildren());
+        I.addAll(b2.getChildren());
+
+
+
+        for (STHolesBucket bi : I) {
+
+            newChildren.add(bi);
+        }
+
+
+        // Create bn
+        Stat newStatistics = new Stat(newFrequency, newDistinct);
+        STHolesBucket bn = new STHolesBucket(newBox, newStatistics, newChildren,
+                null);
+
+        long penalty = 0;
+        AbstractMap.SimpleEntry<STHolesBucket, Long> res = new AbstractMap.SimpleEntry(bn, penalty);
+
+        return res;
     }
 }
