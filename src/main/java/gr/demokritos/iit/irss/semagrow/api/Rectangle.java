@@ -4,7 +4,7 @@ package gr.demokritos.iit.irss.semagrow.api;
  * Rectangle is essentially a multidimensional bounding box
  * Created by angel on 7/11/14.
  */
-public interface Rectangle {
+public interface Rectangle<R> {
 
     /**
      * Return number of total dimensions
@@ -12,13 +12,9 @@ public interface Rectangle {
      */
     int getDimensionality();
 
-    void union(Rectangle rec);
+    R intersection(R rec);
 
-    Rectangle intersection(Rectangle rec);
+    boolean contains(R rec);
 
-    boolean contains(Rectangle rec);
-
-    boolean contains(Point point);
-
-    boolean equals(Rectangle rec);
+    Range<?> getRange(int i);
 }

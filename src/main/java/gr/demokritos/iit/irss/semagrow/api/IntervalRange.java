@@ -61,18 +61,13 @@ public class IntervalRange implements Range<Integer> {
         return range;
     }
 
-    /*@Override
-     public long getLength() {
-        return high - low;
-    }*/
+    public boolean isUnit() { return (high == low); }
 
-    public int getLow() {
-        return low;
-    }
+    public long getLength() { return high - low; }
 
-    public int getHigh() {
-        return high;
-    }
+    public int getLow() { return low; }
+
+    public int getHigh() { return high; }
 
     public String toString() {
         return "(" + low + "," + high + ")";

@@ -59,11 +59,9 @@ public class ExplicitSetRange<T> implements Range<T> {
 		return range;
 	}
 
-    /*@Override
-    public long getLength() {
-        return items.size();
-    }*/
+    public boolean isUnit() { return getLength() == 1; }
 
+    public long getLength() { return items.size(); }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) {
