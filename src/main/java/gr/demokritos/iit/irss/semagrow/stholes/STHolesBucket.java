@@ -117,8 +117,8 @@ public class STHolesBucket {
 
         // Set statistics
         long newFrequency = b1.getFrequency() + b2.getFrequency();
-        ArrayList<Long> newDistinct = b1.getDistinct();
-        ArrayList<Long> curDistinct = b2.getDistinct();
+        List<Long> newDistinct = b1.getDistinct();
+        List<Long> curDistinct = b2.getDistinct();
 
         for (int i = 0; i < newDistinct.size(); i++) {
 
