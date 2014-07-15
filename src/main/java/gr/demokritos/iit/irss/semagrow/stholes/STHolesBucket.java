@@ -5,6 +5,7 @@ import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -13,15 +14,24 @@ import java.util.Vector;
 public class STHolesBucket {
 
     private Rectangle box ;
-    private long frequency;
-    private Collection<STHolesBucket> children;
-    private STHolesBucket parent;
-    private ArrayList<Long> distinct;
 
+    private long frequency;
+
+    private Collection<STHolesBucket> children;
+
+    private STHolesBucket parent;
+
+    private List<Long> distinct;
+
+    public STHolesBucket(Rectangle box, long frequency, List<Long> distinct) {
+        this.box = box;
+        this.frequency = frequency;
+        this.distinct = distinct;
+    }
 
     public STHolesBucket(Rectangle box, long frequency,
                          Collection<STHolesBucket> children,
-                         STHolesBucket parent, ArrayList<Long> distinct) {
+                         STHolesBucket parent, List<Long> distinct) {
         this.box = box;
         this.frequency = frequency;
         this.children = children;
@@ -45,7 +55,7 @@ public class STHolesBucket {
         return parent;
     }
 
-    public ArrayList<Long> getDistinct() {
+    public List<Long> getDistinct() {
         return distinct;
     }
 
@@ -71,7 +81,7 @@ public class STHolesBucket {
         Rectangle newBox = bp.getBox();
         long newFreq = bp.getFrequency();
 
-        ArrayList<Long> newDistinct = bp.getDistinct();
+        List<Long> newDistinct = bp.getDistinct();
         STHolesBucket newParent = bp.getParent();
 
         STHolesBucket bn = new STHolesBucket(newBox, newFreq, null, newParent, newDistinct);
@@ -95,7 +105,7 @@ public class STHolesBucket {
         this.frequency = frequency;
     }
 
-    public void setDistinct(Collection<Long> distinct) {
+    public void setDistinct(List<Long> distinct) {
         this.distinct = new ArrayList(distinct);
     }
 
@@ -106,6 +116,7 @@ public class STHolesBucket {
     public long getEstimate(Rectangle rec) {
 
         long estimate = frequency;
+
         for (int i=0; i< rec.getDimensionality(); i++) {
 
             if ((rec.getRange(i)).getLength() == 1)

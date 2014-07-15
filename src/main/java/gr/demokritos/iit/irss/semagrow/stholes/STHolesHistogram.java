@@ -57,7 +57,6 @@ public class STHolesHistogram implements STHistogram {
             return est;
     }
 
-
     public void refine(Iterable<QueryRecord> workload) {
 
         for (QueryRecord qfr : workload)
@@ -81,7 +80,6 @@ public class STHolesHistogram implements STHistogram {
         // check if histogram must be compacted after refinement
         compact();
     }
-
 
     /**
      * creates a new bucket that has a rectangle that does not intersect with the children of {bucket}
