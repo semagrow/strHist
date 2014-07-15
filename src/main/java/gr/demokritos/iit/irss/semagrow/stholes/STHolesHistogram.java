@@ -40,7 +40,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
             isEnclosingBucket = true;
 
-            for (STHolesBucket bc : b.getChildren()) {
+            for (STHolesBucket<R> bc : b.getChildren()) {
 
                 if ((bc.getBox()).contains(rec)) {
                     isEnclosingBucket = false;
@@ -96,7 +96,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
         Stat stats= countMatchingTuples(r, queryRecord);
 
-        STHolesBucket<R> b = new STHolesBucket(r, stats, null, null);
+        STHolesBucket<R> b = new STHolesBucket<R>(r, stats, null, null);
 
         return b;
     }
@@ -162,9 +162,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
             Stat parentStats = new Stat(candidateHole.getStatistics().getFrequency(),
                     candidateHole.getStatistics().getDistinctCount());
+            parentBucket.setStatistics(parentStats);
            // parentBucket.setFrequency(candidateHole.getFrequency());
            // parentBucket.setDistinct(candidateHole.getDistinct());
-
         }
         else {
 
@@ -191,7 +191,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         // call merge(b1,b2,bn)
     }
 
-    private AbstractMap.SimpleEntry<STHolesBucket<R>, Long>
+    private Map.Entry<STHolesBucket<R>, Long>
             getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
 
         R newBox = bp.getBox();
@@ -208,7 +208,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         return res;
     }
 
-    private AbstractMap.SimpleEntry<STHolesBucket<R>, Long>
+    private Map.Entry<STHolesBucket<R>, Long>
         getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
 
         //TODO: Rectangle newBox = getSiblingSiblingBox(b1,b2);

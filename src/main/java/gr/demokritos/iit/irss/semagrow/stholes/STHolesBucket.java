@@ -4,9 +4,7 @@ package gr.demokritos.iit.irss.semagrow.stholes;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.Stat;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by angel on 7/11/14.
@@ -15,15 +13,11 @@ public class STHolesBucket<R extends Rectangle> {
 
     private R box;
 
-    private long frequency;
-
     private Collection<STHolesBucket<R>> children;
 
     private Stat statistics;
 
     private STHolesBucket parent;
-
-    private List<Long> distinct;
 
     public STHolesBucket(R box, Stat statistics) {
         this.box = box;
@@ -33,10 +27,9 @@ public class STHolesBucket<R extends Rectangle> {
     public STHolesBucket(R box, Stat statistics,
                          Collection<STHolesBucket<R>> children,
                          STHolesBucket parent) {
-        this.box = box;
-        this.statistics = statistics;
+        this(box,statistics);
         this.children = children;
-        this.parent = parent;
+        setParent(parent);
     }
 
     public R getBox() {
@@ -51,7 +44,7 @@ public class STHolesBucket<R extends Rectangle> {
         return children;
     }
 
-    public STHolesBucket getParent() {
+    public STHolesBucket<R> getParent() {
         return parent;
     }
 
@@ -66,7 +59,9 @@ public class STHolesBucket<R extends Rectangle> {
 
     public static <R extends Rectangle<R>> 
         void merge(STHolesBucket<R> bucket1,
-                   STHolesBucket<R> bucket2, STHolesBucket<R> mergeBucket) {
+                   STHolesBucket<R> bucket2,
+                   STHolesBucket<R> mergeBucket)
+    {
         if (bucket2.getParent() == bucket1) { //or equals
             parentChildMerge(bucket1, bucket2, mergeBucket);
         }
@@ -79,12 +74,12 @@ public class STHolesBucket<R extends Rectangle> {
         parentChildMerge(STHolesBucket<R> bp, STHolesBucket<R> bc, STHolesBucket<R> bn) {
 
         //Merge buckets b1, b2 into bn
-        STHolesBucket bpp = bp.getParent();
+        STHolesBucket<R> bpp = bp.getParent();
         bpp.removeChild(bp);
         bpp.addChild(bn);
         bn.setParent(bpp);
 
-        for (STHolesBucket bi : bc.getChildren())
+        for (STHolesBucket<R> bi : bc.getChildren())
             bi.setParent(bn);
 
         //return bn;
@@ -95,13 +90,13 @@ public class STHolesBucket<R extends Rectangle> {
                                  STHolesBucket<R> b2,
                                  STHolesBucket<R> bn) 
     {
-        STHolesBucket newParent = b1.getParent();
+        STHolesBucket<R> newParent = b1.getParent();
 
         // Merge buckets b1, b2 into bn
         bn.setParent(newParent);
         newParent.addChild(bn);
 
-        for (STHolesBucket bi : bn.getChildren()) {
+        for (STHolesBucket<R> bi : bn.getChildren()) {
 
             bi.setParent(bn);
             newParent.removeChild(bi);
@@ -116,9 +111,6 @@ public class STHolesBucket<R extends Rectangle> {
         this.statistics = statistics;
     }
 
-    public void setDistinct(List<Long> distinct) {
-        this.distinct = new ArrayList(distinct);
-    }
 
     public void setParent(STHolesBucket<R> parent) {
         this.parent = parent;
