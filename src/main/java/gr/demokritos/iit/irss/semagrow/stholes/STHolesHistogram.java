@@ -144,7 +144,7 @@ public class STHolesHistogram implements STHistogram {
 
     /**
      * Count the tuples of the query result set that match the criteria of the given bucket.
-     * @param bucket
+     * @param rectangle
      * @param queryRecord
      * @return
      */
