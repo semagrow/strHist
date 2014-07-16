@@ -9,4 +9,6 @@ public interface Rangeable<R> {
 
     boolean contains(R rect);
 
+    boolean intersects(R rect);
+
 }

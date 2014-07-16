@@ -69,7 +69,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
         for (STHolesBucket bucket : candidates) {
 
-            STHolesBucket hole = shrink(bucket, queryRecord);
+            STHolesBucket hole = shrink(bucket, queryRecord); //calculate intersection and shrink it
 
             //if (inaccurateEstimation())
             if (true)
@@ -128,10 +128,11 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
         R c = b.getBox();
 
-        c = c.intersection(queryBox);
 
-        if (c != null)
+        if (!c.intersects(queryBox)) {
             candidates.add(b);
+        }
+
 
         for (STHolesBucket bc : b.getChildren())
             getCandidateBucketsAux(bc,candidates,queryBox);

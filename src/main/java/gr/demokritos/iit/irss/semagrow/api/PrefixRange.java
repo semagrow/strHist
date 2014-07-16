@@ -1,5 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
+import java.util.ArrayList;
+
 /**
  * Defines a subset of all the strings that have a common prefix.
  * Created by angel on 7/12/14.
@@ -7,52 +9,112 @@ package gr.demokritos.iit.irss.semagrow.api;
 public class PrefixRange
         implements Range<String>, Rangeable<PrefixRange> {
 
-    private String prefix;
+    private ArrayList<String> prefixList;
 
-    public PrefixRange(String prefix) {
-        this.prefix = prefix;
+    public PrefixRange(ArrayList<String> prefix) {
+        this.prefixList = prefix;
     }
 
     public boolean contains(String item) {
-        return item.startsWith(prefix);
+
+        for (String p : prefixList) {
+
+            if (item.startsWith(p)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean contains(PrefixRange range) {
-        return range.getPrefix().startsWith(prefix);
+
+        for (String p : prefixList) {
+
+            for (String otherP : range.getPrefixList()) {
+
+                if (otherP.startsWith(p)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean intersects(PrefixRange range) {
+
+        for (String myP : prefixList) {
+
+            for (String otherP : range.getPrefixList()) {
+
+                if ((myP.startsWith(otherP) ||
+                        (otherP.startsWith(myP)))) {
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public PrefixRange intersection(PrefixRange range) {
 
-        String otherPrefix = range.getPrefix();
+        ArrayList<String> intersectionPrefixList = new ArrayList<String>();
 
-        if (prefix.startsWith(otherPrefix)) {
-            return new PrefixRange(prefix);
-        } else if (otherPrefix.startsWith(prefix)) {
-            return new PrefixRange(otherPrefix);
+        for (String myP : prefixList) {
+
+            for (String otherP : range.getPrefixList()) {
+
+                if ((myP.startsWith(otherP))) {
+
+                    intersectionPrefixList.add(myP);
+
+                } else if (otherP.startsWith(myP)) {
+
+                    intersectionPrefixList.add(otherP);
+                }
+            }
         }
 
-        return range;
+
+        return new PrefixRange(intersectionPrefixList);
     }
 
-    public boolean isUnit() { return true; }
+    public boolean isUnit() { return (prefixList.size() == 1); }
 
-    public String getPrefix() {
-        return prefix;
+    public ArrayList<String> getPrefixList() {
+        return prefixList;
     }
 
     public String toString() {
-        return prefix;
+
+        String res;
+
+        res = "[";
+
+        for (String p : prefixList) {
+
+            res = res + p + " ";
+        }
+
+        res += "]";
+        return res;
     }
 
     public static void main(String [] args){
-        PrefixRange myRange = new PrefixRange("http://a/");
+
+        ArrayList<String> myRangePrefixList = new ArrayList<String>();
+        myRangePrefixList.add("http://a/");
+        PrefixRange myRange = new PrefixRange(myRangePrefixList);
         String item1 = "http://a/b/c/d";
         String item2 = "http://b/c";
         boolean res1 = myRange.contains(item1);
         boolean res2 = myRange.contains(item2);
 
         // Test getters
-        System.out.println("My range is " + myRange.getPrefix());
+        System.out.println("My range is " + myRange.getPrefixList());
         //Test contains item method
         if (res1)
             System.out.println("My range contains " + item1);
@@ -64,8 +126,12 @@ public class PrefixRange
         else
             System.out.println("Test failed");
         //Test contains range method
-        PrefixRange testRange1 = new PrefixRange("http://a/b");
-        PrefixRange testRange2 = new PrefixRange("http://b");
+        ArrayList<String> testRange1PrefixList = new ArrayList<String>();
+        ArrayList<String> testRange2PrefixList = new ArrayList<String>();
+        testRange1PrefixList.add("http://a/b");
+        testRange2PrefixList.add("http://b");
+        PrefixRange testRange1 = new PrefixRange(testRange1PrefixList);
+        PrefixRange testRange2 = new PrefixRange(testRange2PrefixList);
 
         res1 = myRange.contains(testRange1);
         res2 = myRange.contains(testRange2);
@@ -76,16 +142,19 @@ public class PrefixRange
                 + testRange2.toString() + ": " + res2);
 
         //Test intersection method
-        testRange1 = new PrefixRange("http://a/b");
-        testRange2 = new PrefixRange("http://");
-        PrefixRange testRange3 = new PrefixRange("http://b");
+        testRange2PrefixList.clear();
+        testRange2PrefixList.add("http://");
+        testRange2 = new PrefixRange(testRange2PrefixList);
+        ArrayList<String> testRange3PrefixList = new ArrayList<String>();
+        testRange3PrefixList.add("http://b");
+        PrefixRange testRange3 = new PrefixRange(testRange3PrefixList);
 
 
-        PrefixRange intersection1 = (PrefixRange) myRange.intersection(
+        PrefixRange intersection1 = myRange.intersection(
                 testRange1);
-        PrefixRange intersection2 = (PrefixRange) myRange.intersection(
+        PrefixRange intersection2 = myRange.intersection(
                 testRange2);
-        PrefixRange intersection3 = (PrefixRange) myRange.intersection(
+        PrefixRange intersection3 = myRange.intersection(
                 testRange3);
 
         System.out.println("Intersection of range " + myRange.toString() +
