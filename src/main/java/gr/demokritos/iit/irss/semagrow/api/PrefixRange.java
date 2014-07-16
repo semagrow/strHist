@@ -21,6 +21,11 @@ public class PrefixRange
         return range.getPrefix().startsWith(prefix);
     }
 
+    @Override
+    public boolean intersects(PrefixRange rect) {
+        return false;
+    }
+
     public PrefixRange intersection(PrefixRange range) {
 
         String otherPrefix = range.getPrefix();

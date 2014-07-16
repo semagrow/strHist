@@ -7,7 +7,7 @@ import static java.lang.Math.min;
  * Defines a set of numbers that lies on an interval
  * Created by angel on 7/12/14.
  */
-public class IntervalRange implements RangeLength<Integer> {
+public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<IntervalRange> {
 
     private int low;
 
@@ -18,49 +18,41 @@ public class IntervalRange implements RangeLength<Integer> {
         this.high = high;
     }
 
-    public boolean contains(Integer item) {
+    public boolean contains(int item) {
         return (item >= low) && (item <= high);
     }
 
-    public boolean contains(Range<Integer> range) {
+    public boolean contains(IntervalRange range) {
 
-        if (range instanceof  IntervalRange) {
-            return (((IntervalRange) range).getLow() >= low) &&
-                    (((IntervalRange) range).getHigh() <= high);
-        }
+        return (range.getLow() >= low) &
+                (range.getHigh() <= high);
+
+    }
+
+    @Override
+    public boolean intersects(IntervalRange rect) {
+
         return false;
     }
 
-    public Range<Integer> intersect(Range<Integer> range) {
+    public IntervalRange intersection(IntervalRange range) {
 
-        if (range instanceof IntervalRange) {
             IntervalRange res;
 
-            int nLow = max(low, ((IntervalRange) range).getLow());
-            int nHigh = min(high, ((IntervalRange) range).getHigh());
+            int nLow = max(low, range.getLow());
+            int nHigh = min(high, range.getHigh());
 
             if (nLow <= nHigh) {
+
                 res = new IntervalRange(nLow, nHigh);
             } else {
+
                 res = null;
             }
+
             return res;
-        }
-        return range;
     }
 
-    public Range<Integer> union(Range<Integer> range) {
-
-        if (range instanceof IntervalRange) {
-            IntervalRange res;
-
-            int nLow = min(low, ((IntervalRange) range).getLow());
-            int nHigh = max(high, ((IntervalRange) range).getHigh());
-            res = new IntervalRange(nLow, nHigh);
-            return res;
-        }
-        return range;
-    }
 
     public boolean isUnit() { return (high == low); }
 
@@ -112,11 +104,11 @@ public class IntervalRange implements RangeLength<Integer> {
         IntervalRange testRange3 = new IntervalRange(8,10);
 
 
-        IntervalRange intersection1 = (IntervalRange) myRange.intersect(
+        IntervalRange intersection1 = (IntervalRange) myRange.intersection(
                 testRange1);
-        IntervalRange intersection2 = (IntervalRange) myRange.intersect(
+        IntervalRange intersection2 = (IntervalRange) myRange.intersection(
                 testRange2);
-        IntervalRange intersection3 = (IntervalRange) myRange.intersect(
+        IntervalRange intersection3 = (IntervalRange) myRange.intersection(
                 testRange3);
 
         System.out.println("Intersection of range " + myRange.toString() +
@@ -126,16 +118,5 @@ public class IntervalRange implements RangeLength<Integer> {
         System.out.println("Intersection of range " + myRange.toString() +
                 " and range " + testRange3.toString() + ":" + intersection3);
 
-        //Test union method
-        IntervalRange union1 = (IntervalRange) myRange.union(testRange1);
-        IntervalRange union2 = (IntervalRange) myRange.union(testRange2);
-        IntervalRange union3 = (IntervalRange) myRange.union(testRange3);
-
-        System.out.println("Union of range " + myRange.toString() + " and " +
-                "range " + testRange1.toString() + ":" + union1);
-        System.out.println("Union of range " + myRange.toString() + " and " +
-                "range " + testRange2.toString() + ":" + union2);
-        System.out.println("Union of range " + myRange.toString() + " and " +
-                "range " + testRange3.toString() + ":" + union3);
     }
 }

@@ -21,4 +21,9 @@ public class RDFLiteralRange
     public boolean contains(RDFLiteralRange rect) {
         return false;
     }
+
+    @Override
+    public boolean intersects(RDFLiteralRange rect) {
+        return false;
+    }
 }
