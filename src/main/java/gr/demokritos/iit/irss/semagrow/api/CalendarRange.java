@@ -39,7 +39,7 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
         return false;
     }
 
-    @Override
+
     public boolean intersects(CalendarRange range) {
 
         CalendarRange res;
@@ -66,7 +66,8 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
 
         return true;
     }
-    @Override
+
+
     public CalendarRange intersection(CalendarRange range) {
 
         CalendarRange res;

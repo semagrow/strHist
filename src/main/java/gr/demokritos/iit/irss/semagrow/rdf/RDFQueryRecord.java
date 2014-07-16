@@ -8,15 +8,21 @@ import gr.demokritos.iit.irss.semagrow.api.QueryResult;
  */
 public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 
-    @Override
-    public RDFRectangle getRectangle() {
-        return null;
-    }
+	
 
-    @Override
-    public QueryResult<RDFRectangle> getResultSet() {
 
-        return null;
-    }
+	public RDFRectangle getRectangle() {
+		return null;
+	}
+
+
+	public QueryResult<RDFRectangle> getResultSet() {
+		return null;
+	}
+
+
+	public String getQuery() {
+		return null;
+	}
 
 }

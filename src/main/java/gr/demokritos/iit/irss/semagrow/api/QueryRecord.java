@@ -6,6 +6,8 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface QueryRecord<R extends Rectangle<R>> {
 
+    String getQuery();
+
     R getRectangle();
 
     QueryResult getResultSet();

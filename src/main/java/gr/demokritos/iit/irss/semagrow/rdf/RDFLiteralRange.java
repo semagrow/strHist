@@ -18,6 +18,7 @@ public class RDFLiteralRange
     private URI valueType;
     private Range<?> range;
 
+
     public RDFLiteralRange(URI valueType, Range<?> range) {
 
         this.valueType = valueType;
@@ -44,7 +45,6 @@ public class RDFLiteralRange
     public RDFLiteralRange(XMLGregorianCalendar begin, XMLGregorianCalendar end) {
         this(XMLSchema.DATETIME, new CalendarRange(begin, end));
     }
-
 
 
     public boolean isUnit() {
@@ -114,7 +114,7 @@ public class RDFLiteralRange
         return false;
     }
 
-    @Override
+    
     public boolean intersects(RDFLiteralRange literalRange) {
 
         if (valueType.equals(literalRange.getValueType()))
