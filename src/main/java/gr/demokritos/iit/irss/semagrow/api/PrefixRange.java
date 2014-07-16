@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Created by angel on 7/12/14.
  */
 public class PrefixRange
-        implements Range<String>, Rangeable<PrefixRange> {
+        implements RangeLength<String>, Rangeable<PrefixRange> {
 
     private ArrayList<String> prefixList;
 
@@ -187,5 +187,10 @@ public class PrefixRange
         System.out.println("Intersection of range " + myRange.toString() +
                 " and range " + testRange3.toString() + ": "  + intersection3);
 
+    }
+
+    @Override
+    public long getLength() {
+        return prefixList.size();
     }
 }

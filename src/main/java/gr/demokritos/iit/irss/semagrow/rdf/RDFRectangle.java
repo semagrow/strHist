@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.rdf;
 
 import gr.demokritos.iit.irss.semagrow.api.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,8 +77,55 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
     }
 
 
-    public RDFRectangle shrink(RDFRectangle rec) {
-        return this;
+    // Shrink rectangle so that it does not intersect with rec
+    public void shrink(RDFRectangle rec) {
+
+        PrefixRange subjectRangeN = subjectRange.minus(rec.subjectRange);
+        ExplicitSetRange<String> predicateRangeN = predicateRange.minus(rec.predicateRange);
+        RDFLiteralRange objectRangeN = objectRange.minus(rec.objectRange);
+
+        ArrayList<Long> lengths = new ArrayList<Long>();
+        long subjectNLength = subjectRangeN.getLength();
+        lengths.add(subjectNLength);
+        long predicateNLength = predicateRangeN.getLength();
+        lengths.add(predicateNLength);
+        long objectNLength = objectRangeN.getLength();
+        lengths.add(objectNLength);
+
+        long largest = lengths.get(0);
+        int j = 0; //dimension
+        for (int i = 0; i < lengths.size(); i++) {
+
+            if ( lengths.get(i) > largest ) {
+                
+                largest = lengths.get(i);
+                j = i;
+            }
+        }
+
+        switch (j) {
+            case 1:
+                setSubjectRange(subjectRangeN);
+            case 2:
+                setPredicateRange(predicateRangeN);
+            case 3:
+                setObjectRange(objectRangeN);
+            default:
+                throw new IllegalArgumentException("Dimension " + j
+                        + " is not valid");
+        }
+
     }
 
+    public void setObjectRange(RDFLiteralRange objectRange) {
+        this.objectRange = objectRange;
+    }
+
+    public void setPredicateRange(ExplicitSetRange<String> predicateRange) {
+        this.predicateRange = predicateRange;
+    }
+
+    public void setSubjectRange(PrefixRange subjectRange) {
+        this.subjectRange = subjectRange;
+    }
 }

@@ -12,14 +12,14 @@ import java.util.ArrayList;
  * Created by angel on 7/15/14.
  */
 public class RDFLiteralRange
-        implements Range<Value>, Rangeable<RDFLiteralRange>
+        implements RangeLength<Value>, Rangeable<RDFLiteralRange>
 {
 
     private URI valueType;
-    private Range<?> range;
+    private RangeLength<?> range;
 
 
-    public RDFLiteralRange(URI valueType, Range<?> range) {
+    public RDFLiteralRange(URI valueType, RangeLength<?> range) {
 
         this.valueType = valueType;
         this.range = range;
@@ -160,7 +160,13 @@ public class RDFLiteralRange
         return range;
     }
 
-    public void setRange(Range<?> range) {
+    public void setRange(RangeLength<?> range) {
         this.range = range;
+    }
+
+    @Override
+    public long getLength() {
+
+        return range.getLength();
     }
 }
