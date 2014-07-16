@@ -9,51 +9,60 @@ import java.util.List;
  */
 public class RDFRectangle implements Rectangle<RDFRectangle> {
 
-    private PrefixRange subjectRange;
+	private PrefixRange subjectRange;
 
-    private ExplicitSetRange<String> predicateRange;
+	private ExplicitSetRange<String> predicateRange;
 
-    //private Range<Object> objectRange;
-    private RDFLiteralRange objectRange;
+	// private Range<Object> objectRange;
+	private RDFLiteralRange objectRange;
 
-    public RDFRectangle(PrefixRange subjectRange,
-                        ExplicitSetRange<String> predicateRange,
-                        RDFLiteralRange objectRange) {
-        this.subjectRange = subjectRange;
-        this.predicateRange = predicateRange;
-        this.objectRange = objectRange;
-    }
 
-    public int getDimensionality() { return 3; }
+	public RDFRectangle(PrefixRange subjectRange,
+			ExplicitSetRange<String> predicateRange, RDFLiteralRange objectRange) {
+		this.subjectRange = subjectRange;
+		this.predicateRange = predicateRange;
+		this.objectRange = objectRange;
+	}
 
-    @Override
-    public RDFRectangle intersection(RDFRectangle rec) {
-        return new RDFRectangle(subjectRange.intersection(rec.subjectRange),
-                                predicateRange.intersection(rec.predicateRange),
-                                objectRange.intersection(rec.objectRange));
-    }
 
-    @Override
-    public boolean contains(RDFRectangle rec) {
-        return subjectRange.contains(rec.subjectRange) &&
-               predicateRange.contains(rec.predicateRange) &&
-               objectRange.contains(rec.objectRange);
-    }
+	public int getDimensionality() {
+		return 3;
+	}
 
-    public boolean equals(RDFRectangle rec) {
-        return this.contains(rec) && rec.contains(this);
-    }
 
-    public Range<?> getRange(int i) {
+	public RDFRectangle intersection(RDFRectangle rec) {
+		return new RDFRectangle(subjectRange.intersection(rec.subjectRange),
+				predicateRange.intersection(rec.predicateRange),
+				objectRange.intersection(rec.objectRange));
+	}
 
-        switch (i) {
-            case 1: return subjectRange;
-            case 2: return predicateRange;
-            case 3: return objectRange;
-            default:
-                throw new IllegalArgumentException("Dimension " + i + " is not valid");
-        }
 
-    }
+	public boolean contains(RDFRectangle rec) {
+		return subjectRange.contains(rec.subjectRange)
+				&& predicateRange.contains(rec.predicateRange)
+				&& objectRange.contains(rec.objectRange);
+	}
+
+
+	public boolean equals(RDFRectangle rec) {
+		return this.contains(rec) && rec.contains(this);
+	}
+
+
+	public Range<?> getRange(int i) {
+
+		switch (i) {
+		case 1:
+			return subjectRange;
+		case 2:
+			return predicateRange;
+		case 3:
+			return objectRange;
+		default:
+			throw new IllegalArgumentException("Dimension " + i
+					+ " is not valid");
+		}
+
+	}
 
 }
