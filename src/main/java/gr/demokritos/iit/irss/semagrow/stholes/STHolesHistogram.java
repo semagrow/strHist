@@ -89,16 +89,50 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      */
     private STHolesBucket<R> shrink(STHolesBucket<R> bucket, QueryRecord<R> queryRecord) {
 
+        // Find candidate hole
+        R c = bucket.getBox().intersection(queryRecord.getRectangle());
+
+        // Shrink candidate hole
+        List<STHolesBucket<R>> participants = new LinkedList<STHolesBucket<R>>();
+
+
+            for (STHolesBucket<R> participant : participants) {
+
+                c.shrink(participant.getBox());
+                updateParticipants(participants, bucket, c);
+
+                if (participants.isEmpty()) {
+
+                    break;
+                }
+            }
+
+
         //TODO: create a new rectangle / this is not the way to do it!
-        R r = bucket.getBox();
+        //R r = bucket.getBox();
 
         //TODO: shrink in such a way that b does not intersect with the rectangles of bucket.getChildren();
 
-        Stat stats= countMatchingTuples(r, queryRecord);
+        // Collect candidate hole statistics
+        Stat stats= countMatchingTuples(c, queryRecord);
 
-        STHolesBucket<R> b = new STHolesBucket<R>(r, stats, null, null);
+        // Create candidate hole bucket
+        STHolesBucket<R> b = new STHolesBucket<R>(c, stats, null, null);
 
         return b;
+    }
+
+    private void updateParticipants(List<STHolesBucket<R>> participants,
+                                    STHolesBucket<R> bucket, R c) {
+
+        participants.clear();
+
+        for (STHolesBucket<R> bi : bucket.getChildren()) {
+            if ((c.intersects(bi.getBox())) && (!c.contains(bi.getBox()))) {
+
+                participants.add(bi);
+            }
+        }
     }
 
     /**

@@ -114,7 +114,7 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
 
             endN = calendarRange.begin;
         }
-        
+
         return new CalendarRange(beginN, endN);
     }
 
