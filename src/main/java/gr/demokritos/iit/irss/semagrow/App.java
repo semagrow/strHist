@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 
 /**
@@ -9,11 +10,14 @@ import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
  */
 public class App 
 {
+
+    private static STHistogram h;
+
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
-        
-        STHistogram h = new STHolesHistogram();
+
+        h = new RDFSTHolesHistogram();
+
         while( true ) {
         	// open query log file
         	
@@ -22,4 +26,5 @@ public class App
 //        	 h.refine( workload );
         }
     }
+
 }

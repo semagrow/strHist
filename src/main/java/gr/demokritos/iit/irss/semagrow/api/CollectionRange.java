@@ -10,9 +10,7 @@ public class CollectionRange<T> implements Range<T> {
 
     private Collection<Range<T>> ranges;
 
-    public CollectionRange() {
-
-    }
+    public CollectionRange() { }
 
     public CollectionRange(Collection<Range<T>> ranges) {
         // do some checking first??
@@ -34,4 +32,7 @@ public class CollectionRange<T> implements Range<T> {
     public Range<T> union(Range<T> range) {
         return null;
     }
+
+    public boolean isUnit() { return (ranges.size() == 1 && ranges.iterator().next().isUnit()); }
+
 }

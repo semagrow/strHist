@@ -8,62 +8,35 @@ import java.util.Set;
  * Defines a set of T explicitly by defining each member of the set. Created by
  * angel on 7/12/14.
  */
-public class ExplicitSetRange<T> implements Range<T> {
+public class ExplicitSetRange<T>
+        implements RangeLength<T>, Rangeable<ExplicitSetRange<T>>
+{
 
 	private Set<T> items;
-
 
 	public ExplicitSetRange(Collection<T> items) {
 		this.items = new HashSet<T>(items);
 	}
 
 
-	public boolean contains(T item) {
-		return items.contains(item);
+	public boolean contains(ExplicitSetRange<T> range) {
+        return items.containsAll(range.items);
 	}
 
 
-	public boolean contains(Range<T> range) {
-		if (range instanceof ExplicitSetRange)
-			return items.containsAll(((ExplicitSetRange) range).items);
-		
-		return false;
+	public ExplicitSetRange<T> intersection(ExplicitSetRange<T> range) {
+
+        ExplicitSetRange<T> esr = new ExplicitSetRange<T>(range.items);
+
+        esr.items.retainAll(this.items);
+
+        return esr;
 	}
 
 
-	public Range<T> intersect(Range<T> range) {
-		if (range instanceof ExplicitSetRange) {
+    public boolean isUnit() { return getLength() == 1; }
 
-			ExplicitSetRange esr = new ExplicitSetRange(
-					((ExplicitSetRange) range).items);
-
-			((ExplicitSetRange) esr).items.retainAll(this.items);
-
-			return esr;
-		}
-		return range;
-	}
-
-
-	public Range<T> union(Range<T> range) {
-		if (range instanceof ExplicitSetRange) {
-			
-			ExplicitSetRange esr = new ExplicitSetRange(
-					((ExplicitSetRange) range).items);
-			
-			((ExplicitSetRange) esr).items.addAll(this.items);
-			
-			return esr;
-		}
-
-		return range;
-	}
-
-    /*@Override
-    public long getLength() {
-        return items.size();
-    }*/
-
+    public long getLength() { return items.size(); }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) {
@@ -79,13 +52,8 @@ public class ExplicitSetRange<T> implements Range<T> {
 		s2.add('d');
 		ExplicitSetRange esr2 = new ExplicitSetRange(s2);
 
-		ExplicitSetRange<String> esr = (ExplicitSetRange) esr1.intersect(esr2);
+		ExplicitSetRange<String> esr = (ExplicitSetRange) esr1.intersection(esr2);
 		Set<String> sss = ((ExplicitSetRange) esr).items;
-		System.out.println("Intesect: " + sss.toString());	
-		
-		esr = (ExplicitSetRange) esr1.union(esr2);
-		sss = ((ExplicitSetRange) esr).items;
-		System.out.println("Union: " + sss.toString());
-
+		System.out.println("Intesect: " + sss.toString());
 	}
 }

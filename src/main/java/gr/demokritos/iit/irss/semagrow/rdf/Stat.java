@@ -31,4 +31,16 @@ public class Stat {
     public void setDistinctCount(List<Long> distinctCount) {
         this.distinctCount = distinctCount;
     }
+
+    public Double getDensity() {
+        Long d = (long)1;
+        for (Long l : getDistinctCount())
+            if (l != null)
+                d *= l;
+
+        if (d != 0)
+            return ((double)getFrequency()) / d;
+        else
+            return (double)0;
+    }
 }

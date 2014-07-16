@@ -5,13 +5,5 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface Range<T> {
 
-    boolean contains(T item);
-
-    boolean contains(Range<T> range);
-
-    Range<T> intersect(Range<T> range);
-
-    Range<T> union(Range<T> range);
-
-    //long getLength();
+    boolean isUnit();
 }
