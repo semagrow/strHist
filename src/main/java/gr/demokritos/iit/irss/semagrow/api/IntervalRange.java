@@ -61,6 +61,20 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
             return res;
     }
 
+    @Override
+    public IntervalRange minus(IntervalRange intervalRange) {
+        int lowN = low;
+        int highN = high;
+
+        if (intervalRange.low <= this.low)
+            lowN = intervalRange.high;
+
+        if (intervalRange.high >= this.high)
+            highN = intervalRange.low;
+
+        return new IntervalRange(lowN, highN);
+    }
+
 
     public boolean isUnit() { return (high == low); }
 

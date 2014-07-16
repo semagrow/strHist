@@ -82,6 +82,11 @@ public class PrefixRange
         return new PrefixRange(intersectionPrefixList);
     }
 
+    @Override
+    public PrefixRange minus(PrefixRange prefixRange) {
+        return null;
+    }
+
     public boolean isUnit() { return (prefixList.size() == 1); }
 
     public ArrayList<String> getPrefixList() {

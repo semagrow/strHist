@@ -19,4 +19,6 @@ public interface Rectangle<R> {
     Range<?> getRange(int i);
 
     boolean intersects(R rec);
+
+    R shrink(R rec);
 }

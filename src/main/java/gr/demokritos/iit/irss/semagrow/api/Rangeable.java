@@ -5,10 +5,12 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface Rangeable<R> {
 
-    R intersection(R rect);
+    R intersection(R r);
 
-    boolean contains(R rect);
+    R minus(R r);
 
-    boolean intersects(R rect);
+    boolean contains(R r);
+
+    boolean intersects(R r);
 
 }

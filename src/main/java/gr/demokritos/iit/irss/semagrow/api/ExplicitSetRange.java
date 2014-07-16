@@ -47,6 +47,14 @@ public class ExplicitSetRange<T>
         return esr;
 	}
 
+    @Override
+    public ExplicitSetRange<T> minus(ExplicitSetRange<T> tExplicitSetRange) {
+        Set<T> set = new HashSet<T>(this.items);
+        set.removeAll(tExplicitSetRange.items);
+        ExplicitSetRange<T> r = new ExplicitSetRange<T>(set);
+        return r;
+    }
+
 
     public boolean isUnit() { return getLength() == 1; }
 
