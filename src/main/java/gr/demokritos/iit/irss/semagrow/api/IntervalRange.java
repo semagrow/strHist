@@ -30,9 +30,17 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
     }
 
     @Override
-    public boolean intersects(IntervalRange rect) {
+    public boolean intersects(IntervalRange range) {
 
-        return false;
+        int nLow = max(low, range.getLow());
+        int nHigh = min(high, range.getHigh());
+
+        if (nLow > nHigh) {
+
+            return false;
+        }
+
+        return true;
     }
 
     public IntervalRange intersection(IntervalRange range) {

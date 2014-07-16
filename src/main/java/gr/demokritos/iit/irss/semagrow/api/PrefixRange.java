@@ -22,8 +22,17 @@ public class PrefixRange
     }
 
     @Override
-    public boolean intersects(PrefixRange rect) {
-        return false;
+    public boolean intersects(PrefixRange range) {
+
+        String otherPrefix = range.getPrefix();
+
+        if (!((prefix.startsWith(otherPrefix)) ||
+                (otherPrefix.startsWith(prefix)))) {
+
+            return false;
+        }
+
+        return true;
     }
 
     public PrefixRange intersection(PrefixRange range) {
@@ -86,11 +95,11 @@ public class PrefixRange
         PrefixRange testRange3 = new PrefixRange("http://b");
 
 
-        PrefixRange intersection1 = (PrefixRange) myRange.intersection(
+        PrefixRange intersection1 = myRange.intersection(
                 testRange1);
-        PrefixRange intersection2 = (PrefixRange) myRange.intersection(
+        PrefixRange intersection2 = myRange.intersection(
                 testRange2);
-        PrefixRange intersection3 = (PrefixRange) myRange.intersection(
+        PrefixRange intersection3 = myRange.intersection(
                 testRange3);
 
         System.out.println("Intersection of range " + myRange.toString() +
