@@ -75,4 +75,9 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         return res;
     }
 
+
+    public RDFRectangle shrink(RDFRectangle rec) {
+        return this;
+    }
+
 }

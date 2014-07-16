@@ -85,6 +85,11 @@ public class RDFLiteralRange
         return res;
     }
 
+
+    public RDFLiteralRange minus(RDFLiteralRange rdfLiteralRange) {
+        return null;
+    }
+
     public boolean contains(RDFLiteralRange literalRange) {
 
 

@@ -1,5 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.parsing;
 
+import gr.demokritos.iit.irss.semagrow.rdf.RDFQueryRecord;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;

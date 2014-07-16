@@ -99,6 +99,11 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
     }
 
 
+    public CalendarRange minus(CalendarRange calendarRange) {
+        return null;
+    }
+
+
     public boolean isUnit() {
 
         return begin.toGregorianCalendar().equals(
