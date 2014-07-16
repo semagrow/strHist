@@ -17,4 +17,6 @@ public interface Rectangle<R> {
     boolean contains(R rec);
 
     Range<?> getRange(int i);
+
+    boolean intersects(R rec);
 }

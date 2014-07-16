@@ -23,8 +23,22 @@ public class ExplicitSetRange<T>
         return items.containsAll(range.items);
 	}
 
+    @Override
+    public boolean intersects(ExplicitSetRange<T> range) {
 
-	public ExplicitSetRange<T> intersection(ExplicitSetRange<T> range) {
+        ExplicitSetRange<T> esr = new ExplicitSetRange<T>(range.items);
+
+        esr.items.retainAll(this.items);
+
+        if (esr.getLength() == 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public ExplicitSetRange<T> intersection(ExplicitSetRange<T> range) {
 
         ExplicitSetRange<T> esr = new ExplicitSetRange<T>(range.items);
 
@@ -54,6 +68,6 @@ public class ExplicitSetRange<T>
 
 		ExplicitSetRange<String> esr = (ExplicitSetRange) esr1.intersection(esr2);
 		Set<String> sss = ((ExplicitSetRange) esr).items;
-		System.out.println("Intesect: " + sss.toString());
+		System.out.println("Intersect: " + sss.toString());
 	}
 }

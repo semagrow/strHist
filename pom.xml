@@ -14,8 +14,31 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+    <repositories>
+
+        <repository>
+            <id>swc-semagrow</id>
+            <name>SWC SemaGrow Repository</name>
+            <url>http://semagrow.semantic-web.at/mvn/</url>
+            <snapshots>
+                <updatePolicy>always</updatePolicy>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>maven-central</id>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+    </repositories>
+
   <dependencies>
-    <dependency>
+      <dependency>
+          <groupId>org.openrdf.sesame</groupId>
+          <artifactId>openrdf-sesame</artifactId>
+          <version>2.7.10</version>
+          <classifier>onejar</classifier>
+      </dependency>
+      <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
