@@ -62,7 +62,7 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         boolean res = subjectRange.intersects(rec.subjectRange) &&
                 predicateRange.intersects(rec.predicateRange) &&
                 objectRange.intersects(rec.objectRange);
-        
+
         return res;
     }
 
