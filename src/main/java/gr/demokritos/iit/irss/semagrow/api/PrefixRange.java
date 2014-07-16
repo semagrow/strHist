@@ -36,8 +36,6 @@ public class PrefixRange
 
     public boolean isUnit() { return true; }
 
-    public long getLength(){ return 1; }
-
     public String getPrefix() {
         return prefix;
     }

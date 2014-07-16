@@ -7,9 +7,10 @@ import static java.lang.Math.min;
  * Defines a set of numbers that lies on an interval
  * Created by angel on 7/12/14.
  */
-public class IntervalRange implements Range<Integer> {
+public class IntervalRange implements RangeLength<Integer> {
 
     private int low;
+
     private int high;
 
     public IntervalRange(int low, int high) {

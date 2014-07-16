@@ -35,11 +35,4 @@ public class CollectionRange<T> implements Range<T> {
 
     public boolean isUnit() { return (ranges.size() == 1 && ranges.iterator().next().isUnit()); }
 
-    public long getLength() {
-        long l = 0;
-        for (Range<T> r : ranges)
-            l += r.getLength();
-
-        return l;
-    }
 }

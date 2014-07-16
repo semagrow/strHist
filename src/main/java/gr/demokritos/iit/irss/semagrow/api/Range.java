@@ -5,7 +5,5 @@ package gr.demokritos.iit.irss.semagrow.api;
  */
 public interface Range<T> {
 
-    long getLength();
-
     boolean isUnit();
 }

@@ -9,7 +9,7 @@ import java.util.Set;
  * angel on 7/12/14.
  */
 public class ExplicitSetRange<T>
-        implements Range<T>, Rangeable<ExplicitSetRange<T>>
+        implements RangeLength<T>, Rangeable<ExplicitSetRange<T>>
 {
 
 	private Set<T> items;
