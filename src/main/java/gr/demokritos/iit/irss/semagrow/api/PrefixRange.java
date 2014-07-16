@@ -90,11 +90,16 @@ public class PrefixRange
 
     public String toString() {
 
-        String res = "";
+        String res;
+
+        res = "[";
 
         for (String p : prefixList) {
-            res = res + p + " | ";
+
+            res = res + p + " ";
         }
+
+        res += "]";
         return res;
     }
 
@@ -141,6 +146,7 @@ public class PrefixRange
         testRange2PrefixList.add("http://");
         testRange2 = new PrefixRange(testRange2PrefixList);
         ArrayList<String> testRange3PrefixList = new ArrayList<String>();
+        testRange3PrefixList.add("http://b");
         PrefixRange testRange3 = new PrefixRange(testRange3PrefixList);
 
 
