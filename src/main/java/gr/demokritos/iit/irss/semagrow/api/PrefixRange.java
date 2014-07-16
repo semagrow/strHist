@@ -84,7 +84,25 @@ public class PrefixRange
 
     @Override
     public PrefixRange minus(PrefixRange prefixRange) {
-        return null;
+
+        ArrayList<String> prefixN = new ArrayList<String>(prefixList);
+
+        //this will also be checked when choosing participant buckets
+        if (!this.contains(prefixRange)) {
+
+            for (String myP : prefixList) {
+
+                for (String otherP : prefixRange.prefixList) {
+
+                    if (otherP.startsWith(myP)) {
+
+                        prefixN.remove(myP);
+                    }
+                }
+            }
+        }
+
+        return new PrefixRange(prefixN);
     }
 
     public boolean isUnit() { return (prefixList.size() == 1); }
