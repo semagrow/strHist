@@ -13,4 +13,6 @@ public interface Rangeable<R> {
 
     boolean intersects(R r);
 
+    R tightRange(R r);
+
 }

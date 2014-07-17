@@ -86,6 +86,7 @@ public class RDFLiteralRange
     }
 
 
+    //todo
     public RDFLiteralRange minus(RDFLiteralRange rdfLiteralRange) {
         return null;
     }
@@ -146,6 +147,11 @@ public class RDFLiteralRange
         }
 
         return false;
+    }
+
+    //todo
+    public RDFLiteralRange tightRange(RDFLiteralRange rdfLiteralRange) {
+        return null;
     }
 
     public URI getValueType() {
