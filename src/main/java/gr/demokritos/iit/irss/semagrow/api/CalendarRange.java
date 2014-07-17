@@ -100,7 +100,22 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
 
 
     public CalendarRange minus(CalendarRange calendarRange) {
-        return null;
+
+        XMLGregorianCalendar beginN = begin;
+        XMLGregorianCalendar endN = end;
+
+        // if calendarRange.begin before begin
+        if ((calendarRange.begin.toGregorianCalendar().compareTo(
+                begin.toGregorianCalendar())) < 0 ) {
+
+            beginN = calendarRange.end;
+        } else if ((calendarRange.end.toGregorianCalendar().compareTo(
+                end.toGregorianCalendar())) > 0 )  {
+
+            endN = calendarRange.begin;
+        }
+
+        return new CalendarRange(beginN, endN);
     }
 
 

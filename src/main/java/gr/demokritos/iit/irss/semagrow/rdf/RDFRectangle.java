@@ -2,6 +2,8 @@ package gr.demokritos.iit.irss.semagrow.rdf;
 
 import gr.demokritos.iit.irss.semagrow.api.*;
 
+import javax.security.auth.Subject;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,8 +78,61 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
     }
 
 
-    public RDFRectangle shrink(RDFRectangle rec) {
-        return this;
+    // Shrink rectangle so that it does not intersect with rec
+    public void shrink(RDFRectangle rec) {
+
+        PrefixRange subjectRangeN = subjectRange.minus(rec.subjectRange);
+        ExplicitSetRange<String> predicateRangeN = predicateRange.minus(rec.predicateRange);
+        RDFLiteralRange objectRangeN = objectRange.minus(rec.objectRange);
+
+        ArrayList<Double> lengths = new ArrayList<Double>();
+        long subjectLength = subjectRange.getLength();
+        long subjectNLength = subjectRangeN.getLength();
+        double reduced = subjectNLength/ subjectLength *100;
+        lengths.add(reduced);
+        long predicateLength = predicateRange.getLength();
+        long predicateNLength = predicateRangeN.getLength();
+        reduced = predicateNLength/ predicateLength *100;
+        lengths.add(reduced);
+        long objectLength = objectRange.getLength();
+        long objectNLength = objectRangeN.getLength();
+        reduced = objectNLength/ objectLength *100;
+        lengths.add(reduced);
+
+        double largest = lengths.get(0);
+        int j = 0; //dimension
+        for (int i = 0; i < lengths.size(); i++) {
+
+            if ( lengths.get(i) > largest ) {
+                
+                largest = lengths.get(i);
+                j = i;
+            }
+        }
+
+        switch (j) {
+            case 1:
+                setSubjectRange(subjectRangeN);
+            case 2:
+                setPredicateRange(predicateRangeN);
+            case 3:
+                setObjectRange(objectRangeN);
+            default:
+                throw new IllegalArgumentException("Dimension " + j
+                        + " is not valid");
+        }
+
     }
 
+    public void setObjectRange(RDFLiteralRange objectRange) {
+        this.objectRange = objectRange;
+    }
+
+    public void setPredicateRange(ExplicitSetRange<String> predicateRange) {
+        this.predicateRange = predicateRange;
+    }
+
+    public void setSubjectRange(PrefixRange subjectRange) {
+        this.subjectRange = subjectRange;
+    }
 }

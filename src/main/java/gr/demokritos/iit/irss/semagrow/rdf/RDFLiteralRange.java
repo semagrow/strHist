@@ -13,14 +13,15 @@ import java.util.ArrayList;
 /**
  * Created by angel on 7/15/14.
  */
-public class RDFLiteralRange implements Range<Value>,
-		Rangeable<RDFLiteralRange> {
+public class RDFLiteralRange
+        implements RangeLength<Value>, Rangeable<RDFLiteralRange>
+{
 
-	private URI valueType;
-	private Range<?> range;
+    private URI valueType;
+    private RangeLength<?> range;
 
 
-	public RDFLiteralRange(URI valueType, Range<?> range) {
+    public RDFLiteralRange(URI valueType, RangeLength<?> range) {
 
 		this.valueType = valueType;
 		this.range = range;
@@ -189,13 +190,17 @@ public class RDFLiteralRange implements Range<Value>,
 		this.valueType = valueType;
 	}
 
-
 	public Range<?> getRange() {
 		return range;
 	}
 
+	public void setRange(RangeLength<?> range) {
+        this.range = range;
+    }
 
-	public void setRange(Range<?> range) {
-		this.range = range;
-	}
+
+    public long getLength() {
+
+        return range.getLength();
+    }
 }

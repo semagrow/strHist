@@ -13,7 +13,10 @@ import java.util.*;
  */
 public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> {
 
+
     private STHolesBucket<R> root;
+    private Long maxBucketsNum;
+    private Long bucketsNum;
 
     public STHolesHistogram() {
         root = null;
@@ -89,16 +92,50 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      */
     private STHolesBucket<R> shrink(STHolesBucket<R> bucket, QueryRecord<R> queryRecord) {
 
+        // Find candidate hole
+        R c = bucket.getBox().intersection(queryRecord.getRectangle());
+
+        // Shrink candidate hole
+        List<STHolesBucket<R>> participants = new LinkedList<STHolesBucket<R>>();
+
+
+            for (STHolesBucket<R> participant : participants) {
+
+                c.shrink(participant.getBox());
+                updateParticipants(participants, bucket, c);
+
+                if (participants.isEmpty()) {
+
+                    break;
+                }
+            }
+
+
         //TODO: create a new rectangle / this is not the way to do it!
-        R r = bucket.getBox();
+        //R r = bucket.getBox();
 
         //TODO: shrink in such a way that b does not intersect with the rectangles of bucket.getChildren();
 
-        Stat stats= countMatchingTuples(r, queryRecord);
+        // Collect candidate hole statistics
+        Stat stats= countMatchingTuples(c, queryRecord);
 
-        STHolesBucket<R> b = new STHolesBucket<R>(r, stats, null, null);
+        // Create candidate hole bucket
+        STHolesBucket<R> b = new STHolesBucket<R>(c, stats, null, null);
 
         return b;
+    }
+
+    private void updateParticipants(List<STHolesBucket<R>> participants,
+                                    STHolesBucket<R> bucket, R c) {
+
+        participants.clear();
+
+        for (STHolesBucket<R> bi : bucket.getChildren()) {
+            if ((c.intersects(bi.getBox())) && (!c.contains(bi.getBox()))) {
+
+                participants.add(bi);
+            }
+        }
     }
 
     /**
@@ -175,6 +212,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
             parentBucket.addChild(bn);
 
+            bucketsNum += 1;
+
             for (STHolesBucket<R> bc : parentBucket.getChildren()) {
 
                 if (bn.getBox().contains(bc.getBox())){
@@ -190,6 +229,77 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         // while too many buckets compute merge penalty for each parent-child
         // and sibling pair, find the one with the minimum penalty and
         // call merge(b1,b2,bn)
+        while (bucketsNum > maxBucketsNum) {
+
+             MergeInfo bestMerge = findBestMerge(root);
+             STHolesBucket<R> b1 = bestMerge.getB1();
+             STHolesBucket<R> b2 = bestMerge.getB2();
+             STHolesBucket<R> bn = bestMerge.getBn();
+
+            (new STHolesBucket<R>()).merge(b1, b2, bn);
+        }
+    }
+
+    private MergeInfo<R> findBestMerge(STHolesBucket<R> b) {
+
+        MergeInfo<R> bestMerge;
+        MergeInfo<R> candidateMerge;
+        long minimumPenalty = Integer.MAX_VALUE;
+        long penalty;
+        Map.Entry<STHolesBucket<R>, Long> candidateMergedBucket;
+
+        // Initialize buckets to be merged and resulting bucket
+        STHolesBucket<R> b1 = b;
+        STHolesBucket<R> b2 = b;
+        STHolesBucket<R> bn = b;
+
+        for (STHolesBucket<R> bi : b.getChildren()) {
+
+            // Candidate parent-child merges
+            candidateMergedBucket = getPCMergePenalty(b, bi);
+            penalty = candidateMergedBucket.getValue();
+
+            if (penalty  <= minimumPenalty) {
+
+                minimumPenalty = penalty;
+                b1 = b;
+                b2 = bi;
+                bn = candidateMergedBucket.getKey();
+            }
+
+            // Candidate sibling-sibling merges
+            for (STHolesBucket<R> bj : b.getChildren()) {
+
+                if (!bj.equals(bi)) {
+
+                    candidateMergedBucket = getSSMergePenalty(b, bi);
+                    penalty = candidateMergedBucket.getValue();
+
+                    if (penalty  <= minimumPenalty) {
+
+                        minimumPenalty = penalty;
+                        b1 = bi;
+                        b2 = bj;
+                        bn = candidateMergedBucket.getKey();
+                    }
+                }
+            }
+        }
+
+        // local best merge
+        bestMerge = new MergeInfo<R>(b1, b2, bn, minimumPenalty);
+
+        for (STHolesBucket<R> bc : b.getChildren()) {
+
+            candidateMerge = findBestMerge(bc);
+
+            if (candidateMerge.getPenalty() <= minimumPenalty) {
+
+                bestMerge = candidateMerge;
+            }
+        }
+
+        return bestMerge;
     }
 
     private Map.Entry<STHolesBucket<R>, Long>

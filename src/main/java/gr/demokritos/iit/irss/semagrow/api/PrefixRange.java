@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Created by angel on 7/12/14.
  */
 public class PrefixRange
-        implements Range<String>, Rangeable<PrefixRange> {
+        implements RangeLength<String>, Rangeable<PrefixRange> {
 
     private ArrayList<String> prefixList;
 
@@ -80,6 +80,28 @@ public class PrefixRange
 
 
         return new PrefixRange(intersectionPrefixList);
+    }
+
+    public PrefixRange minus(PrefixRange prefixRange) {
+
+        ArrayList<String> prefixN = new ArrayList<String>(prefixList);
+
+        //this will also be checked when choosing participant buckets
+        if (!this.contains(prefixRange)) {
+
+            for (String myP : prefixList) {
+
+                for (String otherP : prefixRange.prefixList) {
+
+                    if (otherP.startsWith(myP)) {
+
+                        prefixN.remove(myP);
+                    }
+                }
+            }
+        }
+
+        return new PrefixRange(prefixN);
     }
 
     public boolean isUnit() { return (prefixList.size() == 1); }
@@ -166,8 +188,7 @@ public class PrefixRange
 
     }
 
-	public PrefixRange minus(PrefixRange r) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public long getLength() {
+        return prefixList.size();
+    }
 }

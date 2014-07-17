@@ -20,5 +20,5 @@ public interface Rectangle<R> {
 
     boolean intersects(R rec);
 
-    R shrink(R rec);
+    void shrink(R rec);
 }
