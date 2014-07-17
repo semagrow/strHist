@@ -19,6 +19,9 @@ public class STHolesBucket<R extends Rectangle> {
 
     private STHolesBucket parent;
 
+    public STHolesBucket() {
+    }
+
     public STHolesBucket(R box, Stat statistics) {
         this.box = box;
         this.statistics = statistics;
@@ -129,4 +132,27 @@ public class STHolesBucket<R extends Rectangle> {
         return estimate;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof STHolesBucket)) return false;
+
+        STHolesBucket that = (STHolesBucket) o;
+
+        if (!box.equals(that.box)) return false;
+        if (children != null ? !children.equals(that.children) : that.children != null) return false;
+        if (!parent.equals(that.parent)) return false;
+        if (!statistics.equals(that.statistics)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = box.hashCode();
+        result = 31 * result + (children != null ? children.hashCode() : 0);
+        result = 31 * result + statistics.hashCode();
+        result = 31 * result + parent.hashCode();
+        return result;
+    }
 }
