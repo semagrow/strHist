@@ -23,7 +23,7 @@ public class ExplicitSetRange<T>
         return items.containsAll(range.items);
 	}
 
-    @Override
+    
     public boolean intersects(ExplicitSetRange<T> range) {
 
         ExplicitSetRange<T> esr = new ExplicitSetRange<T>(range.items);
@@ -47,7 +47,7 @@ public class ExplicitSetRange<T>
         return esr;
 	}
 
-    @Override
+    
     public ExplicitSetRange<T> minus(ExplicitSetRange<T> tExplicitSetRange) {
         Set<T> set = new HashSet<T>(this.items);
         set.removeAll(tExplicitSetRange.items);

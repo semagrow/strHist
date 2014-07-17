@@ -41,7 +41,7 @@ public class PrefixRange
         return false;
     }
 
-    @Override
+   
     public boolean intersects(PrefixRange range) {
 
         for (String myP : prefixList) {
@@ -80,11 +80,6 @@ public class PrefixRange
 
 
         return new PrefixRange(intersectionPrefixList);
-    }
-
-    @Override
-    public PrefixRange minus(PrefixRange prefixRange) {
-        return null;
     }
 
     public boolean isUnit() { return (prefixList.size() == 1); }
@@ -170,4 +165,9 @@ public class PrefixRange
                 " and range " + testRange3.toString() + ": "  + intersection3);
 
     }
+
+	public PrefixRange minus(PrefixRange r) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

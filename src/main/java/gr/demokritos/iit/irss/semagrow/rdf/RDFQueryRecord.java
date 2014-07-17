@@ -3,6 +3,7 @@ package gr.demokritos.iit.irss.semagrow.rdf;
 import gr.demokritos.iit.irss.semagrow.api.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.QueryResult;
 import gr.demokritos.iit.irss.semagrow.parsing.LogQuery;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 
 public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 
@@ -14,7 +15,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 
 	public RDFQueryRecord(LogQuery logQuery) {
 		this.logQuery = logQuery;
-		setQueryResult(new RDFQueryResult());
+		setQueryResult(new RDFQueryResult(logQuery.getQueryStatements()));
 	}
 
 
