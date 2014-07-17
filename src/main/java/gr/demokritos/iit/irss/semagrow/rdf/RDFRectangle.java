@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.rdf;
 
 import gr.demokritos.iit.irss.semagrow.api.*;
 
+import javax.security.auth.Subject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,15 +85,21 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         ExplicitSetRange<String> predicateRangeN = predicateRange.minus(rec.predicateRange);
         RDFLiteralRange objectRangeN = objectRange.minus(rec.objectRange);
 
-        ArrayList<Long> lengths = new ArrayList<Long>();
+        ArrayList<Double> lengths = new ArrayList<Double>();
+        long subjectLength = subjectRange.getLength();
         long subjectNLength = subjectRangeN.getLength();
-        lengths.add(subjectNLength);
+        double reduced = subjectNLength/ subjectLength *100;
+        lengths.add(reduced);
+        long predicateLength = predicateRange.getLength();
         long predicateNLength = predicateRangeN.getLength();
-        lengths.add(predicateNLength);
+        reduced = predicateNLength/ predicateLength *100;
+        lengths.add(reduced);
+        long objectLength = objectRange.getLength();
         long objectNLength = objectRangeN.getLength();
-        lengths.add(objectNLength);
+        reduced = objectNLength/ objectLength *100;
+        lengths.add(reduced);
 
-        long largest = lengths.get(0);
+        double largest = lengths.get(0);
         int j = 0; //dimension
         for (int i = 0; i < lengths.size(); i++) {
 
