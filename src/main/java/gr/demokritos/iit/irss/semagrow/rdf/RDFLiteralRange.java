@@ -1,6 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
+
 import gr.demokritos.iit.irss.semagrow.api.*;
+import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -21,9 +23,10 @@ public class RDFLiteralRange
 
     public RDFLiteralRange(URI valueType, RangeLength<?> range) {
 
-        this.valueType = valueType;
-        this.range = range;
-    }
+		this.valueType = valueType;
+		this.range = range;
+	}
+
 
     public RDFLiteralRange(int low, int high) {
         this(XMLSchema.INTEGER, new IntervalRange<Integer>(low, high));
@@ -86,9 +89,30 @@ public class RDFLiteralRange
     }
 
 
-    //todo
-    public RDFLiteralRange minus(RDFLiteralRange rdfLiteralRange) {
-        return null;
+	public RDFLiteralRange minus(RDFLiteralRange rdfLiteralRange) {
+		return null;
+	}
+
+
+	public boolean contains(Value value) {
+    	if (value instanceof Literal) {
+    		Literal literal = (Literal)value;
+    		if (literal.getDatatype() == valueType) { 
+    			if (valueType.equals(XMLSchema.INTEGER)) {
+    				return ((IntervalRange<Integer>) range).contains(literal.intValue());
+    			} else if (valueType.equals(XMLSchema.LONG)) {
+    				return ((IntervalRange<Integer>) range).contains(literal.intValue());
+             } else if (valueType.equals(XMLSchema.STRING)) {
+                 return ((PrefixRange) range).contains(literal.stringValue());
+             } else if (valueType.equals(XMLSchema.DATETIME)) {
+
+                 return ((CalendarRange) range).contains(literal.calendarValue());
+             }
+    		}
+    	} else if (value instanceof URI) { 
+    		((PrefixRange) range).contains(((URI)value).stringValue());
+    	}
+    	return false;
     }
 
     public boolean contains(RDFLiteralRange literalRange) {
@@ -149,7 +173,6 @@ public class RDFLiteralRange
         return false;
     }
 
-    //todo
     public RDFLiteralRange tightRange(RDFLiteralRange rdfLiteralRange) {
         return null;
     }

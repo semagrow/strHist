@@ -41,7 +41,7 @@ public class PrefixRange
         return false;
     }
 
-    @Override
+   
     public boolean intersects(PrefixRange range) {
 
         for (String myP : prefixList) {
@@ -98,7 +98,6 @@ public class PrefixRange
         return new PrefixRange(intersectionPrefixList);
     }
 
-    @Override
     public PrefixRange minus(PrefixRange prefixRange) {
 
         ArrayList<String> prefixN = new ArrayList<String>(prefixList);
@@ -205,7 +204,6 @@ public class PrefixRange
 
     }
 
-    @Override
     public long getLength() {
         return prefixList.size();
     }

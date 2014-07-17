@@ -29,7 +29,7 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
 
     }
 
-    @Override
+    
     public boolean intersects(IntervalRange range) {
 
         int nLow = max(low, range.getLow());
@@ -67,7 +67,7 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
             return res;
     }
 
-    @Override
+   
     public IntervalRange minus(IntervalRange intervalRange) {
         int lowN = low;
         int highN = high;

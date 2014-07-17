@@ -379,7 +379,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         R newBox = getSiblingSiblingBox(b1,b2);
         // the smallest box that encloses both b1 and b2 but does not
         // intersect partially with any other of bp
-       
+
 
         // I contains bp's children which are enclosed by bn box
         Collection<STHolesBucket<R>> I = new ArrayList<STHolesBucket<R>>();
