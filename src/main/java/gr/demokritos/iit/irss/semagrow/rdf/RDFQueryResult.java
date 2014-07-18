@@ -5,10 +5,17 @@ import gr.demokritos.iit.irss.semagrow.api.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.api.QueryResult;
 import gr.demokritos.iit.irss.semagrow.parsing.Binding;
 import gr.demokritos.iit.irss.semagrow.parsing.BindingSet;
+import gr.demokritos.iit.irss.semagrow.parsing.Utilities;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,12 +36,21 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
 
 	/**
-	 * NOT TESTED YET
+	 * Given a Rectangle it returns a Stat object containing total frequency and
+	 * distinct count for each dimension.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public long getCardinality(RDFRectangle rect) {
+	public Stat getCardinality(RDFRectangle rect) {
 
-		long cardinality = 0;
+		long frequency = 0;
+		List<Long> distinctCount = new ArrayList<Long>();
+		// Help structures to store distinct items for each dimension
+		Set<String> prefixSet = new HashSet<String>(), predicateSet = new HashSet<String>();
+		Set<Integer> objectIntegerSet = new HashSet<Integer>();
+		Set<Long> objectLongSet = new HashSet<Long>();
+		Set<Date> objectDateSet = new HashSet<Date>();
+		Set<String> objectStringSet = new HashSet<String>();	
+		
 
 		// First check if const variables of the query exist in rectangle.
 		// If not, then cardinality is surely 0.
@@ -47,19 +63,52 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 					String value = clean(b.getValue());
 
 					switch (type) {
-					case 1:
-						if (((PrefixRange) rect.getRange(1)).contains(value))
-							cardinality++;
+					case 1:		// Subjects
+						if (((PrefixRange) rect.getRange(1)).contains(value)) 
+							frequency++;
+						prefixSet.add(value);
 						break;
-					case 2:
-						//if (((ExplicitSetRange) rect.getRange(2)).contains(value))
-						//	cardinality++;
+					case 2:		// Predicates
+						if (((ExplicitSetRange) rect.getRange(2)).contains(value))
+							frequency++;
+						predicateSet.add(value);
 						break;
-					case 3:
-						// TODO: Change!
-						URI l = ValueFactoryImpl.getInstance().createURI(value);
-						if (((RDFLiteralRange) rect.getRange(3)).contains(l))
-							cardinality++;
+					case 3:		// Objects
+						// TODO: Change! 					
+						
+						if (value.contains("^^")) {
+							// Get the value of the URI.
+							String valueURI = Utilities.getValueFromURI(value);
+							// Get the type of the URI.
+							String typeURI = Utilities.getTypeFromURI(value);
+							// Erase the value from URI and keep only the URL.
+							String url = Utilities.cleanURI(value);							
+							
+							// Frequency
+							URI l = ValueFactoryImpl.getInstance().createURI(url);
+							if (((RDFLiteralRange) rect.getRange(3)).contains(l))
+								frequency++;
+							
+							// Distinct
+							if (typeURI.equals("int")) {
+								objectIntegerSet.add(Integer.parseInt(valueURI));
+							} else if (typeURI.equals("long")) {
+								objectLongSet.add(Long.parseLong(valueURI));
+							} else if (typeURI.equals("dateTime")) {
+								
+								Date date = null;
+								
+								try {date = Utilities.dateFormat.parse(valueURI);}
+								catch (ParseException e) {e.printStackTrace();}
+								
+								objectDateSet.add(date);
+								
+							}// if													
+						}// if
+						else {// Plain Literal or URL
+							objectStringSet.add(value);
+						}						
+						
 						break;
 					default:
 						System.err.println("Not a valid Binding.");
@@ -69,9 +118,20 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 				}// for
 			}// for
 		}// if
+		
+		// Subject distinct count
+		distinctCount.add((long)prefixSet.size()); 
+		// Predicate distinct count
+		distinctCount.add((long)predicateSet.size());
+		// Object distinct count
+		distinctCount.add((long)objectIntegerSet.size() + 
+							(long)objectLongSet.size() +
+							(long)objectDateSet.size() +
+							(long)objectStringSet.size());
+		
 
-		return cardinality;
-	}// getCardinality
+		return new Stat(frequency, distinctCount);
+	}// getCardinality	
 
 
 	/**
@@ -155,7 +215,9 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
 
 	public static void main(String[] args) {
-		System.out.println(clean("Egyptian Division @en"));
+//		System.out.println(clean("Egyptian Division @en"));
+		System.out.println(Utilities.cleanURI("\"192\"^^<http://www.w3.org/2001/XMLSchema#int>"));
+		
 	}
 
 
