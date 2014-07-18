@@ -8,16 +8,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.ValueFactoryImpl;
-
 import gr.demokritos.iit.irss.semagrow.api.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.api.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.api.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.QueryResult;
 import gr.demokritos.iit.irss.semagrow.parsing.Binding;
 import gr.demokritos.iit.irss.semagrow.parsing.LogQuery;
+import gr.demokritos.iit.irss.semagrow.parsing.Utilities;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 
 public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
@@ -35,7 +32,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 
 
 	/**
-	 * 
+	 * Returns a Rectangle over the Query.
 	 */
 	public RDFRectangle getRectangle() {
 
@@ -57,10 +54,11 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 		
 		// Check what's inside the object's value.
 		if (binding.getValue().equals("")) {// If object is a variable
+			objectRange = new RDFLiteralRange();
 			
-		} else if (binding.getValue().contains("^^")) {
-			String value = getValueFromURI(binding.getValue());
-			String type = getTypeFromURI(binding.getValue());
+		} else if (binding.getValue().contains("^^")) {// URI
+			String value = Utilities.getValueFromURI(binding.getValue());
+			String type = Utilities.getTypeFromURI(binding.getValue());
 			
 			if (type.equals("int")) {
 				objectRange = new RDFLiteralRange(Integer.parseInt(value), Integer.parseInt(value));
@@ -80,7 +78,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 					System.err.println("Date Format Error.");
 			}
 			
-		} else {// Plain Literal or URI
+		} else {// Plain Literal or URL
 			objectRange = new RDFLiteralRange(binding.getValue());
 		}	
 		
@@ -91,50 +89,13 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 	public static void main(String[] args) {
 		String v = "\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\"^^<http://www.w3.org/2001/XMLSchema#dateTime>";
 		System.out.println(v);
-		System.out.println(getTypeFromURI(v));
-		System.out.println(getValueFromURI(v));
+//		System.out.println(getTypeFromURI(v));
+//		System.out.println(getValueFromURI(v));
 		
 	}
 
 
-	/**
-	 * Extracts the Value from the URI, 
- 	 * input: "192"^^<http://www.w3.org/2001/XMLSchema#int> returns: 192
-	 */
-	private static String getValueFromURI(String value) {
-		String val = "";
-		// Create a regex pattern.
-		String pattern = "\"(.*?)\"\\^\\^<(.*?)#(.*?)>";
-		// Create a Pattern object
-		Pattern r = Pattern.compile(pattern);
-		// Now create matcher object.
-		Matcher m = r.matcher(value);
-		
-		if (m.find())
-			val = m.group(1);
-		
-		return val;
-	}
-
-
-	/**
-	 * Extracts the Type from the URI, 
- 	 * input: "192"^^<http://www.w3.org/2001/XMLSchema#int> returns: int
-	 */
-	private static String getTypeFromURI(String value) {
-		String type = "";
-		// Create a regex pattern.
-		String pattern = "\"(.*?)\"\\^\\^<(.*?)#(.*?)>";
-		// Create a Pattern object
-		Pattern r = Pattern.compile(pattern);
-		// Now create matcher object.
-		Matcher m = r.matcher(value);
-		
-		if (m.find())
-			type = m.group(3);
-		
-		return type;			
-	}
+	
 
 
 	private ExplicitSetRange<String> getPredicateRange(Binding binding) {
@@ -172,7 +133,8 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 
 
 	/**
-	 * NOT IMPLEMENTED YET
+	 * Returns a Rectangle over the Query's Results.
+	 * TODO: Not implemented yet.
 	 */
 	public QueryResult<RDFRectangle> getResultSet() {
 		return null;
