@@ -13,23 +13,31 @@ public class ExplicitSetRange<T>
 {
 
 	private Set<T> items;
+    private boolean infinite = false;
 
 	public ExplicitSetRange(Collection<T> items) {
 		this.items = new HashSet<T>(items);
 	}
 
 
+    // Construct an infinite expilicitSet range
 	public ExplicitSetRange() {
-		// TODO: Fix me!
+        this.items = new HashSet<T>();
+		infinite = true;
 	}
 
 
 	public boolean contains(ExplicitSetRange<T> range) {
+
+        if (infinite) return true;
+
         return items.containsAll(range.items);
 	}
 
    
     public boolean intersects(ExplicitSetRange<T> range) {
+
+        if (infinite) return true;
 
         ExplicitSetRange<T> esr = new ExplicitSetRange<T>(range.items);
 
@@ -45,6 +53,8 @@ public class ExplicitSetRange<T>
 
     public ExplicitSetRange<T> tightRange(ExplicitSetRange<T> tExplicitSetRange) {
 
+        if (infinite) return new ExplicitSetRange<T>();
+
         Set<T> itemsN = new HashSet<T>(items);
         itemsN.addAll(tExplicitSetRange.items);
 
@@ -53,6 +63,8 @@ public class ExplicitSetRange<T>
 
 
     public ExplicitSetRange<T> intersection(ExplicitSetRange<T> range) {
+
+        if (infinite) return range;
 
         ExplicitSetRange<T> esr = new ExplicitSetRange<T>(range.items);
 
@@ -64,6 +76,8 @@ public class ExplicitSetRange<T>
     
 
     public ExplicitSetRange<T> minus(ExplicitSetRange<T> tExplicitSetRange) {
+
+        //todo: handle infinite
         Set<T> set = new HashSet<T>(this.items);
         set.removeAll(tExplicitSetRange.items);
         ExplicitSetRange<T> r = new ExplicitSetRange<T>(set);
@@ -72,9 +86,18 @@ public class ExplicitSetRange<T>
 
 
 
-    public boolean isUnit() { return getLength() == 1; }
+    public boolean isUnit() {
 
-    public long getLength() { return items.size(); }
+        if (infinite) return false;
+
+        return getLength() == 1;
+    }
+
+    public long getLength() {
+
+        if (infinite) return Integer.MAX_VALUE;
+        return items.size();
+    }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) {

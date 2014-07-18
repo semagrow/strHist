@@ -4,6 +4,7 @@ package gr.demokritos.iit.irss.semagrow.stholes;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.Stat;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -31,6 +32,12 @@ public class STHolesBucket<R extends Rectangle> {
                          Collection<STHolesBucket<R>> children,
                          STHolesBucket parent) {
         this(box,statistics);
+
+        if (children == null) {
+
+            children = new ArrayList<STHolesBucket<R>>();
+        }
+
         this.children = children;
         setParent(parent);
     }
@@ -53,13 +60,17 @@ public class STHolesBucket<R extends Rectangle> {
 
     public void addChild(STHolesBucket<R> bucket) {
 
-        //todo: check for null
+
         children.add(bucket);
         bucket.parent = this;
     }
 
     public void removeChild(STHolesBucket<R> bucket) {
-        children.remove(bucket);
+
+        if (!children.isEmpty()) {
+
+            children.remove(bucket);
+        }
     }
 
     public static <R extends Rectangle<R>> 

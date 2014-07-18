@@ -20,8 +20,13 @@ public class RDFLiteralRange
 
     private URI valueType;
     private RangeLength<?> range;
+    private boolean infinite = false;
 
 
+    public RDFLiteralRange() {
+
+        infinite = true;
+    }
     public RDFLiteralRange(URI valueType, RangeLength<?> range) {
 
 		this.valueType = valueType;
@@ -52,11 +57,15 @@ public class RDFLiteralRange
 
 
     public boolean isUnit() {
+
+        if (infinite) return false;
+
         return range.isUnit();
     }
 
     public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
 
+        if (infinite) return literalRange;
 
         RDFLiteralRange res = null;
         if (valueType.equals(literalRange.getValueType()))
@@ -96,6 +105,9 @@ public class RDFLiteralRange
 
 
 	public boolean contains(Value value) {
+
+        if (infinite) return true;
+
     	if (value instanceof Literal) {
     		Literal literal = (Literal)value;
     		if (literal.getDatatype() == valueType) { 
@@ -120,6 +132,7 @@ public class RDFLiteralRange
 
     public boolean contains(RDFLiteralRange literalRange) {
 
+        if (infinite) return true;
 
         if (valueType.equals(literalRange.getValueType()))
         {
@@ -150,6 +163,8 @@ public class RDFLiteralRange
     
     public boolean intersects(RDFLiteralRange literalRange) {
 
+        if (infinite) return true;
+
         if (valueType.equals(literalRange.getValueType()))
         {
 
@@ -177,6 +192,8 @@ public class RDFLiteralRange
     }
 
     public RDFLiteralRange tightRange(RDFLiteralRange rdfLiteralRange) {
+
+        if (infinite) return new RDFLiteralRange();
         return null;
     }
 
@@ -198,6 +215,8 @@ public class RDFLiteralRange
 
     
     public long getLength() {
+
+        if (infinite) return Integer.MAX_VALUE;
 
         return range.getLength();
     }
