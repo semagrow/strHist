@@ -9,6 +9,7 @@ import org.openrdf.model.vocabulary.XMLSchema;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by angel on 7/15/14.
@@ -45,7 +46,7 @@ public class RDFLiteralRange
         this.range = new PrefixRange(stringList);
     }
 
-    public RDFLiteralRange(XMLGregorianCalendar begin, XMLGregorianCalendar end) {
+    public RDFLiteralRange(Date begin, Date end) {
         this(XMLSchema.DATETIME, new CalendarRange(begin, end));
     }
 
@@ -104,9 +105,11 @@ public class RDFLiteralRange
     				return ((IntervalRange<Integer>) range).contains(literal.intValue());
              } else if (valueType.equals(XMLSchema.STRING)) {
                  return ((PrefixRange) range).contains(literal.stringValue());
-             } else if (valueType.equals(XMLSchema.DATETIME)) {
+             } else if (valueType.equals(XMLSchema.DATETIME)) {            	 
 
-                 return ((CalendarRange) range).contains(literal.calendarValue());
+                 return ((CalendarRange) range).
+                		 contains(literal.calendarValue().
+                				 toGregorianCalendar().getTime());
              }
     		}
     	} else if (value instanceof URI) { 
