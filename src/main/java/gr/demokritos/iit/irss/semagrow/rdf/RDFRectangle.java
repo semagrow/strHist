@@ -124,6 +124,15 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 
     }
 
+    public RDFRectangle computeTightBox(RDFRectangle rec) {
+
+        PrefixRange subjectRangeN = subjectRange.tightRange(rec.subjectRange);
+        ExplicitSetRange<String> predicateRangeN = predicateRange.tightRange(rec.predicateRange);
+        RDFLiteralRange objectRangeN = objectRange.tightRange(rec.objectRange);
+
+        return new RDFRectangle(subjectRangeN, predicateRangeN, objectRangeN);
+    }
+
     public void setObjectRange(RDFLiteralRange objectRange) {
         this.objectRange = objectRange;
     }

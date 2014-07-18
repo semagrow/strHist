@@ -21,4 +21,8 @@ public interface Rectangle<R> {
     boolean intersects(R rec);
 
     void shrink(R rec);
+
+    // compute bounding box that tightly encloses
+    // this rectangle and rec
+    R computeTightBox(R rec);
 }

@@ -63,6 +63,22 @@ public class PrefixRange
         return false;
     }
 
+    public PrefixRange tightRange(PrefixRange prefixRange) {
+
+        ArrayList<String> prefixListN = new ArrayList<String>();
+        prefixListN.addAll(prefixList);
+
+        for (String p : prefixRange.prefixList ) {
+
+            if (!this.contains(p)) {
+
+                prefixListN.add(p);
+            }
+        }
+
+        return new PrefixRange(prefixListN);
+    }
+
     public PrefixRange intersection(PrefixRange range) {
 
         ArrayList<String> intersectionPrefixList = new ArrayList<String>();

@@ -1,7 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
-import gr.demokritos.iit.irss.semagrow.api.*;
 
+import gr.demokritos.iit.irss.semagrow.api.*;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -28,72 +28,65 @@ public class RDFLiteralRange
 	}
 
 
-	public RDFLiteralRange(int low, int high) {
-		this(XMLSchema.INTEGER, new IntervalRange<Integer>(low, high));
-	}
+    public RDFLiteralRange(int low, int high) {
+        this(XMLSchema.INTEGER, new IntervalRange<Integer>(low, high));
+    }
+
+    public RDFLiteralRange(long low, long high) {
+        this(XMLSchema.INTEGER, new IntervalRange<Integer>((int) low, (int) high));
+    }
+
+    public RDFLiteralRange(String range) {
+
+        // TODO: maybe change it to take the list as a parameter
+        ArrayList<String> stringList = new ArrayList<String>();
+        stringList.add(range);
+        this.valueType = XMLSchema.STRING;
+        this.range = new PrefixRange(stringList);
+    }
+
+    public RDFLiteralRange(XMLGregorianCalendar begin, XMLGregorianCalendar end) {
+        this(XMLSchema.DATETIME, new CalendarRange(begin, end));
+    }
 
 
-	public RDFLiteralRange(long low, long high) {
-		this(XMLSchema.INTEGER, new IntervalRange<Integer>((int) low,
-				(int) high));
-	}
+    public boolean isUnit() {
+        return range.isUnit();
+    }
+
+    public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
 
 
-	public RDFLiteralRange(String range) {
+        RDFLiteralRange res = null;
+        if (valueType.equals(literalRange.getValueType()))
+        {
 
-		// TODO: maybe change it to take the list as a parameter
-		ArrayList<String> stringList = new ArrayList<String>();
-		stringList.add(range);
-		this.valueType = XMLSchema.STRING;
-		this.range = new PrefixRange(stringList);
-	}
+            if (valueType.equals(XMLSchema.INTEGER)) {
+                res = new RDFLiteralRange(valueType,
+                        ((IntervalRange<Integer>) range).intersection(
+                                (IntervalRange<Integer>) literalRange.getRange()));
+            } else if (valueType.equals(XMLSchema.LONG)) {
+
+                res = new RDFLiteralRange(valueType,
+                        ((IntervalRange<Integer>) range).intersection(
+                                (IntervalRange<Integer>) literalRange.getRange()));
+            } else if (valueType.equals(XMLSchema.STRING)) {
+
+                res = new RDFLiteralRange(valueType,
+                        ((PrefixRange) range).intersection(
+                                (PrefixRange) literalRange.getRange()));
+            } else if (valueType.equals(XMLSchema.DATETIME)) {
+
+                res = new RDFLiteralRange(valueType,
+                        ((CalendarRange) range).intersection(
+                                (CalendarRange) literalRange.getRange()));
+            }
+        }
 
 
-	public RDFLiteralRange(XMLGregorianCalendar begin, XMLGregorianCalendar end) {
-		this(XMLSchema.DATETIME, new CalendarRange(begin, end));
-	}
 
-
-	public boolean isUnit() {
-		return range.isUnit();
-	}
-
-
-	public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
-
-		RDFLiteralRange res = null;
-		if (valueType.equals(literalRange.getValueType())) {
-
-			if (valueType.equals(XMLSchema.INTEGER)) {
-				res = new RDFLiteralRange(
-						valueType,
-						((IntervalRange<Integer>) range)
-								.intersection((IntervalRange<Integer>) literalRange
-										.getRange()));
-			} else if (valueType.equals(XMLSchema.LONG)) {
-
-				res = new RDFLiteralRange(
-						valueType,
-						((IntervalRange<Integer>) range)
-								.intersection((IntervalRange<Integer>) literalRange
-										.getRange()));
-			} else if (valueType.equals(XMLSchema.STRING)) {
-
-				res = new RDFLiteralRange(valueType,
-						((PrefixRange) range)
-								.intersection((PrefixRange) literalRange
-										.getRange()));
-			} else if (valueType.equals(XMLSchema.DATETIME)) {
-
-				res = new RDFLiteralRange(valueType,
-						((CalendarRange) range)
-								.intersection((CalendarRange) literalRange
-										.getRange()));
-			}
-		}
-
-		return res;
-	}
+        return res;
+    }
 
 
 	public RDFLiteralRange minus(RDFLiteralRange rdfLiteralRange) {
@@ -122,83 +115,85 @@ public class RDFLiteralRange
     	return false;
     }
 
-
-	public boolean contains(RDFLiteralRange literalRange) {
-
-		if (valueType.equals(literalRange.getValueType())) {
-
-			if (valueType.equals(XMLSchema.INTEGER)) {
-
-				return ((IntervalRange<Integer>) range)
-						.contains((IntervalRange<Integer>) literalRange
-								.getRange());
-
-			} else if (valueType.equals(XMLSchema.LONG)) {
-
-				return ((IntervalRange<Integer>) range)
-						.contains((IntervalRange<Integer>) literalRange
-								.getRange());
-			} else if (valueType.equals(XMLSchema.STRING)) {
-
-				return ((PrefixRange) range)
-						.contains((PrefixRange) literalRange.getRange());
-			} else if (valueType.equals(XMLSchema.DATETIME)) {
-
-			return ((CalendarRange) range)
-					.contains((CalendarRange) literalRange.getRange()); }
-		}
-
-		return false;
-	}
+    public boolean contains(RDFLiteralRange literalRange) {
 
 
-	public boolean intersects(RDFLiteralRange literalRange) {
+        if (valueType.equals(literalRange.getValueType()))
+        {
 
-		if (valueType.equals(literalRange.getValueType())) {
+            if (valueType.equals(XMLSchema.INTEGER)) {
 
-			if (valueType.equals(XMLSchema.INTEGER)) {
+               return ((IntervalRange<Integer>) range).contains(
+                                (IntervalRange<Integer>) literalRange.getRange());
 
-				return ((IntervalRange<Integer>) range)
-						.intersects((IntervalRange<Integer>) literalRange
-								.getRange());
+            } else if (valueType.equals(XMLSchema.LONG)) {
 
-			} else if (valueType.equals(XMLSchema.LONG)) {
+                return ((IntervalRange<Integer>) range).contains(
+                        (IntervalRange<Integer>) literalRange.getRange());
+            } else if (valueType.equals(XMLSchema.STRING)) {
 
-				return ((IntervalRange<Integer>) range)
-						.intersects((IntervalRange<Integer>) literalRange
-								.getRange());
-			} else if (valueType.equals(XMLSchema.STRING)) {
+                return ((PrefixRange) range).contains(
+                        (PrefixRange) literalRange.getRange());
+            } else if (valueType.equals(XMLSchema.DATETIME)) {
 
-				return ((PrefixRange) range)
-						.intersects((PrefixRange) literalRange.getRange());
-			} else if (valueType.equals(XMLSchema.DATETIME)) {
+                return ((CalendarRange) range).contains(
+                        (CalendarRange) literalRange.getRange());
+            }
+        }
 
-			return ((CalendarRange) range)
-					.intersects((CalendarRange) literalRange.getRange()); }
-		}
+        return false;
+    }
 
-		return false;
-	}
+    
+    public boolean intersects(RDFLiteralRange literalRange) {
 
+        if (valueType.equals(literalRange.getValueType()))
+        {
 
-	public URI getValueType() {
-		return valueType;
-	}
+            if (valueType.equals(XMLSchema.INTEGER)) {
 
+                return ((IntervalRange<Integer>) range).intersects(
+                        (IntervalRange<Integer>) literalRange.getRange());
 
-	public void setValueType(URI valueType) {
-		this.valueType = valueType;
-	}
+            } else if (valueType.equals(XMLSchema.LONG)) {
 
-	public Range<?> getRange() {
-		return range;
-	}
+                return ((IntervalRange<Integer>) range).intersects(
+                        (IntervalRange<Integer>) literalRange.getRange());
+            } else if (valueType.equals(XMLSchema.STRING)) {
 
-	public void setRange(RangeLength<?> range) {
+                return ((PrefixRange) range).intersects(
+                        (PrefixRange) literalRange.getRange());
+            } else if (valueType.equals(XMLSchema.DATETIME)) {
+
+                return ((CalendarRange) range).intersects(
+                        (CalendarRange) literalRange.getRange());
+            }
+        }
+
+        return false;
+    }
+
+    public RDFLiteralRange tightRange(RDFLiteralRange rdfLiteralRange) {
+        return null;
+    }
+
+    public URI getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(URI valueType) {
+        this.valueType = valueType;
+    }
+
+    public Range<?> getRange() {
+        return range;
+    }
+
+    public void setRange(RangeLength<?> range) {
         this.range = range;
     }
 
-
+    
     public long getLength() {
 
         return range.getLength();

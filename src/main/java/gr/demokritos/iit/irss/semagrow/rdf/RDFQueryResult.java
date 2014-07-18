@@ -113,7 +113,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 					b = b && ((PrefixRange) rect.getRange(i)).contains(value);
 					break;
 				case 2:
-					b = b && ((ExplicitSetRange) rect.getRange(i)).contains(value);
+					//b = b && ((ExplicitSetRange) rect.getRange(i)).contains(value);
 					break;
 				case 3:
 					// TODO: change!

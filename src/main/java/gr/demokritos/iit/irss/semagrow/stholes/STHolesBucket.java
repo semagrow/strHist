@@ -52,6 +52,8 @@ public class STHolesBucket<R extends Rectangle> {
     }
 
     public void addChild(STHolesBucket<R> bucket) {
+
+        //todo: check for null
         children.add(bucket);
         bucket.parent = this;
     }
@@ -117,6 +119,10 @@ public class STHolesBucket<R extends Rectangle> {
 
     public void setParent(STHolesBucket<R> parent) {
         this.parent = parent;
+    }
+
+    public void setBox(R box) {
+        this.box = box;
     }
 
     public long getEstimate(R rec) {

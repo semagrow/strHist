@@ -68,6 +68,25 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
     }
 
 
+    public CalendarRange tightRange(CalendarRange calendarRange) {
+        XMLGregorianCalendar beginN = begin;
+        XMLGregorianCalendar endN = end;
+
+        // if begin after range.getBegin()
+        if ((begin.toGregorianCalendar().compareTo(
+                calendarRange.getBegin().toGregorianCalendar())) > 0 ){
+
+            beginN = calendarRange.getBegin();
+        } else if ((end.toGregorianCalendar().compareTo(
+                calendarRange.getEnd().toGregorianCalendar())) < 0 ){
+
+            endN = calendarRange.getEnd();
+        }
+
+        return new CalendarRange(beginN, endN);
+    }
+
+
     public CalendarRange intersection(CalendarRange range) {
 
         CalendarRange res;

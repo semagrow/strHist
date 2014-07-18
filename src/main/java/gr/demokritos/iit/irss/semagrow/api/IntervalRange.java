@@ -43,6 +43,12 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         return true;
     }
 
+
+    public IntervalRange tightRange(IntervalRange intervalRange) {
+
+        return new IntervalRange(min(low, intervalRange.low), max(high, intervalRange.high));
+    }
+
     public IntervalRange intersection(IntervalRange range) {
 
             IntervalRange res;

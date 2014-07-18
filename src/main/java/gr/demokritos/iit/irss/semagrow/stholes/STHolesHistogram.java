@@ -3,6 +3,7 @@ package gr.demokritos.iit.irss.semagrow.stholes;
 import gr.demokritos.iit.irss.semagrow.api.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.Stat;
 
 import java.util.*;
@@ -15,11 +16,15 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
 
     private STHolesBucket<R> root;
-    private Long maxBucketsNum;
-    private Long bucketsNum;
+    private long maxBucketsNum;
+    private long bucketsNum = 0;
 
     public STHolesHistogram() {
+        //maxBucketsNum = 1000
+
+
         root = null;
+        bucketsNum += bucketsNum;
     }
 
     public STHolesHistogram(Iterable<QueryRecord<R>> workload) {
@@ -67,6 +72,25 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
     public void refine(QueryRecord<R> queryRecord) {
 
+        // check if root is null
+        // expand root
+        if (!root.getBox().contains(queryRecord.getRectangle())) {
+
+            if (root.getChildren() == null) {
+
+                root.setBox(queryRecord.getRectangle());
+            } else {
+
+                R boxN = queryRecord.getRectangle();
+                Stat statsN= countMatchingTuples(queryRecord.getRectangle(), queryRecord);
+                Collection<STHolesBucket<R>> childrenN = new ArrayList<STHolesBucket<R>>();
+                STHolesBucket<R> rootN = new STHolesBucket<R>(boxN, statsN, childrenN, null);
+                rootN.addChild(root);
+                root = rootN;
+            }
+
+        }
+
         // get all c
         Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(queryRecord);
 
@@ -98,17 +122,17 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         // Shrink candidate hole
         List<STHolesBucket<R>> participants = new LinkedList<STHolesBucket<R>>();
 
-
+        updateParticipants(participants, bucket, c);
             for (STHolesBucket<R> participant : participants) {
 
-                c.shrink(participant.getBox());
-                updateParticipants(participants, bucket, c);
+            c.shrink(participant.getBox());
+            updateParticipants(participants, bucket, c);
 
-                if (participants.isEmpty()) {
+            if (participants.isEmpty()) {
 
-                    break;
-                }
+                break;
             }
+        }
 
 
         //TODO: create a new rectangle / this is not the way to do it!
@@ -136,6 +160,36 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
                 participants.add(bi);
             }
         }
+    }
+
+    private R getSiblingSiblingBox(STHolesBucket<R> b1, STHolesBucket<R> b2) {
+
+
+        // Get parent
+        STHolesBucket<R> bp = b1.getParent(); //todo: check if they are siblings
+        // Find tightly enclosing box
+        R c = b1.getBox().computeTightBox(b2.getBox());
+
+
+        // Expand tightly enclosing box
+        List<STHolesBucket<R>> participants = new LinkedList<STHolesBucket<R>>();
+
+        updateParticipants(participants, bp, c);
+
+        for (STHolesBucket<R> participant : participants) {
+
+            c = c.computeTightBox(participant.getBox());
+
+            updateParticipants(participants, bp, c);
+
+            if (participants.isEmpty()) {
+
+                break;
+            }
+        }
+
+
+        return c;
     }
 
     /**
@@ -322,10 +376,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
     private Map.Entry<STHolesBucket<R>, Long>
         getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
 
-        //TODO: Rectangle newBox = getSiblingSiblingBox(b1,b2);
+        R newBox = getSiblingSiblingBox(b1,b2);
         // the smallest box that encloses both b1 and b2 but does not
         // intersect partially with any other of bp
-        R newBox = b1.getBox(); //just temporary
+
 
         // I contains bp's children which are enclosed by bn box
         Collection<STHolesBucket<R>> I = new ArrayList<STHolesBucket<R>>();
