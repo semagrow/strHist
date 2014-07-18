@@ -194,7 +194,6 @@ public class RDFLiteralRange
     public RDFLiteralRange tightRange(RDFLiteralRange rdfLiteralRange) {
 
         if (infinite) return new RDFLiteralRange();
-        
         return null;
     }
 

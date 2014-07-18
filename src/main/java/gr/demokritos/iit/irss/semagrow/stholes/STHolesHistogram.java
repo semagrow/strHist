@@ -73,22 +73,22 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
     public void refine(QueryRecord<R> queryRecord) {
 
         // check if root is null
-        // expand root
-        if (!root.getBox().contains(queryRecord.getRectangle())) {
+        if (root == null) {
 
-            if (root.getChildren() == null) {
+            root = new STHolesBucket<R>(queryRecord.getRectangle(), null, null, null);
+        } else {
+            // expand root
+            if (!root.getBox().contains(queryRecord.getRectangle())) {
 
-                root.setBox(queryRecord.getRectangle());
-            } else {
-
-                R boxN = queryRecord.getRectangle();
-                Stat statsN= countMatchingTuples(queryRecord.getRectangle(), queryRecord);
+                // expand root box so that it contains q
+                R boxN = root.getBox().computeTightBox(queryRecord.getRectangle());
+                //todo: is this right;
+                Stat statsN = countMatchingTuples(queryRecord.getRectangle(), queryRecord);
                 Collection<STHolesBucket<R>> childrenN = new ArrayList<STHolesBucket<R>>();
                 STHolesBucket<R> rootN = new STHolesBucket<R>(boxN, statsN, childrenN, null);
                 rootN.addChild(root);
                 root = rootN;
             }
-
         }
 
         // get all c
