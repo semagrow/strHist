@@ -1,5 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -152,7 +155,18 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
     }
 
     public String toString() {
-        return "(" + begin + "-" + end + ")";
+
+        return "calendarRange: " + begin + "-" + end + "\n";
+
+    }
+
+    public static void main(String args[] ) throws ParseException {
+
+        DateFormat format = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" );
+        Date       dateBegin = format.parse( "2011-10-07T08:51:52.006Z" );
+        Date       dateEnd = format.parse( "2011-10-09T08:51:52.006Z" );
+        CalendarRange range1 = new CalendarRange(dateBegin, dateEnd);
+        System.out.println(range1);
     }
 
 }

@@ -62,6 +62,15 @@ public class RDFLiteralRange
         return range.isUnit();
     }
 
+    public String toString() {
+
+        //uriprefixes for PrefixRange
+        //uris for ExplicitSetRange
+        //intervalRange for IntervalRange
+        //calendarRange for CalendarRange
+        return range.toString();
+    }
+
     public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
 
         if (infinite) return literalRange;

@@ -85,6 +85,20 @@ public class ExplicitSetRange<T>
     }
 
 
+    public String toString() {
+        String res;
+
+        res = "uris: { ";
+
+        for (T p : items) {
+
+            res = res + p + " ";
+        }
+
+        res += "}";
+
+        return res;
+    }
 
     public boolean isUnit() {
 
@@ -116,5 +130,7 @@ public class ExplicitSetRange<T>
 		ExplicitSetRange<String> esr = (ExplicitSetRange) esr1.intersection(esr2);
 		Set<String> sss = ((ExplicitSetRange) esr).items;
 		System.out.println("Intersect: " + sss.toString());
+
+        System.out.println(esr2);
 	}
 }

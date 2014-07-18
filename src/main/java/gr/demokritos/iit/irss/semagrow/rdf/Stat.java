@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,5 +43,29 @@ public class Stat {
             return ((double)getFrequency()) / d;
         else
             return (double)0;
+    }
+
+    public String toString() {
+
+        String res;
+        res =   "statistics:\n"
+                + "\ttriples : \n\t\t" + frequency +
+                "\n\tdistinctSubjects : \n\t\t" + distinctCount.get(0) +
+                "\n\tdistinctPredicates : \n\t\t" + distinctCount.get(1) +
+                "\n\tdistinctObjects : \n\t\t" + distinctCount.get(2) + "\n";
+
+        return res;
+
+    }
+
+    public static void main(String [] args){
+
+        long frequency = 42;
+        List<Long> distinct = new ArrayList<Long>();
+        distinct.add((long)10);
+        distinct.add((long)20);
+        distinct.add((long)30);
+        Stat statistics = new Stat(frequency, distinct);
+        System.out.println(statistics);
     }
 }

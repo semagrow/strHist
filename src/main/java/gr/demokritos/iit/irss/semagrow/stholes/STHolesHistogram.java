@@ -77,6 +77,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
             root = new STHolesBucket<R>(queryRecord.getRectangle(), null, null, null);
         } else {
+
             // expand root
             if (!root.getBox().contains(queryRecord.getRectangle())) {
 
@@ -119,7 +120,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         // Find candidate hole
         R c = bucket.getBox().intersection(queryRecord.getRectangle());
 
-        // Shrink candidate hole
+        // Shrink candidate hole in such a way that b does not intersect
+        // with the rectangles of bucket.getChildren();
         List<STHolesBucket<R>> participants = new LinkedList<STHolesBucket<R>>();
 
         updateParticipants(participants, bucket, c);
@@ -136,9 +138,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
 
         //TODO: create a new rectangle / this is not the way to do it!
+        //todo: is this still a todo?
         //R r = bucket.getBox();
 
-        //TODO: shrink in such a way that b does not intersect with the rectangles of bucket.getChildren();
 
         // Collect candidate hole statistics
         Stat stats= countMatchingTuples(c, queryRecord);
@@ -205,7 +207,6 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
         // check if there are bucket with boxes that intersect with the rectangle of the query
 
-        //TODO:expand root so that it contains q if necessary
 
         candidates = getCandidateBucketsAux(root, candidates, queryBox);
 
@@ -271,6 +272,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             for (STHolesBucket<R> bc : parentBucket.getChildren()) {
 
                 if (bn.getBox().contains(bc.getBox())){
+
                     bc.setParent(bn);
                 }
             }
@@ -291,6 +293,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
              STHolesBucket<R> bn = bestMerge.getBn();
 
             (new STHolesBucket<R>()).merge(b1, b2, bn);
+            bucketsNum -= 1;
         }
     }
 
@@ -359,6 +362,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
     private Map.Entry<STHolesBucket<R>, Long>
             getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
 
+        if (!bc.getParent().equals(bp)) {
+            //todo: throw exception
+            return null;
+        }
         R newBox = bp.getBox();
         long newFreq = bp.getStatistics().getFrequency();
         List<Long> newDistinct = bp.getStatistics().getDistinctCount();
@@ -376,6 +383,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
     private Map.Entry<STHolesBucket<R>, Long>
         getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
 
+        if (!b1.getParent().equals(b2.getParent())) {
+            //todo: throw exception
+            return null;
+        }
         R newBox = getSiblingSiblingBox(b1,b2);
         // the smallest box that encloses both b1 and b2 but does not
         // intersect partially with any other of bp
