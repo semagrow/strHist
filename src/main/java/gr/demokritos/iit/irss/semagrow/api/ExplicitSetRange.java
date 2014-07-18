@@ -19,6 +19,11 @@ public class ExplicitSetRange<T>
 	}
 
 
+	public ExplicitSetRange() {
+		// TODO: Fix me!
+	}
+
+
 	public boolean contains(ExplicitSetRange<T> range) {
         return items.containsAll(range.items);
 	}

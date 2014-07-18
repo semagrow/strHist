@@ -15,7 +15,11 @@ public class PrefixRange
         this.prefixList = prefix;
     }
 
-    public boolean contains(String item) {
+    public PrefixRange() {
+		// TODO: Fix me!
+	}
+
+	public boolean contains(String item) {
 
         for (String p : prefixList) {
 
