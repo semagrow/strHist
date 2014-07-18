@@ -9,7 +9,7 @@ StatementPattern
    
 %%
 2
-[document=http://ie1.cc.uah.es:8080/ariadne/resource/Ariadne/1;title="Egyptian Division @en";description=blabla]
+[document=http://ie1.cc.uah.es:8080/ariadne/resource/Ariadne/1;title="Egyptian Division @en"]
 []
 1b40e6df-0123-4c09-bb44-8efb8689f33d
 1405345743068
