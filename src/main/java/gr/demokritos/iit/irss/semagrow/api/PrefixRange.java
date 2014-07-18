@@ -10,16 +10,22 @@ public class PrefixRange
         implements RangeLength<String>, Rangeable<PrefixRange> {
 
     private ArrayList<String> prefixList;
+    private boolean infinite = false;
 
     public PrefixRange(ArrayList<String> prefix) {
         this.prefixList = prefix;
     }
 
+    // Construct an infinite prefix range
     public PrefixRange() {
-		// TODO: Fix me!
+
+        this.prefixList = new ArrayList<String>();
+		infinite = true;
 	}
 
 	public boolean contains(String item) {
+
+        if (infinite) return true;
 
         for (String p : prefixList) {
 
@@ -31,6 +37,8 @@ public class PrefixRange
     }
 
     public boolean contains(PrefixRange range) {
+
+        if (infinite) return true;
 
         for (String p : prefixList) {
 
@@ -47,6 +55,8 @@ public class PrefixRange
 
    
     public boolean intersects(PrefixRange range) {
+
+        if (infinite) return true;
 
         for (String myP : prefixList) {
 
@@ -65,6 +75,8 @@ public class PrefixRange
 
     public PrefixRange tightRange(PrefixRange prefixRange) {
 
+        if (infinite) return new PrefixRange();
+
         ArrayList<String> prefixListN = new ArrayList<String>();
         prefixListN.addAll(prefixList);
 
@@ -80,6 +92,8 @@ public class PrefixRange
     }
 
     public PrefixRange intersection(PrefixRange range) {
+
+        if (infinite) return range;
 
         ArrayList<String> intersectionPrefixList = new ArrayList<String>();
 
@@ -104,6 +118,8 @@ public class PrefixRange
 
     public PrefixRange minus(PrefixRange prefixRange) {
 
+        //todo: infinite?
+
         ArrayList<String> prefixN = new ArrayList<String>(prefixList);
 
         //this will also be checked when choosing participant buckets
@@ -124,7 +140,12 @@ public class PrefixRange
         return new PrefixRange(prefixN);
     }
 
-    public boolean isUnit() { return (prefixList.size() == 1); }
+    public boolean isUnit() {
+
+        if (infinite) return false;
+
+        return (prefixList.size() == 1);
+    }
 
     public ArrayList<String> getPrefixList() {
         return prefixList;
@@ -209,6 +230,8 @@ public class PrefixRange
     }
 
     public long getLength() {
+
+        if (infinite) return Integer.MAX_VALUE;
         return prefixList.size();
     }
 }
