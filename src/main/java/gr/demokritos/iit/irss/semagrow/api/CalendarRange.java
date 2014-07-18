@@ -1,26 +1,27 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 
 /**
  * Created by efi on 16/7/2014.
  */
-public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeable<CalendarRange> {
+public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange> {
 
-    private XMLGregorianCalendar begin;
-    private XMLGregorianCalendar end;
+    private Date begin;
+    private Date end;
 
-    public CalendarRange(XMLGregorianCalendar begin, XMLGregorianCalendar end) {
+    public CalendarRange(Date begin, Date end) {
         this.begin = begin;
         this.end = end;
     }
 
-    public boolean contains(XMLGregorianCalendar date) {
+    public boolean contains(Date date) {
 
-        if (((begin.toGregorianCalendar().compareTo(
-                date.toGregorianCalendar())) < 0 ) &&
-                ((date.toGregorianCalendar().compareTo(
-                        end.toGregorianCalendar())) < 0) ){
+        if (((begin.compareTo(date)) < 0 ) &&
+                ((date.compareTo(end)) < 0) ){
             return true;
         }
         return false;
@@ -28,10 +29,8 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
 
     public boolean contains(CalendarRange range) {
 
-        if (((begin.toGregorianCalendar().compareTo(
-                range.getBegin().toGregorianCalendar())) < 0 ) &&
-                ((range.getBegin().toGregorianCalendar().compareTo(
-                        end.toGregorianCalendar())) < 0) ){
+        if (((begin.compareTo(range.getBegin())) < 0 ) &&
+                ((range.getBegin().compareTo(end)) < 0) ){
 
             return true;
         }
@@ -43,23 +42,21 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
     public boolean intersects(CalendarRange range) {
 
         CalendarRange res;
-        XMLGregorianCalendar nBegin = begin;
-        XMLGregorianCalendar nEnd = end;
+        Date nBegin = begin;
+        Date nEnd = end;
 
         // if begin before range.getBegin()
-        if ((begin.toGregorianCalendar().compareTo(
-                range.getBegin().toGregorianCalendar())) < 0 ){
+        if ((begin.compareTo(
+                range.getBegin())) < 0 ){
 
             nBegin = range.getBegin();
-        } else if ((end.toGregorianCalendar().compareTo(
-                range.getEnd().toGregorianCalendar())) > 0 ){
+        } else if ((end.compareTo(range.getEnd())) > 0 ){
 
             nEnd = range.getEnd();
         }
 
 
-        if (!(nBegin.toGregorianCalendar().compareTo(
-                nEnd.toGregorianCalendar()) < 0)) {
+        if (!(nBegin.compareTo(nEnd) < 0)) {
 
             return false;
         }
@@ -69,16 +66,14 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
 
 
     public CalendarRange tightRange(CalendarRange calendarRange) {
-        XMLGregorianCalendar beginN = begin;
-        XMLGregorianCalendar endN = end;
+        Date beginN = begin;
+        Date endN = end;
 
         // if begin after range.getBegin()
-        if ((begin.toGregorianCalendar().compareTo(
-                calendarRange.getBegin().toGregorianCalendar())) > 0 ){
+        if ((begin.compareTo(calendarRange.getBegin())) > 0 ){
 
             beginN = calendarRange.getBegin();
-        } else if ((end.toGregorianCalendar().compareTo(
-                calendarRange.getEnd().toGregorianCalendar())) < 0 ){
+        } else if ((end.compareTo(calendarRange.getEnd())) < 0 ){
 
             endN = calendarRange.getEnd();
         }
@@ -90,23 +85,20 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
     public CalendarRange intersection(CalendarRange range) {
 
         CalendarRange res;
-        XMLGregorianCalendar nBegin = begin;
-        XMLGregorianCalendar nEnd = end;
+        Date nBegin = begin;
+        Date nEnd = end;
 
         // if begin before range.getBegin()
-        if ((begin.toGregorianCalendar().compareTo(
-                range.getBegin().toGregorianCalendar())) < 0 ){
+        if ((begin.compareTo(range.getBegin())) < 0 ){
 
                 nBegin = range.getBegin();
-        } else if ((end.toGregorianCalendar().compareTo(
-                range.getEnd().toGregorianCalendar())) > 0 ){
+        } else if ((end.compareTo(range.getEnd())) > 0 ){
 
                 nEnd = range.getEnd();
         }
 
 
-        if ((nBegin.toGregorianCalendar().compareTo(
-                nEnd.toGregorianCalendar()) < 0)) {
+        if ((nBegin.compareTo(nEnd) < 0)) {
 
             res = new CalendarRange(nBegin, nEnd);
         } else {
@@ -120,16 +112,14 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
 
     public CalendarRange minus(CalendarRange calendarRange) {
 
-        XMLGregorianCalendar beginN = begin;
-        XMLGregorianCalendar endN = end;
+        Date beginN = begin;
+        Date endN = end;
 
         // if calendarRange.begin before begin
-        if ((calendarRange.begin.toGregorianCalendar().compareTo(
-                begin.toGregorianCalendar())) < 0 ) {
+        if ((calendarRange.begin.compareTo(begin)) < 0 ) {
 
             beginN = calendarRange.end;
-        } else if ((calendarRange.end.toGregorianCalendar().compareTo(
-                end.toGregorianCalendar())) > 0 )  {
+        } else if ((calendarRange.end.compareTo(end)) > 0 )  {
 
             endN = calendarRange.begin;
         }
@@ -140,21 +130,24 @@ public class CalendarRange implements RangeLength<XMLGregorianCalendar>, Rangeab
 
     public boolean isUnit() {
 
-        return begin.toGregorianCalendar().equals(
-                end.toGregorianCalendar());
+        return begin.equals(end);
     }
 
     public long getLength() {
+    	Calendar calendarBegin = new GregorianCalendar();
+    	calendarBegin.setTime(begin);
+    	
+    	Calendar calendarEnd = new GregorianCalendar();
+    	calendarBegin.setTime(end);   	
 
-        return  end.toGregorianCalendar().getTimeInMillis() -
-                begin.toGregorianCalendar().getTimeInMillis();
+        return calendarEnd.getTimeInMillis() - calendarBegin.getTimeInMillis();
     }
 
-    public XMLGregorianCalendar getBegin() {
+    public Date getBegin() {
         return begin;
     }
 
-    public XMLGregorianCalendar getEnd() {
+    public Date getEnd() {
         return end;
     }
 
