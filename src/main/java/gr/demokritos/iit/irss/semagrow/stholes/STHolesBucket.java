@@ -98,7 +98,6 @@ public class STHolesBucket<R extends Rectangle> {
         for (STHolesBucket<R> bi : bc.getChildren())
             bi.setParent(bn);
 
-        //return bn;
     }
 
     public static <R extends Rectangle<R>> 
