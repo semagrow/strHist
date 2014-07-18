@@ -1,6 +1,10 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,41 +49,91 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 	}// getRectangle
 
 
+	/**
+	 * TODO: Unchecked
+	 */
 	private RDFLiteralRange getObjectRange(Binding binding) {
+		RDFLiteralRange objectRange = null;
 		
 		// Check what's inside the object's value.
-		if (binding.getValue().contains("^^")) {
-			URI uri = getURIFromBinding(binding.getValue());	
+		if (binding.getValue().equals("")) {// If object is a variable
 			
+		} else if (binding.getValue().contains("^^")) {
+			String value = getValueFromURI(binding.getValue());
+			String type = getTypeFromURI(binding.getValue());
 			
-		} else if (binding.getValue().contains("@")) {
+			if (type.equals("int")) {
+				objectRange = new RDFLiteralRange(Integer.parseInt(value), Integer.parseInt(value));
+			} else if (type.equals("long")) {
+				objectRange = new RDFLiteralRange(Long.parseLong(value), Long.parseLong(value));
+			} else if (type.equals("dateTime")) {
+				
+				DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+				Date date = null;
+				
+				try {date = format.parse(value);}
+				catch (ParseException e) {e.printStackTrace();}
+				
+				if (date != null)
+					objectRange = new RDFLiteralRange(date, date);
+				else 
+					System.err.println("Date Format Error.");
+			}
 			
-		} else if (binding.getValue().contains("http://")) {
-			
-		} else {// Plain Literal
-			
-		}
+		} else {// Plain Literal or URI
+			objectRange = new RDFLiteralRange(binding.getValue());
+		}	
 		
+		return objectRange;
+	}// getObjectRange
+	
+	
+	public static void main(String[] args) {
+		String v = "\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\"^^<http://www.w3.org/2001/XMLSchema#dateTime>";
+		System.out.println(v);
+		System.out.println(getTypeFromURI(v));
+		System.out.println(getValueFromURI(v));
 		
-		
-		
-		return null;
 	}
 
 
-	private URI getURIFromBinding(String value) {
-		String uri = "";
+	/**
+	 * Extracts the Value from the URI, 
+ 	 * input: "192"^^<http://www.w3.org/2001/XMLSchema#int> returns: 192
+	 */
+	private static String getValueFromURI(String value) {
+		String val = "";
 		// Create a regex pattern.
-		String pattern = "(^^<=(.*?)>)";
+		String pattern = "\"(.*?)\"\\^\\^<(.*?)#(.*?)>";
 		// Create a Pattern object
 		Pattern r = Pattern.compile(pattern);
 		// Now create matcher object.
 		Matcher m = r.matcher(value);
 		
 		if (m.find())
-			uri = m.group(1);
+			val = m.group(1);
 		
-		return ValueFactoryImpl.getInstance().createURI(uri);			
+		return val;
+	}
+
+
+	/**
+	 * Extracts the Type from the URI, 
+ 	 * input: "192"^^<http://www.w3.org/2001/XMLSchema#int> returns: int
+	 */
+	private static String getTypeFromURI(String value) {
+		String type = "";
+		// Create a regex pattern.
+		String pattern = "\"(.*?)\"\\^\\^<(.*?)#(.*?)>";
+		// Create a Pattern object
+		Pattern r = Pattern.compile(pattern);
+		// Now create matcher object.
+		Matcher m = r.matcher(value);
+		
+		if (m.find())
+			type = m.group(3);
+		
+		return type;			
 	}
 
 
