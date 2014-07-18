@@ -1,11 +1,18 @@
 package gr.demokritos.iit.irss.semagrow.stholes;
 
 
+import gr.demokritos.iit.irss.semagrow.api.ExplicitSetRange;
+import gr.demokritos.iit.irss.semagrow.api.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.Stat;
+import org.openrdf.model.vocabulary.RDF;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by angel on 7/11/14.
@@ -170,5 +177,47 @@ public class STHolesBucket<R extends Rectangle> {
         result = 31 * result + statistics.hashCode();
         result = 31 * result + parent.hashCode();
         return result;
+    }
+
+    public String toString() {
+
+        String res = "bucket: \n" + box + statistics;
+
+        int childrenNum = children.size();
+        res += "childrenNum: \n\t" + childrenNum + "\n";
+        return res;
+    }
+
+    public static void main(String args[] ) {
+
+        ArrayList<String> myRangePrefixList = new ArrayList<String>();
+        myRangePrefixList.add("http://a/");
+        PrefixRange subjectRange = new PrefixRange(myRangePrefixList);
+
+        HashSet s1 = new HashSet<String>();
+        s1.add('a');
+        s1.add('b');
+        s1.add('c');
+        ExplicitSetRange predicateRange = new ExplicitSetRange(s1);
+
+        int low = 0;
+        int high = 10;
+        RDFLiteralRange objectRange = new RDFLiteralRange(0, 10);
+
+        RDFRectangle rect = new RDFRectangle(subjectRange, predicateRange, objectRange);
+
+        long frequency = 42;
+        List<Long> distinct = new ArrayList<Long>();
+        distinct.add((long)10);
+        distinct.add((long)20);
+        distinct.add((long)30);
+        Stat statistics = new Stat(frequency, distinct);
+
+        STHolesBucket<RDFRectangle> b1 = new STHolesBucket<RDFRectangle>(rect,statistics,null,null);
+        rect.setObjectRange(new RDFLiteralRange(2,8));
+        STHolesBucket<RDFRectangle> b2 = new STHolesBucket<RDFRectangle>(rect,statistics,null,b1);
+        STHolesBucket<RDFRectangle> b3 = new STHolesBucket<RDFRectangle>(rect,statistics,null,b1);
+        System.out.println(b1);
+        System.out.println("b2 equals b3: " + (b2.equals(b3)));
     }
 }

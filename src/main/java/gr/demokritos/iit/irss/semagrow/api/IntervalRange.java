@@ -9,6 +9,7 @@ import static java.lang.Math.min;
  */
 public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<IntervalRange> {
 
+    //todo: maybe replace int with long
     private int low;
 
     private int high;
@@ -91,7 +92,8 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
     public int getHigh() { return high; }
 
     public String toString() {
-        return "(" + low + "," + high + ")";
+
+        return "intervalRange: " + low + "-" + high + "\n";
     }
 
     public static void main(String [] args){
@@ -121,9 +123,9 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         res1 = myRange.contains(testRange1);
         res2 = myRange.contains(testRange2);
 
-        System.out.println("Range " + myRange.toString() + " contains range "
+        System.out.println("Range " + myRange.toString() + "contains range "
                 + testRange1.toString() + ":" + res1);
-        System.out.println("Range " + myRange.toString() + " contains range "
+        System.out.println("Range " + myRange.toString() + "contains range "
                 + testRange2.toString() + ":" + res2);
 
         //Test intersection method
@@ -140,11 +142,11 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
                 testRange3);
 
         System.out.println("Intersection of range " + myRange.toString() +
-                " and range " + testRange1.toString() + ":" + intersection1);
+                "and range " + testRange1.toString() + ": " + intersection1);
         System.out.println("Intersection of range " + myRange.toString() +
-                " and range " + testRange2.toString() + ":" + intersection2);
+                "and range " + testRange2.toString() + ":" + intersection2);
         System.out.println("Intersection of range " + myRange.toString() +
-                " and range " + testRange3.toString() + ":" + intersection3);
+                "and range " + testRange3.toString() + ":" + intersection3);
 
     }
 }

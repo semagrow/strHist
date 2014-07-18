@@ -4,6 +4,7 @@ import gr.demokritos.iit.irss.semagrow.api.*;
 
 import javax.security.auth.Subject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -143,5 +144,35 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 
     public void setSubjectRange(PrefixRange subjectRange) {
         this.subjectRange = subjectRange;
+    }
+
+    public String toString() {
+
+        String res = "rectangle:\n" +
+                "\tsubject:\n" + "\t\t" + subjectRange.toString() + "\n" +
+                "\tpredicate:\n" + "\t\t" + predicateRange.toString() + "\n" +
+                "\tobject:\n" + "\t\t" + objectRange.toString() + "\n";
+
+        return res;
+    }
+
+    public static void main(String args[] ) {
+        ArrayList<String> myRangePrefixList = new ArrayList<String>();
+        myRangePrefixList.add("http://a/");
+        PrefixRange subjectRange = new PrefixRange(myRangePrefixList);
+
+        HashSet s1 = new HashSet<String>();
+        s1.add('a');
+        s1.add('b');
+        s1.add('c');
+        ExplicitSetRange predicateRange = new ExplicitSetRange(s1);
+
+        int low = 0;
+        int high = 10;
+        RDFLiteralRange objectRange = new RDFLiteralRange(0, 10);
+
+        RDFRectangle rect = new RDFRectangle(subjectRange, predicateRange, objectRange);
+
+        System.out.println(rect);
     }
 }

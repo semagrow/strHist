@@ -52,8 +52,8 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 							cardinality++;
 						break;
 					case 2:
-						if (((ExplicitSetRange) rect.getRange(2)).contains(value))
-							cardinality++;
+						//if (((ExplicitSetRange) rect.getRange(2)).contains(value))
+						//	cardinality++;
 						break;
 					case 3:
 						// TODO: Change!

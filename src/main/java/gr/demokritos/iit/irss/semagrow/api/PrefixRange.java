@@ -155,14 +155,14 @@ public class PrefixRange
 
         String res;
 
-        res = "[";
+        res = "uriprefixes: { ";
 
         for (String p : prefixList) {
 
             res = res + p + " ";
         }
 
-        res += "]";
+        res += "}";
         return res;
     }
 
@@ -227,6 +227,8 @@ public class PrefixRange
         System.out.println("Intersection of range " + myRange.toString() +
                 " and range " + testRange3.toString() + ": "  + intersection3);
 
+        testRange3PrefixList.add("http://c");
+        System.out.println(new PrefixRange(testRange3PrefixList));
     }
 
     public long getLength() {
