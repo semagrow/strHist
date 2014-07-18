@@ -27,6 +27,12 @@ public class ExplicitSetRange<T>
 	}
 
 
+    public boolean contains(T value) {
+        if (infinite) return true;
+
+        return items.contains(value);
+    }
+    
 	public boolean contains(ExplicitSetRange<T> range) {
 
         if (infinite) return true;
