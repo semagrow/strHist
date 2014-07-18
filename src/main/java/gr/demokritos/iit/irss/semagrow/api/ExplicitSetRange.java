@@ -27,7 +27,8 @@ public class ExplicitSetRange<T>
 	}
 
 
-    public boolean contains(T value) {
+	// TODO: It should be T, but complains.
+    public boolean contains(String value) {
         if (infinite) return true;
 
         return items.contains(value);
