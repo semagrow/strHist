@@ -10,5 +10,5 @@ public interface QueryRecord<R extends Rectangle<R>> {
 
     R getRectangle();
 
-    QueryResult getResultSet();
+    QueryResult<R> getResultSet();
 }

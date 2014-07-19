@@ -161,15 +161,15 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         myRangePrefixList.add("http://a/");
         PrefixRange subjectRange = new PrefixRange(myRangePrefixList);
 
-        HashSet s1 = new HashSet<String>();
-        s1.add('a');
-        s1.add('b');
-        s1.add('c');
-        ExplicitSetRange predicateRange = new ExplicitSetRange(s1);
+        HashSet<String> s1 = new HashSet<String>();
+        s1.add("a");
+        s1.add("b");
+        s1.add("c");
+        ExplicitSetRange<String> predicateRange = new ExplicitSetRange<String>(s1);
 
         int low = 0;
         int high = 10;
-        RDFLiteralRange objectRange = new RDFLiteralRange(0, 10);
+        RDFLiteralRange objectRange = new RDFLiteralRange(low, high);
 
         RDFRectangle rect = new RDFRectangle(subjectRange, predicateRange, objectRange);
 

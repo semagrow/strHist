@@ -7,7 +7,7 @@ import gr.demokritos.iit.irss.semagrow.rdf.Stat;
  */
 public interface QueryResult<R extends Rectangle<R>> {
 
-    long getCardinality();
+    //long getCardinality();
 
     Stat getCardinality(R rect);
 

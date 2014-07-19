@@ -1,9 +1,9 @@
 package gr.demokritos.iit.irss.semagrow.stholes;
 
 import gr.demokritos.iit.irss.semagrow.api.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.api.QueryResult;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.Stat;
 
 import java.util.*;
@@ -20,9 +20,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
     private long bucketsNum = 0;
 
     public STHolesHistogram() {
-        //maxBucketsNum = 1000
-
-
+        //todo: choose a constant
+        maxBucketsNum = 1000;
         root = null;
         bucketsNum += bucketsNum;
     }
@@ -32,6 +31,12 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         refine(workload);
     }
 
+    /**
+     * estimates the number of tuples
+     * that match rectangle {rec}
+     * @param rec rectangle
+     * @return number of tuples
+     */
     public long estimate(R rec) {
         if (root != null)
             return estimateAux(rec, root);
@@ -39,6 +44,13 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             return 0;
     }
 
+    /**
+     * estimates the number of tuples contained in {rec}
+     * by finding the enclosing bucket(s)
+     * @param rec rectangle
+     * @param b bucket
+     * @return estimated number of tuples
+     */
     private long estimateAux(R rec, STHolesBucket<R> b) {
 
         boolean isEnclosingBucket = false;
@@ -66,10 +78,14 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
     public void refine(Iterable<? extends QueryRecord<R>> workload) {
 
-        for (QueryRecord qfr : workload)
+        for (QueryRecord<R> qfr : workload)
             refine(qfr);
     }
 
+    /**
+     * refines histogram using query feedback
+     * @param queryRecord query feedback
+     */
     public void refine(QueryRecord<R> queryRecord) {
 
         // check if root is null
@@ -95,12 +111,11 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         // get all c
         Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(queryRecord);
 
-        for (STHolesBucket bucket : candidates) {
+        for (STHolesBucket<R> bucket : candidates) {
 
-            STHolesBucket hole = shrink(bucket, queryRecord); //calculate intersection and shrink it
+            STHolesBucket<R> hole = shrink(bucket, queryRecord); //calculate intersection and shrink it
 
-            //if (inaccurateEstimation())
-            if (true)
+            if (isInaccurateEstimation(bucket,hole))
                 drillHole(bucket, hole);
         }
 
@@ -108,12 +123,24 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         compact();
     }
 
+    private boolean isInaccurateEstimation(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
+
+        int epsilon = 0; //todo: adjust parameter
+        Stat actualStatistics = hole.getStatistics();
+        Double actualDensity = actualStatistics.getDensity();
+
+        Stat curStatistics = bucket.getStatistics();
+        Double curDensity = curStatistics.getDensity();
+
+        return (Math.abs(actualDensity - curDensity) > epsilon);
+    }
+
     /**
      * creates a new bucket that has a rectangle that does not intersect with the children of {bucket}
      * and contains the number of tuples that matches the queryRecord
-     * @param bucket
-     * @param queryRecord
-     * @return
+     * @param bucket parent bucket
+     * @param queryRecord query feedback
+     * @return shrinked bucket
      */
     private STHolesBucket<R> shrink(STHolesBucket<R> bucket, QueryRecord<R> queryRecord) {
 
@@ -146,11 +173,18 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         Stat stats= countMatchingTuples(c, queryRecord);
 
         // Create candidate hole bucket
-        STHolesBucket<R> b = new STHolesBucket<R>(c, stats, null, null);
 
-        return b;
+        return new STHolesBucket<R>(c, stats, null, null);
     }
 
+    /**
+     * finds {bucket}'s children that partially intersect
+     * with candidate hole c and stores them
+     * in {participants} list
+     * @param participants list of participants
+     * @param bucket parent bucket
+     * @param c candidate hole
+     */
     private void updateParticipants(List<STHolesBucket<R>> participants,
                                     STHolesBucket<R> bucket, R c) {
 
@@ -164,6 +198,13 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         }
     }
 
+    /**
+     * finds the smallest box that encloses both {b1} and {b2} and
+     * does not intersect partially with any other child of their parent
+     * @param b1 sibling 1
+     * @param b2 sibling 2
+     * @return box after merge
+     */
     private R getSiblingSiblingBox(STHolesBucket<R> b1, STHolesBucket<R> b2) {
 
 
@@ -196,8 +237,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
     /**
      * get STHolesBuckets that have nonempty intersection with a queryrecord
-     * @param queryRecord
-     * @return
+     * @param queryRecord query feedback
+     * @return buckets that intersect with queryRecord
      */
     private Iterable<STHolesBucket<R>> getCandidateBuckets(QueryRecord<R> queryRecord) {
 
@@ -226,7 +267,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         }
 
 
-        for (STHolesBucket bc : b.getChildren())
+        for (STHolesBucket<R> bc : b.getChildren())
             getCandidateBucketsAux(bc,candidates,queryBox);
 
         return candidates;
@@ -235,18 +276,21 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
     /**
      * Count the tuples of the query result set that match the criteria of the given bucket.
-     * @param rectangle
-     * @param queryRecord
-     * @return
+     * @param rectangle rectangle
+     * @param queryRecord query feedback
+     * @return statistics
      */
     private Stat countMatchingTuples(R rectangle, QueryRecord<R> queryRecord) {
 
-        //return queryRecord.getResultSet().getCardinality(rectangle);
-        return null;
+        QueryResult<R> qr = queryRecord.getResultSet();
+
+        return qr.getCardinality(rectangle);
     }
 
     /**
      * Create a hole (i.e. a child STHolesBucket) inside an existing bucket
+     * @param parentBucket parent bucket
+     * @param candidateHole candidate hole
      */
     private void drillHole(STHolesBucket<R> parentBucket, STHolesBucket<R> candidateHole)
     {
@@ -262,41 +306,49 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         else {
 
             //STHolesBucket bn = new STHolesBucket(holeBoundaries, holeFrequency,null,parentBucket,distinct);
-            STHolesBucket<R> bn = candidateHole;
-            bn.setParent(parentBucket);
+            candidateHole.setParent(parentBucket);
 
-            parentBucket.addChild(bn);
+            parentBucket.addChild(candidateHole);
 
             bucketsNum += 1;
 
             for (STHolesBucket<R> bc : parentBucket.getChildren()) {
 
-                if (bn.getBox().contains(bc.getBox())){
+                if (candidateHole.getBox().contains(bc.getBox())){
 
-                    bc.setParent(bn);
+                    bc.setParent(candidateHole);
                 }
             }
         }
     }
 
+    /**
+     * merges superfluous buckets
+     */
     private void compact() {
-        // while too many buckets merge buckets with lowest penalty
 
         // while too many buckets compute merge penalty for each parent-child
         // and sibling pair, find the one with the minimum penalty and
         // call merge(b1,b2,bn)
         while (bucketsNum > maxBucketsNum) {
 
-             MergeInfo bestMerge = findBestMerge(root);
+             MergeInfo<R> bestMerge = findBestMerge(root);
              STHolesBucket<R> b1 = bestMerge.getB1();
              STHolesBucket<R> b2 = bestMerge.getB2();
              STHolesBucket<R> bn = bestMerge.getBn();
 
-            (new STHolesBucket<R>()).merge(b1, b2, bn);
+            STHolesBucket.merge(b1, b2, bn);
             bucketsNum -= 1;
         }
     }
 
+    /**
+     * identifies the merge with lowest penalty
+     * and returns the buckets to be merged and
+     * the resulting box
+     * @param b bucket
+     * @return best merge
+     */
     private MergeInfo<R> findBestMerge(STHolesBucket<R> b) {
 
         MergeInfo<R> bestMerge;
@@ -359,6 +411,13 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         return bestMerge;
     }
 
+    /**
+     * computes the penalty of merging parent bucket {bp}
+     * with child bucket {bp} and the resulting box
+     * @param bp parent bucket
+     * @param bc child bucket
+     * @return pair of merge penalty and resulting box
+     */
     private Map.Entry<STHolesBucket<R>, Long>
             getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
 
@@ -375,11 +434,18 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, null, newParent);
         long penalty = Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
 
-        AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res = new AbstractMap.SimpleEntry(bn, penalty);
+        AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res = new AbstractMap.SimpleEntry<STHolesBucket<R>, Long>(bn, penalty);
 
         return res;
     }
 
+    /**
+     * computes the penalty of merging siblings {b1} and {b2}
+     * and the resulting box
+     * @param b1 sibling 1
+     * @param b2 sibling 2
+     * @return pair of merge penalty and resulting box
+     */
     private Map.Entry<STHolesBucket<R>, Long>
         getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
 
@@ -441,13 +507,13 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         Stat newStatistics = new Stat(newFrequency, newDistinct);
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, newChildren, null);
 
-        long penalty = 0;
+        long penalty;
         penalty = Math.abs(b1.getEstimate(b1.getBox()) - bn.getEstimate(b1.getBox()))
         + Math.abs(b2.getEstimate(b2.getBox())-bn.getEstimate(b2.getBox()))
         + Math.abs(bp.getEstimate(bn.getBox()) - bn.getEstimate(bn.getBox()));
 
         AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res =
-                new AbstractMap.SimpleEntry(bn, penalty);
+                new AbstractMap.SimpleEntry<STHolesBucket<R>, Long>(bn, penalty);
 
         return res;
     }
