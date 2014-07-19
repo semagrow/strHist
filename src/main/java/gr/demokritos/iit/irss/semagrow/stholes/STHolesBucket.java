@@ -7,7 +7,6 @@ import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.Stat;
-import org.openrdf.model.vocabulary.RDF;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +24,7 @@ public class STHolesBucket<R extends Rectangle> {
 
     private Stat statistics;
 
-    private STHolesBucket parent;
+    private STHolesBucket<R> parent;
 
     public STHolesBucket() {
     }
@@ -37,7 +36,7 @@ public class STHolesBucket<R extends Rectangle> {
 
     public STHolesBucket(R box, Stat statistics,
                          Collection<STHolesBucket<R>> children,
-                         STHolesBucket parent) {
+                         STHolesBucket<R> parent) {
         this(box,statistics);
 
         if (children == null) {
@@ -112,6 +111,7 @@ public class STHolesBucket<R extends Rectangle> {
                                  STHolesBucket<R> b2,
                                  STHolesBucket<R> bn) 
     {
+        //todo: throw exception if they are not siblings
         STHolesBucket<R> newParent = b1.getParent();
 
         // Merge buckets b1, b2 into bn
@@ -194,15 +194,15 @@ public class STHolesBucket<R extends Rectangle> {
         myRangePrefixList.add("http://a/");
         PrefixRange subjectRange = new PrefixRange(myRangePrefixList);
 
-        HashSet s1 = new HashSet<String>();
-        s1.add('a');
-        s1.add('b');
-        s1.add('c');
-        ExplicitSetRange predicateRange = new ExplicitSetRange(s1);
+        HashSet<String> s1 = new HashSet<String>();
+        s1.add("a");
+        s1.add("b");
+        s1.add("c");
+        ExplicitSetRange<String> predicateRange = new ExplicitSetRange<String>(s1);
 
         int low = 0;
         int high = 10;
-        RDFLiteralRange objectRange = new RDFLiteralRange(0, 10);
+        RDFLiteralRange objectRange = new RDFLiteralRange(low, high);
 
         RDFRectangle rect = new RDFRectangle(subjectRange, predicateRange, objectRange);
 
