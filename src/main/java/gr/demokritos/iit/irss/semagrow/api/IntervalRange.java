@@ -36,12 +36,8 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         int nLow = max(low, range.getLow());
         int nHigh = min(high, range.getHigh());
 
-        if (nLow > nHigh) {
+        return nLow <= nHigh;
 
-            return false;
-        }
-
-        return true;
     }
 
 
@@ -134,11 +130,11 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         IntervalRange testRange3 = new IntervalRange(8,10);
 
 
-        IntervalRange intersection1 = (IntervalRange) myRange.intersection(
+        IntervalRange intersection1 = myRange.intersection(
                 testRange1);
-        IntervalRange intersection2 = (IntervalRange) myRange.intersection(
+        IntervalRange intersection2 = myRange.intersection(
                 testRange2);
-        IntervalRange intersection3 = (IntervalRange) myRange.intersection(
+        IntervalRange intersection3 = myRange.intersection(
                 testRange3);
 
         System.out.println("Intersection of range " + myRange.toString() +

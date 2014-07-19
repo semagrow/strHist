@@ -23,28 +23,21 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
 
     public boolean contains(Date date) {
 
-        if (((begin.compareTo(date)) < 0 ) &&
-                ((date.compareTo(end)) < 0) ){
-            return true;
-        }
-        return false;
+        return ((begin.compareTo(date)) < 0) &&
+                ((date.compareTo(end)) < 0);
     }
 
     public boolean contains(CalendarRange range) {
 
-        if (((begin.compareTo(range.getBegin())) < 0 ) &&
-                ((range.getBegin().compareTo(end)) < 0) ){
+        return ((begin.compareTo(range.getBegin())) < 0) &&
+                ((range.getBegin().compareTo(end)) < 0);
 
-            return true;
-        }
-
-        return false;
     }
 
 
     public boolean intersects(CalendarRange range) {
 
-        CalendarRange res;
+
         Date nBegin = begin;
         Date nEnd = end;
 
@@ -59,12 +52,8 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         }
 
 
-        if (!(nBegin.compareTo(nEnd) < 0)) {
+        return nBegin.compareTo(nEnd) < 0;
 
-            return false;
-        }
-
-        return true;
     }
 
 

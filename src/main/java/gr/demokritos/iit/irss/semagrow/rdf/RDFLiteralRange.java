@@ -33,7 +33,8 @@ public class RDFLiteralRange
 	}
 
 
-    public RDFLiteralRange(int low, int high) {
+    public RDFLiteralRange(int low, int high)
+    {
         this(XMLSchema.INTEGER, new IntervalRange<Integer>(low, high));
     }
 
@@ -51,6 +52,7 @@ public class RDFLiteralRange
     }
 
     public RDFLiteralRange(Date begin, Date end) {
+
         this(XMLSchema.DATETIME, new CalendarRange(begin, end));
     }
 

@@ -50,11 +50,8 @@ public class ExplicitSetRange<T>
 
         esr.items.retainAll(this.items);
 
-        if (esr.getLength() == 0) {
-            return false;
-        }
+        return esr.getLength() != 0;
 
-        return true;
     }
 
 
@@ -120,22 +117,22 @@ public class ExplicitSetRange<T>
         return items.size();
     }
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+
 	public static void main(String[] args) {
 
-		HashSet s1 = new HashSet<String>();
-		s1.add('a');
-		s1.add('b');
-		s1.add('c');
-		ExplicitSetRange esr1 = new ExplicitSetRange(s1);
-		HashSet s2 = new HashSet<String>();
-		s2.add('a');
-		s2.add('b');
-		s2.add('d');
-		ExplicitSetRange esr2 = new ExplicitSetRange(s2);
+		HashSet<String> s1 = new HashSet<String>();
+		s1.add("a");
+		s1.add("b");
+		s1.add("c");
+		ExplicitSetRange<String> esr1 = new ExplicitSetRange<String>(s1);
+		HashSet<String> s2 = new HashSet<String>();
+		s2.add("a");
+		s2.add("b");
+		s2.add("d");
+		ExplicitSetRange<String> esr2 = new ExplicitSetRange<String>(s2);
 
-		ExplicitSetRange<String> esr = (ExplicitSetRange) esr1.intersection(esr2);
-		Set<String> sss = ((ExplicitSetRange) esr).items;
+		ExplicitSetRange<String> esr = esr1.intersection(esr2);
+		Set<String> sss = esr.items;
 		System.out.println("Intersect: " + sss.toString());
 
         System.out.println(esr2);

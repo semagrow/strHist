@@ -1,11 +1,12 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
-import gr.demokritos.iit.irss.semagrow.api.*;
+import gr.demokritos.iit.irss.semagrow.api.ExplicitSetRange;
+import gr.demokritos.iit.irss.semagrow.api.PrefixRange;
+import gr.demokritos.iit.irss.semagrow.api.Range;
+import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 
-import javax.security.auth.Subject;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * Created by angel on 7/15/14.
