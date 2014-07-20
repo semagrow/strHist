@@ -22,16 +22,13 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
     }
 
     public boolean contains(Date date) {
-
-        return ((begin.compareTo(date)) < 0) &&
-                ((date.compareTo(end)) < 0);
+        return ((begin.compareTo(date)) <= 0) &&
+                ((date.compareTo(end)) <= 0);
     }
 
-    public boolean contains(CalendarRange range) {
-
-        return ((begin.compareTo(range.getBegin())) < 0) &&
-                ((range.getBegin().compareTo(end)) < 0);
-
+    public boolean contains(CalendarRange range) { 
+        return ((begin.compareTo(range.getBegin())) <= 0) &&
+                ((range.getBegin().compareTo(end)) <= 0);
     }
 
 

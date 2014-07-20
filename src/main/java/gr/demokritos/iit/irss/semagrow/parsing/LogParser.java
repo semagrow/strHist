@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.parsing;
 
 import gr.demokritos.iit.irss.semagrow.rdf.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,7 +53,7 @@ public class LogParser {
 
 					processTwo(split[1], lq);
 
-					processThree(split[2], lq);
+					processThree(split[2], lq);				
 
 					// Reset the variables
 					text = "";
@@ -110,7 +111,7 @@ public class LogParser {
 		if (string.contains("name") && !string.contains("value")) {// Variable
 
 			String pattern = "name=(.*?)\\)";
-
+			
 			// Create a Pattern object
 			Pattern r = Pattern.compile(pattern);
 
@@ -119,7 +120,7 @@ public class LogParser {
 
 			if (m.find())
 				spv = new Binding(m.group(1));
-
+			
 		} else if (string.contains("name") && string.contains("value")) {// Const
 
 			// Extract Name.
@@ -133,7 +134,7 @@ public class LogParser {
 				name = m.group(1).replace("-const-", "");
 
 			// Extract Value.
-			pattern = "value=(.*?),";
+			pattern = "value=(.*?)(,|\\))";
 			// Create a Pattern object
 			r = Pattern.compile(pattern);
 			// Now create matcher object.
@@ -143,8 +144,10 @@ public class LogParser {
 				value = m.group(1);
 
 			spv = new Binding(name, value);
-
+//			System.out.println(spv.getName() + " = " + spv.getValue());
 		}// if
+		
+
 
 		return spv;
 	}// extractStatementPatternVariable
@@ -164,11 +167,12 @@ public class LogParser {
 	
 	private void processQuery(LogQuery lq) {
 		// Just a dump object.
-		RDFQueryRecord qr =  new RDFQueryRecord(lq);
+		RDFQueryRecord qr = new RDFQueryRecord(lq);
 		// Construct query's BindingSet.
 		BindingSet bs = new BindingSet();
+		
 		for (Binding binding : lq.getQueryBindings()) 
-			bs.getBindings().add(binding);
+			bs.getBindings().add(binding);				
 		
 		// Check if Query already exists in Collection.
 		int index = collection.indexOf(qr);
@@ -179,7 +183,7 @@ public class LogParser {
 			// Get this Query from the Collection.
 			RDFQueryRecord qrTemp = collection.get(index);
 			// Add BindingSet into Query.
-			qrTemp.getQueryResult().getBindingSets().add(bs);
+			qrTemp.getQueryResult().getBindingSets().add(bs);		
 
 		} else { // Doesn't exist in Collection.
 			System.out.println("Query Not Contained");
@@ -188,19 +192,27 @@ public class LogParser {
 			qr.getQueryResult().getBindingSets().add(bs);
 			// Add the Query into Collection.
 			collection.add(qr);
-		}// else		
+			
+		}// else	
+		
 	}// processQuery
 
 
 	/**
 	 * TEST MAIN	
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
+		
 		long start = System.currentTimeMillis();
 
 //		LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs.log");
 		LogParser lp = new LogParser("src\\main\\resources\\test.txt");
-		lp.parse();
+		lp.parse();		
+		
+		// Print the parsed queries signatures.
+		for (RDFQueryRecord qr : lp.getCollection()) {
+			System.out.println(qr.getQuery());
+		}
 		
 		/*
 		 * Report
@@ -211,11 +223,27 @@ public class LogParser {
 				+ " sec.");
 		System.out.println("Total Distinct Log Queries Parsed: "
 				+ lp.getCollection().size());
-		
-		
-//		System.out.println(lp.getCollection().get(0).getQueryResult().getCardinality());
-//		System.out.println(lp.getCollection().get(1).getQueryResult().getCardinality());
 		System.out.println("********************************");
+		
+		RDFQueryRecord rdfqr = new RDFQueryRecord(lp.getCollection().get(0).getLogQuery());	
+		RDFRectangle rec = rdfqr.getRectangle();
+		System.out.println(rec);
+		
+		RDFQueryRecord rdfqr1 = new RDFQueryRecord(lp.getCollection().get(0).getLogQuery());	
+		RDFRectangle rec1 = rdfqr1.getRectangle();
+		System.out.println(rec1);
+		
+		
+		System.out.println(lp.getCollection().get(0).getQueryResult().getCardinality(rec));
+		
+		
+		
+		
+		
+		
+		
+
+		
 	}// main
 
 

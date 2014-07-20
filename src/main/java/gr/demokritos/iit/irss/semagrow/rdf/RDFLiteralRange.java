@@ -73,7 +73,8 @@ public class RDFLiteralRange
         return range.toString();
     }
 
-    public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
+    @SuppressWarnings("unchecked")
+	public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
 
         if (infinite) return literalRange;
 
@@ -114,33 +115,40 @@ public class RDFLiteralRange
 	}
 
 
+	@SuppressWarnings("unchecked")
 	public boolean contains(Value value) {
 
         if (infinite) return true;
-
+        
     	if (value instanceof Literal) {
     		Literal literal = (Literal)value;
+    		
     		if (literal.getDatatype() == valueType) { 
-    			if (valueType.equals(XMLSchema.INTEGER)) {
+    			if (valueType.equals(XMLSchema.INTEGER)) {    				
     				return ((IntervalRange<Integer>) range).contains(literal.intValue());
-    			} else if (valueType.equals(XMLSchema.LONG)) {
+    				
+    			} else if (valueType.equals(XMLSchema.LONG)) {    				
     				return ((IntervalRange<Integer>) range).contains(literal.intValue());
-             } else if (valueType.equals(XMLSchema.STRING)) {
-                 return ((PrefixRange) range).contains(literal.stringValue());
-             } else if (valueType.equals(XMLSchema.DATETIME)) {            	 
-
-                 return ((CalendarRange) range).
-                		 contains(literal.calendarValue().
-                				 toGregorianCalendar().getTime());
-             }
+    				
+    			} else if (valueType.equals(XMLSchema.STRING)) {            	 
+    				return ((PrefixRange) range).contains(literal.stringValue());
+                 
+    			} else if (valueType.equals(XMLSchema.DATETIME)) {           	 
+    				return ((CalendarRange) range).
+    						contains(literal.calendarValue().
+    								toGregorianCalendar().getTime());
+    			}
     		}
-    	} else if (value instanceof URI) { 
-    		((PrefixRange) range).contains(((URI)value).stringValue());
+    	} else if (value instanceof URI) {  
+    		if (range instanceof PrefixRange)
+    			return ((PrefixRange) range).contains(((URI)value).stringValue());   		 
     	}
+    		
     	return false;
     }
 
-    public boolean contains(RDFLiteralRange literalRange) {
+    @SuppressWarnings("unchecked")
+	public boolean contains(RDFLiteralRange literalRange) {
 
         if (infinite) return true;
 
@@ -160,8 +168,7 @@ public class RDFLiteralRange
 
                 return ((PrefixRange) range).contains(
                         (PrefixRange) literalRange.getRange());
-            } else if (valueType.equals(XMLSchema.DATETIME)) {
-
+            } else if (valueType.equals(XMLSchema.DATETIME)) {            	
                 return ((CalendarRange) range).contains(
                         (CalendarRange) literalRange.getRange());
             }
@@ -171,7 +178,8 @@ public class RDFLiteralRange
     }
 
     
-    public boolean intersects(RDFLiteralRange literalRange) {
+    @SuppressWarnings("unchecked")
+	public boolean intersects(RDFLiteralRange literalRange) {
 
         if (infinite) return true;
 
