@@ -19,8 +19,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.XMLSchema;
 
 public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
@@ -39,7 +42,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 	 * Given a Rectangle it returns a Stat object containing total frequency and
 	 * distinct count for each dimension.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	public Stat getCardinality(RDFRectangle rect) {
 
 		long frequency = 0;
@@ -52,64 +55,94 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 		Set<String> objectStringSet = new HashSet<String>();	
 		
 
-		// First check if const variables of the query exist in rectangle.
+		// First check if all const variables of the query exist in rectangle.
 		// If not, then cardinality is surely 0.
 		if (areConstContained(rect)) {
-			for (BindingSet bs : bindingSets) {
+			System.err.println("BindingSet Size: " + bindingSets.size());
+			
+			for (BindingSet bs : bindingSets) {				
+				
 				for (Binding b : bs.getBindings()) {
 					// Find if the Binding is Subject or Predicate or Object.
 					int type = getBindingType(b);
-
-					String value = clean(b.getValue());
-
+					
+					String value = clean(b.getValue());// dn exei idiaiterh xrhsimothta
+					
+					System.out.println(">>>" + type);
+					System.out.println(">>>" + value);
 					switch (type) {
 					case 1:		// Subjects
-						if (((PrefixRange) rect.getRange(1)).contains(value)) 
+						if (((PrefixRange) rect.getRange(type)).contains(value)) 
 							frequency++;
 						prefixSet.add(value);
 						break;
 					case 2:		// Predicates
-						if (((ExplicitSetRange) rect.getRange(2)).contains(value))
+						if (((ExplicitSetRange) rect.getRange(type)).contains(value))
 							frequency++;
 						predicateSet.add(value);
 						break;
 					case 3:		// Objects
-						// TODO: Change! 					
+						// TODO: Change! 		
 						
-						if (value.contains("^^")) {
+						Value val = null;
+						
+						if (value.contains("^^") && value.contains("http://")) {// XSD URI
+							
 							// Get the value of the URI.
 							String valueURI = Utilities.getValueFromURI(value);
 							// Get the type of the URI.
 							String typeURI = Utilities.getTypeFromURI(value);
-							// Erase the value from URI and keep only the URL.
-							String url = Utilities.cleanURI(value);							
-							
-							// Frequency
-							URI l = ValueFactoryImpl.getInstance().createURI(url);
-							if (((RDFLiteralRange) rect.getRange(3)).contains(l))
-								frequency++;
-							
-							// Distinct
+												
 							if (typeURI.equals("int")) {
+								val = ValueFactoryImpl.getInstance()
+										.createLiteral(valueURI, XMLSchema.INTEGER);	
+								
 								objectIntegerSet.add(Integer.parseInt(valueURI));
+								
 							} else if (typeURI.equals("long")) {
+								val = ValueFactoryImpl.getInstance()
+										.createLiteral(valueURI, XMLSchema.LONG);
+								
 								objectLongSet.add(Long.parseLong(valueURI));
+								
 							} else if (typeURI.equals("dateTime")) {
 								
+								DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 								Date date = null;
 								
-								try {date = Utilities.dateFormat.parse(valueURI);}
+								try {date = format.parse(valueURI);}
 								catch (ParseException e) {e.printStackTrace();}
 								
-								objectDateSet.add(date);
+								if (date != null) {
+									 if (((RDFLiteralRange) rect.getRange(type))
+											.contains(new RDFLiteralRange(date, date))) {
+										 frequency++;
+									 }
+									 
+									 objectDateSet.add(date);
+									
+									break;								
+								} else 
+									System.err.println("Date Format Error at: " + getClass().getName());
 								
-							}// if													
-						}// if
-						else {// Plain Literal or URL
+							}// if	
+							
+						} else if (!value.contains("^^") && value.contains("http://")) {// URL							
+							val = ValueFactoryImpl.getInstance()
+									.createURI(value);
+							
 							objectStringSet.add(value);
-						}						
+							
+						} else {// Plain Literal
+							val = ValueFactoryImpl.getInstance()
+									.createLiteral(value, XMLSchema.STRING);
+							
+							objectStringSet.add(value);							
+						}					
+													
+						if (((RDFLiteralRange) rect.getRange(type)).contains(val)) 
+							frequency++;
 						
-						break;
 					default:
 						System.err.println("Not a valid Binding.");
 						break;
@@ -118,6 +151,8 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 				}// for
 			}// for
 		}// if
+		else
+			System.err.println("Not all query's const variables exist in Rectangle");	
 		
 		// Subject distinct count
 		distinctCount.add((long)prefixSet.size()); 
@@ -143,10 +178,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 	 */
 	private int getBindingType(Binding b) {
 		String name = b.getName();
-
-		for (int i = 1; i <= queryStatements.size(); i++) {
+		
+		for (int i = 0; i < queryStatements.size(); i++) {
 			if (queryStatements.get(i).getName().equals(name))
-				return i;
+				return i + 1;
 		}
 
 		return 0;
@@ -154,34 +189,83 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
 
 	/**
-	 * Finds the const variables of the Query and checks if they exist in
+	 * Finds all the const variables of the Query and checks if they exist in
 	 * Rectangle.
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	 */	
+	@SuppressWarnings("rawtypes")
 	private boolean areConstContained(RDFRectangle rect) {
 
 		boolean b = true;
+		
 		// Find the const variables of the query and check them.
 		for (int i = 0; i < queryStatements.size(); i++) {
-			if (!queryStatements.get(i).getValue().equals("")) { // Is a Const
-																	// Variable
-
-				String value = clean(queryStatements.get(i).getValue());
-
+			
+			if (!queryStatements.get(i).getValue().equals("")) { // Is a Const Variable
+				
+				String value = clean(queryStatements.get(i).getValue());				
+				
 				switch (i) {
+				case 0:
+					b = b && ((PrefixRange) rect.getRange(i + 1)).contains(value);					
+					break;
 				case 1:
-					b = b && ((PrefixRange) rect.getRange(i)).contains(value);
+					b = b && ((ExplicitSetRange) rect.getRange(i + 1)).contains(value);					
 					break;
 				case 2:
-					//b = b && ((ExplicitSetRange) rect.getRange(i)).contains(value);
-					break;
-				case 3:
 					// TODO: change!
-					URI l = ValueFactoryImpl.getInstance().createURI(value);
-					b = b && ((RDFLiteralRange) rect.getRange(i)).contains(l);
+					
+					Value val = null;
+					
+					if (value.contains("^^") && value.contains("http://")) {// XSD URI
+						
+						// Get the value of the URI.
+						String valueURI = Utilities.getValueFromURI(value);
+						// Get the type of the URI.
+						String typeURI = Utilities.getTypeFromURI(value);
+											
+						if (typeURI.equals("int")) {
+							val = ValueFactoryImpl.getInstance()
+									.createLiteral(valueURI, XMLSchema.INTEGER);								
+						} else if (typeURI.equals("long")) {
+							val = ValueFactoryImpl.getInstance()
+									.createLiteral(valueURI, XMLSchema.LONG);
+						} else if (typeURI.equals("dateTime")) {	
+							// Special handling of DateTime because there is
+							// a 3 hours error when converting Gregorian to Date
+							// literal.calendarValue().toGregorianCalendar().getTime()
+							//val = ValueFactoryImpl.getInstance()
+							//		.createLiteral(valueURI, XMLSchema.DATETIME);
+							
+							DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+							Date date = null;
+							
+							try {date = format.parse(valueURI);}
+							catch (ParseException e) {e.printStackTrace();}
+							
+							if (date != null) {
+								b = b && ((RDFLiteralRange) rect.getRange(i + 1))
+										.contains(new RDFLiteralRange(date, date));
+								
+								break;								
+							} else 
+								System.err.println("Date Format Error at: " + getClass().getName());
+							
+						}// if	
+						
+					} else if (!value.contains("^^") && value.contains("http://")) {// URL
+						
+						val = ValueFactoryImpl.getInstance()
+								.createURI(value);
+						
+					} else {// Plain Literal
+						val = ValueFactoryImpl.getInstance()
+								.createLiteral(value, XMLSchema.STRING);						
+					}					
+												
+					b = b && ((RDFLiteralRange) rect.getRange(i + 1)).contains(val);
 					break;
 				}
-
+				
 			}// if
 			if (!b)
 				return false;
@@ -208,7 +292,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 			string = string.replace(m.group(0), "");
 		}
 
-		string = string.replaceAll("\"", "");
+//		string = string.replaceAll("\"", "");
 
 		return string.trim();
 	}

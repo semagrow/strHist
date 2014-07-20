@@ -41,7 +41,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 		ExplicitSetRange<String> predicateRange = getPredicateRange(logQuery.getQueryStatements().get(1));
 
 		RDFLiteralRange objectRange = getObjectRange(logQuery.getQueryStatements().get(2));
-
+				
 		return new RDFRectangle(subjectRange, predicateRange, objectRange);
 	}// getRectangle
 
@@ -55,7 +55,9 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 		// Check what's inside the object's value.
 		if (binding.getValue().equals("")) {// If object is a variable
 			objectRange = new RDFLiteralRange();
-			
+			System.err.println("Empty Object");
+			//TODO: Xtypaei nullpointerexception giati ston keno constructor tou RDFLiteralRange
+			// den dinetai timi sti metavliti range i ipoia xrisimopoieitai stin toString
 		} else if (binding.getValue().contains("^^")) {// URI
 			String value = Utilities.getValueFromURI(binding.getValue());
 			String type = Utilities.getTypeFromURI(binding.getValue());
