@@ -20,20 +20,22 @@ public class ExplicitSetRange<T>
 	}
 
 
-    // Construct an infinite expilicitSet range
+    // Construct an infinite explicitSet range
 	public ExplicitSetRange() {
         this.items = new HashSet<T>();
 		infinite = true;
 	}
 
 
+    //Tested
 	// TODO: It should be T, but complains.
     public boolean contains(String value) {
         if (infinite) return true;
 
         return items.contains(value);
     }
-    
+
+    //Tested
 	public boolean contains(ExplicitSetRange<T> range) {
 
         if (infinite) return true;
@@ -41,7 +43,7 @@ public class ExplicitSetRange<T>
         return items.containsAll(range.items);
 	}
 
-   
+    //Tested
     public boolean intersects(ExplicitSetRange<T> range) {
 
         if (infinite) return true;
@@ -55,6 +57,7 @@ public class ExplicitSetRange<T>
     }
 
 
+    //Tested
     public ExplicitSetRange<T> tightRange(ExplicitSetRange<T> tExplicitSetRange) {
 
         if (infinite) return new ExplicitSetRange<T>();
@@ -62,10 +65,10 @@ public class ExplicitSetRange<T>
         Set<T> itemsN = new HashSet<T>(items);
         itemsN.addAll(tExplicitSetRange.items);
 
-        return null;
+        return new ExplicitSetRange<T>(itemsN);
     }
 
-
+    //Tested
     public ExplicitSetRange<T> intersection(ExplicitSetRange<T> range) {
 
         if (infinite) return range;
@@ -78,7 +81,7 @@ public class ExplicitSetRange<T>
 	}
 
     
-
+    //Tested
     public ExplicitSetRange<T> minus(ExplicitSetRange<T> tExplicitSetRange) {
 
         //todo: handle infinite
@@ -89,6 +92,7 @@ public class ExplicitSetRange<T>
     }
 
 
+    //Tested
     public String toString() {
         String res;
 
@@ -130,11 +134,41 @@ public class ExplicitSetRange<T>
 		s2.add("b");
 		s2.add("d");
 		ExplicitSetRange<String> esr2 = new ExplicitSetRange<String>(s2);
+        HashSet<String> s3 = new HashSet<String>();
+        s3.add("a");
+        s3.add("b");
+        ExplicitSetRange<String> esr3 = new ExplicitSetRange<String>(s3);
+        HashSet<String> s4 = new HashSet<String>();
+        s4.add("c");
+        s4.add("d");
+        ExplicitSetRange<String> esr4 = new ExplicitSetRange<String>(s4);
 
-		ExplicitSetRange<String> esr = esr1.intersection(esr2);
-		Set<String> sss = esr.items;
-		System.out.println("Intersect: " + sss.toString());
+        //Test contains
+        String v1 = "a";
+        System.out.println(esr1 + " contains " + v1 + " : " +
+                esr1.contains(v1));
+        System.out.println(esr1 + " contains " + esr3 + " : " +
+                esr1.contains(esr3));
 
-        System.out.println(esr2);
+        //Test intersection
+        if (esr1.intersects(esr2)) {
+            System.out.println(esr1 + " intersection with " + esr2 +
+                    " = " + esr1.intersection(esr2));
+        }
+        if (esr3.intersects(esr4)) {
+            System.out.println("Intersects test failed");
+        }
+        //Test tight range
+        System.out.println("Tight range of " + esr1 + " and " + esr2 +
+                " = " + esr1.tightRange(esr2));
+        //Test minus
+        System.out.println(esr1 + " minus " + esr2 + " = " +
+                esr1.minus(esr2));
+        System.out.println(esr1 + " minus " + esr3 + " = " +
+                esr1.minus(esr3));
+        System.out.println(esr3 + " minus " + esr1 + " = " +
+                esr3.minus(esr1));
+
+
 	}
 }
