@@ -42,8 +42,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         Date nEnd = end;
 
         // if begin before range.getBegin()
-        if ((begin.compareTo(
-                range.getBegin())) < 0 ){
+        if ((begin.compareTo(range.getBegin())) < 0 ){
 
             nBegin = range.getBegin();
         } else if ((end.compareTo(range.getEnd())) > 0 ){
@@ -107,6 +106,31 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         Date beginN = begin;
         Date endN = end;
 
+        Date dummyDate = new Date();
+
+        //Scenario 1: participant contains bucket
+        // in this dimension
+        if (calendarRange.contains(this)) {
+
+            return new CalendarRange(dummyDate, dummyDate);
+        }
+        //Scenario 2: bucket encloses participant range
+        // in this dimension
+        if (this.contains(calendarRange)) {
+
+            long candidate1 = calendarRange.begin.getTime() - begin.getTime();
+            long candidate2 = end.getTime() - calendarRange.end.getTime();
+
+            if (candidate1 > candidate2) {
+
+                return new CalendarRange(begin, calendarRange.begin);
+            } else {
+
+                return new CalendarRange(calendarRange.end, end);
+            }
+
+        }
+        //Scenario 3: default case
         // if calendarRange.begin before begin
         if ((calendarRange.begin.compareTo(begin)) < 0 ) {
 
