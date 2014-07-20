@@ -23,6 +23,7 @@ public class PrefixRange
 		infinite = true;
 	}
 
+    //Tested
 	public boolean contains(String item) {
 
         if (infinite) return true;
@@ -36,6 +37,7 @@ public class PrefixRange
         return false;
     }
 
+    //Tested
     public boolean contains(PrefixRange range) {
 
         if (infinite) return true;
@@ -53,7 +55,7 @@ public class PrefixRange
         return false;
     }
 
-   
+   //Tested
     public boolean intersects(PrefixRange range) {
 
         if (infinite) return true;
@@ -73,6 +75,7 @@ public class PrefixRange
         return false;
     }
 
+    //Tested
     public PrefixRange tightRange(PrefixRange prefixRange) {
 
         if (infinite) return new PrefixRange();
@@ -91,6 +94,7 @@ public class PrefixRange
         return new PrefixRange(prefixListN);
     }
 
+    //Tested
     public PrefixRange intersection(PrefixRange range) {
 
         if (infinite) return range;
@@ -116,26 +120,30 @@ public class PrefixRange
         return new PrefixRange(intersectionPrefixList);
     }
 
+    //Tested
     public PrefixRange minus(PrefixRange prefixRange) {
 
         //todo: infinite?
 
         ArrayList<String> prefixN = new ArrayList<String>(prefixList);
 
-        //this will also be checked when choosing participant buckets
-        if (!this.contains(prefixRange)) {
 
-            for (String myP : prefixList) {
+        if (prefixList.contains(this)) {
 
-                for (String otherP : prefixRange.prefixList) {
+            return new PrefixRange(new ArrayList<String>());
+        }
 
-                    if (otherP.startsWith(myP)) {
+        for (String myP : prefixList) {
 
-                        prefixN.remove(myP);
-                    }
+            for (String otherP : prefixRange.prefixList) {
+
+                if (otherP.startsWith(myP)) {
+
+                    prefixN.remove(myP);
                 }
             }
         }
+
 
         return new PrefixRange(prefixN);
     }
@@ -151,6 +159,7 @@ public class PrefixRange
         return prefixList;
     }
 
+    //Tested
     public String toString() {
 
         String res;
@@ -224,11 +233,23 @@ public class PrefixRange
                 " and range " + testRange1.toString() + ": " + intersection1);
         System.out.println("Intersection of range " + myRange.toString() +
                 " and range " + testRange2.toString() + ": " + intersection2);
-        System.out.println("Intersection of range " + myRange.toString() +
-                " and range " + testRange3.toString() + ": "  + intersection3);
+        if (myRange.intersects(testRange3)) {
+            System.out.println("Intersection of range " + myRange.toString() +
+                    " and range " + testRange3.toString() + ": " + intersection3);
+        }
 
         testRange3PrefixList.add("http://c");
         System.out.println(new PrefixRange(testRange3PrefixList));
+
+        //Test tight range
+        PrefixRange testRange4 = new PrefixRange(testRange3PrefixList);
+        System.out.println("Tight range of " + myRange + " and " + testRange4 +
+                " = " + myRange.tightRange(testRange4));
+
+        //Test minus
+        PrefixRange testRange5 = myRange.tightRange(testRange4);
+        System.out.println(testRange5 + " minus " + testRange1 + " = " +
+                testRange5.minus(testRange1));
     }
 
     public long getLength() {
