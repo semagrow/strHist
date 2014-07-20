@@ -21,20 +21,22 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         this.end = end;
     }
 
+    //Tested
     public boolean contains(Date date) {
 
-        return ((begin.compareTo(date)) < 0) &&
-                ((date.compareTo(end)) < 0);
+        return ((begin.compareTo(date)) <= 0) &&
+                ((date.compareTo(end)) <= 0);
     }
 
+    //Tested
     public boolean contains(CalendarRange range) {
 
-        return ((begin.compareTo(range.getBegin())) < 0) &&
-                ((range.getBegin().compareTo(end)) < 0);
+        return ((begin.compareTo(range.getBegin())) <= 0) &&
+                ((range.getEnd().compareTo(end)) <= 0);
 
     }
 
-
+    //Tested
     public boolean intersects(CalendarRange range) {
 
 
@@ -51,11 +53,12 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         }
 
 
-        return nBegin.compareTo(nEnd) < 0;
+        return nBegin.compareTo(nEnd) <= 0;
 
     }
 
 
+    //Tested
     public CalendarRange tightRange(CalendarRange calendarRange) {
         Date beginN = begin;
         Date endN = end;
@@ -64,7 +67,9 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         if ((begin.compareTo(calendarRange.getBegin())) > 0 ){
 
             beginN = calendarRange.getBegin();
-        } else if ((end.compareTo(calendarRange.getEnd())) < 0 ){
+        }
+
+        if ((end.compareTo(calendarRange.getEnd())) < 0 ){
 
             endN = calendarRange.getEnd();
         }
@@ -72,7 +77,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         return new CalendarRange(beginN, endN);
     }
 
-
+    //Tested
     public CalendarRange intersection(CalendarRange range) {
 
         CalendarRange res;
@@ -89,7 +94,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         }
 
 
-        if ((nBegin.compareTo(nEnd) < 0)) {
+        if ((nBegin.compareTo(nEnd) <= 0)) {
 
             res = new CalendarRange(nBegin, nEnd);
         } else {
@@ -101,6 +106,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
     }
 
 
+    //Tested
     public CalendarRange minus(CalendarRange calendarRange) {
 
         Date beginN = begin;
@@ -111,7 +117,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         //Scenario 1: participant contains bucket
         // in this dimension
         if (calendarRange.contains(this)) {
-
+            System.out.println("boom");
             return new CalendarRange(dummyDate, dummyDate);
         }
         //Scenario 2: bucket encloses participant range
@@ -121,7 +127,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
             long candidate1 = calendarRange.begin.getTime() - begin.getTime();
             long candidate2 = end.getTime() - calendarRange.end.getTime();
 
-            if (candidate1 > candidate2) {
+            if (candidate1 >= candidate2) {
 
                 return new CalendarRange(begin, calendarRange.begin);
             } else {
@@ -149,6 +155,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         return begin.equals(end);
     }
 
+    //Tested
     public long getLength() {
     	Calendar calendarBegin = new GregorianCalendar();
     	calendarBegin.setTime(begin);
@@ -159,14 +166,16 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         return calendarEnd.getTimeInMillis() - calendarBegin.getTimeInMillis();
     }
 
+    //Tested
     public Date getBegin() {
         return begin;
     }
-
+    //Tested
     public Date getEnd() {
         return end;
     }
 
+    //Tested
     public String toString() {
 
         return "calendarRange: " + begin + "-" + end + "\n";
@@ -180,6 +189,33 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         Date       dateEnd = format.parse( "2011-10-09T08:51:52.006Z" );
         CalendarRange range1 = new CalendarRange(dateBegin, dateEnd);
         System.out.println(range1);
+
+        //Test intersection
+        Date dateBegin2 =  format.parse( "2011-10-06T08:51:52.006Z" );
+        Date dateEnd2 = format.parse( "2011-10-10T08:51:52.006Z" );
+        CalendarRange range2 = new CalendarRange(dateBegin2, dateEnd2);
+
+        if (range1.intersects(range2)) {
+            System.out.println(range1 + " intersection with " + range2
+                    + " = " + range1.intersection(range2));
+        }
+
+        //Test tight range
+        System.out.println("Tight range of " + range1 + " and " + range2
+                + " = " + range1.tightRange(range2));
+
+        //Test minus
+        Date dateBegin3 =  format.parse( "2011-10-05T08:51:52.006Z" );
+        Date dateEnd3 = format.parse( "2011-10-09T07:51:52.006Z" );
+        CalendarRange range3 = new CalendarRange(dateBegin3, dateEnd3);
+        System.out.println(range2 + " minus " + range3 + " = " +
+                range2.minus(range3));
+        Date dateBegin4 =  format.parse( "2011-10-04T08:51:52.006Z" );
+        Date dateEnd4 = format.parse( "2011-10-12T07:51:52.006Z" );
+        CalendarRange range4 = new CalendarRange(dateBegin4, dateEnd4);
+        System.out.println(range4 + " minus " + range3 + " = " +
+                range4.minus(range3));
+
     }
 
 }
