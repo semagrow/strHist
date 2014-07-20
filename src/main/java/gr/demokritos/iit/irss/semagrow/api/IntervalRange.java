@@ -19,10 +19,12 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         this.high = high;
     }
 
+    // Tested
     public boolean contains(int item) {
         return (item >= low) && (item <= high);
     }
 
+    //Tested
     public boolean contains(IntervalRange range) {
 
         return (range.getLow() >= low) &
@@ -30,7 +32,7 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
 
     }
 
-    
+    //Tested
     public boolean intersects(IntervalRange range) {
 
         int nLow = max(low, range.getLow());
@@ -40,12 +42,13 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
 
     }
 
-
+    //Tested
     public IntervalRange tightRange(IntervalRange intervalRange) {
 
         return new IntervalRange(min(low, intervalRange.low), max(high, intervalRange.high));
     }
 
+    //Tested
     public IntervalRange intersection(IntervalRange range) {
 
             IntervalRange res;
@@ -64,11 +67,35 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
             return res;
     }
 
-   
+   // Tested
     public IntervalRange minus(IntervalRange intervalRange) {
         int lowN = low;
         int highN = high;
 
+        //Scenario 1: participant contains bucket
+        // in this dimension
+        if (intervalRange.contains(this)) {
+
+            return new IntervalRange(0,0);
+        }
+
+        //Scenario 2: bucket encloses participant range
+        // in this dimension
+        if (this.contains(intervalRange)) {
+
+            int candidate1 = intervalRange.low - low;
+            int candidate2 = high - intervalRange.high;
+
+            if (candidate1 > candidate2) {
+
+                return new IntervalRange(low, intervalRange.low);
+            } else {
+
+                return new IntervalRange(intervalRange.high, high);
+            }
+
+        }
+        //Scenario 3: default case
         if (intervalRange.low <= this.low)
             lowN = intervalRange.high;
 
@@ -143,6 +170,28 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
                 "and range " + testRange2.toString() + ":" + intersection2);
         System.out.println("Intersection of range " + myRange.toString() +
                 "and range " + testRange3.toString() + ":" + intersection3);
+
+        //Test minus
+        IntervalRange b = new IntervalRange(5,10);
+        IntervalRange p1 = new IntervalRange(4,6);
+        IntervalRange p2 = new IntervalRange(8,11);
+        IntervalRange p3 = new IntervalRange(7,9);
+        IntervalRange p4 = new IntervalRange(4,11);
+
+
+        System.out.println(b + " minus " + p1 + " = " + b.minus(p1));
+        System.out.println(b + " minus " + p2 + " = " + b.minus(p2));
+        System.out.println(b + " minus " + p3 + " = " + b.minus(p3));
+        System.out.println(b + " minus " + p4 + " = " + b.minus(p4));
+
+        //Test tightRange
+        IntervalRange r1 = new IntervalRange(14,20);
+
+        System.out.println("Tight range of " + b + " and " +
+                p2 + " is " + b.tightRange(p2));
+        System.out.println("Tight range of " + b + " and " +
+                r1 + " is " + b.tightRange(r1));
+
 
     }
 }
