@@ -254,6 +254,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         return candidates;
     }
 
+    //Tested
     private Collection<STHolesBucket<R>> getCandidateBucketsAux(
             STHolesBucket<R> b, Collection<STHolesBucket<R>> candidates,
             R queryBox)
@@ -262,7 +263,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         R c = b.getBox();
 
 
-        if (!c.intersects(queryBox)) {
+        if (c.intersects(queryBox)) {
+
             candidates.add(b);
         }
 

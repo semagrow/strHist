@@ -29,11 +29,15 @@ public class STHolesBucket<R extends Rectangle> {
     public STHolesBucket() {
     }
 
+    //Tested
     public STHolesBucket(R box, Stat statistics) {
         this.box = box;
         this.statistics = statistics;
+
+        this.children = new ArrayList<STHolesBucket<R>>();
     }
 
+    //Tested
     public STHolesBucket(R box, Stat statistics,
                          Collection<STHolesBucket<R>> children,
                          STHolesBucket<R> parent) {
@@ -41,7 +45,7 @@ public class STHolesBucket<R extends Rectangle> {
 
         if (children == null) {
 
-            children = new ArrayList<STHolesBucket<R>>();
+            this.children = new ArrayList<STHolesBucket<R>>();
         }
 
         this.children = children;
@@ -56,6 +60,7 @@ public class STHolesBucket<R extends Rectangle> {
         return statistics;
     }
 
+    //Tested
     public Collection<STHolesBucket<R>> getChildren() {
         return children;
     }
@@ -64,6 +69,7 @@ public class STHolesBucket<R extends Rectangle> {
         return parent;
     }
 
+    //Tested
     public void addChild(STHolesBucket<R> bucket) {
 
 
@@ -125,10 +131,6 @@ public class STHolesBucket<R extends Rectangle> {
         }
     }
 
-    public static <R extends Rectangle> STHolesBucket<R> shrink() {
-        return null;
-    }
-
     public void setStatistics(Stat statistics) {
         this.statistics = statistics;
     }
@@ -155,6 +157,7 @@ public class STHolesBucket<R extends Rectangle> {
         return estimate;
     }
 
+    //Tested
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -179,6 +182,7 @@ public class STHolesBucket<R extends Rectangle> {
         return result;
     }
 
+    //Tested
     public String toString() {
 
         String res = "bucket: \n" + box + statistics;
