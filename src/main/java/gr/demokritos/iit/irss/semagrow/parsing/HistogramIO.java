@@ -1,20 +1,25 @@
 package gr.demokritos.iit.irss.semagrow.parsing;
 
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 
-public class HistogramWriter<R extends Rectangle<R>> {
+public class HistogramIO<R extends Rectangle<R>> {
 
 	private String path;
 	private STHolesBucket<R> rootBucket;
 
 
-	public HistogramWriter(String path, STHolesBucket<R> rootBucket) {
+	public HistogramIO(String path, STHolesBucket<R> rootBucket) {
 		setPath(path);
 		setRootBucket(rootBucket);
 	}
@@ -26,22 +31,27 @@ public class HistogramWriter<R extends Rectangle<R>> {
 	}
 
 
-	private void writeBinary() {
-		BufferedWriter bw = null;
+	/**
+	 * Writes the histogram into a file in a non human-readable form.
+	 */
+	public void writeBinary() {
+		ObjectOutputStream oos = null;		
 		
-		try {
-			bw = new BufferedWriter(new FileWriter(getPath() + ".ser"));
+		try {			
+			oos = new ObjectOutputStream(new FileOutputStream(getPath() + ".ser"));
 			
+			oos.writeObject(getRootBucket());			
 			
-			
-			
-			bw.close();
+			oos.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}// writeBinary
 
 
+	/**
+	 * Writes the histogram into a file in a human-readable form.
+	 */
 	private void writeNonBinary() {
 		BufferedWriter bw = null;
 		
@@ -67,7 +77,7 @@ public class HistogramWriter<R extends Rectangle<R>> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}// writeNonBinary
+	}// writeNonBinary	
 
 
 	/**
@@ -96,8 +106,37 @@ public class HistogramWriter<R extends Rectangle<R>> {
 			} catch (IOException e) {e.printStackTrace();}
 		}// else
 	}// write
+	
+	
+	/**
+	 * Reads the binary file and instantiates the rootBucket of the Histogram.	
+	 */
+	public STHolesBucket<R> readBinary(String path) {
+		STHolesBucket<R> rootBucket = null;
+		
+		ObjectInputStream ois = null;
+		
+		try {
+			ois = new ObjectInputStream(new FileInputStream(path));
+						
+			rootBucket = (STHolesBucket<R>)ois.readObject();			
+			
+			ois.close();
+		} catch (FileNotFoundException e) {			
+			e.printStackTrace();
+		} catch (IOException e) {			
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return rootBucket;
+	}// readBinary
+	
 
-
+	/*
+	 * Getters & Setters.
+	 */
 	public String getPath() {
 		return path;
 	}

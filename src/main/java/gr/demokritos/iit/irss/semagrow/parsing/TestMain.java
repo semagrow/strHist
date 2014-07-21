@@ -134,7 +134,7 @@ public class TestMain {
         
         
         
-        new HistogramWriter("src\\main\\resources\\hist", b).write();
+        new HistogramIO("src\\main\\resources\\hist", b).write();
        
         
         
