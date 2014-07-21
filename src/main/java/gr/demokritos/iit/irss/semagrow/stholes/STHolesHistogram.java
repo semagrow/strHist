@@ -126,6 +126,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         compact();
     }
 
+    //Tested
     private boolean isInaccurateEstimation(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
 
         int epsilon = 0; //todo: adjust parameter
@@ -237,6 +238,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         return c;
     }
 
+    //Tested
     /**
      * get STHolesBuckets that have nonempty intersection with a queryrecord
      * @param queryRecord query feedback
@@ -291,6 +293,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         return qr.getCardinality(rectangle);
     }
 
+
+    //Tested (default case)
     /**
      * Create a hole (i.e. a child STHolesBucket) inside an existing bucket
      * @param parentBucket parent bucket
