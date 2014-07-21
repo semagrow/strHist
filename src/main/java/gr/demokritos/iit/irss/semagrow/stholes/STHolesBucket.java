@@ -46,9 +46,9 @@ public class STHolesBucket<R extends Rectangle> {
         if (children == null) {
 
             this.children = new ArrayList<STHolesBucket<R>>();
+        } else {
+            this.children = children;
         }
-
-        this.children = children;
         setParent(parent);
     }
 

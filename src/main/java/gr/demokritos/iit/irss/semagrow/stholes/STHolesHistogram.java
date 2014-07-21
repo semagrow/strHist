@@ -138,6 +138,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         return (Math.abs(actualDensity - curDensity) > epsilon);
     }
 
+    //Tested
     /**
      * creates a new bucket that has a rectangle that does not intersect with the children of {bucket}
      * and contains the number of tuples that matches the queryRecord
@@ -155,15 +156,12 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         List<STHolesBucket<R>> participants = new LinkedList<STHolesBucket<R>>();
 
         updateParticipants(participants, bucket, c);
-            for (STHolesBucket<R> participant : participants) {
+        //for (STHolesBucket<R> participant : participants) {
 
-            c.shrink(participant.getBox());
+        while (!participants.isEmpty()) {
+
+            c.shrink(participants.get(0).getBox());
             updateParticipants(participants, bucket, c);
-
-            if (participants.isEmpty()) {
-
-                break;
-            }
         }
 
 

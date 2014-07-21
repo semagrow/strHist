@@ -38,8 +38,8 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         int nLow = max(low, range.getLow());
         int nHigh = min(high, range.getHigh());
 
-        return nLow <= nHigh;
-
+        //todo: check equality
+        return nLow < nHigh;
     }
 
     //Tested
