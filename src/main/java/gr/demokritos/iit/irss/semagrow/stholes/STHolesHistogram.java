@@ -31,6 +31,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         refine(workload);
     }
 
+    //Tested
     /**
      * estimates the number of tuples
      * that match rectangle {rec}
@@ -44,6 +45,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             return 0;
     }
 
+    //Tested
     /**
      * estimates the number of tuples contained in {rec}
      * by finding the enclosing bucket(s)
@@ -63,6 +65,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             for (STHolesBucket<R> bc : b.getChildren()) {
 
                 if ((bc.getBox()).contains(rec)) {
+
                     isEnclosingBucket = false;
                     est = estimateAux(rec, bc);
                     break;

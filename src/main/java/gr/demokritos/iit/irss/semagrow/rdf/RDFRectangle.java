@@ -53,14 +53,15 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 	}
 
 
+    //Tested
 	public Range<?> getRange(int i) {
 
 		switch (i) {
-		case 1:
+		case 0:
 			return subjectRange;
-		case 2:
+		case 1:
 			return predicateRange;
-		case 3:
+		case 2:
 			return objectRange;
 		default:
 			throw new IllegalArgumentException("Dimension " + i
