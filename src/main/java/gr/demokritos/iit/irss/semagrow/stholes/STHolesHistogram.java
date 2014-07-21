@@ -177,6 +177,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         return new STHolesBucket<R>(c, stats, null, null);
     }
 
+    //Tested
     /**
      * finds {bucket}'s children that partially intersect
      * with candidate hole c and stores them

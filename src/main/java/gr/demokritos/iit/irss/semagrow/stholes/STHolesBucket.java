@@ -52,6 +52,7 @@ public class STHolesBucket<R extends Rectangle> {
         setParent(parent);
     }
 
+    //Tested
     public R getBox() {
         return box;
     }
