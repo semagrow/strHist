@@ -31,6 +31,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         refine(workload);
     }
 
+    //Tested
     /**
      * estimates the number of tuples
      * that match rectangle {rec}
@@ -44,6 +45,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             return 0;
     }
 
+    //Tested
     /**
      * estimates the number of tuples contained in {rec}
      * by finding the enclosing bucket(s)
@@ -63,6 +65,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             for (STHolesBucket<R> bc : b.getChildren()) {
 
                 if ((bc.getBox()).contains(rec)) {
+
                     isEnclosingBucket = false;
                     est = estimateAux(rec, bc);
                     break;
@@ -135,6 +138,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         return (Math.abs(actualDensity - curDensity) > epsilon);
     }
 
+    //Tested
     /**
      * creates a new bucket that has a rectangle that does not intersect with the children of {bucket}
      * and contains the number of tuples that matches the queryRecord
@@ -152,15 +156,12 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         List<STHolesBucket<R>> participants = new LinkedList<STHolesBucket<R>>();
 
         updateParticipants(participants, bucket, c);
-            for (STHolesBucket<R> participant : participants) {
+        //for (STHolesBucket<R> participant : participants) {
 
-            c.shrink(participant.getBox());
+        while (!participants.isEmpty()) {
+
+            c.shrink(participants.get(0).getBox());
             updateParticipants(participants, bucket, c);
-
-            if (participants.isEmpty()) {
-
-                break;
-            }
         }
 
 
@@ -177,6 +178,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         return new STHolesBucket<R>(c, stats, null, null);
     }
 
+    //Tested
     /**
      * finds {bucket}'s children that partially intersect
      * with candidate hole c and stores them

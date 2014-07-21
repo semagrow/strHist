@@ -76,7 +76,7 @@ public class RDFLiteralRange
     		return range.toString();
     }
 
-    @SuppressWarnings("unchecked")
+
 	public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
 
         if (infinite) return literalRange;
@@ -113,12 +113,39 @@ public class RDFLiteralRange
     }
 
 
-	public RDFLiteralRange minus(RDFLiteralRange rdfLiteralRange) {
+    //Tested (only interval range)
+	public RDFLiteralRange minus(RDFLiteralRange literalRange) {
+
+        if (valueType.equals(literalRange.getValueType()))
+        {
+
+            if (valueType.equals(XMLSchema.INTEGER)) {
+
+                IntervalRange res = ((IntervalRange<Integer>) range).minus(
+                        (IntervalRange<Integer>) literalRange.getRange());
+                return new RDFLiteralRange(XMLSchema.INTEGER, res);
+
+            } else if (valueType.equals(XMLSchema.LONG)) {
+
+                IntervalRange res = ((IntervalRange<Integer>) range).minus(
+                        (IntervalRange<Integer>) literalRange.getRange());
+                return new RDFLiteralRange(XMLSchema.INTEGER, res);
+            } else if (valueType.equals(XMLSchema.STRING)) {
+
+                PrefixRange res = ((PrefixRange) range).minus(
+                        (PrefixRange) literalRange.getRange());
+                return new RDFLiteralRange(XMLSchema.STRING, res);
+            } else if (valueType.equals(XMLSchema.DATETIME)) {
+                CalendarRange res = ((CalendarRange) range).minus(
+                        (CalendarRange) literalRange.getRange());
+                return new RDFLiteralRange(XMLSchema.DATETIME, res);
+            }
+        }
 		return null;
 	}
 
 
-	@SuppressWarnings("unchecked")
+
 	public boolean contains(Value value) {
 
         if (infinite) return true;

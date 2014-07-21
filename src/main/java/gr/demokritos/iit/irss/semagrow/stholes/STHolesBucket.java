@@ -46,12 +46,13 @@ public class STHolesBucket<R extends Rectangle> {
         if (children == null) {
 
             this.children = new ArrayList<STHolesBucket<R>>();
+        } else {
+            this.children = children;
         }
-
-        this.children = children;
         setParent(parent);
     }
 
+    //Tested
     public R getBox() {
         return box;
     }
@@ -144,6 +145,7 @@ public class STHolesBucket<R extends Rectangle> {
         this.box = box;
     }
 
+    //Tested
     public long getEstimate(R rec) {
 
         long estimate = statistics.getFrequency();
@@ -151,7 +153,8 @@ public class STHolesBucket<R extends Rectangle> {
         for (int i=0; i< rec.getDimensionality(); i++) {
 
             if ((rec.getRange(i)).isUnit())
-                estimate *= 1 /  statistics.getDistinctCount().get(i);
+
+                estimate *= 1.0 /  statistics.getDistinctCount().get(i);
         }
 
         return estimate;

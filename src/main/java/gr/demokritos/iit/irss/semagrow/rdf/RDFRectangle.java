@@ -53,14 +53,15 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 	}
 
 
+    //Tested
 	public Range<?> getRange(int i) {
 
 		switch (i) {
-		case 1:
+		case 0:
 			return subjectRange;
-		case 2:
+		case 1:
 			return predicateRange;
-		case 3:
+		case 2:
 			return objectRange;
 		default:
 			throw new IllegalArgumentException("Dimension " + i
@@ -80,6 +81,7 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
     }
 
 
+    //Tested
     // Shrink rectangle so that it does not intersect with rec
     public void shrink(RDFRectangle rec) {
 
@@ -90,15 +92,15 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         ArrayList<Double> lengths = new ArrayList<Double>();
         long subjectLength = subjectRange.getLength();
         long subjectNLength = subjectRangeN.getLength();
-        double reduced = subjectNLength/ subjectLength *100;
+        double reduced = ((double) subjectNLength)/ subjectLength *100;
         lengths.add(reduced);
         long predicateLength = predicateRange.getLength();
         long predicateNLength = predicateRangeN.getLength();
-        reduced = predicateNLength/ predicateLength *100;
+        reduced = ((double) predicateNLength)/ predicateLength *100;
         lengths.add(reduced);
         long objectLength = objectRange.getLength();
         long objectNLength = objectRangeN.getLength();
-        reduced = objectNLength/ objectLength *100;
+        reduced = ((double) objectNLength)/ objectLength *100;
         lengths.add(reduced);
 
         double largest = lengths.get(0);
@@ -113,12 +115,15 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         }
 
         switch (j) {
-            case 1:
+            case 0:
                 setSubjectRange(subjectRangeN);
-            case 2:
+                break;
+            case 1:
                 setPredicateRange(predicateRangeN);
-            case 3:
+                break;
+            case 2:
                 setObjectRange(objectRangeN);
+                break;
             default:
                 throw new IllegalArgumentException("Dimension " + j
                         + " is not valid");
