@@ -154,15 +154,20 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 		else
 			System.err.println("Not all query's const variables exist in Rectangle");	
 		
-		// Subject distinct count
-		distinctCount.add((long)prefixSet.size()); 
+		// Subject distinct count				 
+		distinctCount.add(prefixSet.isEmpty() ? 1 : (long)prefixSet.size()); 
 		// Predicate distinct count
-		distinctCount.add((long)predicateSet.size());
-		// Object distinct count
-		distinctCount.add((long)objectIntegerSet.size() + 
+		distinctCount.add(predicateSet.isEmpty() ? 1 : (long)predicateSet.size());
+		// Object distinct count		
+		distinctCount.add((objectIntegerSet.isEmpty() &&
+							objectLongSet.isEmpty() &&
+							objectDateSet.isEmpty() &&
+							objectStringSet.isEmpty()) 
+						  ? 1 
+						  : ((long)objectIntegerSet.size() + 
 							(long)objectLongSet.size() +
 							(long)objectDateSet.size() +
-							(long)objectStringSet.size());
+							(long)objectStringSet.size()));
 		
 
 		return new Stat(frequency, distinctCount);

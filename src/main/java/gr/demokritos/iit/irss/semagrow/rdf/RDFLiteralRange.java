@@ -70,7 +70,10 @@ public class RDFLiteralRange
         //uris for ExplicitSetRange
         //intervalRange for IntervalRange
         //calendarRange for CalendarRange
-        return range.toString();
+    	if (infinite)
+    		return "Infinite";
+    	else
+    		return range.toString();
     }
 
     @SuppressWarnings("unchecked")

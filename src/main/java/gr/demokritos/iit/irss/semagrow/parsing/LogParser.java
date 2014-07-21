@@ -206,13 +206,14 @@ public class LogParser {
 		long start = System.currentTimeMillis();
 
 //		LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs.log");
-		LogParser lp = new LogParser("src\\main\\resources\\test.txt");
+//		LogParser lp = new LogParser("src\\main\\resources\\test.txt");
+		LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs_2.log");
 		lp.parse();		
 		
 		// Print the parsed queries signatures.
-		for (RDFQueryRecord qr : lp.getCollection()) {
-			System.out.println(qr.getQuery());
-		}
+//		for (RDFQueryRecord qr : lp.getCollection()) {
+//			System.out.println(qr.getQuery());
+//		}
 		
 		/*
 		 * Report
@@ -234,7 +235,7 @@ public class LogParser {
 		System.out.println(rec1);
 		
 		
-		System.out.println(lp.getCollection().get(0).getQueryResult().getCardinality(rec));
+//		System.out.println(lp.getCollection().get(0).getQueryResult().getCardinality(rec));
 		
 		
 		
