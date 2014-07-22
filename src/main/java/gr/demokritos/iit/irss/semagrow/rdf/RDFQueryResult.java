@@ -23,6 +23,7 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.XMLSchema;
 
 public class RDFQueryResult implements QueryResult<RDFRectangle> {
@@ -356,6 +357,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
         //Get variables
         int cnt = 0;
         List<Integer> types = new ArrayList<Integer>();
+        System.out.println("BindingSet size : " + bindingSets.size());
         if (!bindingSets.isEmpty()) {
 
             for (Binding b : bindingSets.get(0).getBindings()) {
@@ -381,12 +383,14 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
         for (int i = 0; i < 3; i++) {
 
+
             if (!types.contains(i)) {
 
                 switch (i) {
                     case 0 :
                         //todo: check if it is infinite and break
                         isConstSubject = true;
+                        System.out.println("edw mphka");
                         constSubject = (PrefixRange) queryRect.getRange(i);
                         break;
                     case 1 :
@@ -418,6 +422,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
         //for every binding set
         for (BindingSet bs : bindingSets) {
 
+            System.out.println("mpika");
             //get binding
              List<Binding> binding = bs.getBindings();
 
@@ -431,12 +436,13 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                 if (!predicateStrings.contains(value)) {
                     predicateStrings.add(value);
                     curRectangleIdx = predicateStrings.size()-1;
-                } else {
+                } else {System.out.println("vrika kai kati swsto");
                     curRectangleIdx = predicateStrings.indexOf(value);
                 }
             }
 
             if (isConstSubject) {
+                System.out.println("mphka kai edw");
 
                 //add it to subjectRanges as soon as a new rectangle
                 // must be formed
@@ -487,6 +493,13 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
         //Create rectangles from ranges
         for (int i = 0; i < predicateRanges.size(); i++) {
+            System.out.println(i);
+            PrefixRange subjectR = subjectRanges.get(i);
+            System.out.println(subjectR);
+            ExplicitSetRange<String> predicateR = predicateRanges.get(i);
+            System.out.println(predicateR);
+            RDFLiteralRange objectR = objectRanges.get(i);
+            System.out.println(objectR);
             rectangles.add(new RDFRectangle (subjectRanges.get(i),
                     predicateRanges.get(i), objectRanges.get(i)));
         }
