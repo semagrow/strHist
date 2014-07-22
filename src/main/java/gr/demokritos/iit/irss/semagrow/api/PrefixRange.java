@@ -104,7 +104,7 @@ public class PrefixRange
         // each string in prefix range
         for (String p : prefixList) {
 
-             prefixN.set(cnt, p);
+             prefixN.add(p);
 
             int j = 0;
             for(; j < Math.min(prefixN.get(cnt).length(), v.length()); ++j) {
