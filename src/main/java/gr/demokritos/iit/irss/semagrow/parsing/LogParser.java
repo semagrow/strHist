@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.parsing;
 
 import gr.demokritos.iit.irss.semagrow.rdf.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import org.openrdf.model.vocabulary.RDF;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -253,8 +254,8 @@ public class LogParser {
 		long start = System.currentTimeMillis();
 
 //		LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs.log");
-		LogParser lp = new LogParser("src\\main\\resources\\test_2.txt");
-//		LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs_3.log");
+//		LogParser lp = new LogParser("src\\main\\resources\\test_2.txt");
+		LogParser lp = new LogParser("src/main/resources/semagrow_logs_3.log");
 		lp.parse();		
 		
 		// Print the parsed queries signatures.
@@ -273,16 +274,22 @@ public class LogParser {
 				+ lp.getCollection().size());
 		System.out.println("********************************");
 		
-		RDFQueryRecord rdfqr = new RDFQueryRecord(lp.getCollection().get(0).getLogQuery());	
+		RDFQueryRecord rdfqr = new RDFQueryRecord(lp.getCollection().get(0).getLogQuery());
+
 		RDFRectangle rec = rdfqr.getRectangle();
 		System.out.println(rec);
 				
-		RDFQueryRecord rdfqr1 = new RDFQueryRecord(lp.getCollection().get(1).getLogQuery());	
-		RDFRectangle rec1 = rdfqr1.getRectangle();
-		System.out.println(rec1);
+//		RDFQueryRecord rdfqr1 = new RDFQueryRecord(lp.getCollection().get(1).getLogQuery());
+//		RDFRectangle rec1 = rdfqr1.getRectangle();
+//		System.out.println(rec1);
+
+        List<RDFRectangle> rects = lp.getCollection().get(0).getQueryResult().getRectangles(rec);
+		System.out.println("Check rectangles: ");
+        for (RDFRectangle r : rects) {
+            System.out.println(r);
+        }
 		
-		
-//		System.out.println(lp.getCollection().get(0).getQueryResult().getCardinality(rec));
+		System.out.println(lp.getCollection().get(0).getQueryResult().getCardinality(rec));
 		
 		
 		
