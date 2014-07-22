@@ -77,6 +77,23 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         return new CalendarRange(beginN, endN);
     }
 
+
+    public void expand(String v) {
+
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        Date date = null;
+
+        try {date = format.parse(v);}
+        catch (ParseException e) {e.printStackTrace();}
+
+        if (date != null) {
+
+            if (date.compareTo(begin) < 0) begin = date;
+            else if (date.compareTo(end) > 0) end = date;
+        } else
+            System.err.println("Date Format Error.");
+    }
+
     //Tested
     public CalendarRange intersection(CalendarRange range) {
 

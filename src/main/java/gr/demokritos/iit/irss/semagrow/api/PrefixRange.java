@@ -94,6 +94,44 @@ public class PrefixRange
         return new PrefixRange(prefixListN);
     }
 
+
+    public void expand(String v) {
+
+        ArrayList<String> prefixN = new ArrayList<String>();
+        int cnt = 0;
+
+        // find longest common prefix with
+        // each string in prefix range
+        for (String p : prefixList) {
+
+             prefixN.set(cnt, p);
+
+            int j = 0;
+            for(; j < Math.min(prefixN.get(cnt).length(), v.length()); ++j) {
+                if(prefixN.get(cnt).charAt(j) != v.charAt(j)) {
+                    break;
+                }
+
+                prefixN.set(cnt, (prefixN.get(cnt)).substring(0, j));
+            }
+        }
+
+        //find the longest of these common prefixes
+        String largest = prefixN.get(0);
+        int d = 0; //prefix idx
+        for (int i = 0; i < prefixN.size(); i++) {
+
+            if ( prefixN.get(i).length() > largest.length() ) {
+
+                largest = prefixN.get(i);
+                d = i;
+            }
+        }
+
+        // and update corresponding prefix
+        prefixList.set(d,prefixN.get(d));
+    }
+
     //Tested
     public PrefixRange intersection(PrefixRange range) {
 

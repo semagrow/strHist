@@ -48,6 +48,16 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         return new IntervalRange(min(low, intervalRange.low), max(high, intervalRange.high));
     }
 
+
+    public void expand(String v) {
+
+        int value = java.lang.Integer.parseInt(v);
+
+        if (value < low ) low = value;
+        else if (value > high) high = value;
+
+    }
+
     //Tested
     public IntervalRange intersection(IntervalRange range) {
 
