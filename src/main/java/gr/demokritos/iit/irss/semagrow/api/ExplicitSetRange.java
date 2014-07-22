@@ -68,6 +68,12 @@ public class ExplicitSetRange<T>
         return new ExplicitSetRange<T>(itemsN);
     }
 
+
+    public void expand(String v) {
+       //todo: fix me
+        items.add((T) v);
+    }
+
     //Tested
     public ExplicitSetRange<T> intersection(ExplicitSetRange<T> range) {
 

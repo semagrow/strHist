@@ -173,7 +173,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 		
 		
 		return new Stat(frequency, distinctCount);
-	}// getCardinality	
+	}// getCardinality
 
 
 	/**
@@ -308,7 +308,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 	public static void main(String[] args) {
 //		System.out.println(clean("Egyptian Division @en"));
 		System.out.println(Utilities.cleanURI("\"192\"^^<http://www.w3.org/2001/XMLSchema#int>"));
-		
+
 	}
 
 
@@ -325,5 +325,172 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 	public void setBindingSets(ArrayList<BindingSet> bindingSets) {
 		this.bindingSets = bindingSets;
 	}
+
+
+    /**
+     *
+     * @param queryRect the rectangle extracted from query statements
+     *                  (and filters)
+     * @return list of rectangles from query results (one rectangle
+     * for each predicate)
+     */
+    public List<RDFRectangle> getRectangles(RDFRectangle queryRect) {
+
+        //initialize structures
+        List<PrefixRange> subjectRanges = new ArrayList<PrefixRange>();
+        List<String> predicateStrings =
+                new ArrayList<String>();
+        List<ExplicitSetRange<String>> predicateRanges =
+                new ArrayList<ExplicitSetRange<String>>();
+        List<RDFLiteralRange> objectRanges =
+                new ArrayList<RDFLiteralRange>();
+
+        List<RDFRectangle> rectangles = new ArrayList<RDFRectangle>();
+
+        // mappings to bindings
+        int[] mappings = new int[3];
+        mappings[0] = 0;
+        mappings[1] = 1;
+        mappings[2] = 2;
+
+        //Get variables
+        int cnt = 0;
+        List<Integer> types = new ArrayList<Integer>();
+        if (!bindingSets.isEmpty()) {
+
+            for (Binding b : bindingSets.get(0).getBindings()) {
+
+                types.add(getBindingType(b));
+                mappings[getBindingType(b)] = cnt;
+                cnt += 1;
+            }
+
+        }
+
+        for (int t : types) {
+            System.out.println(t);
+        }
+
+        //Take constant values
+        boolean isConstPredicate = false;
+        boolean isConstSubject = false;
+        boolean isConstObject = false;
+        PrefixRange constSubject = null;
+        ExplicitSetRange<String> constPredicate = null;
+        RDFLiteralRange constObject = null;
+
+        for (int i = 0; i < 3; i++) {
+
+            if (!types.contains(i)) {
+
+                switch (i) {
+                    case 0 :
+                        //todo: check if it is infinite and break
+                        isConstSubject = true;
+                        constSubject = (PrefixRange) queryRect.getRange(i);
+                        break;
+                    case 1 :
+                        //todo: check if it is infinite and break
+                        isConstPredicate = true;
+                        constPredicate = (ExplicitSetRange<String>) queryRect.getRange(i);
+                        //add it to predicateRanges
+                        predicateRanges.add(constPredicate);
+                        break;
+                    case 2 :
+                        //todo: check if it is infinite and break
+                        isConstObject = true;
+                        constObject = (RDFLiteralRange) queryRect.getRange(i);
+                        break;
+                    default:
+                        System.err.println("Not a valid Binding.");
+                        break;
+                }
+
+            }
+        }
+
+
+        Binding b;
+        String value;
+        int curRectangleIdx = 0; //rectangle corresponding
+        //to current predicate
+
+        //for every binding set
+        for (BindingSet bs : bindingSets) {
+
+            //get binding
+             List<Binding> binding = bs.getBindings();
+
+            if (!isConstPredicate) {
+
+                //get Predicate from current binding
+                b = binding.get(mappings[1]);
+                value = clean(b.getValue());
+
+                //new predicate, add it to list
+                if (!predicateStrings.contains(value)) {
+                    predicateStrings.add(value);
+                    curRectangleIdx = predicateStrings.size()-1;
+                } else {
+                    curRectangleIdx = predicateStrings.indexOf(value);
+                }
+            }
+
+            if (isConstSubject) {
+
+                //add it to subjectRanges as soon as a new rectangle
+                // must be formed
+                if (curRectangleIdx != subjectRanges.size() - 1) {
+                    subjectRanges.add(constSubject);
+                }
+            } else {
+                //take subject from binding and compute
+                // new prefix from this subject and the subjectRange
+                // in position curRectangle
+                b = binding.get(mappings[0]);
+                value = clean(b.getValue());
+                subjectRanges.get(curRectangleIdx).expand(value);
+
+            }
+
+            if (isConstObject) {
+                //add it to objectRanges as soon as a new rectangle
+                // must be formed
+                if (curRectangleIdx != objectRanges.size() - 1) {
+                    objectRanges.add(constObject);
+                }
+            } else {
+                //take object from binding and compute
+                // new interval/calendarRange/prefix from this
+                // object and the objectRange is position curObject
+                b = binding.get(mappings[0]);
+                value = clean(b.getValue());
+                objectRanges.get(curRectangleIdx).expand(value);
+            }
+
+
+
+        }
+
+        //Create predicateRanges from predicates
+        Set<String> items = new HashSet<String>();
+        for (String p : predicateStrings) {
+            //make an explicitRange and add it
+            // to predicateRanges list
+            items = new HashSet<String>();
+            items.add(p);
+            if (predicateRanges.isEmpty()) {
+                predicateRanges.add(new ExplicitSetRange<String>(items));
+            }
+
+        }
+
+        //Create rectangles from ranges
+        for (int i = 0; i < predicateRanges.size(); i++) {
+            rectangles.add(new RDFRectangle (subjectRanges.get(i),
+                    predicateRanges.get(i), objectRanges.get(i)));
+        }
+        return rectangles;
+    }
 
 }

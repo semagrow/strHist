@@ -246,6 +246,26 @@ public class RDFLiteralRange
         return null;
     }
 
+
+    public void expand(String v) {
+
+        if (valueType.equals(XMLSchema.INTEGER)) {
+
+            ((IntervalRange) range).expand(v);
+        } else if (valueType.equals(XMLSchema.LONG)) {
+
+            ((IntervalRange) range).expand(v);
+        } else if (valueType.equals(XMLSchema.STRING)) {
+
+            ((PrefixRange) range).expand(v);
+        } else if (valueType.equals(XMLSchema.DATETIME)) {
+            ((CalendarRange) range).expand(v);
+
+        }
+
+
+    }
+
     public URI getValueType() {
         return valueType;
     }
