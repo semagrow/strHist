@@ -74,12 +74,13 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 					case 0:		// Subjects
 						if (((PrefixRange) rect.getRange(type)).contains(value)) 
 							frequency++;
+						
 						prefixSet.add(value);
 						break;
 					case 1:		// Predicates
 						if (((ExplicitSetRange) rect.getRange(type)).contains(value))
 							frequency++;
-						System.out.println(value);
+						
 						predicateSet.add(value);
 						break;
 					case 2:		// Objects

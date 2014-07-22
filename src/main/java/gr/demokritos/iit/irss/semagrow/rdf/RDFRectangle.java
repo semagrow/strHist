@@ -144,7 +144,11 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         PrefixRange subjectRangeN = subjectRange.tightRange(rec.subjectRange);
         ExplicitSetRange<String> predicateRangeN = predicateRange.tightRange(rec.predicateRange);
         RDFLiteralRange objectRangeN = objectRange.tightRange(rec.objectRange);
-
+        
+        System.out.println("Subject: " + subjectRangeN);
+        System.out.println("Predicate: " + predicateRangeN);
+        System.out.println("Object: " + objectRangeN);
+        
         return new RDFRectangle(subjectRangeN, predicateRangeN, objectRangeN);
     }
 

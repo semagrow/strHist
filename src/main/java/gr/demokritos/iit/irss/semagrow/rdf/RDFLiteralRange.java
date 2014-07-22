@@ -239,6 +239,7 @@ public class RDFLiteralRange
         return false;
     }
 
+    //TODO: Fix me!
     public RDFLiteralRange tightRange(RDFLiteralRange rdfLiteralRange) {
 
         if (infinite) return new RDFLiteralRange();

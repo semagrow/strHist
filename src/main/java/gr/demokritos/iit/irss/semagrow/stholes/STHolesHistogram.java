@@ -99,9 +99,11 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
             // expand root
             if (!root.getBox().contains(queryRecord.getRectangle())) {
-
+            	
                 // expand root box so that it contains q
                 R boxN = root.getBox().computeTightBox(queryRecord.getRectangle());
+                System.out.println("Rectangle: " + queryRecord.getRectangle());
+                System.out.println("Box: " + root.getBox());
                 //todo: is this right;
                 Stat statsN = countMatchingTuples(queryRecord.getRectangle(), queryRecord);
                 Collection<STHolesBucket<R>> childrenN = new ArrayList<STHolesBucket<R>>();
@@ -111,6 +113,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             }
         }
 
+        
         // get all c
         Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(queryRecord);
         
