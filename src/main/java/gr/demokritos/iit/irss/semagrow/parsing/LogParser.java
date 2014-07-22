@@ -289,7 +289,7 @@ public class LogParser {
             System.out.println(r);
         }
 		
-		System.out.println(lp.getCollection().get(0).getQueryResult().getCardinality(rec));
+		//System.out.println(lp.getCollection().get(0).getQueryResult().getCardinality(rec));
 		
 		
 		

@@ -231,7 +231,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 						// Get the type of the URI.
 						String typeURI = Utilities.getTypeFromURI(value);
 											
-						if (typeURI.equals("int")) {
+						if (typeURI.equals("int") || typeURI.equals("integer")) {
 							val = ValueFactoryImpl.getInstance()
 									.createLiteral(valueURI, XMLSchema.INTEGER);								
 						} else if (typeURI.equals("long")) {
@@ -423,7 +423,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
         //for every binding set
         for (BindingSet bs : bindingSets) {
 
-            System.out.println("mpika");
+
             //get binding
              List<Binding> binding = bs.getBindings();
 
@@ -460,6 +460,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                     prefixList.add(value);
                     subjectRanges.add(new PrefixRange(prefixList));
                 } else {
+
                     subjectRanges.get(curRectangleIdx).expand(value);
                 }
 
@@ -477,12 +478,52 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                 // object and the objectRange is position curObject
                 b = binding.get(mappings[0]);
                 value = clean(b.getValue());
-                objectRanges.get(curRectangleIdx).expand(value);
+
+                if (curRectangleIdx != objectRanges.size() - 1) {
+                    // Find the type(Integer,Long,Date) of the URIS.
+                    String type = Utilities.getTypeFromURI(value);
+                    String v = Utilities.getValueFromURI(value);
+
+                    //todo: not working
+                   System.out.println("Type: " + type);
+                    if (type.equals("int") || type.equals("integer")) {
+                        objectRanges.add(new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v)));
+
+                    } else if (type.equals("long")) {
+                        objectRanges.add(new RDFLiteralRange(Long.parseLong(v), Long.parseLong(v)));
+
+                    } else if (type.equals("dateTime")) {
+
+                        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                        Date dateLow = null, dateHigh = null;
+
+                        try {
+                            dateLow = format.parse(v);
+                            dateHigh = format.parse(v);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (dateLow != null && dateHigh != null)
+                            objectRanges.add(new RDFLiteralRange(dateLow, dateHigh));
+                        else
+                            System.err.println("Date Format Error.");
+                    } else if (!value.contains("^^") && value.contains("http://")) {// URL
+                            //todo: do i need this check above as well?
+                        objectRanges.add(new RDFLiteralRange(value));
+
+                    } else {// Plain Literal
+                        objectRanges.add(new RDFLiteralRange(value));
+                    }
+
+                } else {
+                    objectRanges.get(curRectangleIdx).expand(value);
+                }
             }
 
 
-
         }
+
 
         //Create predicateRanges from predicates
         Set<String> items = new HashSet<String>();
