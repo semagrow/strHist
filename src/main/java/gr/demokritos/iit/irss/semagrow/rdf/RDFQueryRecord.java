@@ -240,7 +240,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 	 * TODO: Not implemented yet.
 	 */
 	public QueryResult<RDFRectangle> getResultSet() {
-		return null;
+		return getQueryResult();
 	}
 
 

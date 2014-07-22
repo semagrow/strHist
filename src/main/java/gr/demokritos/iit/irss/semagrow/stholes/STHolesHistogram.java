@@ -94,7 +94,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         // check if root is null
         if (root == null) {
 
-            root = new STHolesBucket<R>(queryRecord.getRectangle(), null, null, null);
+            root = new STHolesBucket<R>(queryRecord.getRectangle(), new Stat(), null, null);
         } else {
 
             // expand root
@@ -525,4 +525,14 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
         return res;
     }
+
+	
+	public STHolesBucket<R> getRoot() {
+		return root;
+	}
+
+	
+	public void setRoot(STHolesBucket<R> root) {
+		this.root = root;
+	}
 }

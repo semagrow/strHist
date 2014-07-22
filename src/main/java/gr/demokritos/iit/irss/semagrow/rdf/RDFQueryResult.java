@@ -71,17 +71,17 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 					System.out.println(">>>" + type);
 					System.out.println(">>>" + value);
 					switch (type) {
-					case 1:		// Subjects
+					case 0:		// Subjects
 						if (((PrefixRange) rect.getRange(type)).contains(value)) 
 							frequency++;
 						prefixSet.add(value);
 						break;
-					case 2:		// Predicates
+					case 1:		// Predicates
 						if (((ExplicitSetRange) rect.getRange(type)).contains(value))
 							frequency++;
 						predicateSet.add(value);
 						break;
-					case 3:		// Objects
+					case 2:		// Objects
 						// TODO: Change! 		
 						
 						Value val = null;
@@ -211,10 +211,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 				
 				switch (i) {
 				case 0:
-					b = b && ((PrefixRange) rect.getRange(i + 1)).contains(value);					
+					b = b && ((PrefixRange) rect.getRange(i)).contains(value);					
 					break;
 				case 1:
-					b = b && ((ExplicitSetRange) rect.getRange(i + 1)).contains(value);					
+					b = b && ((ExplicitSetRange) rect.getRange(i)).contains(value);					
 					break;
 				case 2:
 					// TODO: change!
@@ -248,7 +248,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 							catch (ParseException e) {e.printStackTrace();}
 							
 							if (date != null) {
-								b = b && ((RDFLiteralRange) rect.getRange(i + 1))
+								b = b && ((RDFLiteralRange) rect.getRange(i))
 										.contains(new RDFLiteralRange(date, date));
 								
 								break;								

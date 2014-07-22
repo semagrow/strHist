@@ -1,7 +1,9 @@
 package gr.demokritos.iit.irss.semagrow;
 
+import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
+import gr.demokritos.iit.irss.semagrow.parsing.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.parsing.LogParser;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 
 /**
@@ -16,15 +18,20 @@ public class App
     public static void main( String[] args )
     {
 
-        h = new RDFSTHolesHistogram();
+        h = new STHolesHistogram();
 
-        while( true ) {
+//        while( true ) {
         	// open query log file
+        	LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs_3.log");        	
         	
         	// filter per  
         	// TODO: construct workload
-//        	 h.refine( workload );
-        }
+        	 h.refine(lp.parse());
+        	 
+        	 // Write histogram to file.
+        	 HistogramIO histIO = new HistogramIO("src\\main\\resources\\hist", ((STHolesHistogram) h).getRoot());
+        	 histIO.write();
+//        }
     }
 
 }

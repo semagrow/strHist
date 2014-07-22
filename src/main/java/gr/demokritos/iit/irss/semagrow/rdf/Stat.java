@@ -15,7 +15,18 @@ public class Stat {
     public Stat(Long frequency, List<Long> distinctCount) {
         this.distinctCount = distinctCount;
         this.frequency = frequency;
-    }
+    }    
+    
+    /**
+     * Default Constructor
+     */
+	public Stat() {
+		setDistinctCount(new ArrayList<Long>());
+		getDistinctCount().add((long)0);
+		getDistinctCount().add((long)0);
+		getDistinctCount().add((long)0);
+		setFrequency((long)0);
+	}
 
     public Long getFrequency() {
         return frequency;
