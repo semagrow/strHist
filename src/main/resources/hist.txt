@@ -1,0 +1,48 @@
+bucket: 
+rectangle:
+	subject:
+		uriprefixes: { "http://ac.collections.natural-europe.eu:8890/sw/resource/" }
+	predicate:
+		uris: { http://www.natural-europe.eu/ontology#height }
+	object:
+		intervalRange: 100-300
+
+statistics:
+	triples : 
+		1
+	distinctSubjects : 
+		1
+	distinctPredicates : 
+		1
+	distinctObjects : 
+		1
+childrenNum: 
+	1
+
+{
+
+{
+bucket: 
+rectangle:
+	subject:
+		uriprefixes: { "http://ac.collections.natural-europe.eu:8890/sw/resource/" }
+	predicate:
+		uris: { http://www.natural-europe.eu/ontology#height }
+	object:
+		intervalRange: 200-300
+
+statistics:
+	triples : 
+		1
+	distinctSubjects : 
+		1
+	distinctPredicates : 
+		1
+	distinctObjects : 
+		1
+childrenNum: 
+	0
+
+}
+
+}

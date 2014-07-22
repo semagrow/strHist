@@ -240,9 +240,35 @@ public class RDFLiteralRange
     }
 
     //TODO: Fix me!
-    public RDFLiteralRange tightRange(RDFLiteralRange rdfLiteralRange) {
+    public RDFLiteralRange tightRange(RDFLiteralRange literalRange) {
 
         if (infinite) return new RDFLiteralRange();
+
+        if (valueType.equals(literalRange.getValueType()))
+        {
+
+            if (valueType.equals(XMLSchema.INTEGER)) {
+
+                IntervalRange res = ((IntervalRange<Integer>) range).tightRange(
+                        (IntervalRange<Integer>) literalRange.getRange());
+                return new RDFLiteralRange(XMLSchema.INTEGER, res);
+
+            } else if (valueType.equals(XMLSchema.LONG)) {
+
+                IntervalRange res = ((IntervalRange<Integer>) range).tightRange(
+                        (IntervalRange<Integer>) literalRange.getRange());
+                return new RDFLiteralRange(XMLSchema.INTEGER, res);
+            } else if (valueType.equals(XMLSchema.STRING)) {
+
+                PrefixRange res = ((PrefixRange) range).tightRange(
+                        (PrefixRange) literalRange.getRange());
+                return new RDFLiteralRange(XMLSchema.STRING, res);
+            } else if (valueType.equals(XMLSchema.DATETIME)) {
+                CalendarRange res = ((CalendarRange) range).tightRange(
+                        (CalendarRange) literalRange.getRange());
+                return new RDFLiteralRange(XMLSchema.DATETIME, res);
+            }
+        }
         return null;
     }
 
