@@ -1,0 +1,52 @@
+c381b8c1-b7a4-443d-ae97-9f64344cc600
+1405976707765
+http://other.collections.natural-europe.eu:8890/sparql/
+%%
+    Filter
+      Compare (<)
+      Var (name=h)
+      ValueConstant (value="300"^^<http://www.w3.org/2001/XMLSchema#integer>)
+    Filter
+      Compare (>)
+      Var (name=h)
+      ValueConstant (value="200"^^<http://www.w3.org/2001/XMLSchema#integer>)
+    Filter
+      Regex
+      Str
+      Var (name=s)
+      ValueConstant (value="http://ac.collections.natural-europe.eu:8890/sw/resource/")
+    StatementPattern
+      Var (name=s)
+      Var (name=-const-http://www.natural-europe.eu/ontology#height-uri, value=http://www.natural-europe.eu/ontology#height, anonymous)
+      Var (name=h)
+
+%%
+
+[s=http://ac.collections.natural-europe.eu:8890/sw/resource/obj/2468e9dd-a51a-4de4-b26e-35e273390e48;h="201"^^<http://www.w3.org/2001/XMLSchema#int>]
+[]
+c381b8c1-b7a4-443d-ae97-9f64344cc600
+1405976707765
+http://other.collections.natural-europe.eu:8890/sparql/
+%%
+    Filter
+      Compare (<)
+      Var (name=h)
+      ValueConstant (value="300"^^<http://www.w3.org/2001/XMLSchema#integer>)
+    Filter
+      Compare (>)
+      Var (name=h)
+      ValueConstant (value="100"^^<http://www.w3.org/2001/XMLSchema#integer>)
+    Filter
+      Regex
+      Str
+      Var (name=s)
+      ValueConstant (value="http://ac.collections.natural-europe.eu:8890/sw/resource/")
+    StatementPattern
+      Var (name=s)
+      Var (name=-const-http://www.natural-europe.eu/ontology#height-uri, value=http://www.natural-europe.eu/ontology#height, anonymous)
+      Var (name=h)
+
+%%
+
+[s=http://ac.collections.natural-europe.eu:8890/sw/resource/obj/2468e9dd-a51a-4de4-b26e-35e273390e48;h="201"^^<http://www.w3.org/2001/XMLSchema#int>]
+[]

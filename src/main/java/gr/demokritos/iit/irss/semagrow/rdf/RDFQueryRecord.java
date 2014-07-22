@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import gr.demokritos.iit.irss.semagrow.api.ExplicitSetRange;
@@ -14,6 +15,7 @@ import gr.demokritos.iit.irss.semagrow.api.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.QueryResult;
 import gr.demokritos.iit.irss.semagrow.parsing.Binding;
 import gr.demokritos.iit.irss.semagrow.parsing.LogQuery;
+import gr.demokritos.iit.irss.semagrow.parsing.QueryFilter;
 import gr.demokritos.iit.irss.semagrow.parsing.Utilities;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 
@@ -54,10 +56,67 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 		
 		// Check what's inside the object's value.
 		if (binding.getValue().equals("")) {// If object is a variable
-			objectRange = new RDFLiteralRange();
-			System.err.println("Empty Object");
-			//TODO: Xtypaei nullpointerexception giati ston keno constructor tou RDFLiteralRange
-			// den dinetai timi sti metavliti range i ipoia xrisimopoieitai stin toString
+			// Check if any Filter for object exists.
+			QueryFilter qf = null, qf2 = null;
+			if ((qf = hasFilter(binding.getName())) != null) {
+				// Check the type of the filter
+				if (qf.getFilterType().equals("Compare")) {// Filter: Compare -> Integer,Long,Date
+					// Compare filter is assumed that ALWAYS comes with an other Compare Filter. 
+					// So find the second one.
+					qf2 = findPairCompareFilter(qf);
+					
+					// Find low-high values and parse it.
+					String high = "", low = "";
+					
+					if (!qf.getHigh().equals(""))
+						high = qf.getHigh();
+					else if (!qf2.getHigh().equals(""))
+						high = qf2.getHigh();
+					
+					if (!qf.getLow().equals(""))
+						low = qf.getLow();
+					else if (!qf2.getLow().equals(""))
+						low = qf2.getLow();
+					
+					// Find the type(Integer,Long,Date) of the URIS.
+					String type = Utilities.getTypeFromURI(low);
+					low = Utilities.getValueFromURI(low);
+					high = Utilities.getValueFromURI(high);
+					
+					if (type.equals("int") || type.equals("integer")) {				
+						objectRange = new RDFLiteralRange(Integer.parseInt(low), Integer.parseInt(high));
+						
+					} else if (type.equals("long")) {						
+						objectRange = new RDFLiteralRange(Long.parseLong(low), Long.parseLong(high));
+						
+					} else if (type.equals("dateTime")) {
+						
+						DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+						Date dateLow = null, dateHigh = null;
+						
+						try {
+							dateLow = format.parse(low);
+							dateHigh = format.parse(high);}
+						catch (ParseException e) {e.printStackTrace();}
+						
+						if (dateLow != null && dateHigh != null)
+							objectRange = new RDFLiteralRange(dateLow, dateHigh);
+						else 
+							System.err.println("Date Format Error.");
+					}				
+					
+				} else if (qf.getFilterType().equals("Regex")) {// Filter: Regex -> Plain Literal or URL
+					objectRange = new RDFLiteralRange(qf.getRegex());
+				}				
+				
+			} else {
+				objectRange = new RDFLiteralRange();
+				System.err.println("Empty Object");
+				//TODO: Apeiro Object. 
+				// Xtypaei nullpointerexception giati ston keno constructor tou RDFLiteralRange
+				// den dinetai timi sti metavliti range i ipoia xrisimopoieitai stin toString
+			}
+			
 		} else if (binding.getValue().contains("^^")) {// URI
 			String value = Utilities.getValueFromURI(binding.getValue());
 			String type = Utilities.getTypeFromURI(binding.getValue());
@@ -88,25 +147,44 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 	}// getObjectRange
 	
 	
+	/**
+	 * Given a QueryFilter find its pair one. (Low-High)	 
+	 */
+	private QueryFilter findPairCompareFilter(QueryFilter qf) {
+		
+		for (QueryFilter temp : getLogQuery().getQueryFilters()) {
+			if (temp.getVariable().equals(qf.getVariable()))
+				if (!temp.equals(qf))
+					return temp;
+		}
+		
+		return null;
+	}
+
+
 	public static void main(String[] args) {
-		String v = "\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\"^^<http://www.w3.org/2001/XMLSchema#dateTime>";
-		System.out.println(v);
-//		System.out.println(getTypeFromURI(v));
-//		System.out.println(getValueFromURI(v));
+	
 		
 	}
 
 
-	
-
-
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private ExplicitSetRange<String> getPredicateRange(Binding binding) {
 		HashSet<String> set = new HashSet<String>();
 
 		// Check if binding is a const variable or not.
 		if (binding.getValue().equals("")) {// Is variable
-			// Call the empty constructor, it handles this case.
-			return new ExplicitSetRange();
+			// Check if any Filter for predicate exists.
+			QueryFilter qf = null;
+			if ((qf = hasFilter(binding.getName())) != null) {
+				Set<String> explicitSet = new HashSet<String>();
+				explicitSet.add(qf.getRegex());
+							
+				return new ExplicitSetRange(explicitSet);
+							
+			} else // Call the empty constructor, it handles this case. 					
+				return new ExplicitSetRange();
+			
 		} else {// Is const
 				// Add the whole value as predicate
 				// TODO: Think if this is really ok.
@@ -121,9 +199,18 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 		ArrayList<String> prefix = new ArrayList<String>();
 
 		// Check if binding is a const variable or not.
-		if (binding.getValue().equals("")) {// Is variable
-			// Call the empty constructor, it handles this case.
-			return new PrefixRange();
+		if (binding.getValue().equals("")) {// Is variable			
+			// Check if any Filter for subject exists.
+			QueryFilter qf = null;
+			if ((qf = hasFilter(binding.getName())) != null) {
+				ArrayList<String> prefixList = new ArrayList<String>();
+				prefixList.add(qf.getRegex());
+				
+				return new PrefixRange(prefixList);
+				
+			} else // Call the empty constructor, it handles this case. 					
+				return new PrefixRange();
+			
 		} else {// Is const
 				// Add the whole value as prefix
 				// TODO: Think if this is really ok.
@@ -132,6 +219,20 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 
 		return new PrefixRange(prefix);
 	}// getSubjectRange
+	
+	
+	/**
+	 * Checks if the given variable has a filter on it and returns it.	
+	 */
+	private QueryFilter hasFilter(String name) {		
+		
+		for (QueryFilter qf : getLogQuery().getQueryFilters()) {
+			if (qf.getVariable().equals(name))
+				return qf;
+		}
+		
+		return null;
+	}
 
 
 	/**

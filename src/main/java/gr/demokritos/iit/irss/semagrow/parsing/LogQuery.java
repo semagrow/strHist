@@ -13,11 +13,13 @@ public class LogQuery {
 	private List<Binding> queryStatements;
 	// Contains only the Query's Bindings.
 	private List<Binding> queryBindings;
+	private List<QueryFilter> queryFilters;
 
 
 	public LogQuery() {
 		setQueryStatements(new ArrayList<Binding>());
 		setQueryBindings(new ArrayList<Binding>());
+		setQueryFilters(new ArrayList<QueryFilter>());
 	}
 
 
@@ -34,6 +36,10 @@ public class LogQuery {
 
 		for (Binding spv : getQueryStatements())
 			s += "\n" + spv.getName() + " " + spv.getValue();
+				
+		for (QueryFilter qf : getQueryFilters())
+			s += "\n" + qf.getFilterType() + " " + qf.getVariable() + " " +
+					qf.getRegex() + " " + qf.getLow() + " " + qf.getHigh();
 
 		return s;
 	}// getQuery
@@ -115,6 +121,16 @@ public class LogQuery {
 
 	public void setQueryBindings(List<Binding> queryBindings) {
 		this.queryBindings = queryBindings;
+	}
+
+
+	public List<QueryFilter> getQueryFilters() {
+		return queryFilters;
+	}
+
+
+	public void setQueryFilters(List<QueryFilter> queryFilters) {
+		this.queryFilters = queryFilters;
 	}
 
 }

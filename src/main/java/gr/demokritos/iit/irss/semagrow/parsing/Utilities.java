@@ -63,5 +63,54 @@ public class Utilities {
 
 		return type;
 	}
+	
+	
+	public static String getCompareOperator(String string) {
+		String operator = "";
+		// Create a regex pattern.
+		String pattern = "\\((.*?)\\)";
+		// Create a Pattern object
+		Pattern r = Pattern.compile(pattern);
+		// Now create matcher object.
+		Matcher m = r.matcher(string);
+
+		if (m.find())
+			operator = m.group(1);
+
+		return operator;
+	}
+
+
+	public static String getVariableName(String string) {
+		String variable = "";
+		// Create a regex pattern.
+		String pattern = "\\(name=(.*?)\\)";
+		// Create a Pattern object
+		Pattern r = Pattern.compile(pattern);
+		// Now create matcher object.
+		Matcher m = r.matcher(string);
+
+		if (m.find())
+			variable = m.group(1);
+
+		return variable;
+	}
+
+
+	public static String getValueConstant(String string) {
+		String value = "";
+		// Create a regex pattern.
+		String pattern = "\\(value=(.*?)\\)";
+		// Create a Pattern object
+		Pattern r = Pattern.compile(pattern);
+		// Now create matcher object.
+		Matcher m = r.matcher(string);
+
+		if (m.find())
+			value = m.group(1);
+
+		return value;
+	}
+
 
 }

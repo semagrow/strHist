@@ -91,16 +91,63 @@ public class LogParser {
 
 
 	/**
-	 * Extracts query variables
+	 * Extracts query variables and filters.
 	 */
 	private void processTwo(String string, LogQuery lq) {
+		// Split input into lines array.
 		String split[] = string.split("\\r?\\n");
-
-		for (int i = 1; i < split.length; i++) {
-			Binding b = extractStatementPatternVariable(split[i]);
-			if (b != null)
-				lq.getQueryStatements().add(b);
-		}// for
+		
+		for (int i = 0; i < split.length; i++) {			
+			if (split[i].contains("Filter")) {
+				QueryFilter qf = null;
+				
+				if (split[i + 1].contains("Compare")) {
+					String operator = Utilities.getCompareOperator(split[i + 1]);
+					String variable = Utilities.getVariableName(split[i + 2]);					
+					String valueConstant = Utilities.getValueConstant(split[i + 3]);
+					
+					System.err.println("\nFilter");
+					System.out.println(operator +"\n" + variable + "\n" + valueConstant);
+					
+					qf = new QueryFilter("Compare", variable);
+					if (operator.contains("<"))
+						qf.setHigh(valueConstant);
+					else if (operator.contains(">"))
+						qf.setLow(valueConstant);
+					
+					// Skip processed lines.
+					i = i + 3;
+			
+				} else if (split[i + 1].contains("Regex")) {
+					String variable = Utilities.getVariableName(split[i + 3]);
+					String regex = Utilities.getValueConstant(split[i + 4]);
+					
+					System.err.println("\nFilter");
+					System.out.println(variable +"\n" + regex);
+					
+					qf = new QueryFilter("Regex", variable);
+					qf.setRegex(regex);
+					
+					// Skip processed lines.
+					i = i + 4;					
+				}	
+				
+				// Add filter to query Object.
+				lq.getQueryFilters().add(qf);
+				
+			} else if (split[i].contains("StatementPattern")) {				
+				Binding b = null;
+				
+				for (int j=i+1; j<=i+3; j++) {
+					b = extractStatementPatternVariable(split[j]);					
+					if (b != null)
+						lq.getQueryStatements().add(b);
+					
+					System.err.println("\nStatementPattern");
+					System.out.println(b.getName() +" = "+ b.getValue());
+				}				
+			}			
+		}// for	
 	}// processTwo
 
 
@@ -206,8 +253,8 @@ public class LogParser {
 		long start = System.currentTimeMillis();
 
 //		LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs.log");
-//		LogParser lp = new LogParser("src\\main\\resources\\test.txt");
-		LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs_2.log");
+		LogParser lp = new LogParser("src\\main\\resources\\test_2.txt");
+//		LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs_3.log");
 		lp.parse();		
 		
 		// Print the parsed queries signatures.
@@ -229,8 +276,8 @@ public class LogParser {
 		RDFQueryRecord rdfqr = new RDFQueryRecord(lp.getCollection().get(0).getLogQuery());	
 		RDFRectangle rec = rdfqr.getRectangle();
 		System.out.println(rec);
-		
-		RDFQueryRecord rdfqr1 = new RDFQueryRecord(lp.getCollection().get(0).getLogQuery());	
+				
+		RDFQueryRecord rdfqr1 = new RDFQueryRecord(lp.getCollection().get(1).getLogQuery());	
 		RDFRectangle rec1 = rdfqr1.getRectangle();
 		System.out.println(rec1);
 		
