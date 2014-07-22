@@ -79,6 +79,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 					case 1:		// Predicates
 						if (((ExplicitSetRange) rect.getRange(type)).contains(value))
 							frequency++;
+						System.out.println(value);
 						predicateSet.add(value);
 						break;
 					case 2:		// Objects
@@ -169,7 +170,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 							(long)objectDateSet.size() +
 							(long)objectStringSet.size()));
 		
-
+		
 		return new Stat(frequency, distinctCount);
 	}// getCardinality	
 
@@ -186,7 +187,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 		
 		for (int i = 0; i < queryStatements.size(); i++) {
 			if (queryStatements.get(i).getName().equals(name))
-				return i + 1;
+				return i;
 		}
 
 		return 0;
