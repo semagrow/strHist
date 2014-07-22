@@ -416,6 +416,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
         Binding b;
         String value;
+        ArrayList<String> prefixList = new ArrayList<String>();
         int curRectangleIdx = 0; //rectangle corresponding
         //to current predicate
 
@@ -436,13 +437,12 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                 if (!predicateStrings.contains(value)) {
                     predicateStrings.add(value);
                     curRectangleIdx = predicateStrings.size()-1;
-                } else {System.out.println("vrika kai kati swsto");
+                } else {
                     curRectangleIdx = predicateStrings.indexOf(value);
                 }
             }
 
             if (isConstSubject) {
-                System.out.println("mphka kai edw");
 
                 //add it to subjectRanges as soon as a new rectangle
                 // must be formed
@@ -455,7 +455,13 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                 // in position curRectangle
                 b = binding.get(mappings[0]);
                 value = clean(b.getValue());
-                subjectRanges.get(curRectangleIdx).expand(value);
+                if (curRectangleIdx != subjectRanges.size() - 1) {
+                    prefixList = new ArrayList<String>();
+                    prefixList.add(value);
+                    subjectRanges.add(new PrefixRange(prefixList));
+                } else {
+                    subjectRanges.get(curRectangleIdx).expand(value);
+                }
 
             }
 
