@@ -106,8 +106,8 @@ public class LogParser {
 					String variable = Utilities.getVariableName(split[i + 2]);					
 					String valueConstant = Utilities.getValueConstant(split[i + 3]);
 					
-					System.err.println("\nFilter");
-					System.out.println(operator +"\n" + variable + "\n" + valueConstant);
+//					System.err.println("\nFilter");
+//					System.out.println(operator +"\n" + variable + "\n" + valueConstant);
 					
 					qf = new QueryFilter("Compare", variable);
 					if (operator.contains("<"))
@@ -122,8 +122,8 @@ public class LogParser {
 					String variable = Utilities.getVariableName(split[i + 3]);
 					String regex = Utilities.getValueConstant(split[i + 4]);
 					
-					System.err.println("\nFilter");
-					System.out.println(variable +"\n" + regex);
+//					System.err.println("\nFilter");
+//					System.out.println(variable +"\n" + regex);
 					
 					qf = new QueryFilter("Regex", variable);
 					qf.setRegex(regex);
@@ -143,8 +143,8 @@ public class LogParser {
 					if (b != null)
 						lq.getQueryStatements().add(b);
 					
-					System.err.println("\nStatementPattern");
-					System.out.println(b.getName() +" = "+ b.getValue());
+//					System.err.println("\nStatementPattern");
+//					System.out.println(b.getName() +" = "+ b.getValue());
 				}				
 			}			
 		}// for	
@@ -225,7 +225,7 @@ public class LogParser {
 		int index = collection.indexOf(qr);
 		
 		if (index != -1) { // Exists in Collection.
-			System.out.println("Query Contained");
+//			System.out.println("Query Contained");
 			
 			// Get this Query from the Collection.
 			RDFQueryRecord qrTemp = collection.get(index);

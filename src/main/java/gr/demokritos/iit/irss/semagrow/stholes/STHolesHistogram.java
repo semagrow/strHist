@@ -90,7 +90,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      * @param queryRecord query feedback
      */
     public void refine(QueryRecord<R> queryRecord) {
-
+    	
         // check if root is null
         if (root == null) {
 
@@ -113,11 +113,12 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
         // get all c
         Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(queryRecord);
-
+        
         for (STHolesBucket<R> bucket : candidates) {
-
+        	System.out.println("<<<>>> Candidate: " + bucket);
+        	System.out.println("--------------------------------------------------");
             STHolesBucket<R> hole = shrink(bucket, queryRecord); //calculate intersection and shrink it
-
+            System.out.println("<<<>>> Hole: " + hole);
             if (isInaccurateEstimation(bucket,hole))
                 drillHole(bucket, hole);
         }
@@ -302,9 +303,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      */
     private void drillHole(STHolesBucket<R> parentBucket, STHolesBucket<R> candidateHole)
     {
-
+    	System.out.println("<<<>>> BIKA");
         if (parentBucket.getBox().equals(candidateHole.getBox())) {
-
+        	 
             Stat parentStats = new Stat(candidateHole.getStatistics().getFrequency(),
                     candidateHole.getStatistics().getDistinctCount());
             parentBucket.setStatistics(parentStats);

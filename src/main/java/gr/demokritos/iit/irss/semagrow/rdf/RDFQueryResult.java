@@ -68,8 +68,8 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 					
 					String value = clean(b.getValue());// dn exei idiaiterh xrhsimothta
 					
-					System.out.println(">>>" + type);
-					System.out.println(">>>" + value);
+//					System.out.println(">>>" + type);
+//					System.out.println(">>>" + value);
 					switch (type) {
 					case 0:		// Subjects
 						if (((PrefixRange) rect.getRange(type)).contains(value)) 
@@ -144,7 +144,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 							frequency++;
 						
 					default:
-						System.err.println("Not a valid Binding.");
+//						System.err.println("Not a valid Binding.");
 						break;
 					}
 

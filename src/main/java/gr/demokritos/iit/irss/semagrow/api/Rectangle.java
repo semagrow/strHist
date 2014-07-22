@@ -25,4 +25,7 @@ public interface Rectangle<R> {
     // compute bounding box that tightly encloses
     // this rectangle and rec
     R computeTightBox(R rec);
+    
+    boolean equals(Object rec);
+   
 }
