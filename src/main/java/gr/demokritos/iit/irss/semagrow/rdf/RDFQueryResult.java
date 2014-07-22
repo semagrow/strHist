@@ -26,6 +26,8 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.XMLSchema;
 
+import javax.rmi.CORBA.Util;
+
 public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
 	private ArrayList<BindingSet> bindingSets;
@@ -455,7 +457,11 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                 // in position curRectangle
                 b = binding.get(mappings[0]);
                 value = clean(b.getValue());
+                value = Utilities.getValueFromURI(value);
+
                 if (curRectangleIdx != subjectRanges.size() - 1) {
+                    System.out.println("Subject value: " + value);
+                    //todo: value is empty
                     prefixList = new ArrayList<String>();
                     prefixList.add(value);
                     subjectRanges.add(new PrefixRange(prefixList));
