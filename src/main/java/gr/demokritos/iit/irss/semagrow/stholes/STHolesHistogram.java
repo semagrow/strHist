@@ -84,14 +84,11 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         for (QueryRecord<R> qfr : workload)
             refine(qfr);
 
+        System.out.println(bucketsNum);
         for (STHolesBucket<R> bc : root.getChildren()) {
             System.out.println(bc);
             for (STHolesBucket<R> bcc : bc.getChildren()) {
                 System.out.println(bcc);
-            for (STHolesBucket<R> bccc : bcc.getChildren()) {
-                System.out.println("Wrong");
-                System.out.println(bccc);
-            }
             }
         }
     }
@@ -115,6 +112,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             if (root == null) {
 
                 root = new STHolesBucket<R>(rect, new Stat(), null, null);
+                bucketsNum += 1;
             } else {
 
                 // expand root
@@ -124,10 +122,23 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
                     R boxN = root.getBox().computeTightBox(rect);
                     //     System.out.println("Rectangle: " + queryRecord.getRectangle());
                     //     System.out.println("Box: " + root.getBox());
-                    //todo: should change this!!!!
+
                     Stat statsN = countMatchingTuples(rect, queryRecord);
-                    Collection<STHolesBucket<R>> childrenN = new ArrayList<STHolesBucket<R>>();
-                    STHolesBucket<R> rootN = new STHolesBucket<R>(boxN, statsN, childrenN, null);
+                    // freqN = freq(root) + freq(q)
+                    // dN(i) = max(d(i,root), d(i,q))
+                    long freqN = statsN.getFrequency() +
+                            root.getStatistics().getFrequency();
+                    List<Long> distinctN = new ArrayList<Long>();
+                    for (int i = 0; i < statsN.getDistinctCount().size(); i++) {
+
+                        distinctN.add(Math.max(statsN.getDistinctCount().get(i),
+                                root.getStatistics().getDistinctCount().get(i)));
+                    }
+                    Collection<STHolesBucket<R>> childrenN =
+                            new ArrayList<STHolesBucket<R>>();
+                    STHolesBucket<R> rootN =
+                            new STHolesBucket<R>(boxN, new Stat(freqN, distinctN), childrenN, null);
+                    bucketsNum += 1;
                     rootN.addChild(root);
                     root = rootN;
                 }

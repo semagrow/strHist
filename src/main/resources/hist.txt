@@ -9,7 +9,7 @@ rectangle:
 
 statistics:
 	triples : 
-		724
+		1295
 	distinctSubjects : 
 		724
 	distinctPredicates : 
