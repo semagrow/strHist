@@ -383,41 +383,46 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
         ExplicitSetRange<String> constPredicate = null;
         RDFLiteralRange constObject = null;
 
+
         for (int i = 0; i < 3; i++) {
 
 
-            if (!types.contains(i)) {
 
-                switch (i) {
-                    case 0 :
-                        //todo: check if it is infinite and break
+
+
+            switch (i) {
+                case 0 :
+                    if (!((PrefixRange) queryRect.getRange(i)).isInfinite()) {
                         isConstSubject = true;
                         constSubject = (PrefixRange) queryRect.getRange(i);
-                        break;
-                    case 1 :
-                        //todo: check if it is infinite and break
+                    }
+                    break;
+                case 1 :
+                    if (!((ExplicitSetRange<String>) queryRect.getRange(i)).isInfinite()) {
                         isConstPredicate = true;
                         constPredicate = (ExplicitSetRange<String>) queryRect.getRange(i);
                         //add it to predicateRanges
                         predicateRanges.add(constPredicate);
-                        break;
-                    case 2 :
-                        //todo: check if it is infinite and break
+                    }
+                    break;
+                case 2 :
+                    if (!((RDFLiteralRange) queryRect.getRange(i)).isInfinite()) {
                         isConstObject = true;
                         constObject = (RDFLiteralRange) queryRect.getRange(i);
-                        break;
-                    default:
-                        System.err.println("Not a valid Binding.");
-                        break;
-                }
-
+                    }
+                    break;
+                default:
+                    System.err.println("Not a valid Binding.");
+                    break;
             }
+
         }
+
 
 
         Binding b;
         String value;
-        ArrayList<String> prefixList = new ArrayList<String>();
+        ArrayList<String> prefixList;
         int curRectangleIdx = 0; //rectangle corresponding
         //to current predicate
 

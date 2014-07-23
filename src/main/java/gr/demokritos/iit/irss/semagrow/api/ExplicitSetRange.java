@@ -121,6 +121,11 @@ public class ExplicitSetRange<T>
         return getLength() == 1;
     }
 
+    public boolean isInfinite() {
+
+        return infinite;
+    }
+
     public long getLength() {
 
         if (infinite) return Integer.MAX_VALUE;

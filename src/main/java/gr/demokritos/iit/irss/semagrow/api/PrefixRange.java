@@ -196,6 +196,11 @@ public class PrefixRange
         return prefixList;
     }
 
+    public boolean isInfinite() {
+
+        return infinite;
+    }
+
     //Tested
     public String toString() {
 

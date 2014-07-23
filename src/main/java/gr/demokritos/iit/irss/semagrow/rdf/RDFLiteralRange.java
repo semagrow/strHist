@@ -315,4 +315,9 @@ public class RDFLiteralRange
 
         return range.getLength();
     }
+
+    public boolean isInfinite() {
+
+        return infinite;
+    }
 }
