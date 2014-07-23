@@ -25,9 +25,19 @@ public class HistogramIO<R extends Rectangle<R>> {
 	}
 
 
-	public void write() {		
-		writeNonBinary();
+	public void write() {
+		writeJSOn();
+//		writeNonBinary();
 //		writeBinary();
+	}
+
+
+	/**
+	 * Writes the histogram into a file in JSOn format.
+	 */
+	private void writeJSOn() {
+		
+		
 	}
 
 
