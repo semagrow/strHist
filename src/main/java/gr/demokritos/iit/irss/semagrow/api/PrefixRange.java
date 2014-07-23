@@ -111,9 +111,8 @@ public class PrefixRange
                 if(prefixN.get(cnt).charAt(j) != v.charAt(j)) {
                     break;
                 }
-
-                prefixN.set(cnt, (prefixN.get(cnt)).substring(0, j));
             }
+            prefixN.set(cnt, (prefixN.get(cnt)).substring(0, j));
         }
 
         //find the longest of these common prefixes

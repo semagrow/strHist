@@ -371,9 +371,9 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
         }
 
-        for (int t : types) {
-            System.out.println(t);
-        }
+        //for (int t : types) {
+          //  System.out.println(t);
+        //}
 
         //Take constant values
         boolean isConstPredicate = false;
@@ -392,7 +392,6 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                     case 0 :
                         //todo: check if it is infinite and break
                         isConstSubject = true;
-                        System.out.println("edw mphka");
                         constSubject = (PrefixRange) queryRect.getRange(i);
                         break;
                     case 1 :
@@ -457,9 +456,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                 // in position curRectangle
                 b = binding.get(mappings[0]);
                 value = clean(b.getValue());
-                value = Utilities.getValueFromURI(value);
+
 
                 if (curRectangleIdx != subjectRanges.size() - 1) {
+
                     System.out.println("Subject value: " + value);
                     //todo: value is empty
                     prefixList = new ArrayList<String>();
@@ -482,16 +482,15 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                 //take object from binding and compute
                 // new interval/calendarRange/prefix from this
                 // object and the objectRange is position curObject
-                b = binding.get(mappings[0]);
+                b = binding.get(mappings[2]);
                 value = clean(b.getValue());
 
-                if (curRectangleIdx != objectRanges.size() - 1) {
-                    // Find the type(Integer,Long,Date) of the URIS.
-                    String type = Utilities.getTypeFromURI(value);
-                    String v = Utilities.getValueFromURI(value);
+                // Find the type(Integer,Long,Date) of the URIS.
+                String type = Utilities.getTypeFromURI(value);
+                String v = Utilities.getValueFromURI(value);
 
-                    //todo: not working
-                   System.out.println("Type: " + type);
+                if (curRectangleIdx != objectRanges.size() - 1) {
+
                     if (type.equals("int") || type.equals("integer")) {
                         objectRanges.add(new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v)));
 
@@ -516,14 +515,14 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
                             System.err.println("Date Format Error.");
                     } else if (!value.contains("^^") && value.contains("http://")) {// URL
                             //todo: do i need this check above as well?
-                        objectRanges.add(new RDFLiteralRange(value));
+                        objectRanges.add(new RDFLiteralRange(v));
 
                     } else {// Plain Literal
-                        objectRanges.add(new RDFLiteralRange(value));
+                        objectRanges.add(new RDFLiteralRange(v));
                     }
 
                 } else {
-                    objectRanges.get(curRectangleIdx).expand(value);
+                    objectRanges.get(curRectangleIdx).expand(v);
                 }
             }
 
@@ -546,13 +545,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
         //Create rectangles from ranges
         for (int i = 0; i < predicateRanges.size(); i++) {
-            System.out.println(i);
+
             PrefixRange subjectR = subjectRanges.get(i);
-            System.out.println(subjectR);
             ExplicitSetRange<String> predicateR = predicateRanges.get(i);
-            System.out.println(predicateR);
             RDFLiteralRange objectR = objectRanges.get(i);
-            System.out.println(objectR);
             rectangles.add(new RDFRectangle (subjectRanges.get(i),
                     predicateRanges.get(i), objectRanges.get(i)));
         }
