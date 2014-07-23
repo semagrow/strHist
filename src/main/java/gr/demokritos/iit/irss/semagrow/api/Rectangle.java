@@ -27,5 +27,9 @@ public interface Rectangle<R> {
     R computeTightBox(R rec);
     
     boolean equals(Object rec);
+
+    //true if rectangle has
+    //at least one infinite range
+    boolean hasInfinite();
    
 }

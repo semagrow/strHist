@@ -101,40 +101,50 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      * @param queryRecord query feedback
      */
     public void refine(QueryRecord<R> queryRecord) {
-    	
-        // check if root is null
-        if (root == null) {
 
-            root = new STHolesBucket<R>(queryRecord.getRectangle(), new Stat(), null, null);
+
+        List<R> rects = new ArrayList<R>();
+        if (queryRecord.getRectangle().hasInfinite()) {
+            rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
         } else {
-
-            // expand root
-            if (!root.getBox().contains(queryRecord.getRectangle())) {
-            	
-                // expand root box so that it contains q
-                R boxN = root.getBox().computeTightBox(queryRecord.getRectangle());
-         //     System.out.println("Rectangle: " + queryRecord.getRectangle());
-         //     System.out.println("Box: " + root.getBox());
-                //todo: should change this!!!!
-                Stat statsN = countMatchingTuples(queryRecord.getRectangle(), queryRecord);
-                Collection<STHolesBucket<R>> childrenN = new ArrayList<STHolesBucket<R>>();
-                STHolesBucket<R> rootN = new STHolesBucket<R>(boxN, statsN, childrenN, null);
-                rootN.addChild(root);
-                root = rootN;
-            }
+            rects.add(queryRecord.getRectangle());
         }
 
-        
-        // get all c
-        Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(queryRecord);
-        
-        for (STHolesBucket<R> bucket : candidates) {
-        	//System.out.println("<<<>>> Candidate: " + bucket);
-        	//System.out.println("--------------------------------------------------");
-            STHolesBucket<R> hole = shrink(bucket, queryRecord); //calculate intersection and shrink it
-            //System.out.println("<<<>>> Hole: " + hole);
-            if (isInaccurateEstimation(bucket,hole))
-                drillHole(bucket, hole);
+        for (R rect : rects) {
+            // check if root is null
+            if (root == null) {
+
+                root = new STHolesBucket<R>(rect, new Stat(), null, null);
+            } else {
+
+                // expand root
+                if (!root.getBox().contains(rect)) {
+
+                    // expand root box so that it contains q
+                    R boxN = root.getBox().computeTightBox(rect);
+                    //     System.out.println("Rectangle: " + queryRecord.getRectangle());
+                    //     System.out.println("Box: " + root.getBox());
+                    //todo: should change this!!!!
+                    Stat statsN = countMatchingTuples(rect, queryRecord);
+                    Collection<STHolesBucket<R>> childrenN = new ArrayList<STHolesBucket<R>>();
+                    STHolesBucket<R> rootN = new STHolesBucket<R>(boxN, statsN, childrenN, null);
+                    rootN.addChild(root);
+                    root = rootN;
+                }
+            }
+
+
+            // get all c
+            Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(rect);
+
+            for (STHolesBucket<R> bucket : candidates) {
+                //System.out.println("<<<>>> Candidate: " + bucket);
+                //System.out.println("--------------------------------------------------");
+                STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
+                //System.out.println("<<<>>> Hole: " + hole);
+                if (isInaccurateEstimation(bucket, hole))
+                    drillHole(bucket, hole);
+            }
         }
 
         // check if histogram must be compacted after refinement
@@ -164,10 +174,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      * @param queryRecord query feedback
      * @return shrinked bucket
      */
-    private STHolesBucket<R> shrink(STHolesBucket<R> bucket, QueryRecord<R> queryRecord) {
+    private STHolesBucket<R> shrink(STHolesBucket<R> bucket, R rect, QueryRecord<R> queryRecord) {
 
         // Find candidate hole
-        R c = bucket.getBox().intersection(queryRecord.getRectangle());
+        R c = bucket.getBox().intersection(rect);
 
         // Shrink candidate hole in such a way that b does not intersect
         // with the rectangles of bucket.getChildren();
@@ -258,12 +268,12 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
     //Tested
     /**
      * get STHolesBuckets that have nonempty intersection with a queryrecord
-     * @param queryRecord query feedback
+     * @param queryBox query feedback
      * @return buckets that intersect with queryRecord
      */
-    private Iterable<STHolesBucket<R>> getCandidateBuckets(QueryRecord<R> queryRecord) {
+    private Iterable<STHolesBucket<R>> getCandidateBuckets(R queryBox) {
 
-        R queryBox = queryRecord.getRectangle();
+
 
         Collection<STHolesBucket<R>> candidates = new LinkedList<STHolesBucket<R>>();
 

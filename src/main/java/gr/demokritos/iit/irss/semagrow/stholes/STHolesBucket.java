@@ -35,7 +35,6 @@ public class STHolesBucket<R extends Rectangle> {
         this.statistics = statistics;
 
         this.children = new ArrayList<STHolesBucket<R>>();
-        System.out.println("A new bucket is born with box: " + box);
     }
 
     //Tested
@@ -52,8 +51,6 @@ public class STHolesBucket<R extends Rectangle> {
             this.children = children;
         }
         setParent(parent);
-
-        System.out.println("A new bucket is born with box: " + box);
     }
 
     //Tested

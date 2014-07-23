@@ -163,6 +163,14 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         this.subjectRange = subjectRange;
     }
 
+    public boolean hasInfinite() {
+
+        boolean res = ((PrefixRange) getRange(0)).isInfinite() ||
+                ((ExplicitSetRange<String>) getRange(1)).isInfinite() ||
+                ((RDFLiteralRange) getRange(2)).isInfinite();
+        return res;
+    }
+
     public String toString() {
 
         String res = "rectangle:\n" +
@@ -187,9 +195,10 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         int low = 0;
         int high = 10;
         RDFLiteralRange objectRange = new RDFLiteralRange(low, high);
+        //RDFLiteralRange objectRange2  = new RDFLiteralRange();
 
         RDFRectangle rect = new RDFRectangle(subjectRange, predicateRange, objectRange);
 
-        System.out.println(rect);
+        System.out.println(rect.hasInfinite());
     }
 }
