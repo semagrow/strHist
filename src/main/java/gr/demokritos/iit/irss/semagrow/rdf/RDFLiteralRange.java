@@ -180,7 +180,8 @@ public class RDFLiteralRange
     @SuppressWarnings("unchecked")
 	public boolean contains(RDFLiteralRange literalRange) {
 
-        if (infinite) return true;
+        //for estimation
+        if (literalRange.isInfinite()) return true;
 
         if (valueType.equals(literalRange.getValueType()))
         {

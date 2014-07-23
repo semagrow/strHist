@@ -40,7 +40,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      */
     public long estimate(R rec) {
         if (root != null)
-            return estimateAux(rec, root);
+            return estimateAux(rec, root, (long)0);
         else
             return 0;
     }
@@ -53,10 +53,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      * @param b bucket
      * @return estimated number of tuples
      */
-    private long estimateAux(R rec, STHolesBucket<R> b) {
+    private long estimateAux(R rec, STHolesBucket<R> b, long est) {
 
         boolean isEnclosingBucket = false;
-        long est = 0;
+
 
         if ((b.getBox()).contains(rec)) { //unnecessary
 
@@ -67,14 +67,14 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
                 if ((bc.getBox()).contains(rec)) {
 
                     isEnclosingBucket = false;
-                    est = estimateAux(rec, bc);
+                    est = estimateAux(rec, bc, est);
                     break;
                 }
             }
         }
 
         if (isEnclosingBucket)
-            return b.getEstimate(rec);
+            return est + b.getEstimate(rec);
         else
             return est;
     }

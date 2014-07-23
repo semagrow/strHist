@@ -38,7 +38,8 @@ public class ExplicitSetRange<T>
     //Tested
 	public boolean contains(ExplicitSetRange<T> range) {
 
-        if (infinite) return true;
+        // for estimation
+        if (range.isInfinite()) return true;
 
         return items.containsAll(range.items);
 	}

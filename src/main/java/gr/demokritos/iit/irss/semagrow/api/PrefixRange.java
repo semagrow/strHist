@@ -40,7 +40,8 @@ public class PrefixRange
     //Tested
     public boolean contains(PrefixRange range) {
 
-        if (infinite) return true;
+        //for estimation
+        if (range.isInfinite()) return true;
 
         for (String p : prefixList) {
 
