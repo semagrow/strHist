@@ -241,7 +241,7 @@ public class LogParser {
 			collection.add(qr);
 			
 		}// else	
-		
+				
 	}// processQuery
 
 

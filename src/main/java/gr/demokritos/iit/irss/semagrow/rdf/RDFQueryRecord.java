@@ -38,6 +38,8 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle> {
 	 */
 	public RDFRectangle getRectangle() {
 
+		System.out.println("SIZE: "+logQuery.getQueryStatements().size());
+		
 		PrefixRange subjectRange = getSubjectRange(logQuery.getQueryStatements().get(0));
 
 		ExplicitSetRange<String> predicateRange = getPredicateRange(logQuery.getQueryStatements().get(1));
