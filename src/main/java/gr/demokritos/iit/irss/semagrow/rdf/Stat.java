@@ -68,6 +68,17 @@ public class Stat {
         return res;
 
     }
+    
+//    public JSONObject toJSON() {
+//    	JSONObject triples = new 
+//    	
+//    	
+//    	JSONObject statistics = new JSONOBject();    	
+//    	obj.put("statistics", statistics);
+//    	
+//    	return obj;
+//    }
+    
 
     public static void main(String [] args){
 
