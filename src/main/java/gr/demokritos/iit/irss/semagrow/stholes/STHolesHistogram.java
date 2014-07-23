@@ -83,6 +83,17 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
         for (QueryRecord<R> qfr : workload)
             refine(qfr);
+
+        for (STHolesBucket<R> bc : root.getChildren()) {
+            System.out.println(bc);
+            for (STHolesBucket<R> bcc : bc.getChildren()) {
+                System.out.println(bcc);
+            for (STHolesBucket<R> bccc : bcc.getChildren()) {
+                System.out.println("Wrong");
+                System.out.println(bccc);
+            }
+            }
+        }
     }
 
     /**
@@ -102,9 +113,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
             	
                 // expand root box so that it contains q
                 R boxN = root.getBox().computeTightBox(queryRecord.getRectangle());
-                System.out.println("Rectangle: " + queryRecord.getRectangle());
-                System.out.println("Box: " + root.getBox());
-                //todo: is this right;
+         //     System.out.println("Rectangle: " + queryRecord.getRectangle());
+         //     System.out.println("Box: " + root.getBox());
+                //todo: should change this!!!!
                 Stat statsN = countMatchingTuples(queryRecord.getRectangle(), queryRecord);
                 Collection<STHolesBucket<R>> childrenN = new ArrayList<STHolesBucket<R>>();
                 STHolesBucket<R> rootN = new STHolesBucket<R>(boxN, statsN, childrenN, null);
@@ -118,10 +129,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(queryRecord);
         
         for (STHolesBucket<R> bucket : candidates) {
-        	System.out.println("<<<>>> Candidate: " + bucket);
-        	System.out.println("--------------------------------------------------");
+        	//System.out.println("<<<>>> Candidate: " + bucket);
+        	//System.out.println("--------------------------------------------------");
             STHolesBucket<R> hole = shrink(bucket, queryRecord); //calculate intersection and shrink it
-            System.out.println("<<<>>> Hole: " + hole);
+            //System.out.println("<<<>>> Hole: " + hole);
             if (isInaccurateEstimation(bucket,hole))
                 drillHole(bucket, hole);
         }
@@ -140,6 +151,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         Stat curStatistics = bucket.getStatistics();
         Double curDensity = curStatistics.getDensity();
 
+      //  System.out.println(">>Bucket is: " + bucket + " and hole is: " + hole +
+        //"actual density is: " + actualDensity + " curDensity is: " + curDensity);
         return (Math.abs(actualDensity - curDensity) > epsilon);
     }
 
@@ -306,7 +319,6 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      */
     private void drillHole(STHolesBucket<R> parentBucket, STHolesBucket<R> candidateHole)
     {
-    	System.out.println("<<<>>> BIKA");
         if (parentBucket.getBox().equals(candidateHole.getBox())) {
         	 
             Stat parentStats = new Stat(candidateHole.getStatistics().getFrequency(),
@@ -318,11 +330,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
         else {
 
             //STHolesBucket bn = new STHolesBucket(holeBoundaries, holeFrequency,null,parentBucket,distinct);
-            candidateHole.setParent(parentBucket);
 
-            parentBucket.addChild(candidateHole);
 
-            bucketsNum += 1;
 
             for (STHolesBucket<R> bc : parentBucket.getChildren()) {
 
@@ -331,6 +340,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
                     bc.setParent(candidateHole);
                 }
             }
+
+            parentBucket.addChild(candidateHole);
+
+            bucketsNum += 1;
         }
     }
 

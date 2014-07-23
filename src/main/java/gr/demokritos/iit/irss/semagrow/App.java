@@ -26,7 +26,7 @@ public class App
         long start = System.currentTimeMillis();
 //        while( true ) {
         	// open query log file
-        	LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs_4.log"); 
+        	LogParser lp = new LogParser("src/main/resources/semagrow_logs_4.log");
 //        	LogParser lp = new LogParser("src\\main\\resources\\test_2.txt");
 
         	List<RDFQueryRecord> list = lp.parse();
@@ -51,7 +51,7 @@ public class App
         	 h.refine(list);
         	 
         	 // Write histogram to file.
-        	 HistogramIO histIO = new HistogramIO("src\\main\\resources\\hist", ((STHolesHistogram) h).getRoot());
+        	 HistogramIO histIO = new HistogramIO("src/main/resources/hist", ((STHolesHistogram) h).getRoot());
         	 histIO.write();
 //        }
     }

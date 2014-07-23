@@ -50,7 +50,6 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 	
 	@Override
 	public boolean equals(Object obj) {
-		System.out.println("EQUALSSS");
 		if (obj instanceof RDFRectangle) {
 			RDFRectangle rec = (RDFRectangle)obj;
 			return this.contains(rec) && rec.contains(this);
