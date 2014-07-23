@@ -26,8 +26,8 @@ public class HistogramIO<R extends Rectangle<R>> {
 
 
 	public void write() {
-		writeJSOn();
-//		writeNonBinary();
+//		writeJSOn();
+		writeNonBinary();
 //		writeBinary();
 	}
 
@@ -79,6 +79,7 @@ public class HistogramIO<R extends Rectangle<R>> {
 
 			// Foreach child, call write method recursively.
 			for (STHolesBucket<R> child : children) {
+				System.err.println("Children of child>> " + child.getChildren().size());
 				write(child, bw);
 			}
 			
@@ -94,27 +95,17 @@ public class HistogramIO<R extends Rectangle<R>> {
 	 * Recursively writes a bucket and its children if exist.
 	 */
 	private void write(STHolesBucket<R> bucket, BufferedWriter bw) {
-
-		if (bucket.getChildren().isEmpty()) {
-			try { 
-				bw.write("\n{\n");
-				bw.write(bucket.toString());
-				bw.write("\n}\n");
-			} catch (IOException e) {e.printStackTrace();}
-			
-		} else {
-			try {
+		
+		try { 
 			bw.write("\n{\n");
-			for (STHolesBucket<R> child : bucket.getChildren()) {
-							
-				bw.write(child.toString());
-				
-				write(child, bw);
-				
-			}// for
+			bw.write(bucket.toString());
+			
+			for (STHolesBucket<R> child : bucket.getChildren()) 			
+				write(child, bw);		
+			
 			bw.write("\n}\n");
-			} catch (IOException e) {e.printStackTrace();}
-		}// else
+		} catch (IOException e) {e.printStackTrace();}	
+
 	}// write
 	
 	
