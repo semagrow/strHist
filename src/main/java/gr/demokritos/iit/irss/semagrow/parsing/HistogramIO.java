@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
+import com.cedarsoftware.util.io.JsonWriter;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 
@@ -26,8 +27,8 @@ public class HistogramIO<R extends Rectangle<R>> {
 
 
 	public void write() {
-//		writeJSOn();
-		writeNonBinary();
+		writeJSOn();
+//		writeNonBinary();
 //		writeBinary();
 	}
 
@@ -36,8 +37,18 @@ public class HistogramIO<R extends Rectangle<R>> {
 	 * Writes the histogram into a file in JSOn format.
 	 */
 	private void writeJSOn() {
-		
-		
+		FileWriter fw;
+
+        try {
+            fw = new FileWriter(getPath() + ".txt");
+
+            // Write root bucket and its children via chained toJSON calls.
+            fw.write(JsonWriter.formatJson(rootBucket.toJSON().toJSONString()));
+
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 
 

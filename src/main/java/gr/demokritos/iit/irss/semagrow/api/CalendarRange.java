@@ -1,5 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
+import org.json.simple.JSONObject;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -180,6 +182,19 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
 
         return "calendarRange: " + begin + "-" + end + "\n";
 
+    }
+
+
+    public JSONObject toJSON() {
+        JSONObject range = new JSONObject();
+        range.put("begin", begin);
+        range.put("end", end);
+
+        JSONObject calendarRange = new JSONObject();
+        calendarRange.put("type", "calendarRange");
+        calendarRange.put("value", range);
+
+        return calendarRange;
     }
 
     public static void main(String args[] ) throws ParseException {

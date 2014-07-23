@@ -1,5 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
+import org.json.simple.JSONObject;
+
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -117,6 +119,18 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
     public String toString() {
 
         return "intervalRange: " + low + "-" + high + "\n";
+    }
+
+    public JSONObject toJSON() {
+        JSONObject range = new JSONObject();
+        range.put("low", low);
+        range.put("high", high);
+
+        JSONObject intervalRange = new JSONObject();
+        intervalRange.put("type", "intervalRange");
+        intervalRange.put("value", range);
+
+        return intervalRange;
     }
 
     public static void main(String [] args){

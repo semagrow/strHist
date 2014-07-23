@@ -1,5 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 
 /**
@@ -173,6 +176,24 @@ public class PrefixRange
 
         res += "}";
         return res;
+    }
+
+
+    public JSONObject toJSON() {
+        JSONObject subject;
+        JSONArray array = new JSONArray();
+
+        for (String p : prefixList) {
+            subject = new JSONObject();
+            subject.put("value", p);
+            subject.put("type", "url");
+            array.add(subject);
+        }
+
+        JSONObject jSONObj = new JSONObject();
+        jSONObj.put("array", array);
+
+        return jSONObj;
     }
 
     public static void main(String [] args){

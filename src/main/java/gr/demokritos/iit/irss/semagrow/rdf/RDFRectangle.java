@@ -4,6 +4,7 @@ import gr.demokritos.iit.irss.semagrow.api.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.api.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.api.Range;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -171,6 +172,16 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
                 "\tobject:\n" + "\t\t" + objectRange.toString() + "\n";
 
         return res;
+    }
+
+
+    public JSONObject toJSON() {
+        JSONObject rectangle = new JSONObject();
+        rectangle.put("subject", subjectRange.toJSON());
+        rectangle.put("predicate", predicateRange.toJSON());
+        rectangle.put("object", objectRange.toJSON());
+
+        return rectangle;
     }
 
     public static void main(String args[] ) {

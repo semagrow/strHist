@@ -1,5 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -107,6 +110,24 @@ public class ExplicitSetRange<T>
 
         return res;
     }
+
+    public JSONObject toJSON() {
+        JSONObject predicate;
+        JSONArray array = new JSONArray();
+
+        for (T p : items) {
+            predicate = new JSONObject();
+            predicate.put("value", p);
+            predicate.put("type", "uri");
+            array.add(predicate);
+        }
+
+        JSONObject jSONObj = new JSONObject();
+        jSONObj.put("array", array);
+
+        return jSONObj;
+    }
+
 
     public boolean isUnit() {
 

@@ -1,5 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +17,8 @@ public class Stat {
     public Stat(Long frequency, List<Long> distinctCount) {
         this.distinctCount = distinctCount;
         this.frequency = frequency;
-    }    
-    
+    }
+
     /**
      * Default Constructor
      */
@@ -68,17 +70,17 @@ public class Stat {
         return res;
 
     }
-    
-//    public JSONObject toJSON() {
-//    	JSONObject triples = new 
-//    	
-//    	
-//    	JSONObject statistics = new JSONOBject();    	
-//    	obj.put("statistics", statistics);
-//    	
-//    	return obj;
-//    }
-    
+
+    public JSONObject toJSON() {
+    	JSONObject statistics = new JSONObject();
+    	statistics.put("triples", frequency);
+    	statistics.put("distinctSubjects", distinctCount.get(0));
+    	statistics.put("distinctPredicates", distinctCount.get(1));
+    	statistics.put("distinctObjects", distinctCount.get(2));
+
+    	return statistics;
+    }
+
 
     public static void main(String [] args){
 
