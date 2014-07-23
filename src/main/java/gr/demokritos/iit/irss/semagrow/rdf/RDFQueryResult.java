@@ -496,29 +496,31 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
                 if (curRectangleIdx != objectRanges.size() - 1) {
 
-                    //todo: check if it is xsd uri
-                    if (type.equals("int") || type.equals("integer")) {
-                        objectRanges.add(new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v)));
+                    if (value.contains("^^") && value.contains("http://")) {
+                        //todo: check if it is xsd uri
+                        if (type.equals("int") || type.equals("integer")) {
+                            objectRanges.add(new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v)));
 
-                    } else if (type.equals("long")) {
-                        objectRanges.add(new RDFLiteralRange(Long.parseLong(v), Long.parseLong(v)));
+                        } else if (type.equals("long")) {
+                            objectRanges.add(new RDFLiteralRange(Long.parseLong(v), Long.parseLong(v)));
 
-                    } else if (type.equals("dateTime")) {
+                        } else if (type.equals("dateTime")) {
 
-                        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                        Date dateLow = null, dateHigh = null;
+                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                            Date dateLow = null, dateHigh = null;
 
-                        try {
-                            dateLow = format.parse(v);
-                            dateHigh = format.parse(v);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                            try {
+                                dateLow = format.parse(v);
+                                dateHigh = format.parse(v);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (dateLow != null && dateHigh != null)
+                                objectRanges.add(new RDFLiteralRange(dateLow, dateHigh));
+                            else
+                                System.err.println("Date Format Error.");
                         }
-
-                        if (dateLow != null && dateHigh != null)
-                            objectRanges.add(new RDFLiteralRange(dateLow, dateHigh));
-                        else
-                            System.err.println("Date Format Error.");
                     } else if (!value.contains("^^") && value.contains("http://")) {// URL
                             //todo: do i need this check above as well?
                         objectRanges.add(new RDFLiteralRange(v));

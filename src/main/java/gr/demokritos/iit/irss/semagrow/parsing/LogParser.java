@@ -277,7 +277,7 @@ public class LogParser {
 		RDFQueryRecord rdfqr = new RDFQueryRecord(lp.getCollection().get(0).getLogQuery());
 
 		RDFRectangle rec = rdfqr.getRectangle();
-		System.out.println(rec);
+		//System.out.println(rec);
 				
 //		RDFQueryRecord rdfqr1 = new RDFQueryRecord(lp.getCollection().get(1).getLogQuery());
 //		RDFRectangle rec1 = rdfqr1.getRectangle();
