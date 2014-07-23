@@ -23,24 +23,35 @@ public class App
     {
 
         h = new STHolesHistogram();
-
+        long start = System.currentTimeMillis();
 //        while( true ) {
         	// open query log file
-        	LogParser lp = new LogParser("src/main/resources/semagrow_logs_4.log");
+        	LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs_4.log");
 //        	LogParser lp = new LogParser("src\\main\\resources\\test_2.txt");
 
         	List<RDFQueryRecord> list = lp.parse();
         	
-        	
+        	/*
+    		 * Report
+    		 */
         	for (RDFQueryRecord qr : list) {
         		System.out.println(qr.getQuery());
-        	}
+        	}        	
+    		long end = System.currentTimeMillis();
+    		System.out.println("\n\n********************************");
+    		System.out.println("Total Parse Time: " + (double) (end - start) / 1000
+    				+ " sec.");
+    		System.out.println("Total Distinct Log Queries Parsed: "
+    				+ lp.getCollection().size());
+    		System.out.println("********************************");
+        	
+        	
         	// filter per  
         	// TODO: construct workload
         	 h.refine(list);
         	 
         	 // Write histogram to file.
-        	 HistogramIO histIO = new HistogramIO("src/main/resources/hist", ((STHolesHistogram) h).getRoot());
+        	 HistogramIO histIO = new HistogramIO("src\\main\\resources\\hist", ((STHolesHistogram) h).getRoot());
         	 histIO.write();
 //        }
     }
