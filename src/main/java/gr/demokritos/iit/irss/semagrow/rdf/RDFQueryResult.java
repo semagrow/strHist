@@ -491,6 +491,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
                 if (curRectangleIdx != objectRanges.size() - 1) {
 
+                    //todo: check if it is xsd uri
                     if (type.equals("int") || type.equals("integer")) {
                         objectRanges.add(new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v)));
 
