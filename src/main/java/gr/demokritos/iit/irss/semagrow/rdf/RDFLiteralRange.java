@@ -64,6 +64,16 @@ public class RDFLiteralRange
         this(XMLSchema.DATETIME, new CalendarRange(begin, end));
     }
 
+    //Copy constructor
+    public RDFLiteralRange(RDFLiteralRange range) {
+
+        this.ranges = new HashMap<URI, RangeLength<?>>(range.getRanges());
+    }
+
+    public void addSubRange(URI type, RangeLength<?> subRange) {
+        ranges.put(type, subRange);
+    }
+
 
     public boolean isUnit() {
 
@@ -102,18 +112,22 @@ public class RDFLiteralRange
     }
 
 
+    //todo: fix me!
+
     public JSONObject toJSON() {
         JSONObject object = new JSONObject();
 
+/*
         if (infinite) {
             object.put("value", "Infinite");
             object.put("type", "Infinite");
         }
         else
             object = range.toJSON();
-
+*/
         return object;
     }
+
 
 
 	public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
@@ -141,7 +155,7 @@ public class RDFLiteralRange
         for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
 
             RangeLength<?> range = entry.getValue();
-            if (entry.equals(literalValueType)) {
+            if (entry.getKey().equals(literalValueType)) {
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
                     res = new RDFLiteralRange(literalValueType,
@@ -199,7 +213,7 @@ public class RDFLiteralRange
         for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
 
             RangeLength<?> range = entry.getValue();
-            if (entry.equals(literalValueType)) {
+            if (entry.getKey().equals(literalValueType)) {
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
                     res = new RDFLiteralRange(literalValueType,
@@ -294,7 +308,7 @@ public class RDFLiteralRange
         for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
 
             RangeLength<?> range = entry.getValue();
-            if (entry.equals(literalValueType)) {
+            if (entry.getKey().equals(literalValueType)) {
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
                     return  ((IntervalRange<Integer>) range).contains(
@@ -344,7 +358,7 @@ public class RDFLiteralRange
         for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
 
             RangeLength<?> range = entry.getValue();
-            if (entry.equals(literalValueType)) {
+            if (entry.getKey().equals(literalValueType)) {
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
                     return  ((IntervalRange<Integer>) range).intersects(
@@ -384,6 +398,8 @@ public class RDFLiteralRange
         URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
         RangeLength<?> literalrange = null;
 
+
+
         // Only 1 loop!
         for (Map.Entry<URI, RangeLength<?>> entry : literalRange.ranges.entrySet()) {
 
@@ -391,10 +407,18 @@ public class RDFLiteralRange
             literalrange = entry.getValue();
         }
 
+        //add another range (only to be used for root bucket)
+        if (!ranges.containsKey(literalValueType)) {
+
+            RDFLiteralRange res = new RDFLiteralRange(this);
+            res.addSubRange(literalValueType, literalrange);
+            return res;
+        }
+
         for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
 
             RangeLength<?> range = entry.getValue();
-            if (entry.equals(literalValueType)) {
+            if (entry.getKey().equals(literalValueType)) {
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
 
@@ -452,18 +476,42 @@ public class RDFLiteralRange
     }
 
 
+    /**
+     * expands an RDFLiteralRange containing ONLY
+     * one subrange, so that is contains {v}
+     * @param v
+     */
     public void expand(String v) {
+
+        if (ranges.size() != 1) {
+            System.err.println("This method cannot be called" +
+                    "for RDFLiteralRange ranges with " +
+                    "more than one subrange.");
+        }
+
+        URI valueType = ValueFactoryImpl.getInstance().createURI("");
+        RangeLength<?> range = null;
+        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
+
+           valueType = entry.getKey();
+           range = entry.getValue();
+        }
 
         if (valueType.equals(XMLSchema.INTEGER)) {
 
+            assert ((IntervalRange) range) != null;
             ((IntervalRange) range).expand(v);
         } else if (valueType.equals(XMLSchema.LONG)) {
 
+            assert ((IntervalRange) range) != null;
             ((IntervalRange) range).expand(v);
         } else if (valueType.equals(XMLSchema.STRING)) {
 
+            assert ((PrefixRange) range) != null;
             ((PrefixRange) range).expand(v);
         } else if (valueType.equals(XMLSchema.DATETIME)) {
+
+            assert ((CalendarRange) range) != null;
             ((CalendarRange) range).expand(v);
 
         }
@@ -497,7 +545,19 @@ public class RDFLiteralRange
 
         if (infinite) return Integer.MAX_VALUE;
 
-        return range.getLength();
+        if (ranges.size() != 1) {
+            System.err.println("This method cannot be called" +
+                    "for RDFLiteralRange ranges with " +
+                    "more than one subrange.");
+            return 0;
+        }
+
+        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
+
+            return (entry.getValue()).getLength();
+        }
+
+        return 0;
     }
 
     public boolean isInfinite() {
