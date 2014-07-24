@@ -105,7 +105,7 @@ public class RDFLiteralRange
 
             for (URI type : ranges.keySet()) {
 
-                res = ranges.get(type).toString() + " ";
+                res = ranges.get(type).toString() + " " + res;
             }
         }
     		return res;
@@ -139,7 +139,7 @@ public class RDFLiteralRange
         if (literalRange.ranges.size() != 1) {
             System.err.println("Argument should be a " +
                     "range of single type");
-            return res;
+            return null;
         }
 
         URI literalValueType = ValueFactoryImpl.getInstance().createURI("http://uri");
@@ -177,6 +177,7 @@ public class RDFLiteralRange
                             ((CalendarRange) range).intersection(
                                     (CalendarRange) literalrange));
                 }
+                break;
             }
         }
 
@@ -194,7 +195,8 @@ public class RDFLiteralRange
 
         RDFLiteralRange res = null;
 
-        if (literalRange.ranges.size() != 1) {
+        if (literalRange.ranges.size() != 1
+                || ranges.size() != 1) {
             System.err.println("Argument should be a " +
                     "range of single type");
             return res;
@@ -235,6 +237,7 @@ public class RDFLiteralRange
                             ((CalendarRange) range).minus(
                                     (CalendarRange) literalrange));
                 }
+                break;
             }
         }
 
@@ -422,24 +425,29 @@ public class RDFLiteralRange
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
 
-                    IntervalRange res = ((IntervalRange<Integer>) range).tightRange(
+                    IntervalRange ires = ((IntervalRange<Integer>) range).tightRange(
                             (IntervalRange<Integer>) literalrange);
-                    return new RDFLiteralRange(literalValueType,res);
+                    RDFLiteralRange res = new RDFLiteralRange(this);
+                    res.setValue(literalValueType, ires);
+                    return res;
                 } else if (literalValueType.equals(XMLSchema.LONG)) {
 
-                    IntervalRange res = ((IntervalRange<Integer>) range).tightRange(
+                    IntervalRange ires = ((IntervalRange<Integer>) range).tightRange(
                             (IntervalRange<Integer>) literalrange);
-                    return new RDFLiteralRange(literalValueType,res);
+                    RDFLiteralRange res = new RDFLiteralRange(this);
+                    res.setValue(literalValueType, ires);
                 } else if (literalValueType.equals(XMLSchema.STRING)) {
 
-                    PrefixRange res = ((PrefixRange) range).tightRange(
+                    PrefixRange ires = ((PrefixRange) range).tightRange(
                             (PrefixRange) literalrange);
-                    return new RDFLiteralRange(XMLSchema.STRING, res);
+                    RDFLiteralRange res = new RDFLiteralRange(this);
+                    res.setValue(literalValueType, ires);
                 } else if (literalValueType.equals(XMLSchema.DATETIME)) {
 
-                    CalendarRange res = ((CalendarRange) range).tightRange(
+                    CalendarRange ires = ((CalendarRange) range).tightRange(
                             (CalendarRange) literalrange);
-                    return new RDFLiteralRange(XMLSchema.DATETIME, res);
+                    RDFLiteralRange res = new RDFLiteralRange(this);
+                    res.setValue(literalValueType, ires);
                 }
             }
         }
@@ -541,6 +549,11 @@ public class RDFLiteralRange
 
         return ranges;
     }
+
+    public void setValue(URI type, RangeLength<?> rangeN) {
+
+        ranges.put(type, rangeN);
+    }
     public long getLength() {
 
         if (infinite) return Integer.MAX_VALUE;
@@ -563,5 +576,20 @@ public class RDFLiteralRange
     public boolean isInfinite() {
 
         return infinite;
+    }
+
+    public static void main(String args[] ) {
+        
+        RDFLiteralRange rootRange = new RDFLiteralRange(0,10);
+        System.out.println("Before: " + rootRange);
+        RDFLiteralRange queryRange = new RDFLiteralRange("http://a");
+        System.out.println("Query: " + queryRange);
+        RDFLiteralRange rootRangeN = rootRange.tightRange(queryRange);
+        System.out.println("After: " + rootRangeN);
+        RDFLiteralRange query2Range = new RDFLiteralRange(14,17);
+        RDFLiteralRange rootRangeN2 = rootRangeN.tightRange(query2Range);
+        System.out.println("Query2: " + query2Range);
+        System.out.println("After: " + rootRangeN2);
+
     }
 }
