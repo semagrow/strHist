@@ -1,5 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
+import org.json.simple.JSONObject;
+
 /**
  *
  * Created by angel on 7/16/14.
@@ -7,4 +9,5 @@ package gr.demokritos.iit.irss.semagrow.api;
 public interface RangeLength<T> extends Range<T> {
 
     long getLength();
+    JSONObject toJSON();
 }

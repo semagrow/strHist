@@ -1,5 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
+import org.json.simple.JSONObject;
+
 /**
  * Rectangle is essentially a multidimensional bounding box
  * Created by angel on 7/11/14.
@@ -27,6 +29,8 @@ public interface Rectangle<R> {
     R computeTightBox(R rec);
     
     boolean equals(Object rec);
+
+    JSONObject toJSON();
 
     //true if rectangle has
     //at least one infinite range

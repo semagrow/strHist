@@ -1,120 +1,177 @@
-bucket: 
-rectangle:
-	subject:
-		uriprefixes: { "http://ac.collections.natural-europe.eu:8890/sw/resource/" }
-	predicate:
-		uris: { http://www.natural-europe.eu/ontology#height }
-	object:
-		intervalRange: 100-300
-
-statistics:
-	triples : 
-		1295
-	distinctSubjects : 
-		724
-	distinctPredicates : 
-		1
-	distinctObjects : 
-		47
-childrenNum: 
-	2
-
 {
-
-{
-bucket: 
-rectangle:
-	subject:
-		uriprefixes: { "http://ac.collections.natural-europe.eu:8890/sw/resource/" }
-	predicate:
-		uris: { http://www.natural-europe.eu/ontology#height }
-	object:
-		intervalRange: 200-300
-
-statistics:
-	triples : 
-		571
-	distinctSubjects : 
-		571
-	distinctPredicates : 
-		1
-	distinctObjects : 
-		44
-childrenNum: 
-	2
-
-{
-bucket: 
-rectangle:
-	subject:
-		uriprefixes: { "http://ac.collections.natural-europe.eu:8890/sw/resource/" }
-	predicate:
-		uris: { http://www.natural-europe.eu/ontology#height }
-	object:
-		intervalRange: 250-290
-
-statistics:
-	triples : 
-		53
-	distinctSubjects : 
-		53
-	distinctPredicates : 
-		1
-	distinctObjects : 
-		26
-childrenNum: 
-	0
-
-}
-
-{
-bucket: 
-rectangle:
-	subject:
-		uriprefixes: { "http://ac.collections.natural-europe.eu:8890/sw/resource/" }
-	predicate:
-		uris: { http://www.natural-europe.eu/ontology#height }
-	object:
-		intervalRange: 200-250
-
-statistics:
-	triples : 
-		493
-	distinctSubjects : 
-		724
-	distinctPredicates : 
-		1
-	distinctObjects : 
-		47
-childrenNum: 
-	0
-
-}
-
-}
-
-{
-bucket: 
-rectangle:
-	subject:
-		uriprefixes: { "http://ac.collections.natural-europe.eu:8890/sw/resource/" }
-	predicate:
-		uris: { http://www.natural-europe.eu/ontology#height }
-	object:
-		intervalRange: 100-200
-
-statistics:
-	triples : 
-		238
-	distinctSubjects : 
-		724
-	distinctPredicates : 
-		1
-	distinctObjects : 
-		47
-childrenNum: 
-	0
-
-}
-
+  "children":[
+    {
+      "children":[
+        {
+          "children":[],
+          "childrenNumber":0,
+          "box":{
+            "subject":{
+              "array":[
+                {
+                  "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
+                  "type":"url"
+                }
+              ]
+            },
+            "predicate":{
+              "array":[
+                {
+                  "value":"http://www.natural-europe.eu/ontology#height",
+                  "type":"uri"
+                }
+              ]
+            },
+            "object":{
+              "value":{
+                "high":290,
+                "low":250
+              },
+              "type":"intervalRange"
+            }
+          },
+          "statistics":{
+            "distinctObjects":26,
+            "distinctPredicates":1,
+            "distinctSubjects":53,
+            "triples":53
+          }
+        },
+        {
+          "children":[],
+          "childrenNumber":0,
+          "box":{
+            "subject":{
+              "array":[
+                {
+                  "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
+                  "type":"url"
+                }
+              ]
+            },
+            "predicate":{
+              "array":[
+                {
+                  "value":"http://www.natural-europe.eu/ontology#height",
+                  "type":"uri"
+                }
+              ]
+            },
+            "object":{
+              "value":{
+                "high":250,
+                "low":200
+              },
+              "type":"intervalRange"
+            }
+          },
+          "statistics":{
+            "distinctObjects":47,
+            "distinctPredicates":1,
+            "distinctSubjects":724,
+            "triples":493
+          }
+        }
+      ],
+      "childrenNumber":2,
+      "box":{
+        "subject":{
+          "array":[
+            {
+              "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
+              "type":"url"
+            }
+          ]
+        },
+        "predicate":{
+          "array":[
+            {
+              "value":"http://www.natural-europe.eu/ontology#height",
+              "type":"uri"
+            }
+          ]
+        },
+        "object":{
+          "value":{
+            "high":300,
+            "low":200
+          },
+          "type":"intervalRange"
+        }
+      },
+      "statistics":{
+        "distinctObjects":44,
+        "distinctPredicates":1,
+        "distinctSubjects":571,
+        "triples":571
+      }
+    },
+    {
+      "children":[],
+      "childrenNumber":0,
+      "box":{
+        "subject":{
+          "array":[
+            {
+              "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
+              "type":"url"
+            }
+          ]
+        },
+        "predicate":{
+          "array":[
+            {
+              "value":"http://www.natural-europe.eu/ontology#height",
+              "type":"uri"
+            }
+          ]
+        },
+        "object":{
+          "value":{
+            "high":200,
+            "low":100
+          },
+          "type":"intervalRange"
+        }
+      },
+      "statistics":{
+        "distinctObjects":47,
+        "distinctPredicates":1,
+        "distinctSubjects":724,
+        "triples":238
+      }
+    }
+  ],
+  "childrenNumber":2,
+  "box":{
+    "subject":{
+      "array":[
+        {
+          "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
+          "type":"url"
+        }
+      ]
+    },
+    "predicate":{
+      "array":[
+        {
+          "value":"http://www.natural-europe.eu/ontology#height",
+          "type":"uri"
+        }
+      ]
+    },
+    "object":{
+      "value":{
+        "high":300,
+        "low":100
+      },
+      "type":"intervalRange"
+    }
+  },
+  "statistics":{
+    "distinctObjects":47,
+    "distinctPredicates":1,
+    "distinctSubjects":724,
+    "triples":724
+  }
 }

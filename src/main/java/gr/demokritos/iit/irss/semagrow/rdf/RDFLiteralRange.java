@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.rdf;
 
 
 import gr.demokritos.iit.irss.semagrow.api.*;
+import org.json.simple.JSONObject;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -74,6 +75,20 @@ public class RDFLiteralRange
     		return "Infinite";
     	else
     		return range.toString();
+    }
+
+
+    public JSONObject toJSON() {
+        JSONObject object = new JSONObject();
+
+        if (infinite) {
+            object.put("value", "Infinite");
+            object.put("type", "Infinite");
+        }
+        else
+            object = range.toJSON();
+
+        return object;
     }
 
 
