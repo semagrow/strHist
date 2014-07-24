@@ -6,10 +6,14 @@ import org.json.simple.JSONObject;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.XMLSchema;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by angel on 7/15/14.
@@ -18,8 +22,9 @@ public class RDFLiteralRange
         implements RangeLength<Value>, Rangeable<RDFLiteralRange>
 {
 
-    private URI valueType;
-    private RangeLength<?> range;
+    private Map<URI,RangeLength<?>> ranges = new HashMap<URI, RangeLength<?>>();
+   // private URI valueType;
+   // private RangeLength<?> range;
     private boolean infinite = false;
 
 
@@ -29,8 +34,9 @@ public class RDFLiteralRange
     }
     public RDFLiteralRange(URI valueType, RangeLength<?> range) {
 
-		this.valueType = valueType;
-		this.range = range;
+        this.ranges.put(valueType, range);
+		//this.valueType = valueType;
+		//this.range = range;
 	}
 
 
@@ -48,8 +54,9 @@ public class RDFLiteralRange
         // TODO: maybe change it to take the list as a parameter
         ArrayList<String> stringList = new ArrayList<String>();
         stringList.add(range);
-        this.valueType = XMLSchema.STRING;
-        this.range = new PrefixRange(stringList);
+        this.ranges.put(XMLSchema.STRING,  new PrefixRange(stringList));
+        //this.valueType = XMLSchema.STRING;
+        //this.range = new PrefixRange(stringList);
     }
 
     public RDFLiteralRange(Date begin, Date end) {
@@ -62,7 +69,17 @@ public class RDFLiteralRange
 
         if (infinite) return false;
 
-        return range.isUnit();
+        boolean res = true;
+
+        if (ranges.size() == 1) {
+
+            for (URI type : ranges.keySet()) {
+
+                res = ranges.get(type).isUnit();
+            }
+        }
+
+        return res;
     }
 
     public String toString() {
@@ -71,10 +88,17 @@ public class RDFLiteralRange
         //uris for ExplicitSetRange
         //intervalRange for IntervalRange
         //calendarRange for CalendarRange
+        String res = "";
     	if (infinite)
     		return "Infinite";
-    	else
-    		return range.toString();
+    	else {
+
+            for (URI type : ranges.keySet()) {
+
+                res = ranges.get(type).toString() + " ";
+            }
+        }
+    		return res;
     }
 
 
@@ -97,28 +121,48 @@ public class RDFLiteralRange
         if (infinite) return literalRange;
 
         RDFLiteralRange res = null;
-        if (valueType.equals(literalRange.getValueType()))
-        {
 
-            if (valueType.equals(XMLSchema.INTEGER)) {
-                res = new RDFLiteralRange(valueType,
-                        ((IntervalRange<Integer>) range).intersection(
-                                (IntervalRange<Integer>) literalRange.getRange()));
-            } else if (valueType.equals(XMLSchema.LONG)) {
+        if (literalRange.ranges.size() != 1) {
+            System.err.println("Argument should be a " +
+                    "range of single type");
+            return res;
+        }
 
-                res = new RDFLiteralRange(valueType,
-                        ((IntervalRange<Integer>) range).intersection(
-                                (IntervalRange<Integer>) literalRange.getRange()));
-            } else if (valueType.equals(XMLSchema.STRING)) {
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        RangeLength<?> literalrange = null;
 
-                res = new RDFLiteralRange(valueType,
-                        ((PrefixRange) range).intersection(
-                                (PrefixRange) literalRange.getRange()));
-            } else if (valueType.equals(XMLSchema.DATETIME)) {
+        // Only 1 loop!
+        for (Map.Entry<URI, RangeLength<?>> entry : literalRange.ranges.entrySet()) {
 
-                res = new RDFLiteralRange(valueType,
-                        ((CalendarRange) range).intersection(
-                                (CalendarRange) literalRange.getRange()));
+            literalValueType = entry.getKey();
+            literalrange = entry.getValue();
+        }
+
+        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
+
+            RangeLength<?> range = entry.getValue();
+            if (entry.equals(literalValueType)) {
+
+                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                    res = new RDFLiteralRange(literalValueType,
+                            ((IntervalRange<Integer>) range).intersection(
+                                    (IntervalRange<Integer>) literalrange));
+                } else if (literalValueType.equals(XMLSchema.LONG)) {
+
+                    res = new RDFLiteralRange(literalValueType,
+                            ((IntervalRange<Integer>) range).intersection(
+                                    (IntervalRange<Integer>) literalrange));
+                } else if (literalValueType.equals(XMLSchema.STRING)) {
+
+                    res = new RDFLiteralRange(literalValueType,
+                            ((PrefixRange) range).intersection(
+                                    (PrefixRange) literalrange));
+                } else if (literalValueType.equals(XMLSchema.DATETIME)) {
+
+                    res = new RDFLiteralRange(literalValueType,
+                            ((CalendarRange) range).intersection(
+                                    (CalendarRange) literalrange));
+                }
             }
         }
 
@@ -131,32 +175,58 @@ public class RDFLiteralRange
     //Tested (only interval range)
 	public RDFLiteralRange minus(RDFLiteralRange literalRange) {
 
-        if (valueType.equals(literalRange.getValueType()))
-        {
 
-            if (valueType.equals(XMLSchema.INTEGER)) {
+        if (infinite) return literalRange;
 
-                IntervalRange res = ((IntervalRange<Integer>) range).minus(
-                        (IntervalRange<Integer>) literalRange.getRange());
-                return new RDFLiteralRange(XMLSchema.INTEGER, res);
+        RDFLiteralRange res = null;
 
-            } else if (valueType.equals(XMLSchema.LONG)) {
+        if (literalRange.ranges.size() != 1) {
+            System.err.println("Argument should be a " +
+                    "range of single type");
+            return res;
+        }
 
-                IntervalRange res = ((IntervalRange<Integer>) range).minus(
-                        (IntervalRange<Integer>) literalRange.getRange());
-                return new RDFLiteralRange(XMLSchema.INTEGER, res);
-            } else if (valueType.equals(XMLSchema.STRING)) {
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        RangeLength<?> literalrange = null;
 
-                PrefixRange res = ((PrefixRange) range).minus(
-                        (PrefixRange) literalRange.getRange());
-                return new RDFLiteralRange(XMLSchema.STRING, res);
-            } else if (valueType.equals(XMLSchema.DATETIME)) {
-                CalendarRange res = ((CalendarRange) range).minus(
-                        (CalendarRange) literalRange.getRange());
-                return new RDFLiteralRange(XMLSchema.DATETIME, res);
+        // Only 1 loop!
+        for (Map.Entry<URI, RangeLength<?>> entry : literalRange.ranges.entrySet()) {
+
+            literalValueType = entry.getKey();
+            literalrange = entry.getValue();
+        }
+
+        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
+
+            RangeLength<?> range = entry.getValue();
+            if (entry.equals(literalValueType)) {
+
+                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                    res = new RDFLiteralRange(literalValueType,
+                            ((IntervalRange<Integer>) range).minus(
+                                    (IntervalRange<Integer>) literalrange));
+                } else if (literalValueType.equals(XMLSchema.LONG)) {
+
+                    res = new RDFLiteralRange(literalValueType,
+                            ((IntervalRange<Integer>) range).minus(
+                                    (IntervalRange<Integer>) literalrange));
+                } else if (literalValueType.equals(XMLSchema.STRING)) {
+
+                    res = new RDFLiteralRange(literalValueType,
+                            ((PrefixRange) range).minus(
+                                    (PrefixRange) literalrange));
+                } else if (literalValueType.equals(XMLSchema.DATETIME)) {
+
+                    res = new RDFLiteralRange(literalValueType,
+                            ((CalendarRange) range).minus(
+                                    (CalendarRange) literalrange));
+                }
             }
         }
-		return null;
+
+
+
+        return res;
 	}
 
 
@@ -164,30 +234,36 @@ public class RDFLiteralRange
 	public boolean contains(Value value) {
 
         if (infinite) return true;
-        
-    	if (value instanceof Literal) {
-    		Literal literal = (Literal)value;
-    		
-    		if (literal.getDatatype() == valueType) { 
-    			if (valueType.equals(XMLSchema.INTEGER)) {    				
-    				return ((IntervalRange<Integer>) range).contains(literal.intValue());
-    				
-    			} else if (valueType.equals(XMLSchema.LONG)) {    				
-    				return ((IntervalRange<Integer>) range).contains(literal.intValue());
-    				
-    			} else if (valueType.equals(XMLSchema.STRING)) {            	 
-    				return ((PrefixRange) range).contains(literal.stringValue());
-                 
-    			} else if (valueType.equals(XMLSchema.DATETIME)) {           	 
-    				return ((CalendarRange) range).
-    						contains(literal.calendarValue().
-    								toGregorianCalendar().getTime());
-    			}
-    		}
-    	} else if (value instanceof URI) {  
-    		if (range instanceof PrefixRange)
-    			return ((PrefixRange) range).contains(((URI)value).stringValue());   		 
-    	}
+
+        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
+
+            URI valueType = entry.getKey();
+            RangeLength<?> range = entry.getValue();
+
+            if (value instanceof Literal) {
+                Literal literal = (Literal) value;
+
+                if (literal.getDatatype() == valueType) {
+                    if (valueType.equals(XMLSchema.INTEGER)) {
+                        return ((IntervalRange<Integer>) range).contains(literal.intValue());
+
+                    } else if (valueType.equals(XMLSchema.LONG)) {
+                        return ((IntervalRange<Integer>) range).contains(literal.intValue());
+
+                    } else if (valueType.equals(XMLSchema.STRING)) {
+                        return ((PrefixRange) range).contains(literal.stringValue());
+
+                    } else if (valueType.equals(XMLSchema.DATETIME)) {
+                        return ((CalendarRange) range).
+                                contains(literal.calendarValue().
+                                        toGregorianCalendar().getTime());
+                    }
+                }
+            } else if (value instanceof URI) {
+                if (range instanceof PrefixRange)
+                    return ((PrefixRange) range).contains(((URI) value).stringValue());
+            }
+        }
     		
     	return false;
     }
@@ -198,27 +274,47 @@ public class RDFLiteralRange
         //for estimation
         if (literalRange.isInfinite()) return true;
 
-        if (valueType.equals(literalRange.getValueType()))
-        {
 
-            if (valueType.equals(XMLSchema.INTEGER)) {
+        if (literalRange.ranges.size() != 1) {
+            System.err.println("Argument should be a " +
+                    "range of single type");
+            return false;
+        }
 
-               return ((IntervalRange<Integer>) range).contains(
-                                (IntervalRange<Integer>) literalRange.getRange());
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        RangeLength<?> literalrange = null;
 
-            } else if (valueType.equals(XMLSchema.LONG)) {
+        // Only 1 loop!
+        for (Map.Entry<URI, RangeLength<?>> entry : literalRange.ranges.entrySet()) {
 
-                return ((IntervalRange<Integer>) range).contains(
-                        (IntervalRange<Integer>) literalRange.getRange());
-            } else if (valueType.equals(XMLSchema.STRING)) {
+            literalValueType = entry.getKey();
+            literalrange = entry.getValue();
+        }
 
-                return ((PrefixRange) range).contains(
-                        (PrefixRange) literalRange.getRange());
-            } else if (valueType.equals(XMLSchema.DATETIME)) {            	
-                return ((CalendarRange) range).contains(
-                        (CalendarRange) literalRange.getRange());
+        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
+
+            RangeLength<?> range = entry.getValue();
+            if (entry.equals(literalValueType)) {
+
+                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                    return  ((IntervalRange<Integer>) range).contains(
+                                    (IntervalRange<Integer>) literalrange);
+                } else if (literalValueType.equals(XMLSchema.LONG)) {
+
+                    return  ((IntervalRange<Integer>) range).contains(
+                                    (IntervalRange<Integer>) literalrange);
+                } else if (literalValueType.equals(XMLSchema.STRING)) {
+
+                    return ((PrefixRange) range).contains(
+                                    (PrefixRange) literalrange);
+                } else if (literalValueType.equals(XMLSchema.DATETIME)) {
+
+                    return ((CalendarRange) range).contains(
+                                    (CalendarRange) literalrange);
+                }
             }
         }
+
 
         return false;
     }
@@ -229,37 +325,102 @@ public class RDFLiteralRange
 
         if (infinite) return true;
 
-        if (valueType.equals(literalRange.getValueType()))
-        {
+        if (literalRange.ranges.size() != 1) {
+            System.err.println("Argument should be a " +
+                    "range of single type");
+            return false;
+        }
 
-            if (valueType.equals(XMLSchema.INTEGER)) {
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        RangeLength<?> literalrange = null;
 
-                return ((IntervalRange<Integer>) range).intersects(
-                        (IntervalRange<Integer>) literalRange.getRange());
+        // Only 1 loop!
+        for (Map.Entry<URI, RangeLength<?>> entry : literalRange.ranges.entrySet()) {
 
-            } else if (valueType.equals(XMLSchema.LONG)) {
+            literalValueType = entry.getKey();
+            literalrange = entry.getValue();
+        }
 
-                return ((IntervalRange<Integer>) range).intersects(
-                        (IntervalRange<Integer>) literalRange.getRange());
-            } else if (valueType.equals(XMLSchema.STRING)) {
+        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
 
-                return ((PrefixRange) range).intersects(
-                        (PrefixRange) literalRange.getRange());
-            } else if (valueType.equals(XMLSchema.DATETIME)) {
+            RangeLength<?> range = entry.getValue();
+            if (entry.equals(literalValueType)) {
 
-                return ((CalendarRange) range).intersects(
-                        (CalendarRange) literalRange.getRange());
+                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                    return  ((IntervalRange<Integer>) range).intersects(
+                            (IntervalRange<Integer>) literalrange);
+                } else if (literalValueType.equals(XMLSchema.LONG)) {
+
+                    return  ((IntervalRange<Integer>) range).intersects(
+                            (IntervalRange<Integer>) literalrange);
+                } else if (literalValueType.equals(XMLSchema.STRING)) {
+
+                    return ((PrefixRange) range).intersects(
+                            (PrefixRange) literalrange);
+                } else if (literalValueType.equals(XMLSchema.DATETIME)) {
+
+                    return ((CalendarRange) range).intersects(
+                            (CalendarRange) literalrange);
+                }
             }
         }
 
         return false;
     }
 
-    //TODO: Fix me!
+    //TODO: Fix me! na kanw add map entry
     public RDFLiteralRange tightRange(RDFLiteralRange literalRange) {
 
         if (infinite) return new RDFLiteralRange();
 
+
+
+        if (literalRange.ranges.size() != 1) {
+            System.err.println("Argument should be a " +
+                    "range of single type");
+            return null;
+        }
+
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        RangeLength<?> literalrange = null;
+
+        // Only 1 loop!
+        for (Map.Entry<URI, RangeLength<?>> entry : literalRange.ranges.entrySet()) {
+
+            literalValueType = entry.getKey();
+            literalrange = entry.getValue();
+        }
+
+        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
+
+            RangeLength<?> range = entry.getValue();
+            if (entry.equals(literalValueType)) {
+
+                if (literalValueType.equals(XMLSchema.INTEGER)) {
+
+                    IntervalRange res = ((IntervalRange<Integer>) range).tightRange(
+                            (IntervalRange<Integer>) literalrange);
+                    return new RDFLiteralRange(literalValueType,res);
+                } else if (literalValueType.equals(XMLSchema.LONG)) {
+
+                    IntervalRange res = ((IntervalRange<Integer>) range).tightRange(
+                            (IntervalRange<Integer>) literalrange);
+                    return new RDFLiteralRange(literalValueType,res);
+                } else if (literalValueType.equals(XMLSchema.STRING)) {
+
+                    PrefixRange res = ((PrefixRange) range).tightRange(
+                            (PrefixRange) literalrange);
+                    return new RDFLiteralRange(XMLSchema.STRING, res);
+                } else if (literalValueType.equals(XMLSchema.DATETIME)) {
+
+                    CalendarRange res = ((CalendarRange) range).tightRange(
+                            (CalendarRange) literalrange);
+                    return new RDFLiteralRange(XMLSchema.DATETIME, res);
+                }
+            }
+        }
+
+        /*
         if (valueType.equals(literalRange.getValueType()))
         {
 
@@ -285,6 +446,8 @@ public class RDFLiteralRange
                 return new RDFLiteralRange(XMLSchema.DATETIME, res);
             }
         }
+        */
+
         return null;
     }
 
@@ -308,6 +471,7 @@ public class RDFLiteralRange
 
     }
 
+    /*
     public URI getValueType() {
         return valueType;
     }
@@ -324,7 +488,11 @@ public class RDFLiteralRange
         this.range = range;
     }
 
-    
+    */
+    public Map<URI, RangeLength<?>> getRanges() {
+
+        return ranges;
+    }
     public long getLength() {
 
         if (infinite) return Integer.MAX_VALUE;
