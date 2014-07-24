@@ -142,7 +142,7 @@ public class RDFLiteralRange
             return res;
         }
 
-        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("http://uri");
         RangeLength<?> literalrange = null;
 
         // Only 1 loop!
@@ -200,7 +200,7 @@ public class RDFLiteralRange
             return res;
         }
 
-        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("http://uri");
         RangeLength<?> literalrange = null;
 
         // Only 1 loop!
@@ -295,7 +295,7 @@ public class RDFLiteralRange
             return false;
         }
 
-        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("http://uri");
         RangeLength<?> literalrange = null;
 
         // Only 1 loop!
@@ -345,7 +345,7 @@ public class RDFLiteralRange
             return false;
         }
 
-        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("http://uri");
         RangeLength<?> literalrange = null;
 
         // Only 1 loop!
@@ -395,7 +395,7 @@ public class RDFLiteralRange
             return null;
         }
 
-        URI literalValueType = ValueFactoryImpl.getInstance().createURI("");
+        URI literalValueType = ValueFactoryImpl.getInstance().createURI("http://uri");
         RangeLength<?> literalrange = null;
 
 
@@ -489,7 +489,7 @@ public class RDFLiteralRange
                     "more than one subrange.");
         }
 
-        URI valueType = ValueFactoryImpl.getInstance().createURI("");
+        URI valueType = ValueFactoryImpl.getInstance().createURI("http://uri");
         RangeLength<?> range = null;
         for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
 
