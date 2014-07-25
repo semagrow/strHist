@@ -6,9 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.cedarsoftware.util.io.JsonWriter;
-import gr.demokritos.iit.irss.semagrow.api.ExplicitSetRange;
-import gr.demokritos.iit.irss.semagrow.api.PrefixRange;
-import gr.demokritos.iit.irss.semagrow.api.Rectangle;
+import gr.demokritos.iit.irss.semagrow.api.*;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.Stat;
@@ -19,7 +17,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.openrdf.model.URI;
-import gr.demokritos.iit.irss.semagrow.api.RangeLength;
+import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.XMLSchema;
 
 public class HistogramIO<R extends Rectangle<R>> {
 
@@ -134,7 +133,7 @@ public class HistogramIO<R extends Rectangle<R>> {
         }
 
         return children;
-    }
+    }// getChildren
 
 
     private static RDFRectangle getBox(Object boxObj) {
@@ -163,39 +162,48 @@ public class HistogramIO<R extends Rectangle<R>> {
         while (iterator.hasNext()) {
             temp = iterator.next();
 
-            String type = (String)temp.get("type");
-            JSONObject value = (JSONObject)temp.get("value");
+            if (temp.get("intervalRange") != null) {
+                getObjectIntervalRange(temp.get("intervalRange"), ranges);
 
-            if (type.equals("intervalRange")) {
-                long low = (Long)value.get("low");
-                long high = (Long)value.get("high");
-                literalRange = new RDFLiteralRange((int)low, (int)high);
+            } else if (temp.get("prefixRange") != null) {
+                ranges.put(XMLSchema.STRING, getSubject(temp.get("prefixRange")));
 
-            } else if (type.equals("calendarRange")) {
-                DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
-                Date dateLow = null, dateHigh = null;
-
-                try {
-                    dateLow = format.parse((String) value.get("begin"));
-                    dateHigh = format.parse((String) value.get("end"));
-                } catch (java.text.ParseException e) {
-                    e.printStackTrace();
-                }
-
-                literalRange = new RDFLiteralRange(dateLow, dateHigh);
-
-            } else if (type.equals("uri") || type.equals("url")) {
-                literalRange = new RDFLiteralRange(value.toString());
-
-            } else if (type.equals("Infinite")) {
-                literalRange = new RDFLiteralRange();
+            } else if (temp.get("calendarRange") != null) {
+                getObjectCalendarRange(temp.get("calendarRange"), ranges);
             }
 
         }// while
 
-        return literalRange;
+        return new RDFLiteralRange(ranges);
     }// getObject
+
+
+    private static void getObjectIntervalRange(Object obj, Map<URI,RangeLength<?>> ranges) {
+        JSONObject jsonObject = (JSONObject)obj;
+
+        long low = (Long) jsonObject.get("low");
+        long high = (Long) jsonObject.get("high");
+
+        ranges.put(XMLSchema.INTEGER, new IntervalRange((int) low, (int) high));
+    }// getObjectIntervalRange
+
+
+    private static void getObjectCalendarRange(Object obj, Map<URI,RangeLength<?>> ranges) {
+        JSONObject jsonObject = (JSONObject)obj;
+
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+        Date dateBegin = null, dateEnd = null;
+
+        try {
+            dateBegin = format.parse((String) jsonObject.get("begin"));
+            dateEnd = format.parse((String) jsonObject.get("end"));
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+
+        ranges.put(XMLSchema.INTEGER, new RDFLiteralRange(dateBegin, dateEnd));
+    }// getObjectCalendarRange
 
 
     private static PrefixRange getSubject(Object subjectObj) {

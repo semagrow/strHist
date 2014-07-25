@@ -23,10 +23,16 @@ public class RDFLiteralRange
         implements RangeLength<Value>, Rangeable<RDFLiteralRange>
 {
 
+
+
     private Map<URI,RangeLength<?>> ranges = new HashMap<URI, RangeLength<?>>();
    // private URI valueType;
    // private RangeLength<?> range;
     private boolean infinite = false;
+
+    public RDFLiteralRange(Map<URI,RangeLength<?>> ranges) {
+        this.ranges = ranges;
+    }
 
 
     public RDFLiteralRange() {
@@ -117,25 +123,27 @@ public class RDFLiteralRange
         JSONObject object;
         JSONArray array = new JSONArray();
 
-        if (infinite) {
+        for (Map.Entry<URI,RangeLength<?>> entry : ranges.entrySet()) {
             object = new JSONObject();
-            object.put("value", "Infinite");
-            object.put("type", "Infinite");
-        }
-        else {
-            for (Map.Entry<URI,RangeLength<?>> entry : ranges.entrySet()) {
-                object = new JSONObject();
-                object = entry.getValue().toJSON();
-                array.add(object);
+
+            if (entry.getKey().equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.LONG)) {
+                object.put("intervalRange", entry.getValue().toJSON());
+
+            } else if (entry.getKey().equals(XMLSchema.DATETIME)) {
+                object.put("calendarRange", entry.getValue().toJSON());
+
+            } else if (entry.getKey().equals(XMLSchema.STRING)) {
+                object.put("prefixRange", entry.getValue().toJSON());
             }
-        }
+
+            array.add(object);
+        }// for
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("array", array);
 
         return jsonObject;
-    }
-
+    }//toJSON
 
 
 	public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
@@ -444,18 +452,21 @@ public class RDFLiteralRange
                             (IntervalRange<Integer>) literalrange);
                     RDFLiteralRange res = new RDFLiteralRange(this);
                     res.setValue(literalValueType, ires);
+                    return res;
                 } else if (literalValueType.equals(XMLSchema.STRING)) {
 
                     PrefixRange ires = ((PrefixRange) range).tightRange(
                             (PrefixRange) literalrange);
                     RDFLiteralRange res = new RDFLiteralRange(this);
                     res.setValue(literalValueType, ires);
+                    return res;
                 } else if (literalValueType.equals(XMLSchema.DATETIME)) {
 
                     CalendarRange ires = ((CalendarRange) range).tightRange(
                             (CalendarRange) literalrange);
                     RDFLiteralRange res = new RDFLiteralRange(this);
                     res.setValue(literalValueType, ires);
+                    return res;
                 }
             }
         }
@@ -584,6 +595,10 @@ public class RDFLiteralRange
     public boolean isInfinite() {
 
         return infinite;
+    }
+
+    public void setRanges(Map<URI, RangeLength<?>> ranges) {
+        this.ranges = ranges;
     }
 
     public static void main(String args[] ) {

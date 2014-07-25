@@ -136,11 +136,11 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         range.put("low", low);
         range.put("high", high);
 
-        JSONObject intervalRange = new JSONObject();
-        intervalRange.put("type", "intervalRange");
-        intervalRange.put("value", range);
+//        JSONObject intervalRange = new JSONObject();
+//        intervalRange.put("type", "intervalRange");
+//        intervalRange.put("value", range);
 
-        return intervalRange;
+        return range;
     }
 
     public static void main(String [] args){

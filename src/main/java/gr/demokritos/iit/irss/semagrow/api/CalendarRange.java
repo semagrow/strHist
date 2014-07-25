@@ -207,11 +207,11 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         range.put("begin", begin);
         range.put("end", end);
 
-        JSONObject calendarRange = new JSONObject();
-        calendarRange.put("type", "calendarRange");
-        calendarRange.put("value", range);
+//        JSONObject calendarRange = new JSONObject();
+//        calendarRange.put("type", "calendarRange");
+//        calendarRange.put("value", range);
 
-        return calendarRange;
+        return range;
     }
 
     public static void main(String args[] ) throws ParseException {

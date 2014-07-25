@@ -26,8 +26,8 @@ public class App
         long start = System.currentTimeMillis();
 //        while( true ) {
         	// open query log file
-        	LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs_4.log");
-//        	LogParser lp = new LogParser("src\\main\\resources\\test_2.txt");
+//        	LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs.log");
+        	LogParser lp = new LogParser("src\\main\\resources\\test_2.txt");
 
         	List<RDFQueryRecord> list = lp.parse();
         	

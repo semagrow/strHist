@@ -3,130 +3,6 @@
     "children":[
       {
         "bucket":{
-          "children":[
-            {
-              "bucket":{
-                "children":[],
-                "childrenNumber":0,
-                "box":{
-                  "subject":{
-                    "array":[
-                      {
-                        "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
-                        "type":"url"
-                      }
-                    ]
-                  },
-                  "predicate":{
-                    "array":[
-                      {
-                        "value":"http://www.natural-europe.eu/ontology#height",
-                        "type":"uri"
-                      }
-                    ]
-                  },
-                  "object":{
-                    "array":[
-                      {
-                        "value":{
-                          "high":290,
-                          "low":250
-                        },
-                        "type":"intervalRange"
-                      }
-                    ]
-                  }
-                },
-                "statistics":{
-                  "distinctObjects":26,
-                  "distinctPredicates":1,
-                  "distinctSubjects":53,
-                  "triples":53
-                }
-              }
-            },
-            {
-              "bucket":{
-                "children":[],
-                "childrenNumber":0,
-                "box":{
-                  "subject":{
-                    "array":[
-                      {
-                        "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
-                        "type":"url"
-                      }
-                    ]
-                  },
-                  "predicate":{
-                    "array":[
-                      {
-                        "value":"http://www.natural-europe.eu/ontology#height",
-                        "type":"uri"
-                      }
-                    ]
-                  },
-                  "object":{
-                    "array":[
-                      {
-                        "value":{
-                          "high":250,
-                          "low":200
-                        },
-                        "type":"intervalRange"
-                      }
-                    ]
-                  }
-                },
-                "statistics":{
-                  "distinctObjects":47,
-                  "distinctPredicates":1,
-                  "distinctSubjects":724,
-                  "triples":493
-                }
-              }
-            }
-          ],
-          "childrenNumber":2,
-          "box":{
-            "subject":{
-              "array":[
-                {
-                  "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
-                  "type":"url"
-                }
-              ]
-            },
-            "predicate":{
-              "array":[
-                {
-                  "value":"http://www.natural-europe.eu/ontology#height",
-                  "type":"uri"
-                }
-              ]
-            },
-            "object":{
-              "array":[
-                {
-                  "value":{
-                    "high":300,
-                    "low":200
-                  },
-                  "type":"intervalRange"
-                }
-              ]
-            }
-          },
-          "statistics":{
-            "distinctObjects":44,
-            "distinctPredicates":1,
-            "distinctSubjects":571,
-            "triples":571
-          }
-        }
-      },
-      {
-        "bucket":{
           "children":[],
           "childrenNumber":0,
           "box":{
@@ -149,25 +25,24 @@
             "object":{
               "array":[
                 {
-                  "value":{
-                    "high":200,
-                    "low":100
-                  },
-                  "type":"intervalRange"
+                  "intervalRange":{
+                    "high":300,
+                    "low":200
+                  }
                 }
               ]
             }
           },
           "statistics":{
-            "distinctObjects":47,
+            "distinctObjects":1,
             "distinctPredicates":1,
-            "distinctSubjects":724,
-            "triples":238
+            "distinctSubjects":1,
+            "triples":1
           }
         }
       }
     ],
-    "childrenNumber":2,
+    "childrenNumber":1,
     "box":{
       "subject":{
         "array":[
@@ -188,20 +63,19 @@
       "object":{
         "array":[
           {
-            "value":{
+            "intervalRange":{
               "high":300,
               "low":100
-            },
-            "type":"intervalRange"
+            }
           }
         ]
       }
     },
     "statistics":{
-      "distinctObjects":47,
+      "distinctObjects":1,
       "distinctPredicates":1,
-      "distinctSubjects":724,
-      "triples":1295
+      "distinctSubjects":1,
+      "triples":1
     }
   }
 }

@@ -240,7 +240,7 @@ public class LogParser {
 			qr.getQueryResult().getBindingSets().add(bs);
 			// Add the Query into Collection.
 			collection.add(qr);
-			
+			System.out.println(qr.getQuery());
 		}// else	
 				
 	}// processQuery
