@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.rdf;
 
 
 import gr.demokritos.iit.irss.semagrow.api.*;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
@@ -112,20 +113,27 @@ public class RDFLiteralRange
     }
 
 
-    //todo: fix me!
-
     public JSONObject toJSON() {
-        JSONObject object = new JSONObject();
+        JSONObject object;
+        JSONArray array = new JSONArray();
 
-/*
         if (infinite) {
+            object = new JSONObject();
             object.put("value", "Infinite");
             object.put("type", "Infinite");
         }
-        else
-            object = range.toJSON();
-*/
-        return object;
+        else {
+            for (Map.Entry<URI,RangeLength<?>> entry : ranges.entrySet()) {
+                object = new JSONObject();
+                object = entry.getValue().toJSON();
+                array.add(object);
+            }
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("array", array);
+
+        return jsonObject;
     }
 
 

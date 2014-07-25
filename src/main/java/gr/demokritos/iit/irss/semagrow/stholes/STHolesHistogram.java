@@ -5,6 +5,7 @@ import gr.demokritos.iit.irss.semagrow.api.QueryResult;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.Stat;
+import org.json.simple.JSONObject;
 
 import java.util.*;
 
@@ -562,6 +563,11 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
                 new AbstractMap.SimpleEntry<STHolesBucket<R>, Long>(bn, penalty);
 
         return res;
+    }
+
+
+    public JSONObject toJSON() {
+        return getRoot().toJSON();
     }
 
 	

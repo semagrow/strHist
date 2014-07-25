@@ -210,7 +210,10 @@ public class STHolesBucket<R extends Rectangle> {
             array.add(child.toJSON());
         jSONObj.put("children", array);
 
-        return jSONObj;
+        JSONObject bucket = new JSONObject();
+        bucket.put("bucket", jSONObj);
+
+        return bucket;
     }
 
 
