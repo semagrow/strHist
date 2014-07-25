@@ -26,11 +26,15 @@
                     ]
                   },
                   "object":{
-                    "value":{
-                      "high":290,
-                      "low":250
-                    },
-                    "type":"intervalRange"
+                    "array":[
+                      {
+                        "value":{
+                          "high":290,
+                          "low":250
+                        },
+                        "type":"intervalRange"
+                      }
+                    ]
                   }
                 },
                 "statistics":{
@@ -63,11 +67,15 @@
                     ]
                   },
                   "object":{
-                    "value":{
-                      "high":250,
-                      "low":200
-                    },
-                    "type":"intervalRange"
+                    "array":[
+                      {
+                        "value":{
+                          "high":250,
+                          "low":200
+                        },
+                        "type":"intervalRange"
+                      }
+                    ]
                   }
                 },
                 "statistics":{
@@ -98,11 +106,15 @@
               ]
             },
             "object":{
-              "value":{
-                "high":300,
-                "low":200
-              },
-              "type":"intervalRange"
+              "array":[
+                {
+                  "value":{
+                    "high":300,
+                    "low":200
+                  },
+                  "type":"intervalRange"
+                }
+              ]
             }
           },
           "statistics":{
@@ -135,11 +147,15 @@
               ]
             },
             "object":{
-              "value":{
-                "high":200,
-                "low":100
-              },
-              "type":"intervalRange"
+              "array":[
+                {
+                  "value":{
+                    "high":200,
+                    "low":100
+                  },
+                  "type":"intervalRange"
+                }
+              ]
             }
           },
           "statistics":{
@@ -170,11 +186,15 @@
         ]
       },
       "object":{
-        "value":{
-          "high":300,
-          "low":100
-        },
-        "type":"intervalRange"
+        "array":[
+          {
+            "value":{
+              "high":300,
+              "low":100
+            },
+            "type":"intervalRange"
+          }
+        ]
       }
     },
     "statistics":{
