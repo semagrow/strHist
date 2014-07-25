@@ -18,6 +18,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.openrdf.model.URI;
+import gr.demokritos.iit.irss.semagrow.api.RangeLength;
 
 public class HistogramIO<R extends Rectangle<R>> {
 
@@ -103,7 +105,6 @@ public class HistogramIO<R extends Rectangle<R>> {
 
         // Instantiate root Bucket
         bucket = new STHolesBucket(box, statistics);
-        bucket.setParent(bucket);
 
         // Get children buckets and set their parent
         bucket.getChildren().addAll(
@@ -153,30 +154,45 @@ public class HistogramIO<R extends Rectangle<R>> {
 
 
     private static RDFLiteralRange getObject(Object objectObj) {
+        Map<URI,RangeLength<?>> ranges = new HashMap<URI, RangeLength<?>>();
         RDFLiteralRange literalRange = null;
-        JSONObject jsonObject = (JSONObject)objectObj;
+        JSONObject jsonObject = (JSONObject)objectObj, temp;
+        JSONArray array = (JSONArray)jsonObject.get("array");
+        Iterator<JSONObject> iterator = array.iterator();
 
-        String type = (String)jsonObject.get("type");
-        JSONObject value = (JSONObject)jsonObject.get("value");
+        while (iterator.hasNext()) {
+            temp = iterator.next();
 
-        if (type.equals("intervalRange")) {
-            long low = (Long)value.get("low");
-            long high = (Long)value.get("high");
+            String type = (String)temp.get("type");
+            JSONObject value = (JSONObject)temp.get("value");
 
-            literalRange = new RDFLiteralRange((int)low, (int)high);
+            if (type.equals("intervalRange")) {
+                long low = (Long)value.get("low");
+                long high = (Long)value.get("high");
+                literalRange = new RDFLiteralRange((int)low, (int)high);
 
-        } else  if (type.equals("calendarRange")) {
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            } else if (type.equals("calendarRange")) {
+                DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-            Date dateLow = null, dateHigh = null;
+                Date dateLow = null, dateHigh = null;
 
-            try {
-                dateLow = format.parse((String)value.get("begin"));
-                dateHigh = format.parse((String)value.get("end"));
-            } catch (java.text.ParseException e) {e.printStackTrace();}
+                try {
+                    dateLow = format.parse((String) value.get("begin"));
+                    dateHigh = format.parse((String) value.get("end"));
+                } catch (java.text.ParseException e) {
+                    e.printStackTrace();
+                }
 
-            literalRange = new RDFLiteralRange(dateLow, dateHigh);
-        }
+                literalRange = new RDFLiteralRange(dateLow, dateHigh);
+
+            } else if (type.equals("uri") || type.equals("url")) {
+                literalRange = new RDFLiteralRange(value.toString());
+
+            } else if (type.equals("Infinite")) {
+                literalRange = new RDFLiteralRange();
+            }
+
+        }// while
 
         return literalRange;
     }// getObject
