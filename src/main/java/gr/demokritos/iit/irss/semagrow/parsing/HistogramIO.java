@@ -160,7 +160,10 @@ public class HistogramIO<R extends Rectangle<R>> {
         JSONObject value = (JSONObject)jsonObject.get("value");
 
         if (type.equals("intervalRange")) {
-            literalRange = new RDFLiteralRange((Long)value.get("low"), (Long)value.get("high"));
+            long low = (Long)value.get("low");
+            long high = (Long)value.get("high");
+
+            literalRange = new RDFLiteralRange((int)low, (int)high);
 
         } else  if (type.equals("calendarRange")) {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
