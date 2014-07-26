@@ -127,7 +127,7 @@ public class LogParser {
 //					System.out.println(variable +"\n" + regex);
 					
 					qf = new QueryFilter("Regex", variable);
-					qf.setRegex(regex);
+					qf.setRegex(Utilities.removeQuotes(regex));
 					
 					// Skip processed lines.
 					i = i + 4;					

@@ -113,4 +113,12 @@ public class Utilities {
 	}
 
 
+    public static String removeQuotes(String string) {
+
+
+        string = string.replaceAll("\"","");
+        System.out.println(">>>>>"+string);
+        return string;
+    }
+
 }

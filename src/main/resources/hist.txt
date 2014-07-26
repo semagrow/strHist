@@ -297,11 +297,11 @@
                                     "subject":{
                                       "array":[
                                         {
-                                          "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
+                                          "value":"http://data.organic-edunet.eu/resource/resource/",
                                           "type":"url"
                                         },
                                         {
-                                          "value":"http://data.organic-edunet.eu/resource/resource/",
+                                          "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
                                           "type":"url"
                                         }
                                       ]
@@ -357,6 +357,10 @@
                                         {
                                           "value":"http://data.organic-edunet.eu/resource/resource/2",
                                           "type":"url"
+                                        },
+                                        {
+                                          "value":"http://data.organic-edunet.eu/resource/resource/2",
+                                          "type":"url"
                                         }
                                       ]
                                     },
@@ -401,6 +405,10 @@
                                         {
                                           "value":"http://data.organic-edunet.eu/resource/resource/",
                                           "type":"url"
+                                        },
+                                        {
+                                          "value":"http://data.organic-edunet.eu/resource/resource/2",
+                                          "type":"url"
                                         }
                                       ]
                                     },
@@ -444,6 +452,10 @@
                                       "array":[
                                         {
                                           "value":"http://data.organic-edunet.eu/resource/resource/",
+                                          "type":"url"
+                                        },
+                                        {
+                                          "value":"http://data.organic-edunet.eu/resource/resource/2",
                                           "type":"url"
                                         }
                                       ]
@@ -561,11 +573,15 @@
                               "subject":{
                                 "array":[
                                   {
-                                    "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
+                                    "value":"http://data.organic-edunet.eu/resource/resource/",
                                     "type":"url"
                                   },
                                   {
-                                    "value":"http://data.organic-edunet.eu/resource/resource/",
+                                    "value":"http://data.organic-edunet.eu/resource/resource/2",
+                                    "type":"url"
+                                  },
+                                  {
+                                    "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
                                     "type":"url"
                                   }
                                 ]
@@ -625,6 +641,10 @@
                                   {
                                     "value":"http://data.organic-edunet.eu/resource/resource/1",
                                     "type":"url"
+                                  },
+                                  {
+                                    "value":"http://data.organic-edunet.eu/resource/resource/1",
+                                    "type":"url"
                                   }
                                 ]
                               },
@@ -669,6 +689,14 @@
                                   {
                                     "value":"http://data.organic-edunet.eu/resource/resource/",
                                     "type":"url"
+                                  },
+                                  {
+                                    "value":"http://data.organic-edunet.eu/resource/resource/1",
+                                    "type":"url"
+                                  },
+                                  {
+                                    "value":"http://data.organic-edunet.eu/resource/resource/2",
+                                    "type":"url"
                                   }
                                 ]
                               },
@@ -712,6 +740,14 @@
                                 "array":[
                                   {
                                     "value":"http://data.organic-edunet.eu/resource/resource/",
+                                    "type":"url"
+                                  },
+                                  {
+                                    "value":"http://data.organic-edunet.eu/resource/resource/1",
+                                    "type":"url"
+                                  },
+                                  {
+                                    "value":"http://data.organic-edunet.eu/resource/resource/2",
                                     "type":"url"
                                   }
                                 ]
@@ -829,11 +865,19 @@
                         "subject":{
                           "array":[
                             {
-                              "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
+                              "value":"http://data.organic-edunet.eu/resource/resource/",
                               "type":"url"
                             },
                             {
-                              "value":"http://data.organic-edunet.eu/resource/resource/",
+                              "value":"http://data.organic-edunet.eu/resource/resource/1",
+                              "type":"url"
+                            },
+                            {
+                              "value":"http://data.organic-edunet.eu/resource/resource/2",
+                              "type":"url"
+                            },
+                            {
+                              "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
                               "type":"url"
                             }
                           ]
@@ -894,10 +938,6 @@
                       "box":{
                         "subject":{
                           "array":[
-                            {
-                              "value":"http://data.organic-edunet.eu/resource/resource/",
-                              "type":"url"
-                            },
                             {
                               "value":"http://",
                               "type":"url"
@@ -1017,15 +1057,11 @@
                   "subject":{
                     "array":[
                       {
-                        "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
-                        "type":"url"
-                      },
-                      {
-                        "value":"http://data.organic-edunet.eu/resource/resource/",
-                        "type":"url"
-                      },
-                      {
                         "value":"http://",
+                        "type":"url"
+                      },
+                      {
+                        "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
                         "type":"url"
                       }
                     ]
@@ -1089,6 +1125,10 @@
                       {
                         "value":"http://agris.fao.org/aos/records/",
                         "type":"url"
+                      },
+                      {
+                        "value":"http://agris.fao.org/aos/records/",
+                        "type":"url"
                       }
                     ]
                   },
@@ -1129,15 +1169,15 @@
             "subject":{
               "array":[
                 {
-                  "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
-                  "type":"url"
-                },
-                {
-                  "value":"http://data.organic-edunet.eu/resource/resource/",
-                  "type":"url"
-                },
-                {
                   "value":"http://",
+                  "type":"url"
+                },
+                {
+                  "value":"http://agris.fao.org/aos/records/",
+                  "type":"url"
+                },
+                {
+                  "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
                   "type":"url"
                 }
               ]
@@ -1203,10 +1243,6 @@
             "subject":{
               "array":[
                 {
-                  "value":"http://data.organic-edunet.eu/resource/resource/",
-                  "type":"url"
-                },
-                {
                   "value":"http://",
                   "type":"url"
                 }
@@ -1245,15 +1281,11 @@
       "subject":{
         "array":[
           {
-            "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
-            "type":"url"
-          },
-          {
-            "value":"http://data.organic-edunet.eu/resource/resource/",
-            "type":"url"
-          },
-          {
             "value":"http://",
+            "type":"url"
+          },
+          {
+            "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
             "type":"url"
           }
         ]
