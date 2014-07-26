@@ -85,7 +85,25 @@ public class PrefixRange
         if (infinite) return new PrefixRange();
 
         ArrayList<String> prefixListN = new ArrayList<String>();
-        prefixListN.addAll(prefixList);
+
+        for (String myP : prefixList) {
+
+            for (String otherP : prefixRange.getPrefixList()) {
+
+                if ((myP.startsWith(otherP))) {
+
+                    prefixListN.add(otherP);
+
+                } else if (otherP.startsWith(myP)) {
+
+                    prefixListN.add(myP);
+                } else {
+                    prefixListN.add(myP);
+                    prefixListN.add(otherP);
+                }
+            }
+        }
+       /* prefixListN.addAll(prefixList);
 
         for (String p : prefixRange.prefixList ) {
 
@@ -93,7 +111,7 @@ public class PrefixRange
 
                 prefixListN.add(p);
             }
-        }
+        } */
 
         return new PrefixRange(prefixListN);
     }
