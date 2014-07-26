@@ -82,7 +82,8 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
 
     public void expand(String v) {
 
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm");
         Date date = null;
 
         try {date = format.parse(v);}
@@ -204,8 +205,8 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
 
     public JSONObject toJSON() {
         JSONObject range = new JSONObject();
-        range.put("begin", begin);
-        range.put("end", end);
+        range.put("begin", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm").format(begin));
+        range.put("end", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm").format(end));
 
 //        JSONObject calendarRange = new JSONObject();
 //        calendarRange.put("type", "calendarRange");

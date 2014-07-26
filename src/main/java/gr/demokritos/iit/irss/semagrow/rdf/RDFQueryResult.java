@@ -112,7 +112,8 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 								
 							} else if (typeURI.equals("dateTime")) {
 								
-								DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+//								DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                                DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm");
 								Date date = null;
 								
 								try {date = format.parse(valueURI);}
@@ -506,7 +507,8 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 
                         } else if (type.equals("dateTime")) {
 
-                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+//                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm");
                             Date dateLow = null, dateHigh = null;
 
                             try {
