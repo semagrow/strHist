@@ -272,7 +272,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle> {
 								.createLiteral(value, XMLSchema.STRING);						
 					}					
 												
-					b = b && ((RDFLiteralRange) rect.getRange(i + 1)).contains(val);
+					b = b && ((RDFLiteralRange) rect.getRange(i)).contains(val);
 					break;
 				}
 				

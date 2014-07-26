@@ -202,7 +202,7 @@ public class HistogramIO<R extends Rectangle<R>> {
             e.printStackTrace();
         }
 
-        ranges.put(XMLSchema.INTEGER, new RDFLiteralRange(dateBegin, dateEnd));
+        ranges.put(XMLSchema.INTEGER, new CalendarRange(dateBegin, dateEnd));
     }// getObjectCalendarRange
 
 

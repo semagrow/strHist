@@ -1,53 +1,12 @@
 {
   "bucket":{
-    "children":[
-      {
-        "bucket":{
-          "children":[],
-          "childrenNumber":0,
-          "box":{
-            "subject":{
-              "array":[
-                {
-                  "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
-                  "type":"url"
-                }
-              ]
-            },
-            "predicate":{
-              "array":[
-                {
-                  "value":"http://www.natural-europe.eu/ontology#height",
-                  "type":"uri"
-                }
-              ]
-            },
-            "object":{
-              "array":[
-                {
-                  "intervalRange":{
-                    "high":300,
-                    "low":200
-                  }
-                }
-              ]
-            }
-          },
-          "statistics":{
-            "distinctObjects":1,
-            "distinctPredicates":1,
-            "distinctSubjects":1,
-            "triples":1
-          }
-        }
-      }
-    ],
-    "childrenNumber":1,
+    "children":[],
+    "childrenNumber":0,
     "box":{
       "subject":{
         "array":[
           {
-            "value":"\"http://ac.collections.natural-europe.eu:8890/sw/resource/\"",
+            "value":"http://agris.fao.org/aos/records/",
             "type":"url"
           }
         ]
@@ -55,7 +14,7 @@
       "predicate":{
         "array":[
           {
-            "value":"http://www.natural-europe.eu/ontology#height",
+            "value":"http://purl.org/dc/terms/dateSubmitted",
             "type":"uri"
           }
         ]
@@ -63,9 +22,13 @@
       "object":{
         "array":[
           {
-            "intervalRange":{
-              "high":300,
-              "low":100
+            "prefixRange":{
+              "array":[
+                {
+                  "value":"\"2001\"",
+                  "type":"url"
+                }
+              ]
             }
           }
         ]
@@ -74,8 +37,8 @@
     "statistics":{
       "distinctObjects":1,
       "distinctPredicates":1,
-      "distinctSubjects":1,
-      "triples":1
+      "distinctSubjects":57042,
+      "triples":57042
     }
   }
 }
