@@ -90,16 +90,29 @@ public class PrefixRange
 
             for (String otherP : prefixRange.getPrefixList()) {
 
+
+
                 if ((myP.startsWith(otherP))) {
 
-                    prefixListN.add(otherP);
+                    if (!prefixListN.contains(otherP) ) {
 
+                        prefixListN.add(otherP);
+                    }
                 } else if (otherP.startsWith(myP)) {
 
-                    prefixListN.add(myP);
+                    if (!prefixListN.contains(myP) ) {
+
+                        prefixListN.add(myP);
+                    }
                 } else {
-                    prefixListN.add(myP);
-                    prefixListN.add(otherP);
+                    if (!prefixListN.contains(otherP) ) {
+
+                        prefixListN.add(otherP);
+                    }
+                    if (!prefixListN.contains(myP) ) {
+
+                        prefixListN.add(myP);
+                    }
                 }
             }
         }
