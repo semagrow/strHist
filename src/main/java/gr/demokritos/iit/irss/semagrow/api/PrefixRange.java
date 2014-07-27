@@ -171,6 +171,8 @@ public class PrefixRange
 
         if (infinite) return range;
 
+        boolean contained = false;
+
         ArrayList<String> intersectionPrefixList = new ArrayList<String>();
 
         for (String myP : prefixList) {
@@ -179,11 +181,31 @@ public class PrefixRange
 
                 if ((myP.startsWith(otherP))) {
 
-                    intersectionPrefixList.add(myP);
+                    for (String p : intersectionPrefixList) {
+
+                        if (myP.startsWith(p)) {
+
+                            contained = true;
+                        }
+                    }
+                    if (!contained) {
+
+                        intersectionPrefixList.add(myP);
+                    }
 
                 } else if (otherP.startsWith(myP)) {
 
-                    intersectionPrefixList.add(otherP);
+                    for (String p : intersectionPrefixList) {
+
+                        if (otherP.startsWith(p)) {
+
+                            contained = true;
+                        }
+                    }
+                    if (!contained) {
+
+                        intersectionPrefixList.add(otherP);
+                    }
                 }
             }
         }
