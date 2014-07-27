@@ -135,13 +135,16 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
                         distinctN.add(Math.max(statsN.getDistinctCount().get(i),
                                 root.getStatistics().getDistinctCount().get(i)));
                     }
-                    Collection<STHolesBucket<R>> childrenN =
-                            new ArrayList<STHolesBucket<R>>();
-                    STHolesBucket<R> rootN =
-                            new STHolesBucket<R>(boxN, new Stat(freqN, distinctN), childrenN, null);
-                    bucketsNum += 1;
-                    rootN.addChild(root);
-                    root = rootN;
+                    //Collection<STHolesBucket<R>> childrenN =
+                      //      new ArrayList<STHolesBucket<R>>();
+                    //STHolesBucket<R> rootN =
+                      //      new STHolesBucket<R>(boxN, new Stat(freqN, distinctN), childrenN, null);
+                    //bucketsNum += 1;
+                    //rootN.addChild(root);
+                   // root = rootN;
+                    root.setBox(boxN);
+                    root.setStatistics(statsN);
+
                 }
             }
 
