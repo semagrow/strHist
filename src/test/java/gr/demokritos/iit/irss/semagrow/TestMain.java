@@ -63,7 +63,6 @@ public class TestMain {
         rio.write(Iterations.asList(statements), out, RDFFormat.NTRIPLES);
 
         conn.close();
-
         out.close();
     }
 }
