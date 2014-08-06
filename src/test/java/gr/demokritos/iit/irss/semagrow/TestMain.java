@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow;
 
+import info.aduna.iteration.Iterations;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -23,22 +24,22 @@ public class TestMain {
 
     public static void main(String[] args) throws RepositoryException, IOException, RDFParseException, RDFHandlerException {
 
-        String tempNSData = args[0];
-        String inputFolder = args[1];
-        String outputFolder = args[2];
+//        String tempNSData = args[0];
+//        String inputFolder = args[1];
+//        String outputFolder = args[2];
 
         // create a local Sesame Native Store
-        File dataDir = new File(tempNSData); //"src\\main\\resources\\temp\\"
+        File dataDir = new File("src\\main\\resources\\temp\\"); //"src\\main\\resources\\temp\\"
         Repository nativeRep = new SailRepository(new NativeStore(dataDir));
         nativeRep.initialize();
 
 
-        File directory = new File(inputFolder); //  "C:\\Users\\Nick\\Downloads\\rdf_output\\RDF_Output";
+        File directory = new File("C:\\Users\\Nick\\Downloads\\rdf_output\\RDF_Output"); //  "C:\\Users\\Nick\\Downloads\\rdf_output\\RDF_Output";
         File[] files = directory.listFiles();
 
         for (File folder : files) {
             System.out.println(folder.getName());
-            parseFolder(folder, nativeRep, outputFolder);
+            parseFolder(folder, nativeRep, "src\\main\\resources\\data\\");
         }
     }
 
@@ -59,7 +60,7 @@ public class TestMain {
             RepositoryResult<Statement> statements = conn.getStatements(null, property, null, true);
 
             Rio rio = new Rio();
-            rio.write((Iterable<Statement>) statements, out, RDFFormat.NTRIPLES);
+            rio.write(Iterations.asList(statements), out, RDFFormat.NTRIPLES);
 
             conn.close();
         }
