@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow;
 
+import info.aduna.iteration.Iterations;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -27,16 +28,17 @@ public class TestMain {
         String inputFolder = args[1];
         String outputFolder = args[2];
 
-        // create a local Sesame Native Store
-        File dataDir = new File(tempNSData); //"src\\main\\resources\\temp\\"
-        Repository nativeRep = new SailRepository(new NativeStore(dataDir));
-        nativeRep.initialize();
-
 
         File directory = new File(inputFolder); //  "C:\\Users\\Nick\\Downloads\\rdf_output\\RDF_Output";
         File[] files = directory.listFiles();
 
         for (File folder : files) {
+
+            // create a local Sesame Native Store
+            File dataDir = new File(tempNSData + "/" + folder.getName()); //"src\\main\\resources\\temp\\"
+            Repository nativeRep = new SailRepository(new NativeStore(dataDir));
+            nativeRep.initialize();
+
             System.out.println(folder.getName());
             parseFolder(folder, nativeRep, outputFolder);
         }
@@ -47,23 +49,21 @@ public class TestMain {
         File[] files = folder.listFiles();
 
         //"src\\main\\resources\\data\\"
-        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outputFolder + "_" + folder.getName() +".ttl"));
+        OutputStream out = new FileOutputStream(outputFolder + "_" + folder.getName() +".ttl");
 
+        RepositoryConnection conn = nativeRep.getConnection();
         for (File file : files) {
             System.out.println(file.getName());
-
-            RepositoryConnection conn = nativeRep.getConnection();
             conn.add(file, file.getName(), RDFFormat.forFileName(file.getName()));
-
-            URI property = ValueFactoryImpl.getInstance().createURI("http://purl.org/dc/terms/subject");
-            RepositoryResult<Statement> statements = conn.getStatements(null, property, null, true);
-
-            Rio rio = new Rio();
-            rio.write((Iterable<Statement>) statements, out, RDFFormat.NTRIPLES);
-
-            conn.close();
         }
 
+        URI property = ValueFactoryImpl.getInstance().createURI("http://purl.org/dc/terms/subject");
+        RepositoryResult<Statement> statements = conn.getStatements(null, property, null, true);
+        Rio rio = new Rio();
+        rio.write(Iterations.asList(statements), out, RDFFormat.NTRIPLES);
 
+        conn.close();
+
+        out.close();
     }
 }
