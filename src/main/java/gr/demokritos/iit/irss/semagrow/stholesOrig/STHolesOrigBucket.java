@@ -159,17 +159,76 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
             parentN = bp.getParent();
             STHolesOrigBucket<R> bn2 = new STHolesOrigBucket<R>(newBox, newFreq, null, parentN);
             merge(bp, b2, bn2);
+
+            return;
         }
+
+        Collection<STHolesOrigBucket<R>> I = new ArrayList<STHolesOrigBucket<R>>();
+
+
+        for (STHolesOrigBucket<R> bi : newParent.getChildren() ) {
+
+            if (bi.getBox().contains(bn.getBox())) {
+                I.add(bi);
+            }
+        }
+
+        long vold = bn.getBox().getVolume() - b1.getBox().getVolume() -
+                b2.getBox().getVolume();
+
+        for (STHolesOrigBucket<R> bi : I) {
+
+            vold -= bi.getBox().getVolume();
+        }
+
+
 
         // Merge buckets b1, b2 into bn
         bn.setParent(newParent);
         newParent.addChild(bn);
+
+        newParent.setFrequency((long)Math.ceil(newParent.frequency*
+                ( 1 - (double)vold/newParent.getVolume())));
 
         for (STHolesOrigBucket<R> bi : bn.getChildren()) {
 
             bi.setParent(bn);
             newParent.removeChild(bi);
         }
+    }
+
+    public double getEstimate(R rec) {
+
+            if (this.box.intersects(rec)) {
+
+                double estimate;
+
+                estimate = (double)this.getIntersectionWithRecVolume(rec) / this.getVolume() * this.frequency;
+
+                for (STHolesOrigBucket<R> bc : children) {
+                    estimate += bc.getEstimate(rec);
+                }
+
+                return estimate;
+            } else {
+
+                return 0;
+            }
+    }
+
+    public long getIntersectionWithRecVolume(R rec) {
+
+        long v;
+
+        v = this.box.intersection(rec).getVolume();
+
+        for (STHolesOrigBucket<R> bc : children) {
+
+            v -= bc.box.intersection(rec).getVolume();
+        }
+
+        return v;
+
     }
 
     public void setFrequency(long frequency) {
