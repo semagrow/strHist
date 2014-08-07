@@ -24,23 +24,27 @@ public class TestMain {
 
     public static void main(String[] args) throws RepositoryException, IOException, RDFParseException, RDFHandlerException {
 
-//        String tempNSData = args[0];
-//        String inputFolder = args[1];
-//        String outputFolder = args[2];
+        String tempNSData = args[0];
+        String inputFolder = args[1];
+        String outputFolder = args[2];
 
 
-        File directory = new File("C:\\Users\\Nick\\Downloads\\rdf_output\\RDF_Output"); //  "C:\\Users\\Nick\\Downloads\\rdf_output\\RDF_Output";
+        File directory = new File(inputFolder); //  "C:\\Users\\Nick\\Downloads\\rdf_output\\RDF_Output";
         File[] files = directory.listFiles();
 
         for (File folder : files) {
 
             // create a local Sesame Native Store
-            File dataDir = new File("src\\main\\resources\\temp\\" + "/" + folder.getName()); //"src\\main\\resources\\temp\\"
-            Repository nativeRep = new SailRepository(new NativeStore(dataDir));
-            nativeRep.initialize();
+            File dataDir = new File(tempNSData + "/" + folder.getName()); //"src\\main\\resources\\temp\\"
+            if (!dataDir.exists()) {
+                Repository nativeRep = new SailRepository(new NativeStore(dataDir));
+                nativeRep.initialize();
 
-            System.out.println(folder.getName());
-            parseFolder(folder, nativeRep, "src\\main\\resources\\data\\");
+                System.out.println(folder.getName());
+                parseFolder(folder, nativeRep, outputFolder);
+            } else {
+                System.out.println("File " + dataDir.getName() + " already exists. Skipping.");
+            }
         }
     }
 
@@ -54,7 +58,12 @@ public class TestMain {
         RepositoryConnection conn = nativeRep.getConnection();
         for (File file : files) {
             System.out.println(file.getName());
-            conn.add(file, file.getName(), RDFFormat.forFileName(file.getName()));
+            try {
+                conn.add(file, file.getName(), RDFFormat.forFileName(file.getName()));
+            } catch(Exception e) {
+                System.out.println(e.toString());
+                System.out.println("skipping " + file.getName());
+            }
         }
 
         URI property = ValueFactoryImpl.getInstance().createURI("http://purl.org/dc/terms/subject");
