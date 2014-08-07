@@ -1,10 +1,10 @@
 package gr.demokritos.iit.irss.semagrow;
 
+import gr.demokritos.iit.irss.semagrow.api.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.parsing.Binding;
 import gr.demokritos.iit.irss.semagrow.parsing.BindingSet;
 import gr.demokritos.iit.irss.semagrow.parsing.LogQuery;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFQueryRecord;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,14 +16,22 @@ import java.util.Random;
  */
 public class QueryFeedbackGenerator {
 
-    private RDFQueryRecord queryRecord;
+    private Iterable<QueryRecord> queryRecords;
+    private String uniqueSubjectData, filteredDataFolder, outputDataFolder;
 
 
-    public QueryFeedbackGenerator(String uniqueSubjectData, String filteredDataFolder,
-                                  String outputDataFolder) throws IOException {
+    public QueryFeedbackGenerator(String uniqueSubjectData, String filteredDataFolder, String outputDataFolder) {
+
+        this.uniqueSubjectData = uniqueSubjectData;
+        this.filteredDataFolder = filteredDataFolder;
+        this.outputDataFolder = outputDataFolder;
+    }
+
+
+    public RDFQueryRecord generateQueryRecord() throws IOException {
 
         // Choose a random subject.
-        int rowsNumber = new CountLineNumber(uniqueSubjectData).count();
+        int rowsNumber = countLineNumber(uniqueSubjectData);
         System.out.println("Total File Rows: " + rowsNumber);
 
         int randomRowNumber = randInt(1, rowsNumber);
@@ -56,7 +64,7 @@ public class QueryFeedbackGenerator {
 
         // Extract query feedback from filtered data based on that subject.
 
-        this.queryRecord = getQueryFeedback(filteredDataFolder, trimmedSubject);
+        return getQueryFeedback(filteredDataFolder, trimmedSubject);
     }
 
 
@@ -176,39 +184,29 @@ public class QueryFeedbackGenerator {
     }
 
 
-    private class CountLineNumber {
+    public static int countLineNumber(String path) {
+        int lines = 0;
+        try {
 
-        private String path;
+            File file = new File(path);
+            LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file));
+            lineNumberReader.skip(Long.MAX_VALUE);
+            lines = lineNumberReader.getLineNumber();
+            lineNumberReader.close();
 
-        public CountLineNumber(String path) {
-            this.path = path;
+        } catch (FileNotFoundException e) {
+             System.out.println("FileNotFoundException Occurred"
+                     + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("IOException Occurred" + e.getMessage());
         }
 
-        public int count() {
-            int lines = 0;
-            try {
-
-                File file = new File(path);
-                LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file));
-                lineNumberReader.skip(Long.MAX_VALUE);
-                lines = lineNumberReader.getLineNumber();
-                lineNumberReader.close();
-
-            } catch (FileNotFoundException e) {
-                System.out.println("FileNotFoundException Occurred"
-                        + e.getMessage());
-            } catch (IOException e) {
-                System.out.println("IOException Occurred" + e.getMessage());
-            }
-
-            return lines;
-        }
-
+        return lines;
     }
 
 
-    public RDFQueryRecord getQueryRecord() {
-        return queryRecord;
+    public Iterable<QueryRecord> getQueryRecords() {
+        return queryRecords;
     }
 
 }

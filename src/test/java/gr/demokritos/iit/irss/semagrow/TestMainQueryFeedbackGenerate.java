@@ -15,6 +15,7 @@ public class TestMainQueryFeedbackGenerate {
         String outputDataFolder = "C:\\Users\\Nick\\git\\sthist\\src\\main\\resources\\data\\";
 
         QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder, outputDataFolder);
-        // qfg.getQueryRecord() gia na pareis to RDFQueryRecord
+        System.out.println(qfg.generateQueryRecord().getQuery());
+        // qfg.generateQueryRecord() gia na pareis to epomeRDFQueryRecord
     }
 }
