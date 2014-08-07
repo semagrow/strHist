@@ -148,7 +148,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         R c = bucket.getBox().intersection(rect);
 
         //todo
-        /*
+
         // Shrink candidate hole in such a way that b does not intersect
         // with the rectangles of bucket.getChildren();
         List<STHolesOrigBucket<R>> participants = new LinkedList<STHolesOrigBucket<R>>();
@@ -156,15 +156,29 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         updateParticipants(participants, bucket, c);
         //for (STHolesOrigBucket<R> participant : participants) {
 
+        STHolesOrigBucket<R> bucketForExclusion = participants.get(0);
+        Double preserved;
+        double maxPreserved = 0;
+        int bestDim = 0;
+        Map.Entry<Double, Integer> candidateShrink;
+
         while (!participants.isEmpty()) {
 
-            c.shrink(participants.get(0).getBox());
+            for (STHolesOrigBucket<R> participant : participants) {
+                candidateShrink = c.getShrinkInfo(participant.getBox());
+                preserved = candidateShrink.getKey();
+
+                if (preserved >= maxPreserved) {
+
+                    bestDim = candidateShrink.getValue();
+                    bucketForExclusion = participant;
+                }
+            }
+
+            c.shrink(bucketForExclusion.getBox(), bestDim);
             updateParticipants(participants, bucket, c);
         }
 
-
-        //R r = bucket.getBox();
-        */
 
         // Collect candidate hole statistics
         long freq= (long)Math.ceil(bucket.getFrequency()* (double)c.getVolume()/
