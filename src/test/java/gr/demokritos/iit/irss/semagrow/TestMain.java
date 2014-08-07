@@ -36,11 +36,15 @@ public class TestMain {
 
             // create a local Sesame Native Store
             File dataDir = new File(tempNSData + "/" + folder.getName()); //"src\\main\\resources\\temp\\"
-            Repository nativeRep = new SailRepository(new NativeStore(dataDir));
-            nativeRep.initialize();
+            if (!dataDir.exists()) {
+                Repository nativeRep = new SailRepository(new NativeStore(dataDir));
+                nativeRep.initialize();
 
-            System.out.println(folder.getName());
-            parseFolder(folder, nativeRep, outputFolder);
+                System.out.println(folder.getName());
+                parseFolder(folder, nativeRep, outputFolder);
+            } else {
+                System.out.println("File " + dataDir.getName() + " already exists. Skipping.");
+            }
         }
     }
 
@@ -54,7 +58,12 @@ public class TestMain {
         RepositoryConnection conn = nativeRep.getConnection();
         for (File file : files) {
             System.out.println(file.getName());
-            conn.add(file, file.getName(), RDFFormat.forFileName(file.getName()));
+            try {
+                conn.add(file, file.getName(), RDFFormat.forFileName(file.getName()));
+            } catch(Exception e) {
+                System.out.println(e.toString());
+                System.out.println("skipping " + file.getName());
+            }
         }
 
         URI property = ValueFactoryImpl.getInstance().createURI("http://purl.org/dc/terms/subject");
