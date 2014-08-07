@@ -176,7 +176,7 @@ public class QueryFeedbackGenerator {
     }
 
 
-    private static class CountLineNumber {
+    private class CountLineNumber {
 
         private String path;
 
