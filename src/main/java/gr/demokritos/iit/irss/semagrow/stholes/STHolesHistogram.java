@@ -40,8 +40,15 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
      * @return number of tuples
      */
     public long estimate(R rec) {
-        if (root != null)
+        if (root != null) {
+
+            // if rec is larger than our root
+            if (!root.getBox().contains(rec)) {
+
+                return root.getEstimate(rec);
+            }
             return estimateAux(rec, root, (long)0);
+        }
         else
             return 0;
     }
@@ -431,7 +438,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R> 
 
                 if (!bj.equals(bi)) {
 
-                    candidateMergedBucket = getSSMergePenalty(b, bi);
+                    //todo: check if bi,bj are mergeable
+                    candidateMergedBucket = getSSMergePenalty(bi, bj);
                     penalty = candidateMergedBucket.getValue();
 
                     if (penalty  <= minimumPenalty) {

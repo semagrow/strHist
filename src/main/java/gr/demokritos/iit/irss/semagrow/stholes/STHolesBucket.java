@@ -111,8 +111,20 @@ public class STHolesBucket<R extends Rectangle> {
         bpp.addChild(bn);
         bn.setParent(bpp);
 
+
+        //Children of both buckets bc and bp
+        //become children of the new bucket
         for (STHolesBucket<R> bi : bc.getChildren())
             bi.setParent(bn);
+
+        for (STHolesBucket<R> bchild : bp.children) {
+
+            if (!bchild.equals(bc)) {
+
+                bchild.setParent(bn);
+            }
+        }
+
 
     }
 
