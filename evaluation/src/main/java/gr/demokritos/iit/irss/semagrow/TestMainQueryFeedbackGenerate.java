@@ -1,5 +1,7 @@
 package gr.demokritos.iit.irss.semagrow;
 
+import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+
 import java.io.IOException;
 
 /**
@@ -15,7 +17,13 @@ public class TestMainQueryFeedbackGenerate {
         String outputDataFolder = "C:\\Users\\Nick\\git\\sthist\\src\\main\\resources\\data\\";
 
         QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder, outputDataFolder);
-        System.out.println(qfg.generateQueryRecord().getQuery());
-        // qfg.generateQueryRecord() gia na pareis to epomeRDFQueryRecord
+
+        Iterable<QueryRecord> trainingSet = qfg.generateTrainingSet(1);
+        for (QueryRecord qr : trainingSet)
+            System.out.println(qr.getQuery());
+
+        Iterable<QueryRecord> evaluationSet = qfg.generateEvaluationSet(1);
+        for (QueryRecord qr : evaluationSet)
+            System.out.println(qr.getQuery());
     }
 }

@@ -7,6 +7,8 @@ import gr.demokritos.iit.irss.semagrow.rdf.parsing.LogQuery;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -16,6 +18,8 @@ public class QueryFeedbackGenerator {
 
     private Iterable<QueryRecord> queryRecords;
     private String uniqueSubjectData, filteredDataFolder, outputDataFolder;
+    private int uniqueSubjectFileRows;
+    private ArrayList<String> savedPrefixes;
 
 
     public QueryFeedbackGenerator(String uniqueSubjectData, String filteredDataFolder, String outputDataFolder) {
@@ -23,19 +27,60 @@ public class QueryFeedbackGenerator {
         this.uniqueSubjectData = uniqueSubjectData;
         this.filteredDataFolder = filteredDataFolder;
         this.outputDataFolder = outputDataFolder;
+
+        savedPrefixes = new ArrayList<String>();
+
+        // Count total lines of unique subject file.
+        uniqueSubjectFileRows = countLineNumber(uniqueSubjectData);
+        System.out.println("Total File Rows: " + uniqueSubjectFileRows);
     }
 
 
-    public RDFQueryRecord generateQueryRecord() throws IOException {
+    public Iterable<QueryRecord> generateTrainingSet(int size) throws IOException {
+        System.out.println("Generating Training Set..");
+        ArrayList<QueryRecord> queryRecords = new ArrayList<QueryRecord>();
+
+        for (int i=0; i<size; i++)
+            queryRecords.add(generateTrainingQueryRecord());
+
+        return queryRecords;
+    }
+
+
+    public Iterable<QueryRecord> generateEvaluationSet(int size) throws IOException {
+        System.out.println("Generating Evaluation Set..");
+        ArrayList<QueryRecord> queryRecords = new ArrayList<QueryRecord>();
+
+        for (int i=0; i<size; i++)
+            queryRecords.add(generateEvaluationQueryRecord());
+
+        return queryRecords;
+    }
+
+
+    /**
+     * The returned URI must at least satisfies a prefix used in the training workload.
+     */
+    private RDFQueryRecord generateEvaluationQueryRecord() throws IOException {
+
+        // Choose a random prefix from the saved ones.
+        int randomRowNumber = randInt(1, savedPrefixes.size());
+        String prefix = savedPrefixes.get(randomRowNumber - 1);
+
+        String subject = getSpecificSubject(prefix);
+
+        // Extract query feedback from filtered data based on that subject.
+        return getQueryFeedback(filteredDataFolder, subject);
+    }
+
+
+    private RDFQueryRecord generateTrainingQueryRecord() throws IOException {
 
         // Choose a random subject.
-        int rowsNumber = countLineNumber(uniqueSubjectData);
-        System.out.println("Total File Rows: " + rowsNumber);
-
-        int randomRowNumber = randInt(1, rowsNumber);
+        int randomRowNumber = randInt(1, uniqueSubjectFileRows);
         System.out.println("Random Row Number: " + randomRowNumber);
 
-        String subject = getSpecificSubject(uniqueSubjectData, randomRowNumber);
+        String subject = getSpecificSubject(randomRowNumber);
         System.out.println("Random Subject: " + subject);
 
         // Trim its prefix randomly
@@ -60,8 +105,11 @@ public class QueryFeedbackGenerator {
         trimmedSubject += lastSlashPrefix.substring(0, randomCut);
         System.out.println("Trimmed Prefix: " + trimmedSubject);
 
-        // Extract query feedback from filtered data based on that subject.
+        // Store the prefix into a collection for the evaluation set.
+        if (!savedPrefixes.contains(trimmedSubject))
+            savedPrefixes.add(trimmedSubject);
 
+        // Extract query feedback from filtered data based on that subject.
         return getQueryFeedback(filteredDataFolder, trimmedSubject);
     }
 
@@ -137,9 +185,9 @@ public class QueryFeedbackGenerator {
     }
 
 
-    private String getSpecificSubject(String path, int row) throws IOException {
+    private String getSpecificSubject(int row) throws IOException {
 
-        BufferedReader br = new BufferedReader(new FileReader(path));
+        BufferedReader br = new BufferedReader(new FileReader(uniqueSubjectData));
         String line = "";
         int counter = 0;
 
@@ -148,6 +196,24 @@ public class QueryFeedbackGenerator {
 
             if (counter == row) {
                 line = cleanString(line);
+                break;
+            }
+        }
+
+        br.close();
+
+        return line;
+    }
+
+
+    private String getSpecificSubject(String prefix) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(uniqueSubjectData));
+        String line = "", subject = "";
+
+        while ((line = br.readLine()) != null) {
+
+            if ((subject = cleanString(line)).startsWith(prefix)) {
+                line = subject;
                 break;
             }
         }
