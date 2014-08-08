@@ -4,12 +4,15 @@ import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
+import gr.demokritos.iit.irss.semagrow.stholes.MergeInfo;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
+import org.openrdf.model.vocabulary.RDF;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by efi on 8/8/2014.
@@ -62,7 +65,7 @@ public class TestApp {
         HashSet<String> b2Predicates = new HashSet<String>();
         b1Predicates.add("a");
         ExplicitSetRange<String> predicateRangeB2= new ExplicitSetRange<String>(b2Predicates);
-        RDFLiteralRange objectRangeB2 = new RDFLiteralRange(1,5);
+        RDFLiteralRange objectRangeB2 = new RDFLiteralRange(2,3);
         RDFRectangle boxB2 = new RDFRectangle(subjectRangeB2, predicateRangeB2, objectRangeB2);
         Long frequencyB2 = (long)10;
         List<Long> distinctB2 = new ArrayList<Long>();
@@ -130,5 +133,19 @@ public class TestApp {
         System.out.println("Expected estimation is: 15");
         System.out.println("Our estimation is: " + myH.estimate(boxQ2));
 
+        /*
+        //Test getPCMerge
+        Map.Entry<STHolesBucket<RDFRectangle>, Long> pcMergePenalty =
+        myH.getPCMergePenalty(root, b1);
+
+        MergeInfo<RDFRectangle> curMerge =
+                new MergeInfo<RDFRectangle>(root, b1, pcMergePenalty.getKey(),
+                        pcMergePenalty.getValue());
+        STHolesBucket<RDFRectangle> bp = curMerge.getB1();
+        STHolesBucket<RDFRectangle> bc = curMerge.getB2();
+        STHolesBucket<RDFRectangle> bn = curMerge.getBn();
+
+        STHolesBucket.merge(bp, bc, bn);
+        */
     }
 }

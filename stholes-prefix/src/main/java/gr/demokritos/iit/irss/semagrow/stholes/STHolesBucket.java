@@ -101,23 +101,32 @@ public class STHolesBucket<R extends Rectangle> {
 
         //Merge buckets b1, b2 into bn
         STHolesBucket<R> bpp = bp.getParent();
-        bpp.removeChild(bp);
-        bpp.addChild(bn);
-        bn.setParent(bpp);
+
 
 
         //Children of both buckets bc and bp
         //become children of the new bucket
         for (STHolesBucket<R> bi : bc.getChildren())
-            bi.setParent(bn);
+            bn.addChild(bi);
 
         for (STHolesBucket<R> bchild : bp.children) {
 
             if (!bchild.equals(bc)) {
 
-                bchild.setParent(bn);
+                bn.addChild(bchild);
             }
         }
+
+        if (bpp == null) {
+            //bp is root
+            bp = bn;
+
+        } else {
+
+            bpp.removeChild(bp);
+            bpp.addChild(bn);
+        }
+
 
 
     }
@@ -131,7 +140,6 @@ public class STHolesBucket<R extends Rectangle> {
         STHolesBucket<R> newParent = b1.getParent();
 
         // Merge buckets b1, b2 into bn
-        bn.setParent(newParent);
         newParent.addChild(bn);
 
         for (STHolesBucket<R> bi : bn.getChildren()) {
