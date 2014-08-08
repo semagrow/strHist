@@ -208,6 +208,12 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle> {
     }
 
 
+    public boolean isMergeable(NumRectangle rec) {
+
+        return true;
+    }
+
+
     public long getVolume() {
 
         long v = (long)1;

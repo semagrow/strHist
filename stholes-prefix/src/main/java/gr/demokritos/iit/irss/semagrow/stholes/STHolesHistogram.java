@@ -439,15 +439,18 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
                 if (!bj.equals(bi)) {
 
                     //todo: check if bi,bj are mergeable
-                    candidateMergedBucket = getSSMergePenalty(bi, bj);
-                    penalty = candidateMergedBucket.getValue();
+                    if (bi.getBox().isMergeable(bj.getBox())) {
 
-                    if (penalty  <= minimumPenalty) {
+                        candidateMergedBucket = getSSMergePenalty(bi, bj);
+                        penalty = candidateMergedBucket.getValue();
 
-                        minimumPenalty = penalty;
-                        b1 = bi;
-                        b2 = bj;
-                        bn = candidateMergedBucket.getKey();
+                        if (penalty <= minimumPenalty) {
+
+                            minimumPenalty = penalty;
+                            b1 = bi;
+                            b2 = bj;
+                            bn = candidateMergedBucket.getKey();
+                        }
                     }
                 }
             }

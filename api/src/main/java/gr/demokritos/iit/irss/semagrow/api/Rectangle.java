@@ -36,5 +36,7 @@ public interface Rectangle<R> {
     //true if rectangle has
     //at least one infinite range
     boolean hasInfinite();
+
+    boolean isMergeable(R rec);
    
 }
