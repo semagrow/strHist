@@ -47,7 +47,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
                 return root.getEstimate(rec);
             }
-            return estimateAux(rec, root, (long)0);
+            return estimateAux(rec, root);
         }
         else
             return 0;
@@ -61,7 +61,23 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @param b bucket
      * @return estimated number of tuples
      */
-    private long estimateAux(R rec, STHolesBucket<R> b, long est) {
+    private long estimateAux(R rec, STHolesBucket<R> b) {
+
+        long est = 0;
+
+        List<STHolesBucket<R>> enclosingBuckets = new ArrayList<STHolesBucket<R>>();
+
+        getEnclosingBuckets(rec, b, enclosingBuckets);
+
+        for (STHolesBucket<R> enclosingB : enclosingBuckets) {
+
+            est += enclosingB.getEstimate(rec);
+        }
+
+        return est;
+    }
+
+    private void getEnclosingBuckets(R rec, STHolesBucket<R> b, List<STHolesBucket<R>> enclosingBuckets) {
 
         boolean isEnclosingBucket = false;
 
@@ -75,16 +91,13 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
                 if ((bc.getBox()).contains(rec)) {
 
                     isEnclosingBucket = false;
-                    est = estimateAux(rec, bc, est);
-                    break;
+                    getEnclosingBuckets(rec, bc, enclosingBuckets);
                 }
             }
         }
 
         if (isEnclosingBucket)
-            return est + b.getEstimate(rec);
-        else
-            return est;
+            enclosingBuckets.add(b);
     }
 
     public void refine(Iterable<? extends QueryRecord<R,Stat>> workload) {
@@ -593,4 +606,5 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 	public void setRoot(STHolesBucket<R> root) {
 		this.root = root;
 	}
+
 }
