@@ -615,4 +615,13 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 		this.root = root;
 	}
 
+    public long getBucketsNum() {
+
+        return bucketsNum;
+    }
+
+    public void setMaxBucketsNum(long maxBucketsNum) {
+        this.maxBucketsNum = maxBucketsNum;
+    }
+
 }
