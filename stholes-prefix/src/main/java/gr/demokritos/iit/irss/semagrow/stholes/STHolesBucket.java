@@ -141,6 +141,8 @@ public class STHolesBucket<R extends Rectangle> {
 
         // Merge buckets b1, b2 into bn
         newParent.addChild(bn);
+        newParent.removeChild(b1);
+        newParent.removeChild(b2);
 
         for (STHolesBucket<R> bi : bn.getChildren()) {
 

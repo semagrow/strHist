@@ -63,7 +63,7 @@ public class TestApp {
         b2PrefixList.add("http://a/b");
         PrefixRange subjectRangeB2 = new PrefixRange(b2PrefixList);
         HashSet<String> b2Predicates = new HashSet<String>();
-        b1Predicates.add("a");
+        b2Predicates.add("a");
         ExplicitSetRange<String> predicateRangeB2= new ExplicitSetRange<String>(b2Predicates);
         RDFLiteralRange objectRangeB2 = new RDFLiteralRange(2,3);
         RDFRectangle boxB2 = new RDFRectangle(subjectRangeB2, predicateRangeB2, objectRangeB2);
@@ -147,5 +147,39 @@ public class TestApp {
 
         STHolesBucket.merge(bp, bc, bn);
         */
+
+        //Create root's third child b4
+        ArrayList<String> b4PrefixList = new ArrayList<String>();
+        b4PrefixList.add("http://a/b");
+        PrefixRange subjectRangeB4 = new PrefixRange(b4PrefixList);
+        HashSet<String> b4Predicates = new HashSet<String>();
+        b4Predicates.add("a");
+        ExplicitSetRange<String> predicateRangeB4= new ExplicitSetRange<String>(b4Predicates);
+        RDFLiteralRange objectRangeB4 = new RDFLiteralRange(8,9);
+        RDFRectangle boxB4 = new RDFRectangle(subjectRangeB4, predicateRangeB4, objectRangeB4);
+        Long frequencyB4 = (long)20;
+        List<Long> distinctB4 = new ArrayList<Long>();
+        distinctB4.add((long)6);
+        distinctB4.add((long)1);
+        distinctB4.add((long)3);
+        Stat statB4 = new Stat(frequencyB4, distinctB4);
+        STHolesBucket<RDFRectangle> b4 = new STHolesBucket<RDFRectangle>(boxB4, statB4, null, null);
+        myH.getRoot().addChild(b4);
+
+        /*
+        //Test getSSMerge
+        Map.Entry<STHolesBucket<RDFRectangle>, Long> ssMergePenalty =
+                myH.getSSMergePenalty(b1, b4);
+
+        MergeInfo<RDFRectangle> curMerge =
+                new MergeInfo<RDFRectangle>(b1, b4, ssMergePenalty.getKey(),
+                        ssMergePenalty.getValue());
+        STHolesBucket<RDFRectangle> bs1 = curMerge.getB1();
+        STHolesBucket<RDFRectangle> bs2 = curMerge.getB2();
+        STHolesBucket<RDFRectangle> bn  = curMerge.getBn();
+
+        STHolesBucket.merge(bs1, bs2, bn);
+        */
+
     }
 }

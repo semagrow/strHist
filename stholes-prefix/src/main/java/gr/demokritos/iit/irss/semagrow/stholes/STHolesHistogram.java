@@ -538,8 +538,12 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
         for (STHolesBucket<R> bi : bp.getChildren() ) {
 
-            if (bi.getBox().contains(newBox)) {
-                I.add(bi);
+            if (!(bi.equals(b1) || bi.equals(b2))) {
+
+                if (newBox.contains(bi.getBox())) {
+
+                    I.add(bi);
+                }
             }
         }
 
