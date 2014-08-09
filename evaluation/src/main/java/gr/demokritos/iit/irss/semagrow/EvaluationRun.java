@@ -35,9 +35,9 @@ public class EvaluationRun<R extends Rectangle<R>, S> {
         int i = 1;
 
         for (i = 1; i <= ITERATIONS ; i++) {
-            Iterable<RDFQueryRecord> batch = getTrainingWorkloadBatch();
-            h.refine(batch);
-            long error = estimateError(h, eval);
+//            Iterable<RDFQueryRecord> batch = getTrainingWorkloadBatch();
+//            h.refine(batch);
+//            long error = estimateError(h, eval);
             // output (i, error);
         }
 

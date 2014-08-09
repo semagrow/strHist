@@ -1,9 +1,10 @@
 package gr.demokritos.iit.irss.semagrow.rdf.parsing;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogQuery {
+public class LogQuery implements Serializable {
 
 	private String sessionId;
 	private long startTime;
