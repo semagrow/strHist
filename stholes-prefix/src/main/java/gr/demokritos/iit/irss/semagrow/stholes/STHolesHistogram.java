@@ -432,8 +432,13 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         STHolesBucket<R> b2 = b;
         STHolesBucket<R> bn = b;
 
-        for (STHolesBucket<R> bi : b.getChildren()) {
+        Collection<STHolesBucket<R>> bcs = b.getChildren();
+        ArrayList<STHolesBucket<R>> bChildren = new ArrayList<STHolesBucket<R>>(bcs);
 
+        STHolesBucket<R> bi, bj;
+
+        for (int i = 0; i < bChildren.size(); i++) {
+            bi = bChildren.get(i);
             // Candidate parent-child merges
             candidateMergedBucket = getPCMergePenalty(b, bi);
             penalty = candidateMergedBucket.getValue();
@@ -447,25 +452,24 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
             }
 
             // Candidate sibling-sibling merges
-            for (STHolesBucket<R> bj : b.getChildren()) {
+            for (int j = i + 1; j < bChildren.size(); j++) {
 
-                if (!bj.equals(bi)) {
+                bj = bChildren.get(j);
 
-                    //todo: check if bi,bj are mergeable
-                    if (bi.getBox().isMergeable(bj.getBox())) {
+                if (bi.getBox().isMergeable(bj.getBox())) {
 
-                        candidateMergedBucket = getSSMergePenalty(bi, bj);
-                        penalty = candidateMergedBucket.getValue();
+                    candidateMergedBucket = getSSMergePenalty(bi, bj);
+                    penalty = candidateMergedBucket.getValue();
 
-                        if (penalty <= minimumPenalty) {
+                    if (penalty <= minimumPenalty) {
 
-                            minimumPenalty = penalty;
-                            b1 = bi;
-                            b2 = bj;
-                            bn = candidateMergedBucket.getKey();
-                        }
+                        minimumPenalty = penalty;
+                        b1 = bi;
+                        b2 = bj;
+                        bn = candidateMergedBucket.getKey();
                     }
                 }
+
             }
         }
 

@@ -181,5 +181,10 @@ public class TestApp {
         STHolesBucket.merge(bs1, bs2, bn);
         */
 
+        /*
+        //Test findBestMerge
+        root = myH.getRoot();
+        MergeInfo<RDFRectangle> bestMerge =  myH.findBestMerge(root);
+        */
     }
 }
