@@ -42,23 +42,25 @@ public class TestMainQueryFeedbackGenerate {
 //        }
 
 
-        // --- Evaluation Pool Generator
-        // Read all training prefixes.
-        qfg.savedPrefixes.addAll(getAllPrefixes(trainingPool));
+//        // --- Evaluation Pool Generator
+//        // Read all training prefixes.
+//        qfg.savedPrefixes.addAll(getAllPrefixes(trainingPool));
+//
+//        for (int i=0; i<1; i++) {
+//            qr = qfg.generateEvaluationSet();
+//            System.out.println(qr.getQuery());
+//
+//            RDFQueryRecord rdfQr = (RDFQueryRecord)qr;
+//            // Get prefix
+//            String prefix = rdfQr.getLogQuery().getQueryStatements().get(0).getValue();
+//            String[] splits = prefix.split("/");
+//            writeToPool(evaluationPool, splits[splits.length - 1], rdfQr);
+//
+////            rdfQr = readFromPool(evaluationPool, splits[splits.length - 1]);
+////            System.out.println(rdfQr.getQuery());
+//        }
 
-        for (int i=0; i<48; i++) {
-            qr = qfg.generateEvaluationSet();
-            System.out.println(qr.getQuery());
-
-            RDFQueryRecord rdfQr = (RDFQueryRecord)qr;
-            // Get prefix
-            String prefix = rdfQr.getLogQuery().getQueryStatements().get(0).getValue();
-            String[] splits = prefix.split("/");
-            writeToPool(evaluationPool, splits[splits.length - 1], rdfQr);
-
-//            rdfQr = readFromPool(evaluationPool, splits[splits.length - 1]);
-//            System.out.println(rdfQr.getQuery());
-        }
+//        new QueryPool(trainingPool, evaluationPool).getEvaluationQueryRecords();
 
     }// main
 
@@ -102,32 +104,5 @@ public class TestMainQueryFeedbackGenerate {
 
         }
     }// writeToPool
-
-
-    private static RDFQueryRecord readFromPool(String path, String filename) {
-        RDFQueryRecord rdfQueryRecord = null;
-        File file = new File(path + filename);
-        ObjectInputStream ois;
-
-        try {
-
-            ois = new ObjectInputStream(new FileInputStream(file));
-
-            rdfQueryRecord = (RDFQueryRecord)ois.readObject();
-
-            ois.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return  rdfQueryRecord;
-    }// readFromPool
 
 }
