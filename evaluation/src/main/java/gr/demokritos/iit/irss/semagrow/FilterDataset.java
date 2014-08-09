@@ -20,7 +20,7 @@ import java.io.*;
 /**
  * Created by Nick on 06-Aug-14.
  */
-public class TestMain {
+public class FilterDataset {
 
     public static void main(String[] args) throws RepositoryException, IOException, RDFParseException, RDFHandlerException {
 
@@ -35,7 +35,7 @@ public class TestMain {
         for (File folder : files) {
 
             // create a local Sesame Native Store
-            File dataDir = new File(tempNSData + "/" + folder.getName()); //"src\\main\\resources\\temp\\"
+            File dataDir = new File(tempNSData + "/" + folder.getName()); //"src\\main\\resources\\native_store\\"
             if (!dataDir.exists()) {
                 Repository nativeRep = new SailRepository(new NativeStore(dataDir));
                 nativeRep.initialize();

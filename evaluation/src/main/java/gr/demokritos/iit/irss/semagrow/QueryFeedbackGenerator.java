@@ -5,38 +5,55 @@ import gr.demokritos.iit.irss.semagrow.rdf.parsing.Binding;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.LogQuery;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.query.*;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.sail.nativerdf.NativeStore;
+
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Nick on 07-Aug-14.
  */
 public class QueryFeedbackGenerator {
 
-    private Iterable<QueryRecord> queryRecords;
-    private String uniqueSubjectData, filteredDataFolder, outputDataFolder;
+    private String uniqueSubjectData, filteredDataFolder, outputDataFolder, natineStoreFolder;
     private int uniqueSubjectFileRows;
     private ArrayList<String> savedPrefixes;
+    private Repository nativeRep;
+    private RepositoryConnection conn;
 
 
-    public QueryFeedbackGenerator(String uniqueSubjectData, String filteredDataFolder, String outputDataFolder) {
+    public QueryFeedbackGenerator(String uniqueSubjectData, String filteredDataFolder, String outputDataFolder,
+                                  String natineStoreFolder) throws RepositoryException {
 
         this.uniqueSubjectData = uniqueSubjectData;
         this.filteredDataFolder = filteredDataFolder;
         this.outputDataFolder = outputDataFolder;
+        this.natineStoreFolder = natineStoreFolder;
 
         savedPrefixes = new ArrayList<String>();
 
         // Count total lines of unique subject file.
         uniqueSubjectFileRows = countLineNumber(uniqueSubjectData);
         System.out.println("Total File Rows: " + uniqueSubjectFileRows);
-    }
+
+        // Create a local Sesame Native Store.
+        System.out.println("Initializing Native Store...");
+        nativeRep = new SailRepository(new NativeStore(new File(natineStoreFolder)));
+        nativeRep.initialize();
+        System.out.println("Native Store successfully initialized.");
+    }// Constructor
 
 
-    public Iterable<QueryRecord> generateTrainingSet(int size) throws IOException {
+    public Iterable<QueryRecord> generateTrainingSet(int size) throws IOException, RepositoryException {
         System.out.println("Generating Training Set..");
         ArrayList<QueryRecord> queryRecords = new ArrayList<QueryRecord>();
 
@@ -44,10 +61,10 @@ public class QueryFeedbackGenerator {
             queryRecords.add(generateTrainingQueryRecord());
 
         return queryRecords;
-    }
+    }// generateTrainingSet
 
 
-    public Iterable<QueryRecord> generateEvaluationSet(int size) throws IOException {
+    public Iterable<QueryRecord> generateEvaluationSet(int size) throws IOException, RepositoryException {
         System.out.println("Generating Evaluation Set..");
         ArrayList<QueryRecord> queryRecords = new ArrayList<QueryRecord>();
 
@@ -55,26 +72,35 @@ public class QueryFeedbackGenerator {
             queryRecords.add(generateEvaluationQueryRecord());
 
         return queryRecords;
-    }
+    }// generateEvaluationSet
 
 
     /**
      * The returned URI must at least satisfies a prefix used in the training workload.
+     * Randomly choose if subject must exist in saved prefixes or not!
      */
-    private RDFQueryRecord generateEvaluationQueryRecord() throws IOException {
+    private RDFQueryRecord generateEvaluationQueryRecord() throws IOException, RepositoryException {
+        String subject = "";
 
-        // Choose a random prefix from the saved ones.
-        int randomRowNumber = randInt(1, savedPrefixes.size());
-        String prefix = savedPrefixes.get(randomRowNumber - 1);
+        if (randInt(0, 1) == 0) {
 
-        String subject = getSpecificSubject(prefix);
+            // Choose a random prefix from the saved ones.
+            int randomRowNumber = randInt(1, savedPrefixes.size());
+            String prefix = savedPrefixes.get(randomRowNumber - 1);
 
+            subject = getSpecificSubject(prefix);
+        } else {
+
+            // Just choose a random subject from the sorted ones.
+            int randomRowNumber = randInt(1, uniqueSubjectFileRows);
+            subject = getSpecificSubject(randomRowNumber);
+        }
         // Extract query feedback from filtered data based on that subject.
-        return getQueryFeedback(filteredDataFolder, subject);
-    }
+        return getQueryFeedback(filteredDataFolder, subject, false);
+    }// generateEvaluationQueryRecord
 
 
-    private RDFQueryRecord generateTrainingQueryRecord() throws IOException {
+    private RDFQueryRecord generateTrainingQueryRecord() throws IOException, RepositoryException {
 
         // Choose a random subject.
         int randomRowNumber = randInt(1, uniqueSubjectFileRows);
@@ -110,11 +136,11 @@ public class QueryFeedbackGenerator {
             savedPrefixes.add(trimmedSubject);
 
         // Extract query feedback from filtered data based on that subject.
-        return getQueryFeedback(filteredDataFolder, trimmedSubject);
-    }
+        return getQueryFeedback(filteredDataFolder, trimmedSubject, true);
+    }// generateTrainingQueryRecord
 
 
-    private RDFQueryRecord getQueryFeedback(String filteredDataFolder, String subject) throws IOException {
+    private RDFQueryRecord getQueryFeedback(String filteredDataFolder, String subject, boolean regex) throws IOException, RepositoryException {
 
         // Query Statements.
         LogQuery lq = new LogQuery();
@@ -126,54 +152,111 @@ public class QueryFeedbackGenerator {
         lq.getQueryStatements().add(new Binding("object", ""));
 
         // Query BindingSets.
-        ArrayList<BindingSet> bindingSets = extractQueryBindingSets(new File(filteredDataFolder), subject);
+        ArrayList<BindingSet> bindingSets = extractQueryResultSet(subject, regex);
         System.out.println("Size of BindingSets = " + bindingSets.size());
         RDFQueryRecord queryRecord = new RDFQueryRecord(lq);
         queryRecord.getQueryResult().setBindingSets(bindingSets);
         return queryRecord;
-    }
+    }// getQueryFeedback
 
 
-    private ArrayList<BindingSet> extractQueryBindingSets(File filteredDataFolder, String subject) throws IOException {
+    private ArrayList<BindingSet> extractQueryResultSet(String subjectString, boolean regex) {
 
         ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
-        File[] files = filteredDataFolder.listFiles();
 
-        for (File file : files) {
-            System.out.println(file.getName());
-            bindingSets.addAll(extractFromFile(file, subject));
-        }
+            try {
+                conn = nativeRep.getConnection();
 
-        return bindingSets;
-    }
+                if (regex) {
 
+                    String queryString = "select ?p ?o where { ?s ?p ?o . FILTER regex(?s, \"^" + subjectString + "\") }";
 
-    private ArrayList<BindingSet> extractFromFile(File file, String subject) throws IOException {
-        ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
+                    System.out.println(queryString);
+                    TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                    System.out.println("a");
+                    TupleQueryResult result = tupleQuery.evaluate();
+                    System.out.println("b");
+                    org.openrdf.query.BindingSet binSet;
 
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String line = "";
-        String splits[];
+                    while (result.hasNext()) {
 
-        while ((line = br.readLine()) != null) {
-            splits = line.split(" ");
+                        System.out.println("c");
+                        binSet = result.next();
+                        System.out.println(binSet.toString());
+                        BindingSet bs = new BindingSet();
+                        bs.getBindings().add(new Binding("predicate", binSet.getBinding("p").getValue().stringValue()));
+                        bs.getBindings().add(new Binding("object", binSet.getBinding("o").getValue().stringValue()));
+                        bindingSets.add(bs);
+                    }
+                    result.close();
+                    System.out.println("d");
+                } else {
 
-            // Check if the current subject starts with the trimmed subject.
-            String currentSubject = cleanString(splits[0]);
+                    URI subject = ValueFactoryImpl.getInstance().createURI(subjectString);
+                    RepositoryResult<Statement> statements = conn.getStatements(subject, null, null, true);
+                    Statement s;
 
-            if (currentSubject.startsWith(subject)) {// If yes, add the predicate and object of this tuple to the BindingSet.
-                BindingSet bs = new BindingSet();
+                    while (statements.hasNext()) {
 
-                bs.getBindings().add(new Binding("predicate", cleanString(splits[1])));
-                bs.getBindings().add(new Binding("object", cleanString(splits[2])));
+                        s = statements.next();
 
-                bindingSets.add(bs);
+                        BindingSet bs = new BindingSet();
+                        bs.getBindings().add(new Binding("predicate", s.getPredicate().toString()));
+                        bs.getBindings().add(new Binding("object", s.getObject().stringValue()));
+                        bindingSets.add(bs);
+                    }
+                }
+
+                conn.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }
 
-        br.close();
         return bindingSets;
-    }
+    }// extractQueryResultSet
+
+
+//    private ArrayList<BindingSet> extractQueryBindingSets(File filteredDataFolder, String subject) throws IOException {
+//
+//        ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
+//        File[] files = filteredDataFolder.listFiles();
+//
+//        for (File file : files) {
+//            System.out.println(file.getName());
+//            bindingSets.addAll(extractFromFile(file, subject));
+//        }
+//
+//        return bindingSets;
+//    }
+//
+//
+//    private ArrayList<BindingSet> extractFromFile(File file, String subject) throws IOException {
+//        ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
+//
+//        BufferedReader br = new BufferedReader(new FileReader(file));
+//        String line = "";
+//        String splits[];
+//
+//        while ((line = br.readLine()) != null) {
+//            splits = line.split(" ");
+//
+//            // Check if the current subject starts with the trimmed subject.
+//            String currentSubject = cleanString(splits[0]);
+//
+//            if (currentSubject.startsWith(subject)) {// If yes, add the predicate and object of this tuple to the BindingSet.
+//                BindingSet bs = new BindingSet();
+//
+//                bs.getBindings().add(new Binding("predicate", cleanString(splits[1])));
+//                bs.getBindings().add(new Binding("object", cleanString(splits[2])));
+//
+//                bindingSets.add(bs);
+//            }
+//        }
+//
+//        br.close();
+//        return bindingSets;
+//    }
 
 
     private String cleanString(String string) {
@@ -182,7 +265,7 @@ public class QueryFeedbackGenerator {
         string = string.replace(">", "");
 
         return string.trim();
-    }
+    }// cleanString
 
 
     private String getSpecificSubject(int row) throws IOException {
@@ -203,7 +286,7 @@ public class QueryFeedbackGenerator {
         br.close();
 
         return line;
-    }
+    }// getSpecificSubject(int)
 
 
     private String getSpecificSubject(String prefix) throws IOException {
@@ -221,7 +304,7 @@ public class QueryFeedbackGenerator {
         br.close();
 
         return line;
-    }
+    }// getSpecificSubject(String)
 
 
     /**
@@ -245,7 +328,7 @@ public class QueryFeedbackGenerator {
         int randomNum = rand.nextInt((max - min) + 1) + min;
 
         return randomNum;
-    }
+    }// randInt
 
 
     public static int countLineNumber(String path) {
@@ -266,12 +349,7 @@ public class QueryFeedbackGenerator {
         }
 
         return lines;
-    }
-
-
-    public Iterable<QueryRecord> getQueryRecords() {
-        return queryRecords;
-    }
+    }// countLineNumber
 
 }
 
