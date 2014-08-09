@@ -60,6 +60,16 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         }
     }
 
+
+    public void setMaxBucketsNum(long maxBucketsNum) {
+        this.maxBucketsNum = maxBucketsNum;
+    }
+
+
+    public long getBucketsNum() {
+        return bucketsNum;
+    }
+
     /**
      * refines histogram using query feedback
      * @param queryRecord query feedback
@@ -385,8 +395,13 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         STHolesOrigBucket<R> b2 = b;
         STHolesOrigBucket<R> bn = b;
 
-        for (STHolesOrigBucket<R> bi : b.getChildren()) {
+        Collection<STHolesOrigBucket<R>> bcs = b.getChildren();
+        ArrayList<STHolesOrigBucket<R>> bChildren = new ArrayList<STHolesOrigBucket<R>>(bcs);
 
+        STHolesOrigBucket<R> bi, bj;
+
+        for (int i = 0; i < bChildren.size(); i++) {
+            bi = bChildren.get(i);
             // Candidate parent-child merges
             candidateMergedBucket = getPCMergePenalty(b, bi);
             penalty = candidateMergedBucket.getValue();
@@ -400,14 +415,16 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
             }
 
             // Candidate sibling-sibling merges
-            for (STHolesOrigBucket<R> bj : b.getChildren()) {
+            for (int j = i + 1; j < bChildren.size(); j++) {
 
-                if (!bj.equals(bi)) {
+                bj = bChildren.get(j);
 
-                    candidateMergedBucket = getSSMergePenalty(b, bi);
+                if (bi.getBox().isMergeable(bj.getBox())) {
+
+                    candidateMergedBucket = getSSMergePenalty(bi, bj);
                     penalty = candidateMergedBucket.getValue();
 
-                    if (penalty  <= minimumPenalty) {
+                    if (penalty <= minimumPenalty) {
 
                         minimumPenalty = penalty;
                         b1 = bi;
@@ -415,6 +432,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                         bn = candidateMergedBucket.getKey();
                     }
                 }
+
             }
         }
 
@@ -487,8 +505,12 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
         for (STHolesOrigBucket<R> bi : bp.getChildren() ) {
 
-            if (bi.getBox().contains(newBox)) {
-                I.add(bi);
+            if (!(bi.equals(b1) || bi.equals(b2))) {
+
+                if (newBox.contains(bi.getBox())) {
+
+                    I.add(bi);
+                }
             }
         }
 

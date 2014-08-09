@@ -10,4 +10,8 @@ public interface STHistogram<R extends Rectangle<R>,S> extends Histogram<R> {
 
     void refine(Iterable<? extends QueryRecord<R,S>> workload);
 
+    void setMaxBucketsNum(long maxBucketsNum);
+
+    long getBucketsNum();
+
 }

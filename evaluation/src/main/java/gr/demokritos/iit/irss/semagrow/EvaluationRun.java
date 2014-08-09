@@ -38,7 +38,8 @@ public class EvaluationRun<R extends Rectangle<R>, S> {
             Iterable<RDFQueryRecord> batch = getTrainingWorkloadBatch();
             h.refine(batch);
             long error = estimateError(h, eval);
-            // output (i, error);
+            long numberOfBuckets = h.getBucketsNum();
+            // output (i, error, numberOfBuckets);
         }
 
     }
@@ -57,15 +58,25 @@ public class EvaluationRun<R extends Rectangle<R>, S> {
     {
         long estimated = h.estimate(r);
         return estimated - getActual(r);
+
+         /*
+        return (estimated - getActual(r))^2;
+         */
     }
 
     public long estimateError(Histogram<R> h, Iterable<R> rects)
     {
         long accumError = 0;
-        for (R r : rects)
+        int W = 0;
+
+        for (R r : rects) {
             accumError += estimateError(h, r);
+            W += 1;
+        }
 
         return accumError;
+
+        //return Math.sqrt((double)accumError/W);
     }
 
     public <R extends Rectangle<R>> long
