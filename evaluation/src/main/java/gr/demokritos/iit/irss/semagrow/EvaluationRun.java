@@ -4,53 +4,53 @@ import gr.demokritos.iit.irss.semagrow.api.Histogram;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.api.range.Range;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 
 /**
  * Created by angel on 8/9/14.
  */
 public class EvaluationRun<R extends Rectangle<R>, S> {
 
-    public static int ITERATIONS = 10;
+    private int ITERATIONS;
 
-    public static int QUERYPERBATCH = 50;
+    private STHistogram<R,S> histogram;
 
-    public static int EVALQUERIES = 10;
+    private Iterable<? extends QueryRecord<R,S>> trainingWorkloadBatches[];
 
-    public static int MAXBUCKETS = 100;
+    private Iterable<R> evaluationWorkload;
 
-    public static void main (String[] args) {
-
+    public EvaluationRun(STHistogram<R,S> histogram,
+                         Iterable<? extends QueryRecord<R,S>> trainingWorkloadBatches[],
+                         Iterable<R> evaluationWorkload)
+    {
+        this.histogram = histogram;
+        this.trainingWorkloadBatches = trainingWorkloadBatches;
+        ITERATIONS = trainingWorkloadBatches.length;
+        this.evaluationWorkload = evaluationWorkload;
     }
 
     public void run() {
 
         Iterable<R> eval = getEvaluationWorkload();
 
-        STHistogram<R,?> h = getHistogram();
+        STHistogram<R,S> h = getHistogram();
 
-        int i = 1;
-
-        for (i = 1; i <= ITERATIONS ; i++) {
-            Iterable<RDFQueryRecord> batch = getTrainingWorkloadBatch();
+        for (int i = 0; i <= ITERATIONS ; i++) {
+            Iterable<? extends QueryRecord<R,S>> batch = getTrainingWorkloadBatch(i);
             h.refine(batch);
             long error = estimateError(h, eval);
-            // output (i, error);
+            // output (i+1, error);
         }
 
     }
 
-    public STHistogram<R,?> getHistogram() { return null; }
+    public STHistogram<R,S> getHistogram() { return histogram; }
 
-    public Iterable<? extends QueryRecord<R,?>> getTrainingWorkloadBatch(){
-        return null;
+    public Iterable<? extends QueryRecord<R,S>> getTrainingWorkloadBatch(int iter){
+        return trainingWorkloadBatches[iter];
     }
 
     public Iterable<R> getEvaluationWorkload() {
-        return null;
+        return evaluationWorkload;
     }
 
     public long estimateError(Histogram<R> h, R r)
