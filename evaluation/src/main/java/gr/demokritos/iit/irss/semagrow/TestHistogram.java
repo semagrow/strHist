@@ -14,8 +14,8 @@ public class TestHistogram {
 
     static String trainingPool = "src\\main\\resources\\training_pool\\";
     static String evaluationPool = "src\\main\\resources\\evaluation_pool\\";
-    static String outputPath = "src\\main\\resources\\training_pool\\histograms\\";
-    
+    static String outputPath = "src\\main\\resources\\histograms\\training_pool\\";
+
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
