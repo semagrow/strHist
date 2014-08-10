@@ -73,7 +73,6 @@ public class TestMainQueryFeedbackGenerate {
            if (rdfRq != null ) {
                System.out.println(rdfRq.getQuery());
                System.out.println("Actual: " + rdfRq.getQueryResult().getBindingSets().size());
-               iter.remove();
            }
         }
 

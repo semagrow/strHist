@@ -34,7 +34,6 @@ public class TestHistogram {
             h.refine(rdfRq);
             System.out.println(rdfRq.getQuery());
             System.out.println("Actual Cardinality: " + rdfRq.getQueryResult().getBindingSets().size());
-            iter.remove();
 
             // Write histogram to file.
             histIO = new HistogramIO(outputPath + getSubjectLastSplit(rdfRq), h);
