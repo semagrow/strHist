@@ -6,6 +6,7 @@ import org.openrdf.repository.RepositoryException;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Nick on 07-Aug-14.
@@ -21,13 +22,13 @@ public class TestMainQueryFeedbackGenerate {
 
     public static void main(String[] args) throws IOException, RepositoryException {
 
-        QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder,
-                outputDataFolder, nativeStoreFolder);
-
-        QueryRecord qr;
-
+//        QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder,
+//                outputDataFolder, nativeStoreFolder);
+//
+//        QueryRecord qr;
+//
 //        // --- Training Pool Generator
-//        for (int i=0; i<10; i++) {
+//        for (int i=0; i<1; i++) {
 //            qr = qfg.generateTrainingSet();
 //            System.out.println(qr.getQuery());
 //
@@ -60,7 +61,19 @@ public class TestMainQueryFeedbackGenerate {
 ////            System.out.println(rdfQr.getQuery());
 //        }
 
-//        new QueryPool(trainingPool, evaluationPool).getEvaluationQueryRecords();
+//        new QueryPool(trainingPool, evaluationPool).getTrainingQueryRecords();
+
+        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
+        Iterator<RDFQueryRecord> iter = collection.iterator();
+
+       while (iter.hasNext()) {
+           RDFQueryRecord rdfRq = iter.next();
+           if (rdfRq != null ) {
+               System.out.println(rdfRq.getQuery());
+               System.out.println("Actual: " + rdfRq.getQueryResult().getBindingSets().size());
+               iter.remove();
+           }
+        }
 
     }// main
 
