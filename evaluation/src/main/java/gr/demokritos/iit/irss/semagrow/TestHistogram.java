@@ -16,7 +16,7 @@ public class TestHistogram {
     static String trainingPool = "src\\main\\resources\\training_pool\\";
     static String evaluationPool = "src\\main\\resources\\evaluation_pool\\";
     static String trainingOutputPath = "src\\main\\resources\\histograms\\training_pool\\";
-    static String evaluationOutputPath = "src\\main\\resources\\histograms\\training_pool\\";
+    static String evaluationOutputPath = "src\\main\\resources\\histograms\\evaluation_pool\\";
     static String trainingActualEstimates = "src\\main\\resources\\training_actual_estimates.txt";
     static String evaluationActualEstimates = "src\\main\\resources\\evaluation_actual_estimates.txt";
     static BufferedWriter bw;
@@ -24,10 +24,11 @@ public class TestHistogram {
 
     public static void main(String[] args) throws IOException {
         long start = System.currentTimeMillis();
-        bw = new BufferedWriter(new FileWriter(evaluationActualEstimates));
+        bw = new BufferedWriter(new FileWriter(trainingActualEstimates));
+        bw.write("query_subject, evaluation, actual\n");
 
         HistogramIO histIO;
-        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(evaluationPool);
+        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
         Iterator<RDFQueryRecord> iter = collection.iterator();
 
         STHolesHistogram h = new STHolesHistogram();
@@ -38,13 +39,13 @@ public class TestHistogram {
             h.refine(rdfRq);
 
             // Write actual and estimate query cardinality.
-            bw.write(rdfRq.getLogQuery().getQueryStatements().get(0).getValue() + "\n" +
-                    "Evaluation: " + h.estimate(rdfRq.getRectangle()) +
-                    ", Actual: " + rdfRq.getQueryResult().getBindingSets().size());
+            bw.write(rdfRq.getLogQuery().getQueryStatements().get(0).getValue() + ", " +
+                    h.estimate(rdfRq.getRectangle()) + ", " +
+                    rdfRq.getQueryResult().getBindingSets().size());
             bw.newLine();
 
             // Write histogram to a file.
-            histIO = new HistogramIO(evaluationOutputPath + getSubjectLastSplit(rdfRq),
+            histIO = new HistogramIO(trainingOutputPath + getSubjectLastSplit(rdfRq),
                     ((STHolesHistogram) h));
             histIO.write();
         }
