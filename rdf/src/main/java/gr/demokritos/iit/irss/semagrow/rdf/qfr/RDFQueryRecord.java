@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.rdf.qfr;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,7 +20,7 @@ import gr.demokritos.iit.irss.semagrow.rdf.parsing.LogQuery;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.QueryFilter;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.Utilities;
 
-public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat> {
+public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializable {
 
 	// Contains the Query's signature elements.
 	private LogQuery logQuery;

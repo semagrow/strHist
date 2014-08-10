@@ -8,6 +8,7 @@ import gr.demokritos.iit.irss.semagrow.rdf.parsing.LogParser;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 
+
 /**
  * Hello world!
  *
@@ -29,7 +30,7 @@ public class App
 //            LogParser lp = new LogParser("src\\main\\resources\\master_log.log");
 
         	List<RDFQueryRecord> list = lp.parse();
-        	
+
         	/*
     		 * Report
     		 */

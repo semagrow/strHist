@@ -12,7 +12,7 @@ public class MergeInfo<R extends Rectangle<R>> {
     private STHolesBucket<R> bn;
     private long penalty;
 
-    MergeInfo(STHolesBucket<R> b1, STHolesBucket<R> b2, STHolesBucket<R> bn, long penalty) {
+    public MergeInfo(STHolesBucket<R> b1, STHolesBucket<R> b2, STHolesBucket<R> bn, long penalty) {
         this.b1 = b1;
         this.b2 = b2;
         this.bn = bn;

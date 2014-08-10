@@ -1,6 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.rdf.parsing;
 
-public class Binding {
+import java.io.Serializable;
+
+public class Binding implements Serializable {
 
 	private String name, value;
 

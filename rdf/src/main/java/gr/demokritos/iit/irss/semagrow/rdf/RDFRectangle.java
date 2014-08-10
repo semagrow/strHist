@@ -172,6 +172,12 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         return res;
     }
 
+
+    public boolean isMergeable(RDFRectangle rec) {
+
+        return objectRange.hasSameType((RDFLiteralRange) rec.getRange(2));
+    }
+
     public String toString() {
 
         String res = "rectangle:\n" +
@@ -209,6 +215,14 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         //RDFLiteralRange objectRange2  = new RDFLiteralRange();
 
         RDFRectangle rect = new RDFRectangle(subjectRange, predicateRange, objectRange);
+
+        RDFLiteralRange objectRange2 = new RDFLiteralRange(low + 1, high);
+        RDFRectangle rect2 = new RDFRectangle(subjectRange, predicateRange, objectRange2);
+        System.out.println(rect + " and " + rect2 + " are mergeable: " + rect.isMergeable(rect2));
+
+        RDFLiteralRange objectRange3 = new RDFLiteralRange("http://a");
+        RDFRectangle rect3 = new RDFRectangle(subjectRange, predicateRange, objectRange3);
+        System.out.println(rect + " and " + rect3 + " are mergeable: " + rect.isMergeable(rect3));
 
         System.out.println(rect.hasInfinite());
     }

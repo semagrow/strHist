@@ -1,6 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.rdf.parsing;
 
-public class QueryFilter {
+import java.io.Serializable;
+
+public class QueryFilter implements Serializable {
 
 	private String filterType;
 	private String variable;

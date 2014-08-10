@@ -10,6 +10,7 @@ import gr.demokritos.iit.irss.semagrow.rdf.parsing.Binding;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.Utilities;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,7 +26,7 @@ import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.XMLSchema;
 
-public class RDFQueryResult implements QueryResult<RDFRectangle,Stat> {
+public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializable {
 
 	private ArrayList<BindingSet> bindingSets;
 	// Query's statements stored for Cardinality estimation

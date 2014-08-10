@@ -604,6 +604,30 @@ public class RDFLiteralRange
         this.ranges = ranges;
     }
 
+    public boolean hasSameType(RDFLiteralRange literalRange) {
+
+        if (literalRange.ranges.size() != 1 || ranges.size() != 1) {
+            System.err.println("This method cannot be called" +
+                    "for RDFLiteralRange ranges with " +
+                    "more than one subrange " +
+                    "and argument should be a " +
+                    "range of single type as well.");
+
+
+            return false;
+        }
+
+        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
+
+            for (Map.Entry<URI, RangeLength<?>> otherEntry : literalRange.ranges.entrySet()) {
+
+                return entry.getKey().equals(otherEntry.getKey());
+            }
+        }
+
+        return false;
+    }
+
     public static void main(String args[] ) {
         
         RDFLiteralRange rootRange = new RDFLiteralRange(0,10);

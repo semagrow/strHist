@@ -47,7 +47,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
                 return root.getEstimate(rec);
             }
-            return estimateAux(rec, root, (long)0);
+            return estimateAux(rec, root);
         }
         else
             return 0;
@@ -61,7 +61,23 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @param b bucket
      * @return estimated number of tuples
      */
-    private long estimateAux(R rec, STHolesBucket<R> b, long est) {
+    private long estimateAux(R rec, STHolesBucket<R> b) {
+
+        long est = 0;
+
+        List<STHolesBucket<R>> enclosingBuckets = new ArrayList<STHolesBucket<R>>();
+
+        getEnclosingBuckets(rec, b, enclosingBuckets);
+
+        for (STHolesBucket<R> enclosingB : enclosingBuckets) {
+
+            est += enclosingB.getEstimate(rec);
+        }
+
+        return est;
+    }
+
+    private void getEnclosingBuckets(R rec, STHolesBucket<R> b, List<STHolesBucket<R>> enclosingBuckets) {
 
         boolean isEnclosingBucket = false;
 
@@ -75,16 +91,13 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
                 if ((bc.getBox()).contains(rec)) {
 
                     isEnclosingBucket = false;
-                    est = estimateAux(rec, bc, est);
-                    break;
+                    getEnclosingBuckets(rec, bc, enclosingBuckets);
                 }
             }
         }
 
         if (isEnclosingBucket)
-            return est + b.getEstimate(rec);
-        else
-            return est;
+            enclosingBuckets.add(b);
     }
 
     public void refine(Iterable<? extends QueryRecord<R,Stat>> workload) {
@@ -419,8 +432,13 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         STHolesBucket<R> b2 = b;
         STHolesBucket<R> bn = b;
 
-        for (STHolesBucket<R> bi : b.getChildren()) {
+        Collection<STHolesBucket<R>> bcs = b.getChildren();
+        ArrayList<STHolesBucket<R>> bChildren = new ArrayList<STHolesBucket<R>>(bcs);
 
+        STHolesBucket<R> bi, bj;
+
+        for (int i = 0; i < bChildren.size(); i++) {
+            bi = bChildren.get(i);
             // Candidate parent-child merges
             candidateMergedBucket = getPCMergePenalty(b, bi);
             penalty = candidateMergedBucket.getValue();
@@ -434,15 +452,16 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
             }
 
             // Candidate sibling-sibling merges
-            for (STHolesBucket<R> bj : b.getChildren()) {
+            for (int j = i + 1; j < bChildren.size(); j++) {
 
-                if (!bj.equals(bi)) {
+                bj = bChildren.get(j);
 
-                    //todo: check if bi,bj are mergeable
+                if (bi.getBox().isMergeable(bj.getBox())) {
+
                     candidateMergedBucket = getSSMergePenalty(bi, bj);
                     penalty = candidateMergedBucket.getValue();
 
-                    if (penalty  <= minimumPenalty) {
+                    if (penalty <= minimumPenalty) {
 
                         minimumPenalty = penalty;
                         b1 = bi;
@@ -450,6 +469,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
                         bn = candidateMergedBucket.getKey();
                     }
                 }
+
             }
         }
 
@@ -522,8 +542,12 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
         for (STHolesBucket<R> bi : bp.getChildren() ) {
 
-            if (bi.getBox().contains(newBox)) {
-                I.add(bi);
+            if (!(bi.equals(b1) || bi.equals(b2))) {
+
+                if (newBox.contains(bi.getBox())) {
+
+                    I.add(bi);
+                }
             }
         }
 
@@ -590,4 +614,14 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 	public void setRoot(STHolesBucket<R> root) {
 		this.root = root;
 	}
+
+    public long getBucketsNum() {
+
+        return bucketsNum;
+    }
+
+    public void setMaxBucketsNum(long maxBucketsNum) {
+        this.maxBucketsNum = maxBucketsNum;
+    }
+
 }

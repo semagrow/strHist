@@ -1,8 +1,9 @@
 package gr.demokritos.iit.irss.semagrow.rdf.parsing;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class BindingSet {
+public class BindingSet implements Serializable {
 
 	private ArrayList<Binding> bindings;
 

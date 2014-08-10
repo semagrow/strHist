@@ -111,21 +111,29 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
 
         //Merge buckets b1, b2 into bn
         STHolesOrigBucket<R> bpp = bp.getParent();
-        bpp.removeChild(bp);
-        bpp.addChild(bn);
-        bn.setParent(bpp);
+
 
         //Children of both buckets bc and bp
         //become children of the new bucket
         for (STHolesOrigBucket<R> bi : bc.getChildren())
-            bi.setParent(bn);
+            bn.addChild(bi);
 
         for (STHolesOrigBucket<R> bchild : bp.children) {
 
             if (!bchild.equals(bc)) {
 
-                bchild.setParent(bn);
+                bn.addChild(bchild);
             }
+        }
+
+        if (bpp == null) {
+            //bp is root
+            bp = bn;
+
+        } else {
+
+            bpp.removeChild(bp);
+            bpp.addChild(bn);
         }
 
     }
@@ -183,6 +191,8 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
         // Merge buckets b1, b2 into bn
         bn.setParent(newParent);
         newParent.addChild(bn);
+        newParent.removeChild(b1);
+        newParent.removeChild(b2);
 
         newParent.setFrequency((long)Math.ceil(newParent.frequency*
                 ( 1 - (double)vold/newParent.getVolume())));
