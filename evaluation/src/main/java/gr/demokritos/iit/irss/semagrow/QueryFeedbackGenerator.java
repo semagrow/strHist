@@ -169,6 +169,7 @@ public class QueryFeedbackGenerator {
                         s = statements.next();
 
                         BindingSet bs = new BindingSet();
+                        bs.getBindings().add(new Binding("subject", s.getSubject().toString()));
                         bs.getBindings().add(new Binding("predicate", s.getPredicate().toString()));
                         bs.getBindings().add(new Binding("object", s.getObject().stringValue()));
                         bindingSets.add(bs);
@@ -215,6 +216,7 @@ public class QueryFeedbackGenerator {
             if (currentSubject.startsWith(subject)) {// If yes, add the predicate and object of this tuple to the BindingSet.
                 BindingSet bs = new BindingSet();
 
+                bs.getBindings().add(new Binding("subject", cleanString(splits[0])));
                 bs.getBindings().add(new Binding("predicate", cleanString(splits[1])));
                 bs.getBindings().add(new Binding("object", cleanString(splits[2])));
 
