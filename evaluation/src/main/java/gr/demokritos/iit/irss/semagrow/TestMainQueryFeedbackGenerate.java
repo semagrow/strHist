@@ -1,7 +1,9 @@
 package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.openrdf.repository.RepositoryException;
 
 import java.io.*;
@@ -66,7 +68,7 @@ public class TestMainQueryFeedbackGenerate {
         CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
         Iterator<RDFQueryRecord> iter = collection.iterator();
 
-       while (iter.hasNext()) {
+        while (iter.hasNext()) {
            RDFQueryRecord rdfRq = iter.next();
            if (rdfRq != null ) {
                System.out.println(rdfRq.getQuery());
