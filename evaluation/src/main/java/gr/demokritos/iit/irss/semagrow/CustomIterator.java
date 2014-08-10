@@ -28,14 +28,14 @@ public class CustomIterator<T> implements Iterator<T> {
 
     @Override
     public T next() {
-        return readFromPool(poolPath, files.get(0).getName());
+        T temp = readFromPool(poolPath, files.get(0).getName());
+        files.remove(0);
+        return temp;
     }
 
 
     @Override
-    public void remove() {
-        files.remove(0);
-    }
+    public void remove() { }
 
 
     private T readFromPool(String path, String filename) {
