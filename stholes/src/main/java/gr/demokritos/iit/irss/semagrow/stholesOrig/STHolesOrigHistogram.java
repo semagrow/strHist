@@ -157,7 +157,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         // Find candidate hole
         R c = bucket.getBox().intersection(rect);
 
-        //todo
+        long Tb = countMatchingTuples(c, queryRecord);
 
         // Shrink candidate hole in such a way that b does not intersect
         // with the rectangles of bucket.getChildren();
@@ -191,7 +191,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
 
         // Collect candidate hole statistics
-        long freq= (long)Math.ceil(bucket.getFrequency()* (double)c.getVolume()/
+        long freq= (long)Math.ceil(Tb * (double)c.getVolume()/
                 bucket.getIntersectionWithRecVolume(rect));
 
         // Create candidate hole bucket
