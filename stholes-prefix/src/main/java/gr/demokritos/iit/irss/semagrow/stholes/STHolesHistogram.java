@@ -265,7 +265,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
     /**
      * finds the smallest box that encloses both {b1} and {b2} and
-     * does not intersect partially with any other child of their parent
+     * does not intersect partially with any other child of their parent.
+     * The box is expanded until all partial intersections are fully enclosed 
      * @param b1 sibling 1
      * @param b2 sibling 2
      * @return box after merge
@@ -532,8 +533,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
             return null;
         }
         R newBox = getSiblingSiblingBox(b1,b2);
-        // the smallest box that encloses both b1 and b2 but does not
-        // intersect partially with any other of bp
+        // the smallest box that encloses both b1 and b2 and also
+        // encloses any other buckets with which it intersects,
+        // even partially. 
 
 
         // I contains bp's children which are enclosed by bn box
