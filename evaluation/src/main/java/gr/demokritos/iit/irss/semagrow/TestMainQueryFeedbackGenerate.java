@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
@@ -67,14 +68,20 @@ public class TestMainQueryFeedbackGenerate {
 
         CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
         Iterator<RDFQueryRecord> iter = collection.iterator();
-
+        int i = 0;
         while (iter.hasNext()) {
            RDFQueryRecord rdfRq = iter.next();
-           if (rdfRq != null ) {
-               System.out.println(rdfRq.getQuery());
-               System.out.println("Actual: " + rdfRq.getQueryResult().getBindingSets().size());
-           }
+            System.out.println(i++);
+            for (BindingSet bs : rdfRq.getResultSet().getBindingSets()) {
+                if (bs.getBindings().get(1).getValue().length() < 32)
+                    System.out.println(">>>>> ");
+//                else
+//                    System.out.println(bs.getBindings().get(1).getValue());
+            }
+
         }
+
+//        System.out.println("http://aims.fao.org/aos/agrovoc/".length());
 
     }// main
 
