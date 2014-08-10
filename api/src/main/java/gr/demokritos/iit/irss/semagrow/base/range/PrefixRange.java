@@ -53,7 +53,7 @@ public class PrefixRange
 
             boolean b = false;
             for (String otherP : prefixList) {
-                if (otherP.startsWith(p)) {
+                if (p.startsWith(otherP)) {
                     b = true;
                     continue;
                 }
