@@ -6,6 +6,7 @@ import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
 import java.util.Iterator;
 
 /**
@@ -13,14 +14,20 @@ import java.util.Iterator;
  */
 public class TestHistogram {
 
-    private static String trainingPool = "src\\main\\resources\\training_pool\\";
-    private static String evaluationPool = "src\\main\\resources\\evaluation_pool\\";
-    private static String outputPath = "src\\main\\resources\\histograms\\training_pool\\";
+    static String trainingPool = "src\\main\\resources\\training_pool\\";
+    static String evaluationPool = "src\\main\\resources\\evaluation_pool\\";
+    static String trainingOutputPath = "src\\main\\resources\\histograms\\training_pool\\";
+    static String evaluationOutputPath = "src\\main\\resources\\histograms\\evaluation_pool\\";
+    static String trainingActualEstimates = "src\\main\\resources\\training_actual_estimates.txt";
+    static String evaluationActualEstimates = "src\\main\\resources\\evaluation_actual_estimates.txt";
+    static BufferedWriter bw;
 
     private static Logger logger = LoggerFactory.getLogger(TestHistogram.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         long start = System.currentTimeMillis();
+        bw = new BufferedWriter(new FileWriter(trainingActualEstimates));
+        bw.write("query_subject, evaluation, actual\n");
 
         HistogramIO histIO;
         CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
@@ -32,14 +39,20 @@ public class TestHistogram {
             RDFQueryRecord rdfRq = iter.next();
 
             h.refine(rdfRq);
-            System.out.println(rdfRq.getQuery());
-            System.out.println("Actual Cardinality: " + rdfRq.getQueryResult().getBindingSets().size());
 
-            // Write histogram to file.
-            histIO = new HistogramIO(outputPath + getSubjectLastSplit(rdfRq), h);
+            // Write actual and estimate query cardinality.
+            bw.write(rdfRq.getLogQuery().getQueryStatements().get(0).getValue() + ", " +
+                    h.estimate(rdfRq.getRectangle()) + ", " +
+                    rdfRq.getQueryResult().getBindingSets().size());
+            bw.newLine();
+
+            // Write histogram to a file.
+            histIO = new HistogramIO(trainingOutputPath + getSubjectLastSplit(rdfRq),
+                    ((STHolesHistogram) h));
             histIO.write();
         }
 
+        bw.close();
         long end = System.currentTimeMillis();
         System.out.println("Total Time: " + (double) (end - start) / 1000 + " sec.");
     }
