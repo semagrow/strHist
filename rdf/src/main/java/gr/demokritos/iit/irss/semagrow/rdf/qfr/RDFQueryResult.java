@@ -523,14 +523,14 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                         }
                     } else if (!value.contains("^^") && value.contains("http://")) {// URL
                             //todo: do i need this check above as well?
-                        objectRanges.add(new RDFLiteralRange(v));
+                        objectRanges.add(new RDFLiteralRange(value));
 
                     } else {// Plain Literal
-                        objectRanges.add(new RDFLiteralRange(v));
+                        objectRanges.add(new RDFLiteralRange(value));
                     }
 
                 } else {
-                    objectRanges.get(curRectangleIdx).expand(v);
+                    objectRanges.get(curRectangleIdx).expand(value);
                 }
             }
 
