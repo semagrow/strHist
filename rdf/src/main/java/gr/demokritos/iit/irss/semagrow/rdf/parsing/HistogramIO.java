@@ -53,7 +53,7 @@ public class HistogramIO<R extends Rectangle<R>> {
 		FileWriter fw;
 
         try {
-            fw = new FileWriter(getPath() + ".txt");
+            fw = new FileWriter(getPath()/* + ".txt"*/);
 
             // Write root bucket and its children via chained toJSON calls.
             fw.write(JsonWriter.formatJson(histogram.toJSON().toJSONString()));
