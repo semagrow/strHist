@@ -62,8 +62,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 			System.err.println("BindingSet Size: " + bindingSets.size());
 			
 			for (BindingSet bs : bindingSets) {				
-				
-				for (Binding b : bs.getBindings()) {
+
+                boolean contained = true;
+
+                for (Binding b : bs.getBindings()) {
 					// Find if the Binding is Subject or Predicate or Object.
 					int type = getBindingType(b);
 					
@@ -73,16 +75,16 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 //					System.out.println(">>>" + value);
 					switch (type) {
 					case 0:		// Subjects
-						if (((PrefixRange) rect.getRange(type)).contains(value)) 
-							frequency++;
-						
-						prefixSet.add(value);
+						if (! ((PrefixRange) rect.getRange(type)).contains(value))
+							contained = false;
+						else
+						    prefixSet.add(value);
 						break;
 					case 1:		// Predicates
-						if (((ExplicitSetRange) rect.getRange(type)).contains(value))
-							frequency++;
-						
-						predicateSet.add(value);
+						if (!((ExplicitSetRange) rect.getRange(type)).contains(value))
+							contained = false;
+						else
+						    predicateSet.add(value);
 						break;
 					case 2:		// Objects
 						// TODO: Change! 		
@@ -98,15 +100,20 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 												
 							if (typeURI.equals("int")) {
 								val = ValueFactoryImpl.getInstance()
-										.createLiteral(valueURI, XMLSchema.INTEGER);	
-								
-								objectIntegerSet.add(Integer.parseInt(valueURI));
+										.createLiteral(valueURI, XMLSchema.INTEGER);
+
+                                if (!((RDFLiteralRange) rect.getRange(type)).contains(val))
+                                    contained = false;
+                                else
+								    objectIntegerSet.add(Integer.parseInt(valueURI));
 								
 							} else if (typeURI.equals("long")) {
 								val = ValueFactoryImpl.getInstance()
 										.createLiteral(valueURI, XMLSchema.LONG);
-								
-								objectLongSet.add(Long.parseLong(valueURI));
+                                if (!((RDFLiteralRange) rect.getRange(type)).contains(val))
+                                    contained = false;
+								else
+                                    objectLongSet.add(Long.parseLong(valueURI));
 								
 							} else if (typeURI.equals("dateTime")) {
 								
@@ -118,12 +125,12 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 								catch (ParseException e) {e.printStackTrace();}
 								
 								if (date != null) {
-									 if (((RDFLiteralRange) rect.getRange(type))
+									 if (!((RDFLiteralRange) rect.getRange(type))
 											.contains(new RDFLiteralRange(date, date))) {
-										 frequency++;
+										 contained = false;
 									 }
-									 
-									 objectDateSet.add(date);
+								     else
+									    objectDateSet.add(date);
 									
 									break;								
 								} else 
@@ -134,25 +141,35 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 						} else if (!value.contains("^^") && value.contains("http://")) {// URL							
 							val = ValueFactoryImpl.getInstance()
 									.createURI(value);
-							
-							objectStringSet.add(value);
+
+                            if (!((RDFLiteralRange) rect.getRange(type)).contains(val))
+                                contained = false;
+                            else
+							    objectStringSet.add(value);
 							
 						} else {// Plain Literal
 							val = ValueFactoryImpl.getInstance()
 									.createLiteral(value, XMLSchema.STRING);
-							
-							objectStringSet.add(value);							
-						}					
-													
-						if (((RDFLiteralRange) rect.getRange(type)).contains(val)) 
-							frequency++;
+
+                            if (!((RDFLiteralRange) rect.getRange(type)).contains(val))
+                                contained = false;
+							else
+                                objectStringSet.add(value);
+						}
 						
 					default:
 //						System.err.println("Not a valid Binding.");
 						break;
 					}
 
+                    if (!contained)
+                        continue;
+
 				}// for
+
+                if (contained)
+                    frequency++;
+
 			}// for
 		}// if
 		else
