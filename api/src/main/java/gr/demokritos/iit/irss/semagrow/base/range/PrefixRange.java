@@ -48,17 +48,23 @@ public class PrefixRange
         //for estimation
         if (range.isInfinite()) return true;
 
-        for (String p : prefixList) {
+        boolean contained = true;
+        for (String p : range.getPrefixList()) {
 
-            for (String otherP : range.getPrefixList()) {
-
+            boolean b = false;
+            for (String otherP : prefixList) {
                 if (otherP.startsWith(p)) {
-                    return true;
+                    b = true;
+                    continue;
                 }
             }
+            if (!b)
+                return false;
+            else
+                contained = contained && b;
         }
 
-        return false;
+        return contained;
     }
 
    //Tested

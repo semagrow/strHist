@@ -1,9 +1,10 @@
 package gr.demokritos.iit.irss.semagrow;
 
-import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ public class TestHistogram {
     static String evaluationActualEstimates = "src/main/resource/evaluation_actual_estimates.txt";
     static BufferedWriter bw;
 
+    private static Logger logger = LoggerFactory.getLogger(TestHistogram.class);
 
     public static void main(String[] args) throws IOException {
         long start = System.currentTimeMillis();

@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow;
+package gr.demokritos.iit.irss.semagrow.tools;
 
 import info.aduna.iteration.Iterations;
 import org.openrdf.model.Statement;
