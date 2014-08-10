@@ -162,6 +162,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
                     //bucketsNum += 1;
                     //rootN.addChild(root);
                    // root = rootN;
+                    statsN = new Stat(freqN, distinctN);
                     root.setBox(boxN);
                     root.setStatistics(statsN);
 
