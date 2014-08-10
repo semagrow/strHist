@@ -24,20 +24,19 @@ import java.util.*;
  */
 public class QueryFeedbackGenerator {
 
-    private String uniqueSubjectData, filteredDataFolder, outputDataFolder, natineStoreFolder;
+    private String uniqueSubjectData, filteredDataFolder, natineStoreFolder;
     private int uniqueSubjectFileRows;
     public ArrayList<String> savedPrefixes;
     private Repository nativeRep;
     private RepositoryConnection conn;
 
 
-    public QueryFeedbackGenerator(String uniqueSubjectData, String filteredDataFolder, String outputDataFolder,
-                                  String nativeStoreFolder) throws RepositoryException {
+    public QueryFeedbackGenerator(String uniqueSubjectData, String filteredDataFolder/*,
+                                  String nativeStoreFolder*/) throws RepositoryException {
 
         this.uniqueSubjectData = uniqueSubjectData;
         this.filteredDataFolder = filteredDataFolder;
-        this.outputDataFolder = outputDataFolder;
-        this.natineStoreFolder = nativeStoreFolder;
+//        this.natineStoreFolder = nativeStoreFolder;
 
         savedPrefixes = new ArrayList<String>();
 
@@ -45,11 +44,11 @@ public class QueryFeedbackGenerator {
         uniqueSubjectFileRows = countLineNumber(uniqueSubjectData);
         System.out.println("Total File Rows: " + uniqueSubjectFileRows);
 
-        // Create a local Sesame Native Store.
-        System.out.println("Initializing Native Store...");
-        nativeRep = new SailRepository(new NativeStore(new File(nativeStoreFolder)));
-        nativeRep.initialize();
-        System.out.println("Native Store successfully initialized.");
+//        // Create a local Sesame Native Store.
+//        System.out.println("Initializing Native Store...");
+//        nativeRep = new SailRepository(new NativeStore(new File(nativeStoreFolder)));
+//        nativeRep.initialize();
+//        System.out.println("Native Store successfully initialized.");
     }// Constructor
 
 
@@ -153,7 +152,7 @@ public class QueryFeedbackGenerator {
         ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
 
             try {
-                conn = nativeRep.getConnection();
+//                conn = nativeRep.getConnection();
 
                 if (regex) {// Does not use the native store, because regex is too slow.
 
@@ -169,13 +168,14 @@ public class QueryFeedbackGenerator {
                         s = statements.next();
 
                         BindingSet bs = new BindingSet();
+                        bs.getBindings().add(new Binding("subject", s.getSubject().toString()));
                         bs.getBindings().add(new Binding("predicate", s.getPredicate().toString()));
                         bs.getBindings().add(new Binding("object", s.getObject().stringValue()));
                         bindingSets.add(bs);
                     }
                 }
 
-                conn.close();
+//                conn.close();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -215,6 +215,7 @@ public class QueryFeedbackGenerator {
             if (currentSubject.startsWith(subject)) {// If yes, add the predicate and object of this tuple to the BindingSet.
                 BindingSet bs = new BindingSet();
 
+                bs.getBindings().add(new Binding("subject", cleanString(splits[0])));
                 bs.getBindings().add(new Binding("predicate", cleanString(splits[1])));
                 bs.getBindings().add(new Binding("object", cleanString(splits[2])));
 
