@@ -2,6 +2,8 @@ package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ public class QueryPool {
 
     private String trainingPoolPath, evaluationPoolPath;
 
+    private Logger logger = LoggerFactory.getLogger(QueryPool.class);
 
     public QueryPool(String trainingPoolPath, String evaluationPoolPath) {
         this.trainingPoolPath = trainingPoolPath;
@@ -27,9 +30,9 @@ public class QueryPool {
 
         File[] files = new File(trainingPoolPath).listFiles();
 
-        System.out.println("Reading files...");
+        logger.info("Reading files...");
         for (File f : files) {
-            System.out.println(f.getName());
+            logger.info("Reading file " + f.getName());
             queryRecords.add(readFromPool(trainingPoolPath, f.getName()));
         }
 
@@ -42,9 +45,9 @@ public class QueryPool {
 
         File[] files = new File(evaluationPoolPath).listFiles();
 
-        System.out.println("Reading files...");
+        logger.info("Reading files...");
         for (File f : files) {
-            System.out.println(f.getName());
+            logger.info("Reading file " + f.getName());
             queryRecords.add(readFromPool(evaluationPoolPath, f.getName()));
         }
 

@@ -1,9 +1,10 @@
 package gr.demokritos.iit.irss.semagrow;
 
-import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
@@ -12,10 +13,11 @@ import java.util.Iterator;
  */
 public class TestHistogram {
 
-    static String trainingPool = "src\\main\\resources\\training_pool\\";
-    static String evaluationPool = "src\\main\\resources\\evaluation_pool\\";
-    static String outputPath = "src\\main\\resources\\histograms\\training_pool\\";
+    private static String trainingPool = "src\\main\\resources\\training_pool\\";
+    private static String evaluationPool = "src\\main\\resources\\evaluation_pool\\";
+    private static String outputPath = "src\\main\\resources\\histograms\\training_pool\\";
 
+    private static Logger logger = LoggerFactory.getLogger(TestHistogram.class);
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
@@ -35,8 +37,7 @@ public class TestHistogram {
             iter.remove();
 
             // Write histogram to file.
-            histIO = new HistogramIO(outputPath + getSubjectLastSplit(rdfRq),
-                    ((STHolesHistogram) h));
+            histIO = new HistogramIO(outputPath + getSubjectLastSplit(rdfRq), h);
             histIO.write();
         }
 
