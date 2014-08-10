@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.Binding;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
@@ -27,18 +28,16 @@ public class TestMainQueryFeedbackGenerate {
 
         String uniqueSubjectData = args[0];
         String filteredDataFolder = args[1];
-        String outputDataFolder = args[2];
-        String nativeStoreFolder = args[3];
-        String trainingPool = args[4];
+        String trainingPool = args[2];
 
 
-        QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder,
-                outputDataFolder, nativeStoreFolder);
+        QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder/*,
+                nativeStoreFolder*/);
 
         QueryRecord qr;
 
         // --- Training Pool Generator
-        for (int i=0; i<50; i++) {
+        for (int i=0; i<1; i++) {
             qr = qfg.generateTrainingSet();
             System.out.println(qr.getQuery());
 
@@ -111,6 +110,13 @@ public class TestMainQueryFeedbackGenerate {
      * @param filename The last split of the prefix
      */
     private static void writeToPool(String path, String filename, RDFQueryRecord rdfQr) {
+
+        writeBinary(path, filename, rdfQr);
+        writeASCII(path, filename, rdfQr);
+    }// writeToPool
+
+
+    private static void writeBinary(String path, String filename, RDFQueryRecord rdfQr) {
         File file = new File(path + filename);
         ObjectOutputStream oos;
 
@@ -129,8 +135,35 @@ public class TestMainQueryFeedbackGenerate {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
-    }// writeToPool
+    }// writeBinary
+
+
+    private static void writeASCII(String path, String filename, RDFQueryRecord rdfQr) {
+        File file = new File(path + filename + ".txt");
+        BufferedWriter bw;
+
+        try {
+            bw = new BufferedWriter(new FileWriter(file));
+
+            bw.write("Query Statement: ");
+            bw.write(rdfQr.getQuery());
+            bw.newLine();
+            bw.newLine();
+            bw.write("Query Bindings: \n");
+            ArrayList<BindingSet> bsSets = rdfQr.getResultSet().getBindingSets();
+
+            for (BindingSet bs : bsSets) {
+                bw.write(bs.getBindings().get(0).getValue() + ", " +
+                        bs.getBindings().get(1).getValue() + ", " +
+                        bs.getBindings().get(2).getValue());
+                bw.newLine();
+            }
+
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }// writeASCII
 
 }
