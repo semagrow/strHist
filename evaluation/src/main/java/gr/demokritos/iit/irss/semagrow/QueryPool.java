@@ -22,7 +22,7 @@ public class QueryPool {
     }// Constructor
 
 
-    public ArrayList<RDFQueryRecord> getTrainingQueryRecords() {
+    public Iterator<RDFQueryRecord> getTrainingQueryRecords() {
         ArrayList<RDFQueryRecord> queryRecords = new ArrayList<RDFQueryRecord>();
 
         File[] files = new File(trainingPoolPath).listFiles();
@@ -33,11 +33,11 @@ public class QueryPool {
             queryRecords.add(readFromPool(trainingPoolPath, f.getName()));
         }
 
-        return queryRecords;
+        return queryRecords.iterator();
     }// getTrainingQueryRecords
 
 
-    public ArrayList<RDFQueryRecord> getEvaluationQueryRecords() {
+    public Iterator<RDFQueryRecord> getEvaluationQueryRecords() {
         ArrayList<RDFQueryRecord> queryRecords = new ArrayList<RDFQueryRecord>();
 
         File[] files = new File(evaluationPoolPath).listFiles();
@@ -48,7 +48,7 @@ public class QueryPool {
             queryRecords.add(readFromPool(evaluationPoolPath, f.getName()));
         }
 
-        return queryRecords;
+        return queryRecords.iterator();
     }// getTrainingQueryRecords
 
 
