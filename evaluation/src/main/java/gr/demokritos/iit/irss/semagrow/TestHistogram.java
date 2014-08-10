@@ -14,9 +14,9 @@ import java.util.Iterator;
  */
 public class TestHistogram {
 
-    static String trainingPool = "src/main/resources/training_pool/";
-    static String evaluationPool = "src/main/resources/evaluation_pool/";
-    static String trainingOutputPath = "src/main/resources/histograms/training_pool/";
+    static String trainingPool = "src/main/resources/training_pool/b1/";
+    static String evaluationPool = "src/main/resources/evaluation_pool/b1/";
+    static String trainingOutputPath = "src/main/resources/histograms/training_pool/b1/";
     static String evaluationOutputPath = "src/main/resources/histograms/evaluation_pool/";
     static String trainingActualEstimates = "src/main/resources/training_actual_estimates.txt";
     static String evaluationActualEstimates = "src/main/resources/evaluation_actual_estimates.txt";
