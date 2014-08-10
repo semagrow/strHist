@@ -34,12 +34,17 @@ public class TestHistogram {
         Iterator<RDFQueryRecord> iter = collection.iterator();
 
         STHolesHistogram h = new STHolesHistogram();
+        // TODO: Caution! Remove it after debuggin
+        h.setRoot(HistogramIO.read("src/main/resources/IT19")); // Load histogram manually!
 
         while (iter.hasNext()) {
             RDFQueryRecord rdfRq = iter.next();
 
-            h.refine(rdfRq);
+            System.out.println(">>>" + rdfRq.getQuery());
 
+
+            h.refine(rdfRq);
+            System.out.println("<<<");
             // Write histogram to a file.
             histIO = new HistogramIO(trainingOutputPath + getSubjectLastSplit(rdfRq),
                     ((STHolesHistogram) h));
