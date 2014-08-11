@@ -191,7 +191,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
 
         // Collect candidate hole statistics
-        long freq= (long)Math.ceil(Tb * (double)c.getVolume()/
+        long freq= (long)Math.ceil(Tb * ((double)c.getVolume())/
                 bucket.getIntersectionWithRecVolume(rect));
 
         // Create candidate hole bucket
@@ -487,7 +487,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         STHolesOrigBucket<R> bn = new STHolesOrigBucket<R>(newBox, newFreq, null, newParent);
 
         long penalty = (long)Math.ceil(Math.abs(bp.getFrequency() - bn.getFrequency() *
-                (double) bp.getVolume() / bn.getVolume()));
+                ((double) bp.getVolume()) / bn.getVolume()));
 
         AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long> res =
                 new AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long>(bn, penalty);
@@ -539,7 +539,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
         // Set statistics
         long newFrequency = (long)Math.ceil(b1.getFrequency() + b2.getFrequency()
-                + bp.getFrequency()* (double) vold/bp.getVolume());
+                + bp.getFrequency()* ((double) vold)/bp.getVolume());
 
 
         //Add children
@@ -560,12 +560,12 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
         long penalty;
         penalty = (long) Math.ceil(
-                Math.abs( bn.getFrequency()* (double) vold/bn.getVolume() -
-        bp.getFrequency()*(double) vold/bp.getVolume())
+                Math.abs( bn.getFrequency()* ((double) vold)/bn.getVolume() -
+        bp.getFrequency()*((double) vold)/bp.getVolume())
                 + Math.abs( b1.getFrequency() - bn.getFrequency()*
-                        (double) b1.getVolume()/bn.getVolume())
+                        ((double) b1.getVolume())/bn.getVolume())
                 + Math.abs(b2.getFrequency() - bn.getFrequency()*
-                        (double) b2.getVolume()/bn.getVolume()));
+                        ((double) b2.getVolume())/bn.getVolume()));
 
         AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long> res =
                 new AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long>(bn, penalty);

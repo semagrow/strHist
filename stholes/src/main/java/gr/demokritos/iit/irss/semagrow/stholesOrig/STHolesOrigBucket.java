@@ -217,7 +217,7 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
 
                 double estimate;
 
-                estimate = (double)this.getIntersectionWithRecVolume(rec) / this.getVolume() * this.frequency;
+                estimate = ((double)this.getIntersectionWithRecVolume(rec)) / this.getVolume() * this.frequency;
 
                 for (STHolesOrigBucket<R> bc : children) {
                     estimate += bc.getEstimate(rec);
@@ -238,7 +238,10 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
 
         for (STHolesOrigBucket<R> bc : children) {
 
-            v -= bc.box.intersection(rec).getVolume();
+            if (bc.box.intersects(rec)) {
+
+                v -= bc.box.intersection(rec).getVolume();
+            }
         }
 
         return v;
