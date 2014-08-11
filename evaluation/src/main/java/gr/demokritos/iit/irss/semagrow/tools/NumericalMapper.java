@@ -39,17 +39,16 @@ public class NumericalMapper {
         try {
             BufferedReader br = new BufferedReader(new FileReader(sortedFilePath));
             String line = "";
-            int counter = 1;
+//            int counter = 1;
 
             while ((line = br.readLine()) != null) {
 
                 line = line.replace("<", "").replace(">", "").trim();
                 array.add(line);
 
-
-                // TODO: Remove after debug. Counter too.
-                if (counter++ == 2970959 / 5)
-                    break;
+//                // TODO: Comment it after debug. Counter too.
+//                if (counter++ == 2970959 / 5)
+//                    break;
             }
 
             br.close();
@@ -74,9 +73,9 @@ public class NumericalMapper {
 
                 counter++;
 
-                // TODO: Remove after debug. Counter too.
-                if (counter == 2970959 / 5)
-                    break;
+//                // TODO: Comment it after debug.
+//                if (counter == 2970959 / 5)
+//                    break;
             }
 
             br.close();
