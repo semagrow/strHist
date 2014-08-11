@@ -28,9 +28,9 @@ public class RDFtoNumQueryConverter {
     public static void main(String[] args) {
 
 
-//        uniqueSubjectData = args[0];
-//        trainingRdfPool = args[1];
-//        trainingNumPool = args[2];
+        uniqueSubjectData = args[0];
+        trainingRdfPool = args[1];
+        trainingNumPool = args[2];
 //        evaluationPool = args[1];
 //        evaluationNumPool = args[2];
 
