@@ -15,6 +15,7 @@ import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.json.simple.JSONArray;
@@ -41,8 +42,13 @@ public class HistogramIO<R extends Rectangle<R>> {
     }
 
 
-    public static STHolesBucket read(String path) {
-        return readJSON(path);
+    public static RDFSTHolesHistogram
+           read(String path) {
+
+        STHolesBucket<RDFRectangle> root = readJSON(path);
+        RDFSTHolesHistogram h = new RDFSTHolesHistogram();
+        h.setRoot(root);
+        return h;
     }
 
 
@@ -65,11 +71,11 @@ public class HistogramIO<R extends Rectangle<R>> {
 	}
 
 
-    public static STHolesBucket readJSON(String path) {
+    public static STHolesBucket<RDFRectangle> readJSON(String path) {
         JSONParser parser = new JSONParser();
         Object obj;
         JSONObject jsonObject;
-        STHolesBucket rootBucket = null;
+        STHolesBucket<RDFRectangle> rootBucket = null;
 
         try {
             obj = parser.parse(new FileReader(path));
@@ -92,8 +98,8 @@ public class HistogramIO<R extends Rectangle<R>> {
     }// readJSON
 
 
-    private static STHolesBucket getBucket(JSONObject b) {
-        STHolesBucket bucket = null;
+    private static STHolesBucket<RDFRectangle> getBucket(JSONObject b) {
+        STHolesBucket<RDFRectangle> bucket = null;
         JSONObject jsonObject;
         RDFRectangle box;
         Stat statistics;
@@ -106,7 +112,7 @@ public class HistogramIO<R extends Rectangle<R>> {
         statistics = getStatistics(b.get("statistics"));
 
         // Instantiate root Bucket
-        bucket = new STHolesBucket(box, statistics);
+        bucket = new STHolesBucket<RDFRectangle>(box, statistics);
 
         // Get children buckets and set their parent
         bucket.getChildren().addAll(
@@ -116,11 +122,11 @@ public class HistogramIO<R extends Rectangle<R>> {
     }// getBucket
 
 
-    private static Collection<STHolesBucket> getChildren(Object childrenObj, STHolesBucket parent) {
-        Collection<STHolesBucket> children = new ArrayList<STHolesBucket>();
+    private static Collection<STHolesBucket<RDFRectangle>> getChildren(Object childrenObj, STHolesBucket parent) {
+        Collection<STHolesBucket<RDFRectangle>> children = new ArrayList<STHolesBucket<RDFRectangle>>();
         JSONArray array = (JSONArray)childrenObj;
         JSONObject temp;
-        STHolesBucket tempBucket;
+        STHolesBucket<RDFRectangle> tempBucket;
 
         Iterator<JSONObject> iterator = array.iterator();
 

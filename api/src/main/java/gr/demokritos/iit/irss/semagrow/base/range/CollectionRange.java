@@ -37,4 +37,12 @@ public class CollectionRange<T> implements Range<T> {
 
     public boolean isUnit() { return (ranges.size() == 1 && ranges.iterator().next().isUnit()); }
 
+    public boolean isEmpty() {
+        boolean nonempty = true;
+
+        for (Range<T> r : ranges)
+            nonempty = !r.isEmpty();
+
+        return !nonempty;
+    }
 }

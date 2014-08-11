@@ -78,7 +78,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
 
         List<R> rects = new ArrayList<R>();
-        if (queryRecord.getRectangle().hasInfinite()) {
+        if (queryRecord.getRectangle().isInfinite()) {
             rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
         } else {
             rects.add(queryRecord.getRectangle());

@@ -164,18 +164,20 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         this.subjectRange = subjectRange;
     }
 
-    public boolean hasInfinite() {
+    public boolean isInfinite() {
 
-        boolean res = ((PrefixRange) getRange(0)).isInfinite() ||
-                ((ExplicitSetRange<String>) getRange(1)).isInfinite() ||
-                ((RDFLiteralRange) getRange(2)).isInfinite();
-        return res;
+        return subjectRange.isInfinite() ||
+               predicateRange.isInfinite() ||
+               objectRange.isInfinite();
     }
-
 
     public boolean isMergeable(RDFRectangle rec) {
 
         return objectRange.hasSameType((RDFLiteralRange) rec.getRange(2));
+    }
+
+    public boolean isEmpty() {
+        return subjectRange.isEmpty() || predicateRange.isEmpty() || objectRange.isEmpty();
     }
 
     public String toString() {
@@ -187,7 +189,6 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 
         return res;
     }
-
 
     public JSONObject toJSON() {
         JSONObject rectangle = new JSONObject();
@@ -224,6 +225,6 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         RDFRectangle rect3 = new RDFRectangle(subjectRange, predicateRange, objectRange3);
         System.out.println(rect + " and " + rect3 + " are mergeable: " + rect.isMergeable(rect3));
 
-        System.out.println(rect.hasInfinite());
+        System.out.println(rect.isInfinite());
     }
 }

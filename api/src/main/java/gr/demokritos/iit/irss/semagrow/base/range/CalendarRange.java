@@ -177,6 +177,10 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         return begin.equals(end);
     }
 
+    public boolean isEmpty() {
+        return begin.compareTo(end) == -1;
+    }
+
     //Tested
     public long getLength() {
     	Calendar calendarBegin = new GregorianCalendar();
