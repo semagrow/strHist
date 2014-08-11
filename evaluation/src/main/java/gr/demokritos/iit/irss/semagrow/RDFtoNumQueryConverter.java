@@ -19,8 +19,8 @@ import java.util.Random;
 public class RDFtoNumQueryConverter {
 
     public static String uniqueSubjectData = "C:/Users/Nick/Downloads/sorted/sorted";
-    static String trainingPool = "src/main/resources/training_pool/b1/rdf/";
-    static String evaluationPool = "src/main/resources/evaluation_pool/b1/rdf/";
+    static String trainingRdfPool = "src/main/resources/training_pool/b1/rdf/";
+    static String evaluationRdfPool = "src/main/resources/evaluation_pool/b1/rdf/";
     static String trainingNumPool = "src/main/resources/training_pool/b1/num/";
     static String evaluationNumPool = "src/main/resources/evaluation_pool/b1/num/";
     static NumericalMapper numericalMapper;
@@ -29,7 +29,7 @@ public class RDFtoNumQueryConverter {
 
 
         uniqueSubjectData = args[0];
-        trainingPool = args[1];
+        trainingRdfPool = args[1];
         trainingNumPool = args[2];
 //        evaluationPool = args[1];
 //        evaluationNumPool = args[2];
@@ -39,14 +39,14 @@ public class RDFtoNumQueryConverter {
         System.out.println("Loading index collections...\n");
         numericalMapper = new NumericalMapper(uniqueSubjectData);
 
-        
+
 
         /*
             Convert Training Pool
         */
-        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
+        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingRdfPool);
         Iterator<RDFQueryRecord> iter = collection.iterator();
-        System.out.println("Training Pool Conversion: " + trainingPool);
+        System.out.println("Training Pool Conversion: " + trainingRdfPool);
 
         while (iter.hasNext()) {
 
@@ -66,9 +66,9 @@ public class RDFtoNumQueryConverter {
         /*
               Convert Evaluation Pool
         */
-//        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(evaluationPool);
+//        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(evaluationRdfPool);
 //        Iterator<RDFQueryRecord> iter = collection.iterator();
-//        System.out.println("Evaluation Pool Conversion: " + evaluationPool);
+//        System.out.println("Evaluation Pool Conversion: " + evaluationRdfPool);
 //
 //        while (iter.hasNext()) {
 //
