@@ -96,18 +96,20 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
     public static <R extends RectangleWithVolume<R>>
     void merge(STHolesOrigBucket<R> bucket1,
                STHolesOrigBucket<R> bucket2,
-               STHolesOrigBucket<R> mergeBucket)
+               STHolesOrigBucket<R> mergeBucket,
+               STHolesOrigHistogram<R> h)
     {
         if (bucket2.getParent() == bucket1) { //or equals
-            parentChildMerge(bucket1, bucket2, mergeBucket);
+            parentChildMerge(bucket1, bucket2, mergeBucket, h);
         }
         else if (bucket2.getParent() == bucket1.getParent()) {
-            siblingSiblingMerge(bucket1, bucket2, mergeBucket);
+            siblingSiblingMerge(bucket1, bucket2, mergeBucket, h);
         }
     }
 
     public static <R extends RectangleWithVolume<R>> void
-    parentChildMerge(STHolesOrigBucket<R> bp, STHolesOrigBucket<R> bc, STHolesOrigBucket<R> bn) {
+    parentChildMerge(STHolesOrigBucket<R> bp, STHolesOrigBucket<R> bc, STHolesOrigBucket<R> bn,
+                     STHolesOrigHistogram<R> h) {
 
         //Merge buckets b1, b2 into bn
         STHolesOrigBucket<R> bpp = bp.getParent();
@@ -128,7 +130,7 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
 
         if (bpp == null) {
             //bp is root
-            bp = bn;
+            h.setRoot(bn);
 
         } else {
 
@@ -136,12 +138,15 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
             bpp.addChild(bn);
         }
 
+        h.setBucketsNum(h.getBucketsNum() - 1);
+
     }
 
     public static <R extends RectangleWithVolume<R>>
     void siblingSiblingMerge(STHolesOrigBucket<R> b1,
                              STHolesOrigBucket<R> b2,
-                             STHolesOrigBucket<R> bn)
+                             STHolesOrigBucket<R> bn,
+                             STHolesOrigHistogram<R> h)
     {
         //todo: throw exception if they are not siblings
 
@@ -156,14 +161,14 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
             long newFreq = newParent.frequency + b1.frequency;
             STHolesOrigBucket<R> parentN = newParent.getParent();
             STHolesOrigBucket<R> bn1 = new STHolesOrigBucket<R>(newBox, newFreq, null, parentN);
-            merge(newParent, b1, bn1);
+            merge(newParent, b1, bn1, h);
             //2nd merge
             STHolesOrigBucket<R> bp = b2.parent;
             newBox = bp.box;
             newFreq = bp.frequency + b2.frequency;
             parentN = bp.getParent();
             STHolesOrigBucket<R> bn2 = new STHolesOrigBucket<R>(newBox, newFreq, null, parentN);
-            merge(bp, b2, bn2);
+            merge(bp, b2, bn2, h);
 
             return;
         }
@@ -202,6 +207,8 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
             bi.setParent(bn);
             newParent.removeChild(bi);
         }
+
+        h.setBucketsNum(h.getBucketsNum() - 1);
     }
 
     public double getEstimate(R rec) {

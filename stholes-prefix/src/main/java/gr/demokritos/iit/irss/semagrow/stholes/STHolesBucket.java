@@ -86,10 +86,11 @@ public class STHolesBucket<R extends Rectangle> {
     public static <R extends Rectangle<R>> 
         void merge(STHolesBucket<R> bucket1,
                    STHolesBucket<R> bucket2,
-                   STHolesBucket<R> mergeBucket)
+                   STHolesBucket<R> mergeBucket,
+                   STHolesHistogram<R> h)
     {
         if (bucket2.getParent() == bucket1) { //or equals
-            parentChildMerge(bucket1, bucket2, mergeBucket);
+            parentChildMerge(bucket1, bucket2, mergeBucket, h);
         }
         else if (bucket2.getParent() == bucket1.getParent()) {
             siblingSiblingMerge(bucket1, bucket2, mergeBucket);
@@ -97,7 +98,8 @@ public class STHolesBucket<R extends Rectangle> {
     }
 
     public static <R extends Rectangle<R>> void
-        parentChildMerge(STHolesBucket<R> bp, STHolesBucket<R> bc, STHolesBucket<R> bn) {
+        parentChildMerge(STHolesBucket<R> bp, STHolesBucket<R> bc, STHolesBucket<R> bn,
+                         STHolesHistogram<R> h) {
 
         //Merge buckets b1, b2 into bn
         STHolesBucket<R> bpp = bp.getParent();
@@ -119,7 +121,7 @@ public class STHolesBucket<R extends Rectangle> {
 
         if (bpp == null) {
             //bp is root
-            bp = bn;
+            h.setRoot(bn);
 
         } else {
 
