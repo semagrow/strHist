@@ -418,7 +418,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
              STHolesBucket<R> b2 = bestMerge.getB2();
              STHolesBucket<R> bn = bestMerge.getBn();
 
-            STHolesBucket.merge(b1, b2, bn);
+            STHolesBucket.merge(b1, b2, bn, this);
             bucketsNum -= 1;
         }
     }

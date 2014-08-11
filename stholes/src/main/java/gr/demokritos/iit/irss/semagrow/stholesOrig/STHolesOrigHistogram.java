@@ -121,7 +121,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                 //System.out.println("--------------------------------------------------");
                 STHolesOrigBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
                 //System.out.println("<<<>>> Hole: " + hole);
-                if (isInaccurateEstimation(hole))
+                if  (!hole.getBox().isEmpty() && isInaccurateEstimation(hole))
                     drillHole(bucket, hole);
             }
         }
@@ -191,7 +191,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
 
         // Collect candidate hole statistics
-        long freq= (long)Math.ceil(Tb * (double)c.getVolume()/
+        long freq= (long)Math.ceil(Tb * ((double)c.getVolume())/
                 bucket.getIntersectionWithRecVolume(rect));
 
         // Create candidate hole bucket
@@ -215,6 +215,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         participants.clear();
 
         for (STHolesOrigBucket<R> bi : bucket.getChildren()) {
+
             if ((c.intersects(bi.getBox())) && (!c.contains(bi.getBox()))) {
 
                 participants.add(bi);
@@ -323,6 +324,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
      */
     private void drillHole(STHolesOrigBucket<R> parentBucket, STHolesOrigBucket<R> candidateHole)
     {
+
         if (parentBucket.getBox().equals(candidateHole.getBox())) {
 
             parentBucket.setFrequency(candidateHole.getFrequency());
@@ -335,19 +337,34 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
             long newFreq = parentBucket.getFrequency() + candidateHole.getFrequency();
             STHolesOrigBucket<R> parentN = parentBucket.getParent();
             STHolesOrigBucket<R> bn = new STHolesOrigBucket<R>(newBox, newFreq, null, parentN);
-            STHolesOrigBucket.merge(parentBucket, candidateHole, bn);
+            STHolesOrigBucket.merge(parentBucket, candidateHole, bn, this);
+
+            System.out.println("Parent child merge in drillHole!!!");
+
+            drillHole(parentBucket, candidateHole);
         }
         else {
+
+            Collection<STHolesOrigBucket<R>> toBeRemoved = new ArrayList<STHolesOrigBucket<R>>();
+
+
 
             for (STHolesOrigBucket<R> bc : parentBucket.getChildren()) {
 
                 if (candidateHole.getBox().contains(bc.getBox())){
 
-                    bc.setParent(candidateHole);
+                    candidateHole.addChild(bc);
+                    toBeRemoved.add(bc);
                 }
             }
 
+            for (STHolesOrigBucket<R> bc : toBeRemoved) {
+
+                parentBucket.removeChild(bc);
+            }
+
             parentBucket.addChild(candidateHole);
+
             parentBucket.setFrequency(Math.max(0,parentBucket.getFrequency() -
                     candidateHole.getFrequency()));
 
@@ -370,8 +387,8 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
             STHolesOrigBucket<R> b2 = bestMerge.getB2();
             STHolesOrigBucket<R> bn = bestMerge.getBn();
 
-            STHolesOrigBucket.merge(b1, b2, bn);
-            bucketsNum -= 1;
+            STHolesOrigBucket.merge(b1, b2, bn, this);
+            //bucketsNum -= 1;
         }
     }
 
@@ -472,7 +489,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         STHolesOrigBucket<R> bn = new STHolesOrigBucket<R>(newBox, newFreq, null, newParent);
 
         long penalty = (long)Math.ceil(Math.abs(bp.getFrequency() - bn.getFrequency() *
-                (double) bp.getVolume() / bn.getVolume()));
+                ((double) bp.getVolume()) / bn.getVolume()));
 
         AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long> res =
                 new AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long>(bn, penalty);
@@ -524,7 +541,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
         // Set statistics
         long newFrequency = (long)Math.ceil(b1.getFrequency() + b2.getFrequency()
-                + bp.getFrequency()* (double) vold/bp.getVolume());
+                + bp.getFrequency()* ((double) vold)/bp.getVolume());
 
 
         //Add children
@@ -545,12 +562,12 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
         long penalty;
         penalty = (long) Math.ceil(
-                Math.abs( bn.getFrequency()* (double) vold/bn.getVolume() -
-        bp.getFrequency()*(double) vold/bp.getVolume())
+                Math.abs( bn.getFrequency()* ((double) vold)/bn.getVolume() -
+        bp.getFrequency()*((double) vold)/bp.getVolume())
                 + Math.abs( b1.getFrequency() - bn.getFrequency()*
-                        (double) b1.getVolume()/bn.getVolume())
+                        ((double) b1.getVolume())/bn.getVolume())
                 + Math.abs(b2.getFrequency() - bn.getFrequency()*
-                        (double) b2.getVolume()/bn.getVolume()));
+                        ((double) b2.getVolume())/bn.getVolume()));
 
         AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long> res =
                 new AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long>(bn, penalty);
@@ -571,5 +588,10 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
     public void setRoot(STHolesOrigBucket<R> root) {
         this.root = root;
+    }
+
+    public void setBucketsNum(long bucketsNum) {
+
+        this.bucketsNum = bucketsNum;
     }
 }
