@@ -16,7 +16,13 @@ public class CustomIterator<T> implements Iterator<T> {
 
     public CustomIterator(String poolPath) {
         this.poolPath = poolPath;
-        files = new ArrayList<File>(Arrays.asList(new File(poolPath).listFiles()));
+
+        // Filter ascii from binary files to accept only the second ones.
+        files = new ArrayList<File>(Arrays.asList(new File(poolPath).listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return !name.toLowerCase().endsWith(".txt");
+            }
+        })));
     }
 
 

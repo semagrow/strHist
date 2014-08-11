@@ -19,23 +19,31 @@ import java.util.Random;
 public class RDFtoNumQueryConverter {
 
     public static String uniqueSubjectData = "C:/Users/Nick/Downloads/sorted/sorted";
-    static String trainingPool = "src/main/resources/training_pool/b1/";
-    static String evaluationPool = "src/main/resources/evaluation_pool/b1/";
-    static String trainingNumPool = "src/main/resources/training_pool/num/b1/";
-    static String evaluationNumPool = "src/main/resources/evaluation_pool/num/b1/";
+    static String trainingPool = "src/main/resources/training_pool/b1/rdf/";
+    static String evaluationPool = "src/main/resources/evaluation_pool/b1/rdf/";
+    static String trainingNumPool = "src/main/resources/training_pool/b1/num/";
+    static String evaluationNumPool = "src/main/resources/evaluation_pool/b1/num/";
     static NumericalMapper numericalMapper;
 
     public static void main(String[] args) {
 
 
+        uniqueSubjectData = args[0];
+        trainingPool = args[1];
+        trainingNumPool = args[2];
+//        evaluationPool = args[1];
+//        evaluationNumPool = args[2];
+
+
+        // Instantiate collection that holds the sorted subjects. Caution: Heavy Process
+        System.out.println("Loading index collections...\n");
+        numericalMapper = new NumericalMapper(uniqueSubjectData);
+
+        
 
         /*
             Convert Training Pool
         */
-
-        // Instantiate collection that holds the sorted subjects. Caution: Heavy Process
-        numericalMapper = new NumericalMapper(uniqueSubjectData);
-
         CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
         Iterator<RDFQueryRecord> iter = collection.iterator();
         System.out.println("Training Pool Conversion: " + trainingPool);
@@ -43,7 +51,7 @@ public class RDFtoNumQueryConverter {
         while (iter.hasNext()) {
 
             RDFQueryRecord rdfRq = iter.next();
-            System.out.println("Converting... >>>" + rdfRq.getQuery());
+            System.out.println("\nConverting... >>>" + rdfRq.getQuery());
             NumQueryRecord numQueryRecord = RDFConvertToNum(rdfRq, true);
             System.out.println("<<<");
 
@@ -58,12 +66,8 @@ public class RDFtoNumQueryConverter {
         /*
               Convert Evaluation Pool
         */
-
-//        // Instantiate collection that holds the sorted subjects. Caution: Heavy Process
-//        numericalMapper = new NumericalMapper(uniqueSubjectData);
-//
-//        collection = new CustomCollection<RDFQueryRecord>(evaluationPool);
-//        iter = collection.iterator();
+//        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(evaluationPool);
+//        Iterator<RDFQueryRecord> iter = collection.iterator();
 //        System.out.println("Evaluation Pool Conversion: " + evaluationPool);
 //
 //        while (iter.hasNext()) {
@@ -93,7 +97,7 @@ public class RDFtoNumQueryConverter {
         */
         String subject = rdfRq.getLogQuery().getQueryStatements().get(0).getValue();
 
-        queryStatements.add(numericalMapper.getMapping(subject, isPrefix));                      // subject
+        queryStatements.add(numericalMapper.getMapping(subject, isPrefix));            // subject
         queryStatements.add(new IntervalRange(Integer.MIN_VALUE, Integer.MAX_VALUE));  // predicate
         queryStatements.add(new IntervalRange(Integer.MIN_VALUE, Integer.MAX_VALUE));  // object
 
@@ -107,9 +111,9 @@ public class RDFtoNumQueryConverter {
             subject = bs.getBindings().get(0).getValue();
 
             bindingSet.add(numericalMapper.getMapping(subject, false));     // subject
-            bindingSet.add(new IntervalRange(1, 1));                    // predicate
+            bindingSet.add(new IntervalRange(1, 1));                        // predicate
             int randInt = rand.nextInt(1000);
-            bindingSet.add(new IntervalRange(randInt, randInt)); // object
+            bindingSet.add(new IntervalRange(randInt, randInt));            // object
 
             queryResults.add(bindingSet);
         }
@@ -192,7 +196,6 @@ public class RDFtoNumQueryConverter {
 
             for (NumRectangle nr : resultNumRectangles) {
                 bw.write(nr.toString());
-                System.out.println(nr.toString());
                 bw.newLine();
             }
 
