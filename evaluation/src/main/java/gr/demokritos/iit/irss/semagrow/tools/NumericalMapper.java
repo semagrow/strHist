@@ -1,5 +1,10 @@
 package gr.demokritos.iit.irss.semagrow.tools;
 
+import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -18,65 +23,74 @@ public class NumericalMapper {
     }
 
 
-    public ArrayList<Integer> getPrefixRange(String prefix) throws IOException {
+    public ArrayList<Integer> getPrefixRange(String prefix)  {
         ArrayList<Integer> array = new ArrayList<Integer>(2);
 
-        BufferedReader br = new BufferedReader(new FileReader(sortedFilePath));
-        String line = "";
-        int counter = 1;
-        int startRange = -1, endRange = -1;
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(sortedFilePath));
+            String line = "";
+            int counter = 1;
+            int startRange = -1, endRange = -1;
 
-        while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
 
-            line = line.replace("<", "").replace(">", "").trim();
+                line = line.replace("<", "").replace(">", "").trim();
 
-            if (line.startsWith(prefix) && startRange == -1)
-                startRange = counter;
+                if (line.startsWith(prefix) && startRange == -1)
+                    startRange = counter;
 
-            if (!line.startsWith(prefix) && startRange != -1 && endRange == -1) {
-                endRange = counter - 1;
-                break;
-            }
+                if (!line.startsWith(prefix) && startRange != -1 && endRange == -1) {
+                    endRange = counter - 1;
+                    break;
+                }
 
-            counter++;
-        }// while
+                counter++;
+            }// while
 
-        array.add(startRange);
-        array.add(endRange);
+            array.add(startRange);
+            array.add(endRange);
 
-        br.close();
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return array;
     }// getPrefixRange
 
 
-    public int getSubjectRow(String subject) throws IOException {
+    public int getSubjectRow(String subject) {
 
-        BufferedReader br = new BufferedReader(new FileReader(sortedFilePath));
-        String line = "";
-        int counter = 1;
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(sortedFilePath));
+            String line = "";
+            int counter = 1;
 
-        while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
 
-            line = line.replace("<", "").replace(">", "").trim();
+                line = line.replace("<", "").replace(">", "").trim();
 
-            if (line.equals(subject))
-                return counter;
+                if (line.equals(subject))
+                    return counter;
 
-            counter++;
-        }// while
+                counter++;
+            }// while
 
-        br.close();
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return -1;
     }// getSubjectRow
 
 
     public static void main(String[] args) throws IOException {
-//        ArrayList<Integer> array = new NumericalMapper("C:\\Users\\Nick\\Downloads\\sorted\\sorted")
+//        ArrayList<Integer> array = new NumericalMapper("C:/Users/Nick/Downloads/sorted/sorted")
 //                .getPrefixRange("http://agris.fao.org/aos/records/AG197500003");
 
 
-        System.out.println(new NumericalMapper("C:\\Users\\Nick\\Downloads\\sorted\\sorted").
+        System.out.println(new NumericalMapper("C:/Users/Nick/Downloads/sorted/sorted").
                 getSubjectRow("http://agris.fao.org/aos/records/IT19780298159"));
     }
 }

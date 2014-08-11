@@ -4,6 +4,8 @@ import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import org.json.simple.JSONObject;
 
+import java.io.Serializable;
+
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -11,7 +13,7 @@ import static java.lang.Math.min;
  * Defines a set of numbers that lies on an interval
  * Created by angel on 7/12/14.
  */
-public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<IntervalRange> {
+public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<IntervalRange>, Serializable {
 
     //todo: maybe replace int with long
     private int low;
