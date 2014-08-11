@@ -6,6 +6,8 @@ import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.tools.NumericalMapper;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -19,27 +21,66 @@ import java.util.Random;
 public class RDFtoNumQueryConverter {
 
     public static String uniqueSubjectData = "C:/Users/Nick/Downloads/sorted/sorted";
-    static String trainingRdfPool = "src/main/resources/training_pool/b1/rdf/";
-    static String evaluationRdfPool = "src/main/resources/evaluation_pool/b1/rdf/";
-    static String trainingNumPool = "src/main/resources/training_pool/b1/num/";
-    static String evaluationNumPool = "src/main/resources/evaluation_pool/b1/num/";
     static NumericalMapper numericalMapper;
 
     public static void main(String[] args) {
 
+        OptionParser parser = new OptionParser("t:e:s:o:");
+        OptionSet options = parser.parse(args);
+        String trainingRdfPool = "src/main/resources/training_pool/b1/rdf/";
+        String evaluationRdfPool = "src/main/resources/evaluation_pool/b1/rdf/";
 
-        uniqueSubjectData = args[0];
-        trainingRdfPool = args[1];
-        trainingNumPool = args[2];
-//        evaluationPool = args[1];
-//        evaluationNumPool = args[2];
+        String outputDir = "o";
+
+        if (options.hasArgument("s")) {
+
+            uniqueSubjectData = options.valueOf("s").toString();
+
+            // Instantiate collection that holds the sorted subjects. Caution: Heavy Process
+            System.out.println("Loading index collections...\n");
+            numericalMapper = new NumericalMapper(uniqueSubjectData);
+        }
+
+        if (options.hasArgument("o"))
+            outputDir = options.valueOf("o").toString();
+
+        if (options.hasArgument("t")) {
+            for (Object tDir : options.valuesOf("t")) {
+                File f = new File(tDir.toString());
+                if (f.exists()) {
+                    File o = new File(outputDir);
+                    if (options.valuesOf("t").size() > 1) {
+                        o = new File(outputDir, f.getName());
+                    }
+
+                    if (!o.exists())
+                        o.mkdir();
+                    trainingRdfPool = f.getAbsolutePath();
+                    convertTraining(trainingRdfPool + "/", o.getAbsolutePath() + "/");
+                }
+            }
+        }
 
 
-        // Instantiate collection that holds the sorted subjects. Caution: Heavy Process
-        System.out.println("Loading index collections...\n");
-        numericalMapper = new NumericalMapper(uniqueSubjectData);
 
+        if (options.hasArgument("e")) {
+            for (Object eDir : options.valuesOf("e")) {
+                File f = new File(eDir.toString());
+                if (f.exists()) {
+                    File o = new File(outputDir);
+                    if (options.valuesOf("e").size() > 1) {
+                        o = new File(outputDir, f.getName());
+                    }
+                    if (!o.exists())
+                        o.mkdir();
+                    evaluationRdfPool = f.getAbsolutePath();
+                    convertEvaluation(evaluationRdfPool + "/", o.getAbsolutePath() + "/");
+                }
+            }
+        }
+    }// main
 
+    private static void convertTraining(String trainingRdfPool, String trainingNumPool) {
 
         /*
             Convert Training Pool
@@ -61,31 +102,31 @@ public class RDFtoNumQueryConverter {
 
             writeToPool(trainingNumPool, splits[splits.length - 1], numQueryRecord);
         }// while
+    }
 
-
+    private static void convertEvaluation(String evaluationRdfPool, String evaluationNumPool) {
         /*
               Convert Evaluation Pool
         */
-//        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(evaluationRdfPool);
-//        Iterator<RDFQueryRecord> iter = collection.iterator();
-//        System.out.println("Evaluation Pool Conversion: " + evaluationRdfPool);
-//
-//        while (iter.hasNext()) {
-//
-//            RDFQueryRecord rdfRq = iter.next();
-//            System.out.println("Converting... >>>" + rdfRq.getQuery());
-//            NumQueryRecord numQueryRecord = RDFConvertToNum(rdfRq, false);
-//            System.out.println("<<<");
-//
-//            // Get prefix to put it as a file's name.
-//            String prefix = rdfRq.getLogQuery().getQueryStatements().get(0).getValue();
-//            String[] splits = prefix.split("/");
-//
-//            writeToPool(evaluationNumPool, splits[splits.length - 1], numQueryRecord);
-//        }// while
+        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(evaluationRdfPool);
+        Iterator<RDFQueryRecord> iter = collection.iterator();
+        System.out.println("Evaluation Pool Conversion: " + evaluationRdfPool);
 
-    }// main
+        while (iter.hasNext()) {
 
+            RDFQueryRecord rdfRq = iter.next();
+            System.out.println("Converting... >>>" + rdfRq.getQuery());
+            NumQueryRecord numQueryRecord = RDFConvertToNum(rdfRq, false);
+            System.out.println("<<<");
+
+            // Get prefix to put it as a file's name.
+            String prefix = rdfRq.getLogQuery().getQueryStatements().get(0).getValue();
+            String[] splits = prefix.split("/");
+
+            writeToPool(evaluationNumPool, splits[splits.length - 1], numQueryRecord);
+        }// while
+
+    }
 
     private static NumQueryRecord RDFConvertToNum(RDFQueryRecord rdfRq, boolean isPrefix) {
         Random rand = new Random();
