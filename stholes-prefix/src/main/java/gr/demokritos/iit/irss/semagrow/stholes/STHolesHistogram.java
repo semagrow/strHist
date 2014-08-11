@@ -17,7 +17,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
 
     private STHolesBucket<R> root;
-    private long maxBucketsNum;
+    public long maxBucketsNum;
     private long bucketsNum = 0;
 
     public STHolesHistogram() {
@@ -379,14 +379,22 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
             //STHolesBucket bn = new STHolesBucket(holeBoundaries, holeFrequency,null,parentBucket,distinct);
 
+            Collection<STHolesBucket<R>> toBeRemoved = new ArrayList<STHolesBucket<R>>();
+
 
 
             for (STHolesBucket<R> bc : parentBucket.getChildren()) {
 
                 if (candidateHole.getBox().contains(bc.getBox())){
 
-                    bc.setParent(candidateHole);
+                    candidateHole.addChild(bc);
+                    toBeRemoved.add(bc);
                 }
+            }
+
+            for (STHolesBucket<R> bc : toBeRemoved) {
+
+                parentBucket.removeChild(bc);
             }
 
             parentBucket.addChild(candidateHole);

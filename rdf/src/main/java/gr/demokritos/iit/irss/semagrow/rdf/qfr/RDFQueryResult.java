@@ -232,7 +232,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 				
 				switch (i) {
 				case 0:
-					b = b && ((PrefixRange) rect.getRange(i)).contains(value);					
+					//b = b && ((PrefixRange) rect.getRange(i)).contains(value);
 					break;
 				case 1:
 					b = b && ((ExplicitSetRange) rect.getRange(i)).contains(value);					
