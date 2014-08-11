@@ -16,65 +16,29 @@ import java.util.List;
  */
 public class NumQueryRecord implements QueryRecord<NumRectangle, Long>, Serializable {
 
-    private RDFQueryRecord rdfQueryRecord;
-    private boolean isPrefix;
+    private NumQuery numQuery;
 
 
-    /**
-     * Convert Constructor
-     * @param rdfQueryRecord
-     * @param isPrefix
-     */
-    public NumQueryRecord(RDFQueryRecord rdfQueryRecord, boolean isPrefix) {
-        this.rdfQueryRecord = rdfQueryRecord;
-        this.isPrefix = isPrefix;
+    public NumQueryRecord(NumQuery numQuery) {
+        this.numQuery = numQuery;
     }
 
 
     @Override
     public String getQuery() {
-        if (isPrefix) {
-
-            List<Integer> listRange = new NumericalMapper(RDFtoNumRectangleConverter.uniqueSubjectData)
-                    .getPrefixRange(rdfQueryRecord.getLogQuery().getQueryStatements().get(0).getValue());
-
-            return new IntervalRange(listRange.get(0), listRange.get(1)).toString();
-        } else {
-
-            int subjectRow = new NumericalMapper(RDFtoNumRectangleConverter.uniqueSubjectData)
-                    .getSubjectRow(rdfQueryRecord.getLogQuery().getQueryStatements().get(0).getValue());
-
-            return new IntervalRange(subjectRow, subjectRow).toString();
-        }
+        return numQuery.toString();
     }// getQuery
 
 
     @Override
     public NumRectangle getRectangle() {
-
-        ArrayList <IntervalRange> arrayList = new ArrayList<IntervalRange>();
-
-        if (isPrefix) {
-
-            List<Integer> listRange = new NumericalMapper(RDFtoNumRectangleConverter.uniqueSubjectData)
-                    .getPrefixRange(rdfQueryRecord.getLogQuery().getQueryStatements().get(0).getValue());
-
-            arrayList.add(new IntervalRange(listRange.get(0), listRange.get(1)));
-        } else {
-
-            int subjectRow = new NumericalMapper(RDFtoNumRectangleConverter.uniqueSubjectData)
-                    .getSubjectRow(rdfQueryRecord.getLogQuery().getQueryStatements().get(0).getValue());
-
-            arrayList.add(new IntervalRange(subjectRow, subjectRow));
-        }
-
-        return new NumRectangle(arrayList);
+        return new NumRectangle(numQuery.getQueryStatements());
     }// getRectangle
 
 
     @Override
     public QueryResult getResultSet() {
-        return new NumQueryResult(rdfQueryRecord.getResultSet(), isPrefix);
+        return new NumQueryResult(numQuery);
     }
 
 }

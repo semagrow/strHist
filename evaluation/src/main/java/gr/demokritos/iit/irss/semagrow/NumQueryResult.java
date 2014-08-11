@@ -16,18 +16,15 @@ import java.util.List;
  */
 public class NumQueryResult implements QueryResult<NumRectangle, Long>, Serializable {
 
-    private RDFQueryResult rdfQueryResult;
-    private boolean isPrefix;
+    private NumQuery numQuery;
     private List<NumRectangle> resultNumRectangles;
 
 
-    public NumQueryResult(RDFQueryResult rdfQueryResult, boolean isPrefix) {
-        this.rdfQueryResult = rdfQueryResult;
-        this.isPrefix = isPrefix;
+    public NumQueryResult(NumQuery numQuery) {
 
-        // Convert all resultRDFRectangles to resultNUMRectangles.
+        this.numQuery = numQuery;
         resultNumRectangles = instantiateNumRectangles();
-    }// Constructor
+    }
 
 
     @Override
@@ -45,6 +42,7 @@ public class NumQueryResult implements QueryResult<NumRectangle, Long>, Serializ
 
     @Override
     public List<NumRectangle> getRectangles(NumRectangle rect) {
+
         List<NumRectangle> list = new ArrayList<NumRectangle>();
 
         for (NumRectangle nr : resultNumRectangles)
@@ -56,31 +54,11 @@ public class NumQueryResult implements QueryResult<NumRectangle, Long>, Serializ
 
 
     private List<NumRectangle> instantiateNumRectangles() {
+
         ArrayList<NumRectangle> numRectangles = new ArrayList<NumRectangle>();
-        NumRectangle numRectangle = null;
-        ArrayList <IntervalRange> listIntervalRange;
 
-        // Foreach BindingSet get the Subject(Prefix/Subject) and instantiate a NumRectangle.
-        for (BindingSet bs : rdfQueryResult.getBindingSets()) {
-
-            listIntervalRange = new ArrayList<IntervalRange>();
-            if (isPrefix) {
-
-                List<Integer> listRange = new NumericalMapper(RDFtoNumRectangleConverter.uniqueSubjectData)
-                        .getPrefixRange(bs.getBindings().get(0).getValue());
-
-                listIntervalRange.add(new IntervalRange(listRange.get(0), listRange.get(1)));
-            } else {
-
-                int subjectRow = new NumericalMapper(RDFtoNumRectangleConverter.uniqueSubjectData)
-                        .getSubjectRow(bs.getBindings().get(0).getValue());
-
-                listIntervalRange.add(new IntervalRange(subjectRow, subjectRow));
-            }
-
-            numRectangle = new NumRectangle(listIntervalRange);
-            numRectangles.add(numRectangle);
-        }// for
+        for (List<IntervalRange> resultBindings : numQuery.getQueryResults())
+            numRectangles.add(new NumRectangle(resultBindings));
 
         return numRectangles;
     }// instantiateNumRectangles

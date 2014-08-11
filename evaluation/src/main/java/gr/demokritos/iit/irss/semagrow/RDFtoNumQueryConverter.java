@@ -2,30 +2,40 @@ package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
+import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.tools.NumericalMapper;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Nick on 11-Aug-14.
  */
-public class RDFtoNumRectangleConverter {
+public class RDFtoNumQueryConverter {
 
-    public static String uniqueSubjectData = "C:\\Users\\Nick\\Downloads\\sorted\\sorted";
-    static String trainingPool = "src/main/resources/training_pool/b1";
+    public static String uniqueSubjectData = "C:/Users/Nick/Downloads/sorted/sorted";
+    static String trainingPool = "src/main/resources/training_pool/b1/";
     static String evaluationPool = "src/main/resources/evaluation_pool/b1/";
-    static String trainingNumPool = "src/main/resources/training_pool/num/b1";
+    static String trainingNumPool = "src/main/resources/training_pool/num/b1/";
     static String evaluationNumPool = "src/main/resources/evaluation_pool/num/b1/";
+    static NumericalMapper numericalMapper;
 
     public static void main(String[] args) {
 
+
+
         /*
-         Convert Training Pool
+            Convert Training Pool
         */
+
+        // Instantiate collection that holds the sorted subjects. Caution: Heavy Process
+        numericalMapper = new NumericalMapper(uniqueSubjectData);
+
         CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
         Iterator<RDFQueryRecord> iter = collection.iterator();
         System.out.println("Training Pool Conversion: " + trainingPool);
@@ -34,8 +44,7 @@ public class RDFtoNumRectangleConverter {
 
             RDFQueryRecord rdfRq = iter.next();
             System.out.println("Converting... >>>" + rdfRq.getQuery());
-
-            NumQueryRecord numQueryRecord = new NumQueryRecord(rdfRq, true);
+            NumQueryRecord numQueryRecord = RDFConvertToNum(rdfRq, true);
             System.out.println("<<<");
 
             // Get prefix to put it as a file's name.
@@ -46,9 +55,13 @@ public class RDFtoNumRectangleConverter {
         }// while
 
 
-//        /*
-//         Convert Evaluation Pool
-//        */
+        /*
+              Convert Evaluation Pool
+        */
+
+//        // Instantiate collection that holds the sorted subjects. Caution: Heavy Process
+//        numericalMapper = new NumericalMapper(uniqueSubjectData);
+//
 //        collection = new CustomCollection<RDFQueryRecord>(evaluationPool);
 //        iter = collection.iterator();
 //        System.out.println("Evaluation Pool Conversion: " + evaluationPool);
@@ -57,8 +70,7 @@ public class RDFtoNumRectangleConverter {
 //
 //            RDFQueryRecord rdfRq = iter.next();
 //            System.out.println("Converting... >>>" + rdfRq.getQuery());
-//
-//            NumQueryRecord numQueryRecord = new NumQueryRecord(rdfRq, false);
+//            NumQueryRecord numQueryRecord = RDFConvertToNum(rdfRq, false);
 //            System.out.println("<<<");
 //
 //            // Get prefix to put it as a file's name.
@@ -69,6 +81,41 @@ public class RDFtoNumRectangleConverter {
 //        }// while
 
     }// main
+
+
+    private static NumQueryRecord RDFConvertToNum(RDFQueryRecord rdfRq, boolean isPrefix) {
+        Random rand = new Random();
+        List<IntervalRange> queryStatements = new ArrayList<IntervalRange>(3);
+        List<List<IntervalRange>> queryResults = new ArrayList<List<IntervalRange>>();
+
+        /*
+            Convert Query Statements.
+        */
+        String subject = rdfRq.getLogQuery().getQueryStatements().get(0).getValue();
+
+        queryStatements.add(numericalMapper.getMapping(subject, isPrefix));                      // subject
+        queryStatements.add(new IntervalRange(Integer.MIN_VALUE, Integer.MAX_VALUE));  // predicate
+        queryStatements.add(new IntervalRange(Integer.MIN_VALUE, Integer.MAX_VALUE));  // object
+
+        /*
+            Convert Query Results.
+        */
+        for (BindingSet bs : rdfRq.getQueryResult().getBindingSets()) {
+
+            List<IntervalRange> bindingSet = new ArrayList<IntervalRange>(3);
+
+            subject = bs.getBindings().get(0).getValue();
+
+            bindingSet.add(numericalMapper.getMapping(subject, false));     // subject
+            bindingSet.add(new IntervalRange(1, 1));                    // predicate
+            int randInt = rand.nextInt(1000);
+            bindingSet.add(new IntervalRange(randInt, randInt)); // object
+
+            queryResults.add(bindingSet);
+        }
+
+        return new NumQueryRecord(new NumQuery(queryStatements, queryResults));
+    }// RDFConvertToNum
 
 
     private static QueryRecord readFromPool(String path, String filename) {
@@ -110,7 +157,7 @@ public class RDFtoNumRectangleConverter {
         File file = new File(path + filename);
         ObjectOutputStream oos;
 
-        if (!file.exists()) {
+//        if (!file.exists()) {
 
             try {
 
@@ -125,7 +172,7 @@ public class RDFtoNumRectangleConverter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+//        }
     }// writeBinary
 
 
@@ -136,15 +183,16 @@ public class RDFtoNumRectangleConverter {
         try {
             bw = new BufferedWriter(new FileWriter(file));
 
-            bw.write("Query Statement: ");
+            bw.write("Query Statements: \n");
             bw.write(numQr.getQuery());
             bw.newLine();
             bw.newLine();
-            bw.write("Query Bindings: \n");
+            bw.write("Query Results: \n");
             List<NumRectangle> resultNumRectangles = ((NumQueryResult)numQr.getResultSet()).getResultNumRectangles();
 
             for (NumRectangle nr : resultNumRectangles) {
                 bw.write(nr.toString());
+                System.out.println(nr.toString());
                 bw.newLine();
             }
 
