@@ -166,29 +166,31 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         updateParticipants(participants, bucket, c);
         //for (STHolesOrigBucket<R> participant : participants) {
 
-        STHolesOrigBucket<R> bucketForExclusion = participants.get(0);
-        Double preserved;
-        double maxPreserved = 0;
-        int bestDim = 0;
-        Map.Entry<Double, Integer> candidateShrink;
+        if (!participants.isEmpty()) {
+            STHolesOrigBucket<R> bucketForExclusion = participants.get(0);
+            Double preserved;
+            double maxPreserved = 0;
+            int bestDim = 0;
+            Map.Entry<Double, Integer> candidateShrink;
 
-        while (!participants.isEmpty()) {
+            while (!participants.isEmpty()) {
 
-            for (STHolesOrigBucket<R> participant : participants) {
-                candidateShrink = c.getShrinkInfo(participant.getBox());
-                preserved = candidateShrink.getKey();
+                for (STHolesOrigBucket<R> participant : participants) {
+                    candidateShrink = c.getShrinkInfo(participant.getBox());
+                    preserved = candidateShrink.getKey();
 
-                if (preserved >= maxPreserved) {
+                    if (preserved >= maxPreserved) {
 
-                    bestDim = candidateShrink.getValue();
-                    bucketForExclusion = participant;
+                        bestDim = candidateShrink.getValue();
+                        bucketForExclusion = participant;
+                    }
                 }
+
+                c.shrink(bucketForExclusion.getBox(), bestDim);
+                updateParticipants(participants, bucket, c);
             }
 
-            c.shrink(bucketForExclusion.getBox(), bestDim);
-            updateParticipants(participants, bucket, c);
         }
-
 
         // Collect candidate hole statistics
         long freq= (long)Math.ceil(Tb * ((double)c.getVolume())/

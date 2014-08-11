@@ -31,11 +31,11 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
 
     public NumRectangle intersection(NumRectangle rec) {
 
-        List<IntervalRange> dimsN = new ArrayList<IntervalRange>();
+        List<IntervalRange> dimsN = new ArrayList<IntervalRange>(dims.size());
 
         for (int i = 0; i < dims.size(); i++) {
 
-            dimsN.set(i, dims.get(i).intersection(rec.dims.get(i)));
+            dimsN.add(i, dims.get(i).intersection(rec.dims.get(i)));
         }
 
         return new NumRectangle(dimsN);
@@ -90,7 +90,7 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
                     + " is not valid");
         }
 
-        dims.set(i, r);
+        dims.add(i, r);
     }
 
 
@@ -141,7 +141,7 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
 
         for (int i = 0; i < dims.size(); i++) {
 
-            dimsN.set(i,dims.get(i).minus(rec.dims.get(i)));
+            dimsN.add(i,dims.get(i).minus(rec.dims.get(i)));
         }
 
 
@@ -190,7 +190,7 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
 
         for (int i = 0; i < dims.size(); i++) {
 
-            dimsN.set(i, dims.get(i).tightRange(rec.dims.get(i)));
+            dimsN.add(i, dims.get(i).tightRange(rec.dims.get(i)));
         }
 
         return new NumRectangle(dimsN);

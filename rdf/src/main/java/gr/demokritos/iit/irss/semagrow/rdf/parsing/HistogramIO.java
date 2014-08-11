@@ -41,7 +41,7 @@ public class HistogramIO<R extends Rectangle<R>> {
 
     public HistogramIO(String filename, STHolesOrigHistogram<NumRectangle> h) {
         setPath(filename);
-        this.histogramOrig = histogramOrig;
+        this.histogramOrig = h;
     }
 
 

@@ -134,7 +134,7 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
 
     public String toString() {
 
-        return "intervalRange: " + low + "-" + high + "\n";
+        return "[" + low + "-" + high + "]";
     }
 
     public JSONObject toJSON() {
