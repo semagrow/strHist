@@ -14,12 +14,20 @@ public class RDFSTHolesHistogramTest extends TestCase {
 
     public void testRefine() throws URISyntaxException {
 
-        RDFSTHolesHistogram h = HistogramIO.read(Paths.get(getClass().getResource("/IT19").toURI()).toString().toString());
+        RDFSTHolesHistogram h = HistogramIO.read(Paths.get(getClass().getResource("/DE19810").toURI()).toString());
 
-        RDFQueryRecord r = readFromPool(Paths.get(getClass().getResource("/IT199400").toURI()).toString().toString());
+        RDFQueryRecord r = readFromPool(Paths.get(getClass().getResource("/SE9").toURI()).toString());
 
          h.refine(r);
 
+       // String filename = "src/main/resources/test_output";
+       // outputHistogram(h, filename);
+
+    }
+
+    private static void outputHistogram(RDFSTHolesHistogram h, String filename) {
+        HistogramIO histIO = new HistogramIO(filename, h);
+        histIO.write();
     }
 
     private static <T>  T readFromPool(String filename) {
