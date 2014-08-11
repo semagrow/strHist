@@ -34,9 +34,9 @@ public class NumQuery implements Serializable {
 
         String s = "";
 
-        s += "Subject: " + queryStatements.get(0).toString() + "\n";
-        s += "Predicate: " + queryStatements.get(1).toString() + "\n";
-        s += "Object: " + queryStatements.get(2).toString() + "\n";
+        for (int i = 0; i < queryStatements.size(); i++) {
+            s += "[" + queryStatements.get(i).getLow() + "-" + queryStatements.get(i).getHigh() + "]\t";
+        }
 
         return s;
     }
