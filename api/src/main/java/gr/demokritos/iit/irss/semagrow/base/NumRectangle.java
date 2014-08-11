@@ -6,12 +6,13 @@ import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import org.json.simple.JSONObject;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by efi on 6/8/2014.
  */
-public class NumRectangle implements RectangleWithVolume<NumRectangle> {
+public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializable {
 
     private List<IntervalRange> dims;
 
