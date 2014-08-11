@@ -339,7 +339,9 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
             STHolesOrigBucket<R> bn = new STHolesOrigBucket<R>(newBox, newFreq, null, parentN);
             STHolesOrigBucket.merge(parentBucket, candidateHole, bn, this);
 
-            System.out.println("Parent child merge in drillHole.");
+            System.out.println("Parent child merge in drillHole!!!");
+
+            drillHole(parentBucket, candidateHole);
         }
         else {
 

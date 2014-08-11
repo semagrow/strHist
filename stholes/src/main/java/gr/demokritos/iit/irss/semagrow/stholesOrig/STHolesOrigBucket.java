@@ -178,7 +178,7 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
 
         for (STHolesOrigBucket<R> bi : newParent.getChildren() ) {
 
-            if (bi.getBox().contains(bn.getBox())) {
+            if (bn.getBox().contains(bi.getBox())) {
                 I.add(bi);
             }
         }
@@ -200,7 +200,7 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
         newParent.removeChild(b2);
 
         newParent.setFrequency((long)Math.ceil(newParent.frequency*
-                ( 1 - (double)vold/newParent.getVolume())));
+                ( 1 - ((double)vold)/newParent.getVolume())));
 
         for (STHolesOrigBucket<R> bi : bn.getChildren()) {
 
