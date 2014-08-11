@@ -121,7 +121,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                 //System.out.println("--------------------------------------------------");
                 STHolesOrigBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
                 //System.out.println("<<<>>> Hole: " + hole);
-                if (isInaccurateEstimation(hole))
+                if  (!hole.getBox().isEmpty() && isInaccurateEstimation(hole))
                     drillHole(bucket, hole);
             }
         }
@@ -323,6 +323,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
      */
     private void drillHole(STHolesOrigBucket<R> parentBucket, STHolesOrigBucket<R> candidateHole)
     {
+
         if (parentBucket.getBox().equals(candidateHole.getBox())) {
 
             parentBucket.setFrequency(candidateHole.getFrequency());
@@ -339,15 +340,26 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         }
         else {
 
+            Collection<STHolesOrigBucket<R>> toBeRemoved = new ArrayList<STHolesOrigBucket<R>>();
+
+
+
             for (STHolesOrigBucket<R> bc : parentBucket.getChildren()) {
 
                 if (candidateHole.getBox().contains(bc.getBox())){
 
-                    bc.setParent(candidateHole);
+                    candidateHole.addChild(bc);
+                    toBeRemoved.add(bc);
                 }
             }
 
+            for (STHolesOrigBucket<R> bc : toBeRemoved) {
+
+                parentBucket.removeChild(bc);
+            }
+
             parentBucket.addChild(candidateHole);
+
             parentBucket.setFrequency(Math.max(0,parentBucket.getFrequency() -
                     candidateHole.getFrequency()));
 
