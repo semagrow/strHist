@@ -19,6 +19,7 @@ public class NumQueryRecord implements QueryRecord<NumRectangle, Long>, Serializ
     private NumQuery numQuery;
 
 
+
     public NumQueryRecord(NumQuery numQuery) {
         this.numQuery = numQuery;
     }
@@ -29,6 +30,7 @@ public class NumQueryRecord implements QueryRecord<NumRectangle, Long>, Serializ
         return numQuery.toString();
     }// getQuery
 
+    public NumQuery getNumQuery() { return numQuery; }
 
     @Override
     public NumRectangle getRectangle() {
