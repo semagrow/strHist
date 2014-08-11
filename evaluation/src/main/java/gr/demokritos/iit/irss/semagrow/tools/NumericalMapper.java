@@ -75,6 +75,8 @@ public class NumericalMapper {
 //        ArrayList<Integer> array = new NumericalMapper("C:\\Users\\Nick\\Downloads\\sorted\\sorted")
 //                .getPrefixRange("http://agris.fao.org/aos/records/AG197500003");
 
-        System.out.println("http://agris.fao.org/aos/records/AG19750000373");
+
+        System.out.println(new NumericalMapper("C:\\Users\\Nick\\Downloads\\sorted\\sorted").
+                getSubjectRow("http://agris.fao.org/aos/records/IT19780298159"));
     }
 }
