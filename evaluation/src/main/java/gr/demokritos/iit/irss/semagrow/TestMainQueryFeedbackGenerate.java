@@ -26,9 +26,10 @@ public class TestMainQueryFeedbackGenerate {
 
     public static void main(String[] args) throws IOException, RepositoryException {
 
-        String uniqueSubjectData = args[0];
-        String filteredDataFolder = args[1];
-        String trainingPool = args[2];
+        int times = Integer.parseInt(args[0]);
+        String uniqueSubjectData = args[1];
+        String filteredDataFolder = args[2];
+        String trainingPool = args[3];
 
 
         QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder/*,
@@ -37,7 +38,7 @@ public class TestMainQueryFeedbackGenerate {
         QueryRecord qr;
 
         // --- Training Pool Generator
-        for (int i=0; i<1; i++) {
+        for (int i=0; i<times; i++) {
             qr = qfg.generateTrainingSet();
             System.out.println(qr.getQuery());
 

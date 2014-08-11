@@ -122,6 +122,8 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
 
     public boolean isUnit() { return (high == low); }
 
+    public boolean isEmpty() { return low > high; }
+
     public long getLength() { return high - low; }
 
     public int getLow() { return low; }

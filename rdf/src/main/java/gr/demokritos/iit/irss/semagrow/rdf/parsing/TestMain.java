@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.rdf.parsing;
 
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 
@@ -131,14 +132,12 @@ public class TestMain {
 
 
         // Read histogram from file.
-        STHolesBucket rootBucket = HistogramIO.read("src\\main\\resources\\hist.txt");
+        STHolesBucket<RDFRectangle> rootBucket = HistogramIO.readJSON("src\\main\\resources\\hist.txt");
         System.out.println(rootBucket);
 
-        STHolesHistogram histogram = new STHolesHistogram();
+        STHolesHistogram<RDFRectangle> histogram = new STHolesHistogram();
         histogram.setRoot(rootBucket);
         new HistogramIO("src\\main\\resources\\histTest", histogram).write();
-
-               
 
 	}
 

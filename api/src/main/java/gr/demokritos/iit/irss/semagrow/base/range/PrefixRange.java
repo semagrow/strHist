@@ -15,6 +15,7 @@ public class PrefixRange
         implements RangeLength<String>, Rangeable<PrefixRange> {
 
     private ArrayList<String> prefixList;
+
     private boolean infinite = false;
 
     public PrefixRange(ArrayList<String> prefix) {
@@ -230,11 +231,11 @@ public class PrefixRange
         ArrayList<String> prefixN = new ArrayList<String>(prefixList);
 
 
-        if (prefixList.contains(this)) {
-
+        // if this is a subset then return empty range
+        if (prefixRange.contains(this))
             return new PrefixRange(new ArrayList<String>());
-        }
 
+        // else compute the difference
         for (String myP : prefixList) {
 
             for (String otherP : prefixRange.prefixList) {
@@ -255,6 +256,10 @@ public class PrefixRange
         if (infinite) return false;
 
         return (prefixList.size() == 1);
+    }
+
+    public boolean isEmpty() {
+        return !isInfinite() && prefixList.isEmpty();
     }
 
     public ArrayList<String> getPrefixList() {

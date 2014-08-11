@@ -122,7 +122,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
 
         List<R> rects = new ArrayList<R>();
-        if (queryRecord.getRectangle().hasInfinite()) {
+        if (queryRecord.getRectangle().isInfinite()) {
             rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
         } else {
             rects.add(queryRecord.getRectangle());
@@ -178,7 +178,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
                 //System.out.println("--------------------------------------------------");
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
                 //System.out.println("<<<>>> Hole: " + hole);
-                if (isInaccurateEstimation(bucket, hole))
+                if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole))
                     drillHole(bucket, hole);
             }
         }
@@ -251,7 +251,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @param bucket parent bucket
      * @param c candidate hole
      */
-    private void updateParticipants(List<STHolesBucket<R>> participants,
+    private void  updateParticipants(List<STHolesBucket<R>> participants,
                                     STHolesBucket<R> bucket, R c) {
 
         participants.clear();
@@ -366,6 +366,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      */
     private void drillHole(STHolesBucket<R> parentBucket, STHolesBucket<R> candidateHole)
     {
+
         if (parentBucket.getBox().equals(candidateHole.getBox())) {
         	 
             Stat parentStats = new Stat(candidateHole.getStatistics().getFrequency(),

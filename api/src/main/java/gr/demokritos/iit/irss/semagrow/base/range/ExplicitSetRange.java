@@ -150,6 +150,8 @@ public class ExplicitSetRange<T>
         return infinite;
     }
 
+    public boolean isEmpty() { return !isInfinite() && items.isEmpty(); }
+
     public long getLength() {
 
         if (infinite) return Integer.MAX_VALUE;

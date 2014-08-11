@@ -6,4 +6,6 @@ package gr.demokritos.iit.irss.semagrow.api.range;
 public interface Range<T> {
 
     boolean isUnit();
+
+    boolean isEmpty();
 }

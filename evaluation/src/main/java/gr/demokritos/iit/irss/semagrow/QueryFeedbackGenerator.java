@@ -109,7 +109,7 @@ public class QueryFeedbackGenerator {
         System.out.println("Last Prefix: " + lastSlashPrefix);
 
         // Get random cut on the prefix. 3 is given to avoid memory heap overflow
-        int randomCut = randInt(3, lastSlashPrefix.length() - 1);//lastSlashPrefix.length() - 1
+        int randomCut = randInt(2, lastSlashPrefix.length() - 3);//lastSlashPrefix.length() - 1
         System.out.println("Random Cut Number: " + randomCut);
 
         String trimmedSubject = "";

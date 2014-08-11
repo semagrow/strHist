@@ -102,6 +102,14 @@ public class RDFLiteralRange
         return res;
     }
 
+    public boolean isEmpty() {
+        boolean nonempty = !ranges.isEmpty();
+        for (RangeLength<?> r : ranges.values())
+            nonempty = !r.isEmpty();
+
+        return !nonempty;
+    }
+
     public String toString() {
 
         //uriprefixes for PrefixRange

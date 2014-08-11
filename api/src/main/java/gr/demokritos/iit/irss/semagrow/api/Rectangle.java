@@ -15,11 +15,12 @@ public interface Rectangle<R> {
      */
     int getDimensionality();
 
+    Range<?> getRange(int i);
+
+
     R intersection(R rec);
 
     boolean contains(R rec);
-
-    Range<?> getRange(int i);
 
     boolean intersects(R rec);
 
@@ -31,12 +32,13 @@ public interface Rectangle<R> {
     
     boolean equals(Object rec);
 
-    JSONObject toJSON();
-
     //true if rectangle has
     //at least one infinite range
-    boolean hasInfinite();
+    boolean isInfinite();
 
     boolean isMergeable(R rec);
-   
+
+    boolean isEmpty();
+
+    JSONObject toJSON();
 }

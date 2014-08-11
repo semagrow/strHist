@@ -199,7 +199,7 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle> {
        this.dims = new ArrayList<IntervalRange>(dims);
     }
 
-    public boolean hasInfinite() {
+    public boolean isInfinite() {
 
         //todo: fix this, do we need infinite for intervalRange?
         boolean res = false;
@@ -211,6 +211,15 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle> {
     public boolean isMergeable(NumRectangle rec) {
 
         return true;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for (IntervalRange d : dims)
+            if (d.isEmpty())
+                return true;
+
+        return false;
     }
 
 
