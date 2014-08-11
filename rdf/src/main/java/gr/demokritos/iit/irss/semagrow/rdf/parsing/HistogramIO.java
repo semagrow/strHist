@@ -7,6 +7,7 @@ import java.util.*;
 
 import com.cedarsoftware.util.io.JsonWriter;
 import gr.demokritos.iit.irss.semagrow.api.*;
+import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
@@ -18,6 +19,7 @@ import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
+import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -30,15 +32,24 @@ public class HistogramIO<R extends Rectangle<R>> {
 	private String path;
 	private STHolesBucket<R> rootBucket;
     private STHolesHistogram histogram;
+    private STHolesOrigHistogram histogramOrig;
 
    	public HistogramIO(String path, STHolesHistogram histogram) {
 		setPath(path);
 		setHistogram(histogram);
 	}
 
+    public HistogramIO(String filename, STHolesOrigHistogram<NumRectangle> h) {
+        setPath(filename);
+        this.histogramOrig = histogramOrig;
+    }
 
-	public void write() {
-        writeJSOn();
+
+    public void write() {
+        if (histogram != null)
+            writeJSOn();
+        else
+            writeJSOnOrig();
     }
 
 
@@ -69,6 +80,25 @@ public class HistogramIO<R extends Rectangle<R>> {
             e.printStackTrace();
         }
 	}
+
+
+    /**
+     * Writes the histogramOrig into a file in jSON format.
+     */
+    private void writeJSOnOrig() {
+        FileWriter fw;
+
+        try {
+            fw = new FileWriter(getPath()/* + ".txt"*/);
+
+            // Write root bucket and its children via chained toJSON calls.
+            fw.write(JsonWriter.formatJson(histogramOrig.toJSON().toJSONString()));
+
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public static STHolesBucket<RDFRectangle> readJSON(String path) {

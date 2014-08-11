@@ -271,8 +271,8 @@ public class TestHistogram {
     }
 
     private static void outputHistogramNum(STHolesOrigHistogram<NumRectangle> h, String filename) {
-        //histIO = new HistogramIO(filename, h);
-        //histIO.write();
+        histIO = new HistogramIO(filename, h);
+        histIO.write();
     }
 
 

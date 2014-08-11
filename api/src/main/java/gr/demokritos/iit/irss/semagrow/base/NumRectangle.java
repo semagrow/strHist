@@ -3,6 +3,7 @@ package gr.demokritos.iit.irss.semagrow.base;
 import gr.demokritos.iit.irss.semagrow.api.*;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -238,21 +239,33 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
 
     public String toString() {
 
-        String res = "rectangle:\n";
+        String s = "";
 
         for (int i = 0; i < dims.size(); i++) {
-
-            res += "\tdim " + i + ":\n" + "\t\t" + dims.get(i).toString() + "\n";
+            s += "[" + dims.get(i).getLow() + "] ";
         }
 
-        return res;
+        return s;
+
+//        String res = "rectangle:\n";
+//
+//        for (int i = 0; i < dims.size(); i++) {
+//
+//            res += "\tdim " + i + ":\n" + "\t\t" + dims.get(i).toString() + "\n";
+//        }
+//
+//        return res;
     }
 
 
     public JSONObject toJSON() {
         JSONObject rectangle = new JSONObject();
+        JSONArray array = new JSONArray();
 
+        for (IntervalRange ir : dims)
+            array.add(ir.toJSON());
 
+        rectangle.put("rectangle", array);
         return rectangle;
     }
 
