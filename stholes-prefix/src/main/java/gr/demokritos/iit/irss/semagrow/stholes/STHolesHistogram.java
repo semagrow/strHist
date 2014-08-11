@@ -17,7 +17,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
 
     private STHolesBucket<R> root;
-    private long maxBucketsNum;
+    public long maxBucketsNum;
     private long bucketsNum = 0;
 
     public STHolesHistogram() {
