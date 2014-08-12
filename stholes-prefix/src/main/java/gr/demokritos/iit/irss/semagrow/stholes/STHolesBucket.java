@@ -93,7 +93,7 @@ public class STHolesBucket<R extends Rectangle> {
             parentChildMerge(bucket1, bucket2, mergeBucket, h);
         }
         else if (bucket2.getParent() == bucket1.getParent()) {
-            siblingSiblingMerge(bucket1, bucket2, mergeBucket);
+            siblingSiblingMerge(bucket1, bucket2, mergeBucket, h);
         }
     }
 
@@ -130,13 +130,14 @@ public class STHolesBucket<R extends Rectangle> {
         }
 
 
-
+        h.setPcMergesNum(h.getPcMergesNum() + 1);
     }
 
     public static <R extends Rectangle<R>> 
         void siblingSiblingMerge(STHolesBucket<R> b1,
                                  STHolesBucket<R> b2,
-                                 STHolesBucket<R> bn) 
+                                 STHolesBucket<R> bn,
+                                 STHolesHistogram<R> h)
     {
         //todo: throw exception if they are not siblings
         STHolesBucket<R> newParent = b1.getParent();
@@ -151,6 +152,8 @@ public class STHolesBucket<R extends Rectangle> {
             bi.setParent(bn);
             newParent.removeChild(bi);
         }
+
+        h.setSsMergesNum(h.getSsMergesNum() + 1);
     }
 
     public void setStatistics(Stat statistics) {

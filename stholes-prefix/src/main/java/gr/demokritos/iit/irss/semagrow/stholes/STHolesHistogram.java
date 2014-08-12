@@ -21,6 +21,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
     public int epsilon = 0;
     private long bucketsNum = 0;
 
+    private long pcMergesNum = 0;
+    private long ssMergesNum = 0;
+
     public STHolesHistogram() {
         //todo: choose a constant
         maxBucketsNum = 1000;
@@ -190,6 +193,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         }
 
         // check if histogram must be compacted after refinement
+        System.out.println("Histogram refined with query: " + queryRecord.getRectangle().getRange(0));
         compact();
     }
 
@@ -425,6 +429,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
              STHolesBucket<R> bn = bestMerge.getBn();
 
             STHolesBucket.merge(b1, b2, bn, this);
+            System.out.println(bestMerge.toString());
+            System.out.println("Number of PC merges:" + pcMergesNum);
+            System.out.println("Number of SS merges: " + ssMergesNum);
             bucketsNum -= 1;
         }
     }
@@ -527,7 +534,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         Stat newStatistics = new Stat(newFreq, newDistinct);
 
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, null, newParent);
-        long penalty = Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
+        //long penalty = Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
+        long penalty = Math.abs(bc.getStatistics().getDensity().longValue() -
+                bp.getStatistics().getDensity().longValue());
 
         AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res = new AbstractMap.SimpleEntry<STHolesBucket<R>, Long>(bn, penalty);
 
@@ -543,7 +552,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      */
     private Map.Entry<STHolesBucket<R>, Long>
     getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
-    	return getSSMergePenalty(0, b1, b2);
+    	return getSSMergePenalty(1, b1, b2);
     }
     
     /**
@@ -630,8 +639,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         	break;
         case 1:
         	penalty =
-        		Math.abs( b1.getEstimate(null) - bn.getEstimate(null) ) +
-        		Math.abs( b2.getEstimate(null) - bn.getEstimate(null) );
+        		Math.abs( b1.getStatistics().getDensity().longValue() -
+                        bn.getStatistics().getDensity().longValue() ) +
+        		Math.abs( b2.getStatistics().getDensity().longValue() -
+                        bn.getStatistics().getDensity().longValue() );
         	break;
         default:
         	throw new IllegalArgumentException( "Type must be 0..1" );
@@ -666,5 +677,22 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
     public void setMaxBucketsNum(long maxBucketsNum) {
         this.maxBucketsNum = maxBucketsNum;
     }
+
+    public long getSsMergesNum() {
+        return ssMergesNum;
+    }
+
+    public void setSsMergesNum(long ssMergesNum) {
+        this.ssMergesNum = ssMergesNum;
+    }
+
+    public long getPcMergesNum() {
+        return pcMergesNum;
+    }
+
+    public void setPcMergesNum(long pcMergesNum) {
+        this.pcMergesNum = pcMergesNum;
+    }
+
 
 }
