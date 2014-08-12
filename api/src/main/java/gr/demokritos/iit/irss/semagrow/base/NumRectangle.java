@@ -90,7 +90,7 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
                     + " is not valid");
         }
 
-        dims.add(i, r);
+        dims.set(i, r);
     }
 
 
@@ -137,7 +137,7 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
         double preserved = 0;
         Integer bestDim = 0;
 
-        List<IntervalRange> dimsN = new ArrayList<IntervalRange>();
+        List<IntervalRange> dimsN = new ArrayList<IntervalRange>(dims.size());
 
         for (int i = 0; i < dims.size(); i++) {
 
@@ -186,7 +186,7 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
 
     public NumRectangle computeTightBox(NumRectangle rec) {
 
-        List<IntervalRange> dimsN = new ArrayList<IntervalRange>();
+        List<IntervalRange> dimsN = new ArrayList<IntervalRange>(dims.size());
 
         for (int i = 0; i < dims.size(); i++) {
 
@@ -231,7 +231,8 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
 
         for (IntervalRange d : dims) {
 
-            v *= d.getLength();
+            if (!d.isUnit())
+                v *= d.getLength();
         }
 
         return v;
