@@ -19,7 +19,11 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
     private STHolesBucket<R> root;
     public long maxBucketsNum;
+    public int epsilon = 0;
     private long bucketsNum = 0;
+
+    private long pcMergesNum = 0;
+    private long ssMergesNum = 0;
 
     public STHolesHistogram() {
         //todo: choose a constant
@@ -44,10 +48,15 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         if (root != null) {
 
             // if rec is larger than our root
-            if (!root.getBox().contains(rec)) {
+            if (rec.contains(root.getBox())){
 
                 return root.getEstimate(rec);
             }
+            else if (!root.getBox().contains(rec)) {
+
+                return 0;
+            }
+
             return estimateAux(rec, root);
         }
         else
@@ -185,13 +194,14 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         }
 
         // check if histogram must be compacted after refinement
+        System.out.println("Histogram refined with query: " + queryRecord.getRectangle().getRange(0));
         compact();
     }
 
     //Tested
     private boolean isInaccurateEstimation(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
 
-        int epsilon = 0; //todo: adjust parameter
+//        int epsilon = 0; //todo: adjust parameter
         Stat actualStatistics = hole.getStatistics();
         Double actualDensity = actualStatistics.getDensity();
 
@@ -420,6 +430,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
              STHolesBucket<R> bn = bestMerge.getBn();
 
             STHolesBucket.merge(b1, b2, bn, this);
+            System.out.println(bestMerge.toString());
+            System.out.println("Number of PC merges:" + pcMergesNum);
+            System.out.println("Number of SS merges: " + ssMergesNum);
             bucketsNum -= 1;
         }
     }
@@ -576,7 +589,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      */
     private Map.Entry<STHolesBucket<R>, Long>
     getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
-    	return getSSMergePenalty(0, b1, b2);
+    	return getSSMergePenalty(1, b1, b2);
     }
     
     /**
@@ -716,5 +729,22 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
     public void setMaxBucketsNum(long maxBucketsNum) {
         this.maxBucketsNum = maxBucketsNum;
     }
+
+    public long getSsMergesNum() {
+        return ssMergesNum;
+    }
+
+    public void setSsMergesNum(long ssMergesNum) {
+        this.ssMergesNum = ssMergesNum;
+    }
+
+    public long getPcMergesNum() {
+        return pcMergesNum;
+    }
+
+    public void setPcMergesNum(long pcMergesNum) {
+        this.pcMergesNum = pcMergesNum;
+    }
+
 
 }

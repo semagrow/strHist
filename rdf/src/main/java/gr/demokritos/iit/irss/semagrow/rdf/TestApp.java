@@ -166,6 +166,9 @@ public class TestApp {
         STHolesBucket<RDFRectangle> b4 = new STHolesBucket<RDFRectangle>(boxB4, statB4, null, null);
         myH.getRoot().addChild(b4);
 
+        MergeInfo<RDFRectangle> m = new MergeInfo<RDFRectangle>(b1,b2,b3,4);
+        System.out.println(m.toString());
+
         /*
         //Test getSSMerge
         Map.Entry<STHolesBucket<RDFRectangle>, Long> ssMergePenalty =

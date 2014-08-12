@@ -143,6 +143,42 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
 
     }
 
+    public static <R extends RectangleWithVolume<R>> STHolesOrigBucket<R>
+    getParentChildMerge(STHolesOrigBucket<R> bp, STHolesOrigBucket<R> bc, STHolesOrigBucket<R> bn,
+                     STHolesOrigHistogram<R> h) {
+
+        //Merge buckets b1, b2 into bn
+        STHolesOrigBucket<R> bpp = bp.getParent();
+
+
+        //Children of both buckets bc and bp
+        //become children of the new bucket
+        for (STHolesOrigBucket<R> bi : bc.getChildren())
+            bn.addChild(bi);
+
+        for (STHolesOrigBucket<R> bchild : bp.children) {
+
+            if (!bchild.equals(bc)) {
+
+                bn.addChild(bchild);
+            }
+        }
+
+        if (bpp == null) {
+
+            //bp is root
+            h.setRoot(bn);
+        } else {
+
+            bpp.removeChild(bp);
+            bpp.addChild(bn);
+        }
+
+        h.setBucketsNum(h.getBucketsNum() - 1);
+
+        return bn;
+    }
+
     public static <R extends RectangleWithVolume<R>>
     void siblingSiblingMerge(STHolesOrigBucket<R> b1,
                              STHolesOrigBucket<R> b2,

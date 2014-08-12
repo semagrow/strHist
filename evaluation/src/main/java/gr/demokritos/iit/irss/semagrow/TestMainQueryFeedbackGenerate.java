@@ -20,9 +20,9 @@ public class TestMainQueryFeedbackGenerate {
     static String uniqueSubjectData = "C:\\Users\\Nick\\Downloads\\sorted\\sorted";
     static String filteredDataFolder = "C:\\Users\\Nick\\Downloads\\filtered\\";
     static String outputDataFolder = "C:\\Users\\Nick\\git\\sthist\\src\\main\\resources\\data\\";
-    static String nativeStoreFolder = "src\\main\\resources\\native_store\\";
-    static String trainingPool = "src\\main\\resources\\training_pool\\b1";
-    static String evaluationPool = "src\\main\\resources\\evaluation_pool\\b1\\";
+    static String nativeStoreFolder = "src/main/resources/native_store/";
+    static String trainingPool = "src/main/resources/training_pool/b1";
+    static String evaluationPool = "src/main/resources/evaluation_pool/b1/";
 
     public static void main(String[] args) throws IOException, RepositoryException {
 
