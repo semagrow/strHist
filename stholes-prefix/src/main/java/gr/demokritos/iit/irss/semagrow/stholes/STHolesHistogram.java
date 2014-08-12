@@ -18,6 +18,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
     private STHolesBucket<R> root;
     public long maxBucketsNum;
+    public int epsilon = 0;
     private long bucketsNum = 0;
 
     public STHolesHistogram() {
@@ -195,7 +196,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
     //Tested
     private boolean isInaccurateEstimation(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
 
-        int epsilon = 0; //todo: adjust parameter
+//        int epsilon = 0; //todo: adjust parameter
         Stat actualStatistics = hole.getStatistics();
         Double actualDensity = actualStatistics.getDensity();
 
