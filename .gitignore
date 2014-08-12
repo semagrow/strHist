@@ -3,3 +3,7 @@
 */target
 *target*
 /classes
+.classpath
+.project
+.settings/*
+.idea/*

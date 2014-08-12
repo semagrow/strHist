@@ -1,8 +1,11 @@
-package gr.demokritos.iit.irss.semagrow.rdf;
+package gr.demokritos.iit.irss.semagrow;
 
 
+import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import junit.framework.TestCase;
 
 import java.io.*;
@@ -14,15 +17,24 @@ public class RDFSTHolesHistogramTest extends TestCase {
 
     public void testRefine() throws URISyntaxException {
 
-        RDFSTHolesHistogram h = HistogramIO.read(Paths.get(getClass().getResource("/DE19810").toURI()).toString());
+        //RDFSTHolesHistogram h = HistogramIO.read(Paths.get(getClass().getResource("/DE19810").toURI()).toString());
 
-        RDFQueryRecord r = readFromPool(Paths.get(getClass().getResource("/SE9").toURI()).toString());
+        //RDFQueryRecord r = readFromPool(Paths.get(getClass().getResource("/SE9").toURI()).toString());
 
-         h.refine(r);
+         //h.refine(r);
 
        // String filename = "src/main/resources/test_output";
        // outputHistogram(h, filename);
 
+    }
+
+    public void testNum() throws URISyntaxException {
+
+        STHolesOrigHistogram<NumRectangle> h = new STHolesOrigHistogram<NumRectangle>();
+        NumQueryRecord r = readFromPool(Paths.get(getClass().getResource("/BR19830").toURI()).toString());
+        h.refine(r);
+        NumRectangle e = readFromPool(Paths.get(getClass().getResource("/BR19830838758").toURI()).toString());
+        h.estimate(e);
     }
 
     private static void outputHistogram(RDFSTHolesHistogram h, String filename) {
