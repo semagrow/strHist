@@ -5,6 +5,7 @@ import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
+
 import org.json.simple.JSONObject;
 
 import java.util.*;
@@ -508,7 +509,20 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @return pair of merge penalty and resulting box
      */
     private Map.Entry<STHolesBucket<R>, Long>
-            getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
+    getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
+        return getPCMergePenalty( 0, bp, bc );
+    }
+
+    /**
+     * computes the penalty of merging parent bucket {bp}
+     * with child bucket {bp} and the resulting box
+     * @param type penalty formula (0,1,2)
+     * @param bp parent bucket
+     * @param bc child bucket
+     * @return pair of merge penalty and resulting box
+     */
+    private Map.Entry<STHolesBucket<R>, Long>
+    getPCMergePenalty(int type, STHolesBucket<R> bp, STHolesBucket<R> bc) {
 
         if (!bc.getParent().equals(bp)) {
             //todo: throw exception
@@ -521,7 +535,32 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         Stat newStatistics = new Stat(newFreq, newDistinct);
 
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, null, newParent);
-        long penalty = Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
+        long penalty;
+        double dd, dd2, acc;
+        int dim;
+        switch( type ) {
+        case 0:
+        	penalty = Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
+        	break;
+        case 1:
+        	dd = Math.abs( bc.getStatistics().getDensity() - bp.getStatistics().getDensity() );
+        	penalty = Math.round( dd );
+        	break;
+        case 2:
+        	dim = bp.getStatistics().getDistinctCount().size();
+        	acc = 0.0;
+        	for( int i=0; i<dim; ++i ) {
+        		dd = (double)bn.getStatistics().getFrequency() /
+        				(double)bn.getStatistics().getDistinctCount().get(i);
+        		dd2 = (double)bc.getStatistics().getFrequency() /
+        				(double)bc.getStatistics().getDistinctCount().get(i);
+        		acc += Math.abs( dd2 - dd );
+        	}
+        	penalty = Math.round( acc );
+        	break;
+        default:
+        	throw new IllegalArgumentException( "Type must be 0..2" );
+        }
 
         AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res = new AbstractMap.SimpleEntry<STHolesBucket<R>, Long>(bn, penalty);
 
@@ -543,7 +582,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
     /**
      * computes the penalty of merging siblings {b1} and {b2}
      * and the resulting box
-     * @param type penalty formula
+     * @param type penalty formula (0,1,2)
      * @param b1 sibling 1
      * @param b2 sibling 2
      * @return pair of merge penalty and resulting box
@@ -615,20 +654,37 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, newChildren, null);
 
         long penalty;
+        double dd, dd2, acc;
+        int dim;
         switch( type ) {
         case 0:
-        	penalty =
-        		Math.abs( b1.getEstimate(b1.getBox()) - bn.getEstimate(b1.getBox()) ) +
-        		Math.abs( b2.getEstimate(b2.getBox()) - bn.getEstimate(b2.getBox()) ) +
-        		Math.abs( bp.getEstimate(bn.getBox()) - bn.getEstimate(bn.getBox()) );
-        	break;
-        case 1:
         	penalty =
         		Math.abs( b1.getEstimate(null) - bn.getEstimate(null) ) +
         		Math.abs( b2.getEstimate(null) - bn.getEstimate(null) );
         	break;
+        case 1:
+        	dd =
+        		Math.abs( b1.getStatistics().getDensity() - bn.getStatistics().getDensity() ) +
+        		Math.abs( b2.getStatistics().getDensity() - bn.getStatistics().getDensity() );
+        	penalty = Math.round( dd );
+        	break;
+        case 2:
+        	dim = b1.getStatistics().getDistinctCount().size();
+        	acc = 0.0;
+        	for( int i=0; i<dim; ++i ) {
+        		dd = (double)bn.getStatistics().getFrequency() /
+        				(double)bn.getStatistics().getDistinctCount().get(i);
+        		dd2 = (double)b1.getStatistics().getFrequency() /
+        				(double)b1.getStatistics().getDistinctCount().get(i);
+        		acc += Math.abs( dd2 - dd );
+        		dd2 = (double)b2.getStatistics().getFrequency() /
+        				(double)b2.getStatistics().getDistinctCount().get(i);
+        		acc += Math.abs( dd2 - dd );
+        	}
+        	penalty = Math.round( acc );
+        	break;
         default:
-        	throw new IllegalArgumentException( "Type must be 0..1" );
+        	throw new IllegalArgumentException( "Type must be 0..2" );
         }
 
         AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res =
