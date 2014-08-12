@@ -28,7 +28,7 @@ public class NumericalMapper {
      */
     public NumericalMapper(String sortedFilePath) {
 
-        loadIndex(sortedFilePath);
+//        loadIndex(sortedFilePath);
         loadArray(sortedFilePath);
     }// Constructor
 
@@ -39,7 +39,7 @@ public class NumericalMapper {
         try {
             BufferedReader br = new BufferedReader(new FileReader(sortedFilePath));
             String line = "";
-//            int counter = 1;
+            int counter = 1;
 
             while ((line = br.readLine()) != null) {
 
@@ -47,8 +47,8 @@ public class NumericalMapper {
                 array.add(line);
 
 //                // TODO: Comment it after debug. Counter too.
-//                if (counter++ == 2970959 / 5)
-//                    break;
+                if (counter++ == 2970959 / 5)
+                    break;
             }
 
             br.close();
@@ -74,8 +74,8 @@ public class NumericalMapper {
                 counter++;
 
 //                // TODO: Comment it after debug.
-//                if (counter == 2970959 / 5)
-//                    break;
+                if (counter == 2970959 / 5)
+                    break;
             }
 
             br.close();
@@ -94,13 +94,13 @@ public class NumericalMapper {
 
         int startRange = -1, endRange = -1;
 
-        for (int i=1; i<array.size(); i++) {
+        for (int i=0; i<array.size(); i++) {
 
             if (array.get(i).startsWith(prefix) && startRange == -1)
-                startRange = i;
+                startRange = i + 1;
 
             if (!array.get(i).startsWith(prefix) && startRange != -1 && endRange == -1) {
-                endRange = i - 1;
+                endRange = i;
                 break;
              }
         }
