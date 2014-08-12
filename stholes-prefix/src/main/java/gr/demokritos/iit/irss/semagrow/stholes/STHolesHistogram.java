@@ -43,10 +43,15 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         if (root != null) {
 
             // if rec is larger than our root
-            if (!root.getBox().contains(rec)) {
+            if (rec.contains(root.getBox())){
 
                 return root.getEstimate(rec);
             }
+            else if (!root.getBox().contains(rec)) {
+
+                return 0;
+            }
+
             return estimateAux(rec, root);
         }
         else
