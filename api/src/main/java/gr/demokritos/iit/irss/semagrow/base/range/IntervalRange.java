@@ -77,7 +77,7 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
                 res = new IntervalRange(nLow, nHigh);
             } else {
 
-                res = null;
+                res = new IntervalRange(nLow, nHigh);
             }
 
             return res;
