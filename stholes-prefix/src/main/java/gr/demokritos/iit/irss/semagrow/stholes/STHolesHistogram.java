@@ -533,7 +533,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         Stat newStatistics = new Stat(newFreq, newDistinct);
 
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, null, newParent);
-        long penalty = Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
+        //long penalty = Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
+        long penalty = Math.abs(bc.getStatistics().getDensity().longValue() -
+                bp.getStatistics().getDensity().longValue());
 
         AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res = new AbstractMap.SimpleEntry<STHolesBucket<R>, Long>(bn, penalty);
 
@@ -549,7 +551,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      */
     private Map.Entry<STHolesBucket<R>, Long>
     getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
-    	return getSSMergePenalty(0, b1, b2);
+    	return getSSMergePenalty(1, b1, b2);
     }
     
     /**
@@ -636,8 +638,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         	break;
         case 1:
         	penalty =
-        		Math.abs( b1.getEstimate(null) - bn.getEstimate(null) ) +
-        		Math.abs( b2.getEstimate(null) - bn.getEstimate(null) );
+        		Math.abs( b1.getStatistics().getDensity().longValue() -
+                        bn.getStatistics().getDensity().longValue() ) +
+        		Math.abs( b2.getStatistics().getDensity().longValue() -
+                        bn.getStatistics().getDensity().longValue() );
         	break;
         default:
         	throw new IllegalArgumentException( "Type must be 0..1" );
