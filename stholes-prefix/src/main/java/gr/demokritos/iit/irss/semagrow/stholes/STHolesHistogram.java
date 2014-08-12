@@ -536,7 +536,20 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @return pair of merge penalty and resulting box
      */
     private Map.Entry<STHolesBucket<R>, Long>
-        getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
+    getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
+    	return getSSMergePenalty(0, b1, b2);
+    }
+    
+    /**
+     * computes the penalty of merging siblings {b1} and {b2}
+     * and the resulting box
+     * @param type penalty formula
+     * @param b1 sibling 1
+     * @param b2 sibling 2
+     * @return pair of merge penalty and resulting box
+     */
+    private Map.Entry<STHolesBucket<R>, Long>
+        getSSMergePenalty(int type, STHolesBucket<R> b1, STHolesBucket<R> b2) {
 
         if (!b1.getParent().equals(b2.getParent())) {
             //todo: throw exception
@@ -602,9 +615,21 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, newChildren, null);
 
         long penalty;
-        penalty = Math.abs(b1.getEstimate(b1.getBox()) - bn.getEstimate(b1.getBox()))
-        + Math.abs(b2.getEstimate(b2.getBox())-bn.getEstimate(b2.getBox()))
-        + Math.abs(bp.getEstimate(bn.getBox()) - bn.getEstimate(bn.getBox()));
+        switch( type ) {
+        case 0:
+        	penalty =
+        		Math.abs( b1.getEstimate(b1.getBox()) - bn.getEstimate(b1.getBox()) ) +
+        		Math.abs( b2.getEstimate(b2.getBox()) - bn.getEstimate(b2.getBox()) ) +
+        		Math.abs( bp.getEstimate(bn.getBox()) - bn.getEstimate(bn.getBox()) );
+        	break;
+        case 1:
+        	penalty =
+        		Math.abs( b1.getEstimate(null) - bn.getEstimate(null) ) +
+        		Math.abs( b2.getEstimate(null) - bn.getEstimate(null) );
+        	break;
+        default:
+        	throw new IllegalArgumentException( "Type must be 0..1" );
+        }
 
         AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res =
                 new AbstractMap.SimpleEntry<STHolesBucket<R>, Long>(bn, penalty);

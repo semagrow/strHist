@@ -168,18 +168,22 @@ public class STHolesBucket<R extends Rectangle> {
     }
 
     //Tested
-    public long getEstimate(R rec) {
-
-        long estimate = statistics.getFrequency();
+    public long getEstimate(R rec)
+    {
+        long dvc = 1;
+        
+        // If no argument, return myself's estimate
+        if( rec == null ) { rec = this.box; }
 
         for (int i=0; i< rec.getDimensionality(); i++) {
-
-            if ((rec.getRange(i)).isUnit())
-
-                estimate *= 1.0 /  statistics.getDistinctCount().get(i);
+            if ((rec.getRange(i)).isUnit()) {
+            	dvc *= this.statistics.getDistinctCount().get(i);
+            }
         }
-
-        return estimate;
+        
+        float estimate =
+        	((float)this.statistics.getFrequency().longValue()) / ((float)dvc);
+        return Math.round( estimate );
     }
 
     //Tested
