@@ -127,6 +127,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         }
 
         // check if histogram must be compacted after refinement
+        System.out.println("Histogram refined with query: " + queryRecord.getRectangle().getRange(0));
         compact();
     }
 

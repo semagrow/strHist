@@ -31,8 +31,8 @@ public class RDFSTHolesHistogramTest extends TestCase {
     public void testNum() throws URISyntaxException {
 
         STHolesOrigHistogram h = HistogramIO.readOrig(Paths.get(getClass().getResource("/" +
-                "1373867-1473515").toURI()).toString());
-        NumQueryRecord r = readFromPool(Paths.get(getClass().getResource("/NL200").toURI()).toString());
+                "3740087-3743332").toURI()).toString());
+        NumQueryRecord r = readFromPool(Paths.get(getClass().getResource("/US80").toURI()).toString());
         h.refine(r);
 
         String filename = "src/main/resources/test_output";

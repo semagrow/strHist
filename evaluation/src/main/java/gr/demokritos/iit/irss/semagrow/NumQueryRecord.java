@@ -25,20 +25,20 @@ public class NumQueryRecord implements QueryRecord<NumRectangle, Long>, Serializ
     }
 
 
-    @Override
+
     public String getQuery() {
         return numQuery.toString();
     }// getQuery
 
     public NumQuery getNumQuery() { return numQuery; }
 
-    @Override
+
     public NumRectangle getRectangle() {
         return new NumRectangle(numQuery.getQueryStatements());
     }// getRectangle
 
 
-    @Override
+
     public QueryResult getResultSet() {
         return new NumQueryResult(numQuery);
     }
