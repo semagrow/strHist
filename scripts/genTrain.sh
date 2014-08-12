@@ -2,11 +2,17 @@
 
 i=1;
 
+if [[ x"$1" == x ]]; then P="b";
+else P="$1"; fi
+
 while [[ 1==1 ]]; do
     F=$(printf "%05d\n" $i)
-
-    java -cp ./lib/*:./lib/cp gr.demokritos.iit.irss.semagrow.TestMainQueryFeedbackGenerate 50 sorted f/ "train/b$F/"
-    java -cp ./lib/*:./lib/cp gr.demokritos.iit.irss.semagrow.RDFtoNumQueryConverter -s sorted -t "train/b$F" -o "train_num/b$F"
+    D="train/$P$F/"
+    mkdir -p $D
+    java -cp ./lib/*:./lib/cp gr.demokritos.iit.irss.semagrow.TestMainQueryFeedbackGenerate 50 sorted f/ "$D"
+    DNUM="train_num/$P$F/"
+    mkdir -p $DNUM
+    java -cp ./lib/*:./lib/cp gr.demokritos.iit.irss.semagrow.RDFtoNumQueryConverter -s sorted -t "$D" -o "$DNUM"
 
     i=$((i+1))
 done
