@@ -33,8 +33,8 @@ public class RDFSTHolesHistogramTest extends TestCase {
         STHolesOrigHistogram<NumRectangle> h = new STHolesOrigHistogram<NumRectangle>();
         NumQueryRecord r = readFromPool(Paths.get(getClass().getResource("/BR19830").toURI()).toString());
         h.refine(r);
-        NumRectangle e = readFromPool(Paths.get(getClass().getResource("/BR19830838758").toURI()).toString());
-        h.estimate(e);
+        NumQueryRecord e = readFromPool(Paths.get(getClass().getResource("/BR19830838758").toURI()).toString());
+        h.estimate(e.getRectangle());
     }
 
     private static void outputHistogram(RDFSTHolesHistogram h, String filename) {
