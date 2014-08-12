@@ -28,7 +28,7 @@ public class NumericalMapper {
      */
     public NumericalMapper(String sortedFilePath) {
 
-//        loadIndex(sortedFilePath);
+        loadIndex(sortedFilePath);
         loadArray(sortedFilePath);
     }// Constructor
 
