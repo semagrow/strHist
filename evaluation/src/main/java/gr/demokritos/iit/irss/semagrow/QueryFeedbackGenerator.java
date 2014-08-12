@@ -8,7 +8,6 @@ import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -31,7 +30,9 @@ public class QueryFeedbackGenerator {
     private RepositoryConnection conn;
     private ArrayList<RDFTriple> filteredData;
 
+    private static Random rand = new Random();
 
+    
     public QueryFeedbackGenerator(String uniqueSubjectData, String filteredDataFolder,
                                   String nativeStoreFolder) throws RepositoryException {
 
@@ -359,13 +360,10 @@ public class QueryFeedbackGenerator {
      */
     public static int randInt(int min, int max) {
 
-        // NOTE: Usually this should be a field rather than a method
-        // variable so that it is not re-seeded every call.
-        Random rand = new Random();
 
         // nextInt is normally exclusive of the top value,
         // so add 1 to make it inclusive
-        int randomNum = rand.nextInt((max - min) + 1) + min;
+        int randomNum = QueryFeedbackGenerator.rand.nextInt((max - min) + 1) + min;
 
         return randomNum;
     }// randInt

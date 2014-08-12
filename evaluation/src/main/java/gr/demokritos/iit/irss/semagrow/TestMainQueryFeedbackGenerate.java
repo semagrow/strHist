@@ -17,30 +17,33 @@ import java.util.Iterator;
  */
 public class TestMainQueryFeedbackGenerate {
 
-    static String uniqueSubjectData = "C:\\Users\\Nick\\Downloads\\sorted_2\\sorted";
-//    static String filteredDataFolder = "C:\\Users\\Nick\\Downloads\\filtered\\";
-    static String filteredDataFolder = "C:\\Users\\Nick\\Downloads\\test\\";
+    static String uniqueSubjectData = "C:\\Users\\Nick\\Downloads\\sorted\\sorted";
+    static String filteredDataFolder = "C:\\Users\\Nick\\Downloads\\filtered\\";
     static String outputDataFolder = "C:\\Users\\Nick\\git\\sthist\\src\\main\\resources\\data\\";
     static String nativeStoreFolder = "src/main/resources/native_store/";
-//    static String trainingPool = "C:\\Users\\Nick\\Downloads\\train\\train\\b12\\";
-    static String trainingPool = "src/main/resources/training_pool/b/";
-    static String evaluationPool = "src/main/resources/evaluation_pool/b12/";
+    static String trainingPool = "src/main/resources/training_pool/b1";
+    static String evaluationPool = "src/main/resources/evaluation_pool/b1/";
 
     public static void main(String[] args) throws IOException, RepositoryException {
 
-//        int times = Integer.parseInt(args[0]);
-//        String uniqueSubjectData = args[1];
-//        String filteredDataFolder = args[2];
-//        String trainingPool = args[3];
+        int times = Integer.parseInt(args[0]);
+        String uniqueSubjectData = args[1];
+        String filteredDataFolder = args[2];
+        String trainingPool = args[3];
 
 
         QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder,
                 nativeStoreFolder);
 
         QueryRecord qr;
-
-//        // --- Training Pool Generator
-        for (int i=0; i<5; i++) {
+        ArrayList<String> allPrefixes = new ArrayList<String>();
+        File[] files = new File( trainingPool ).listFiles();
+        for (File f : files) {
+        	allPrefixes.add( "http://agris.fao.org/aos/records/" + f.getName() );
+        }
+        
+        // --- Training Pool Generator
+        for (int i=0; i<times; i++) {
             qr = qfg.generateTrainingSet();
             System.out.println(qr.getQuery());
 
@@ -76,9 +79,9 @@ public class TestMainQueryFeedbackGenerate {
 
         // --- Evaluation Pool Generator
         // Read all training prefixes.
-//        qfg.savedPrefixes.addAll(getAllPrefixes(trainingPool));
+//        qfg.savedPrefixes.addAll( allPrefixes );
 //
-//        for (int i=0; i<200; i++) {
+//        for (int i=0; i<2; i++) {
 //            qr = qfg.generateEvaluationSet();
 //            System.out.println(qr.getQuery());
 //
@@ -93,18 +96,6 @@ public class TestMainQueryFeedbackGenerate {
 //        }
 
     }// main
-
-
-    private static ArrayList<String> getAllPrefixes(String path) {
-        ArrayList<String> list = new ArrayList<String>();
-
-        File[] files = new File(path).listFiles();
-
-        for (File f : files)
-            list.add("http://agris.fao.org/aos/records/" + f.getName());
-
-        return list;
-    }// getAllPrefixes
 
 
     /**
