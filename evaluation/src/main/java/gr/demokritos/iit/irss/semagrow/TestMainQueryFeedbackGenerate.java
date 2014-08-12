@@ -36,7 +36,12 @@ public class TestMainQueryFeedbackGenerate {
                 nativeStoreFolder);
 
         QueryRecord qr;
-
+        ArrayList<String> allPrefixes = new ArrayList<String>();
+        File[] files = new File( trainingPool ).listFiles();
+        for (File f : files) {
+        	allPrefixes.add( "http://agris.fao.org/aos/records/" + f.getName() );
+        }
+        
         // --- Training Pool Generator
         for (int i=0; i<times; i++) {
             qr = qfg.generateTrainingSet();
@@ -74,7 +79,7 @@ public class TestMainQueryFeedbackGenerate {
 
         // --- Evaluation Pool Generator
         // Read all training prefixes.
-        qfg.savedPrefixes.addAll(getAllPrefixes(trainingPool));
+        qfg.savedPrefixes.addAll( allPrefixes );
 
         for (int i=0; i<2; i++) {
             qr = qfg.generateEvaluationSet();
@@ -110,18 +115,6 @@ public class TestMainQueryFeedbackGenerate {
 //        System.out.println("http://aims.fao.org/aos/agrovoc/".length());
 
     }// main
-
-
-    private static ArrayList<String> getAllPrefixes(String path) {
-        ArrayList<String> list = new ArrayList<String>();
-
-        File[] files = new File(path).listFiles();
-
-        for (File f : files)
-            list.add("http://agris.fao.org/aos/records/" + f.getName());
-
-        return list;
-    }// getAllPrefixes
 
 
     /**
