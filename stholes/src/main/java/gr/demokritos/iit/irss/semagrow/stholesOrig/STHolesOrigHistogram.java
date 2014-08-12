@@ -335,15 +335,18 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                 getIntersectionWithRecVolume(candidateHole.getBox())) {
 
             //if candidate hole covers all parentBucket's remaining space
-            R newBox = parentBucket.getBox();
-            long newFreq = parentBucket.getFrequency() + candidateHole.getFrequency();
-            STHolesOrigBucket<R> parentN = parentBucket.getParent();
+            // merge parentBucket with its parent
+            STHolesOrigBucket<R> bp = parentBucket.getParent();
+            R newBox = bp.getBox();
+            long newFreq = bp.getFrequency() + parentBucket.getFrequency();
+            STHolesOrigBucket<R> parentN = bp.getParent();
             STHolesOrigBucket<R> bn = new STHolesOrigBucket<R>(newBox, newFreq, null, parentN);
-            STHolesOrigBucket.merge(parentBucket, candidateHole, bn, this);
+
+            STHolesOrigBucket<R> mergedBucket = STHolesOrigBucket.getParentChildMerge(bp, parentBucket, bn, this);
 
             System.out.println("Parent child merge in drillHole!!!");
 
-            drillHole(parentBucket, candidateHole);
+            drillHole(mergedBucket, candidateHole);
         }
         else {
 
