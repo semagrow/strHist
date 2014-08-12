@@ -34,4 +34,16 @@ public class MergeInfo<R extends Rectangle<R>> {
     public long getPenalty() {
         return penalty;
     }
+
+    public String toString() {
+
+        String res;
+
+        res = "Merge: \n" +
+                "b1: \n" + b1.toString() +
+                "b2: \n" + b2.toString() +
+                "into bn: \n" + bn.toString() +
+                "with penalty " + penalty;
+        return res;
+    }
 }
