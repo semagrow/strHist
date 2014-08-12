@@ -17,19 +17,21 @@ import java.util.Iterator;
  */
 public class TestMainQueryFeedbackGenerate {
 
-    static String uniqueSubjectData = "C:\\Users\\Nick\\Downloads\\sorted\\sorted";
-    static String filteredDataFolder = "C:\\Users\\Nick\\Downloads\\filtered\\";
+    static String uniqueSubjectData = "C:\\Users\\Nick\\Downloads\\sorted_2\\sorted";
+//    static String filteredDataFolder = "C:\\Users\\Nick\\Downloads\\filtered\\";
+    static String filteredDataFolder = "C:\\Users\\Nick\\Downloads\\test\\";
     static String outputDataFolder = "C:\\Users\\Nick\\git\\sthist\\src\\main\\resources\\data\\";
     static String nativeStoreFolder = "src/main/resources/native_store/";
-    static String trainingPool = "src/main/resources/training_pool/b1";
-    static String evaluationPool = "src/main/resources/evaluation_pool/b1/";
+//    static String trainingPool = "C:\\Users\\Nick\\Downloads\\train\\train\\b12\\";
+    static String trainingPool = "src/main/resources/training_pool/b/";
+    static String evaluationPool = "src/main/resources/evaluation_pool/b12/";
 
     public static void main(String[] args) throws IOException, RepositoryException {
 
-        int times = Integer.parseInt(args[0]);
-        String uniqueSubjectData = args[1];
-        String filteredDataFolder = args[2];
-        String trainingPool = args[3];
+//        int times = Integer.parseInt(args[0]);
+//        String uniqueSubjectData = args[1];
+//        String filteredDataFolder = args[2];
+//        String trainingPool = args[3];
 
 
         QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder,
@@ -37,8 +39,8 @@ public class TestMainQueryFeedbackGenerate {
 
         QueryRecord qr;
 
-        // --- Training Pool Generator
-        for (int i=0; i<times; i++) {
+//        // --- Training Pool Generator
+        for (int i=0; i<5; i++) {
             qr = qfg.generateTrainingSet();
             System.out.println(qr.getQuery());
 
@@ -74,40 +76,21 @@ public class TestMainQueryFeedbackGenerate {
 
         // --- Evaluation Pool Generator
         // Read all training prefixes.
-        qfg.savedPrefixes.addAll(getAllPrefixes(trainingPool));
-
-        for (int i=0; i<2; i++) {
-            qr = qfg.generateEvaluationSet();
-            System.out.println(qr.getQuery());
-
-            RDFQueryRecord rdfQr = (RDFQueryRecord)qr;
-            // Get prefix
-            String prefix = rdfQr.getLogQuery().getQueryStatements().get(0).getValue();
-            String[] splits = prefix.split("/");
-            writeToPool(evaluationPool, splits[splits.length - 1], rdfQr);
-
-//            rdfQr = readFromPool(evaluationPool, splits[splits.length - 1]);
-//            System.out.println(rdfQr.getQuery());
-        }
-
-//        new QueryPool(trainingPool, evaluationPool).getTrainingQueryRecords();
-
-//        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
-//        Iterator<RDFQueryRecord> iter = collection.iterator();
-//        int i = 0;
-//        while (iter.hasNext()) {
-//           RDFQueryRecord rdfRq = iter.next();
-//            System.out.println(i++);
-//            for (BindingSet bs : rdfRq.getResultSet().getBindingSets()) {
-//                if (bs.getBindings().get(1).getValue().length() < 32)
-//                    System.out.println(">>>>> ");
-////                else
-////                    System.out.println(bs.getBindings().get(1).getValue());
-//            }
+//        qfg.savedPrefixes.addAll(getAllPrefixes(trainingPool));
 //
+//        for (int i=0; i<200; i++) {
+//            qr = qfg.generateEvaluationSet();
+//            System.out.println(qr.getQuery());
+//
+//            RDFQueryRecord rdfQr = (RDFQueryRecord)qr;
+//            // Get prefix
+//            String prefix = rdfQr.getLogQuery().getQueryStatements().get(0).getValue();
+//            String[] splits = prefix.split("/");
+//            writeToPool(evaluationPool, splits[splits.length - 1], rdfQr);
+//
+////            rdfQr = readFromPool(evaluationPool, splits[splits.length - 1]);
+////            System.out.println(rdfQr.getQuery());
 //        }
-
-//        System.out.println("http://aims.fao.org/aos/agrovoc/".length());
 
     }// main
 
