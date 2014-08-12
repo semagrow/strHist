@@ -14,7 +14,8 @@ import java.util.*;
 public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements STHistogram<R,Long> {
 
     private STHolesOrigBucket<R> root;
-    private long maxBucketsNum;
+    public long maxBucketsNum;
+    public int epsilon = 0;
     private long bucketsNum = 0;
 
     public STHolesOrigHistogram() {
@@ -134,7 +135,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
     //Tested
     private boolean isInaccurateEstimation(STHolesOrigBucket<R> hole) {
 
-        int epsilon = 0; //todo: adjust parameter
+        //int epsilon = 0; //todo: adjust parameter
         long actualStatistics = hole.getFrequency();
 
 

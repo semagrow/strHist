@@ -31,8 +31,10 @@ public class TestHistogram {
         *  -h histogram to start (optional)
         *  -o output dir
         *  -v verbose (output histogram in each
+        *  -b max bucket
+        *  -d difference of inaccuracy (epsilon)
         * */
-        OptionParser parser = new OptionParser("nvt:e:o:h::");
+        OptionParser parser = new OptionParser("nvt:e:o:h::b:d:");
         OptionSet options = parser.parse(args);
 
         if (options.has("n"))
@@ -49,6 +51,12 @@ public class TestHistogram {
         RDFSTHolesHistogram h = new RDFSTHolesHistogram();
 
         String outputDir = ".";
+
+        if (options.has("b") && options.hasArgument("b"))
+            h.setMaxBucketsNum(Integer.parseInt(options.valueOf("b").toString()));
+
+        if (options.has("d") && options.hasArgument("d"))
+            h.epsilon = Integer.parseInt(options.valueOf("d").toString());
 
         if (options.has("h") && options.hasArgument("h"))
              h = HistogramIO.read(options.valueOf("h").toString());
@@ -113,6 +121,12 @@ public class TestHistogram {
         String outputDir = ".";
 
 
+        if (options.has("b") && options.hasArgument("b"))
+            h.setMaxBucketsNum(Integer.parseInt(options.valueOf("b").toString()));
+
+        if (options.has("d") && options.hasArgument("d"))
+            h.epsilon = Integer.parseInt(options.valueOf("d").toString());
+
         if (options.has("o") && options.hasArgument("o"))
             outputDir = options.valueOf("o").toString();
 
@@ -145,7 +159,7 @@ public class TestHistogram {
                     runBatchNum(h, f.getAbsolutePath(), batchOutput, verbose);
 
                     outputHistogramNum(h, batchOutput + "/histogram.json");
-                    //outputHistogramStats(h, batchOutput + "/stats.txt");
+                    outputHistogramStatsNum(h, batchOutput + "/stats.txt");
 
                     if (options.has("e") && options.hasArgument("e")) {
                         for (Object evopt : options.valuesOf("e")) {
@@ -281,7 +295,20 @@ public class TestHistogram {
         BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
 
         bw.write("Max Buckets: " + h.maxBucketsNum);
+        bw.newLine();
         bw.write("Total Buckets: " + h.getBucketsNum());
+        bw.newLine();
+        bw.close();
+    }
+
+    private static void outputHistogramStatsNum(STHolesOrigHistogram<NumRectangle> h, String filename) throws IOException {
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
+
+        bw.write("Max Buckets: " + h.maxBucketsNum);
+        bw.newLine();
+        bw.write("Total Buckets: " + h.getBucketsNum());
+        bw.newLine();
         bw.close();
     }
 

@@ -171,7 +171,7 @@ public class STHolesBucket<R extends Rectangle> {
     }
 
     //Tested
-    public long getEstimate(R rec)
+    public long getEstimate( R rec )
     {
         long dvc = 1;
         
