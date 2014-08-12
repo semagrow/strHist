@@ -30,14 +30,19 @@ public class RDFSTHolesHistogramTest extends TestCase {
 
     public void testNum() throws URISyntaxException {
 
-        STHolesOrigHistogram<NumRectangle> h = new STHolesOrigHistogram<NumRectangle>();
-        NumQueryRecord r = readFromPool(Paths.get(getClass().getResource("/BR19830").toURI()).toString());
+        STHolesOrigHistogram h = HistogramIO.readOrig(Paths.get(getClass().getResource("/" +
+                "1373867-1473515").toURI()).toString());
+        NumQueryRecord r = readFromPool(Paths.get(getClass().getResource("/NL200").toURI()).toString());
         h.refine(r);
-        NumQueryRecord e = readFromPool(Paths.get(getClass().getResource("/BR19830838758").toURI()).toString());
-        h.estimate(e.getRectangle());
+
+        String filename = "src/main/resources/test_output";
+        outputHistogram(h, filename);
+
+    //    NumQueryRecord e = readFromPool(Paths.get(getClass().getResource("/BR19830838758").toURI()).toString());
+    //    h.estimate(e.getRectangle());
     }
 
-    private static void outputHistogram(RDFSTHolesHistogram h, String filename) {
+    private static void outputHistogram(STHolesOrigHistogram h, String filename) {
         HistogramIO histIO = new HistogramIO(filename, h);
         histIO.write();
     }

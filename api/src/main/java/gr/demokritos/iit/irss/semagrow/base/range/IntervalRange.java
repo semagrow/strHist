@@ -92,7 +92,7 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         // in this dimension
         if (intervalRange.contains(this)) {
 
-            return new IntervalRange(0,0);
+            return new IntervalRange(1,0);
         }
 
         //Scenario 2: bucket encloses participant range
