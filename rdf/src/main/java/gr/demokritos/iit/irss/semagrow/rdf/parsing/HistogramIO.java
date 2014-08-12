@@ -19,6 +19,7 @@ import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
+import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigBucket;
 import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -48,7 +49,7 @@ public class HistogramIO<R extends Rectangle<R>> {
     public void write() {
         if (histogram != null)
             writeJSOn();
-        else
+        else if (histogramOrig != null)
             writeJSOnOrig();
     }
 
@@ -58,6 +59,15 @@ public class HistogramIO<R extends Rectangle<R>> {
 
         STHolesBucket<RDFRectangle> root = readJSON(path);
         RDFSTHolesHistogram h = new RDFSTHolesHistogram();
+        h.setRoot(root);
+        return h;
+    }
+
+
+    public static STHolesOrigHistogram readOrig(String path) {
+
+        STHolesOrigBucket<NumRectangle> root = readJSONOrig(path);
+        STHolesOrigHistogram h = new STHolesOrigHistogram();
         h.setRoot(root);
         return h;
     }
@@ -99,6 +109,108 @@ public class HistogramIO<R extends Rectangle<R>> {
             e.printStackTrace();
         }
     }
+
+
+    public static STHolesOrigBucket<NumRectangle> readJSONOrig(String path) {
+
+        JSONParser parser = new JSONParser();
+        Object obj;
+        JSONObject jsonObject;
+        STHolesOrigBucket<NumRectangle> rootBucket = null;
+
+        try {
+            obj = parser.parse(new FileReader(path));
+            jsonObject = (JSONObject) obj;
+
+            obj = jsonObject.get("bucket");
+            JSONObject bucket = (JSONObject)obj;
+
+            rootBucket = getBucketOrig(bucket);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+        return rootBucket;
+    }// readJSONOrig
+
+
+    private static STHolesOrigBucket<NumRectangle> getBucketOrig(JSONObject b) {
+
+        STHolesOrigBucket<NumRectangle> bucket = null;
+        JSONObject jsonObject;
+        NumRectangle box;
+        long frequency;
+        Collection<STHolesOrigBucket> children;
+
+        // Get box
+        box = getBoxOrig(b.get("box"));
+
+        // Get frequency
+        frequency = (Long)(b.get("frequency"));
+
+        // Instantiate root Bucket
+        bucket = new STHolesOrigBucket<NumRectangle>(box, frequency);
+
+        // Get children buckets and set their parent
+        bucket.getChildren().addAll(
+                getChildrenOrig(b.get("children"), bucket));
+
+        return bucket;
+    }// getBucketOrig
+
+
+    private static Collection<STHolesOrigBucket<NumRectangle>> getChildrenOrig
+            (Object childrenObj, STHolesOrigBucket<NumRectangle> parent) {
+
+        Collection<STHolesOrigBucket<NumRectangle>> children = new ArrayList<STHolesOrigBucket<NumRectangle>>();
+        JSONArray array = (JSONArray)childrenObj;
+        JSONObject temp;
+        STHolesOrigBucket<NumRectangle> tempBucket;
+
+        Iterator<JSONObject> iterator = array.iterator();
+
+        while (iterator.hasNext()) {
+            temp = (JSONObject)iterator.next();
+
+            // Get Bucket
+            tempBucket = getBucketOrig((JSONObject) temp.get("bucket"));
+            // And set its parent
+            tempBucket.setParent(parent);
+
+            children.add(tempBucket);
+        }
+
+        return children;
+
+    }// getChildrenOrig
+
+
+    private static NumRectangle getBoxOrig(Object boxObj) {
+
+        JSONObject jsonObject;
+        JSONArray jsonArray;
+
+        jsonObject = (JSONObject)boxObj;
+        jsonArray = (JSONArray)jsonObject.get("rectangle");
+        List<IntervalRange> list = new ArrayList<IntervalRange>();
+
+        for (Object obj : jsonArray) {
+
+            jsonObject = (JSONObject)obj;
+
+            long low = (Long) jsonObject.get("low");
+            long high = (Long) jsonObject.get("high");
+            list.add(new IntervalRange((int)low, (int)high));
+        }
+
+        return new NumRectangle(list);
+    }// getBoxOrig
 
 
     public static STHolesBucket<RDFRectangle> readJSON(String path) {

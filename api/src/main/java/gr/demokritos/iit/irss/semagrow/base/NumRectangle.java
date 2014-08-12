@@ -215,7 +215,7 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
         return true;
     }
 
-    @Override
+
     public boolean isEmpty() {
         for (IntervalRange d : dims)
             if (d.isEmpty())
