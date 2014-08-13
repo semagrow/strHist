@@ -118,6 +118,17 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         if (intervalRange.high >= this.high)
             highN = intervalRange.low;
 
+        //If intervalRange and this are adjacent
+        if (lowN == intervalRange.high) {
+
+            lowN += 1;
+        }
+
+        if (highN == intervalRange.low) {
+
+            highN -= 1;
+        }
+
         return new IntervalRange(lowN, highN);
     }
 
