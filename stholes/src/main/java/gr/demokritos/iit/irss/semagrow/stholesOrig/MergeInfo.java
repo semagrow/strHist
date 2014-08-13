@@ -10,9 +10,9 @@ public class MergeInfo<R extends RectangleWithVolume<R>> {
     private STHolesOrigBucket<R> b1;
     private STHolesOrigBucket<R> b2;
     private STHolesOrigBucket<R> bn;
-    private long penalty;
+    private double penalty;
 
-    MergeInfo(STHolesOrigBucket<R> b1, STHolesOrigBucket<R> b2, STHolesOrigBucket<R> bn, long penalty) {
+    MergeInfo(STHolesOrigBucket<R> b1, STHolesOrigBucket<R> b2, STHolesOrigBucket<R> bn, double penalty) {
         this.b1 = b1;
         this.b2 = b2;
         this.bn = bn;
@@ -31,7 +31,19 @@ public class MergeInfo<R extends RectangleWithVolume<R>> {
         return bn;
     }
 
-    public long getPenalty() {
+    public double getPenalty() {
         return penalty;
+    }
+
+    public String toString() {
+
+        String res;
+
+        res = "Merge: \n" +
+                "b1: \n" + b1.toString() +
+                "b2: \n" + b2.toString() +
+                "into bn: \n" + bn.toString() +
+                "with penalty " + penalty;
+        return res;
     }
 }

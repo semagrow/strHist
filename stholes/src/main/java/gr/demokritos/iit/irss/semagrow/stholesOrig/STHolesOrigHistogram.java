@@ -18,6 +18,12 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
     public int epsilon = 0;
     private long bucketsNum = 0;
 
+
+    public long pcMergesNum = 0;
+    public long ssMergesNum = 0;
+
+
+
     public STHolesOrigHistogram() {
         //todo: choose a constant
         maxBucketsNum = 1000;
@@ -216,7 +222,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                 System.err.println("This should not happen! Original" +
                         "frequency: " + Tb + " and new frequency: " + freq);
                 System.err.println(bucket.getIntersectionWithRecVolume(rect));
-                
+
                 freq= (long)Math.ceil(Tb * ((double)c.getVolume())/
                         bucket.getBox().intersection(rect).getVolume());
 
@@ -422,6 +428,9 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
             STHolesOrigBucket<R> bn = bestMerge.getBn();
 
             STHolesOrigBucket.merge(b1, b2, bn, this);
+            System.out.println(bestMerge.toString());
+            System.out.println("Number of PC merges:" + pcMergesNum);
+            System.out.println("Number of SS merges: " + ssMergesNum);
             //bucketsNum -= 1;
         }
     }
@@ -437,9 +446,9 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
         MergeInfo<R> bestMerge;
         MergeInfo<R> candidateMerge;
-        long minimumPenalty = Integer.MAX_VALUE;
-        long penalty;
-        Map.Entry<STHolesOrigBucket<R>, Long> candidateMergedBucket;
+        double minimumPenalty = Integer.MAX_VALUE;
+        double penalty;
+        Map.Entry<STHolesOrigBucket<R>, Double> candidateMergedBucket;
 
         // Initialize buckets to be merged and resulting bucket
         STHolesOrigBucket<R> b1 = b;
@@ -510,7 +519,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
      * @param bc child bucket
      * @return pair of merge penalty and resulting box
      */
-    private Map.Entry<STHolesOrigBucket<R>, Long>
+    private Map.Entry<STHolesOrigBucket<R>, Double>
     getPCMergePenalty(STHolesOrigBucket<R> bp, STHolesOrigBucket<R> bc) {
 
         if (!bc.getParent().equals(bp)) {
@@ -522,11 +531,11 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         STHolesOrigBucket<R> newParent = bp.getParent();
         STHolesOrigBucket<R> bn = new STHolesOrigBucket<R>(newBox, newFreq, null, newParent);
 
-        long penalty = (long)Math.ceil(Math.abs(bp.getFrequency() - bn.getFrequency() *
+        double penalty = (long)Math.ceil(Math.abs(bp.getFrequency() - bn.getFrequency() *
                 ((double) bp.getVolume()) / bn.getVolume()));
 
-        AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long> res =
-                new AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long>(bn, penalty);
+        AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Double> res =
+                new AbstractMap.SimpleEntry<>(bn, penalty);
 
         return res;
     }
@@ -538,7 +547,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
      * @param b2 sibling 2
      * @return pair of merge penalty and resulting box
      */
-    private Map.Entry<STHolesOrigBucket<R>, Long>
+    private Map.Entry<STHolesOrigBucket<R>, Double>
     getSSMergePenalty(STHolesOrigBucket<R> b1, STHolesOrigBucket<R> b2) {
 
         if (!b1.getParent().equals(b2.getParent())) {
@@ -594,17 +603,16 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         // Create bn
         STHolesOrigBucket<R> bn = new STHolesOrigBucket<R>(newBox, newFrequency, newChildren, null);
 
-        long penalty;
-        penalty = (long) Math.ceil(
-                Math.abs( bn.getFrequency()* ((double) vold)/bn.getVolume() -
+        double penalty;
+        penalty = Math.abs( bn.getFrequency()* ((double) vold)/bn.getVolume() -
         bp.getFrequency()*((double) vold)/bp.getVolume())
                 + Math.abs( b1.getFrequency() - bn.getFrequency()*
                         ((double) b1.getVolume())/bn.getVolume())
                 + Math.abs(b2.getFrequency() - bn.getFrequency()*
-                        ((double) b2.getVolume())/bn.getVolume()));
+                        ((double) b2.getVolume())/bn.getVolume());
 
-        AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long> res =
-                new AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Long>(bn, penalty);
+        AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Double> res =
+                new AbstractMap.SimpleEntry<>(bn, penalty);
 
         return res;
     }
@@ -627,5 +635,21 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
     public void setBucketsNum(long bucketsNum) {
 
         this.bucketsNum = bucketsNum;
+    }
+
+    public long getPcMergesNum() {
+        return pcMergesNum;
+    }
+
+    public void setPcMergesNum(long pcMergesNum) {
+        this.pcMergesNum = pcMergesNum;
+    }
+
+    public long getSsMergesNum() {
+        return ssMergesNum;
+    }
+
+    public void setSsMergesNum(long ssMergesNum) {
+        this.ssMergesNum = ssMergesNum;
     }
 }

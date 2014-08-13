@@ -140,7 +140,7 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
         }
 
         h.setBucketsNum(h.getBucketsNum() - 1);
-
+        h.setPcMergesNum(h.getPcMergesNum() + 1);
     }
 
     public static <R extends RectangleWithVolume<R>> STHolesOrigBucket<R>
@@ -175,7 +175,7 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
         }
 
         h.setBucketsNum(h.getBucketsNum() - 1);
-
+        h.setPcMergesNum(h.getPcMergesNum() + 1);
         return bn;
     }
 
@@ -246,6 +246,7 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
         }
 
         h.setBucketsNum(h.getBucketsNum() - 1);
+        h.setSsMergesNum(h.getSsMergesNum() + 1);
     }
 
     public double getEstimate(R rec) {
