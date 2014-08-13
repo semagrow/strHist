@@ -28,6 +28,7 @@ public class QueryFeedbackGenerator {
     public ArrayList<String> savedPrefixes;
     private Repository nativeRep;
     private RepositoryConnection conn;
+    private ArrayList<RDFTriple> filteredData;
 
     private static Random rand = new Random();
 
@@ -45,12 +46,50 @@ public class QueryFeedbackGenerator {
         uniqueSubjectFileRows = countLineNumber(uniqueSubjectData);
         System.out.println("Total File Rows: " + uniqueSubjectFileRows);
 
-        // Create a local Sesame Native Store.
+        // --- Create a local Sesame Native Store.
         System.out.println("Initializing Native Store...");
         nativeRep = new SailRepository(new NativeStore(new File(nativeStoreFolder)));
         nativeRep.initialize();
         System.out.println("Native Store successfully initialized.");
+        // ---
+
+        // Load filtered files into memory. Caution: Heavy Process!
+        loadFilteredData();
+
     }// Constructor
+
+
+    private void loadFilteredData() {
+        System.out.println("Loading filtered files into memory...");
+
+        filteredData = new ArrayList<RDFTriple>();
+
+        File[] files = new File(filteredDataFolder).listFiles();
+
+        for (File file : files)
+            loadFile(file);
+    }// loadFiltered
+
+
+    private void loadFile(File file) {
+        System.out.println("Loading " + file.getName());
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line = "";
+            String splits[];
+
+            while ((line = br.readLine()) != null) {
+                splits = line.split(" ");
+
+                filteredData.add(new RDFTriple(cleanString(splits[0]),
+                        cleanString(splits[1]),
+                        cleanString(splits[2])));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }// loadFile
 
 
     public QueryRecord generateTrainingSet() throws IOException, RepositoryException {
@@ -81,6 +120,7 @@ public class QueryFeedbackGenerator {
             String prefix = savedPrefixes.get(randomRowNumber - 1);
 
             subject = getSpecificSubject(prefix);
+
         } else {
 
             // Just choose a random subject from the sorted ones.
@@ -100,6 +140,11 @@ public class QueryFeedbackGenerator {
 
         String subject = getSpecificSubject(randomRowNumber);
         System.out.println("Random Subject: " + subject);
+
+        /////////////////
+//        // TODO: Comment it after debug
+//        subject = "http://agris.fao.org/aos/records/YU7500516";
+        /////////////////
 
         // Trim its prefix randomly
         // TODO: Make it general for various datasets
@@ -153,12 +198,15 @@ public class QueryFeedbackGenerator {
         ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
 
             try {
-                conn = nativeRep.getConnection();
 
-                if (regex) {// Does not use the native store, because regex is too slow.
 
-                    bindingSets.addAll(extractQueryBindingSets(subjectString));
+                if (regex) {// Does not use the native store, because regex is too slow. Uses in-memory collection.
+
+//                    bindingSets.addAll(extractQueryBindingSets(subjectString));
+                    bindingSets = (extractQueryBS(subjectString)); // Searches in-memory collection.
                 } else { // Uses the native store.
+
+                    conn = nativeRep.getConnection();
 
                     URI subject = ValueFactoryImpl.getInstance().createURI(subjectString);
                     RepositoryResult<Statement> statements = conn.getStatements(subject, null, null, true);
@@ -170,13 +218,14 @@ public class QueryFeedbackGenerator {
 
                         BindingSet bs = new BindingSet();
                         bs.getBindings().add(new Binding("subject", s.getSubject().toString()));
-                        bs.getBindings().add(new Binding("predicate", ""));//s.getPredicate().toString())
+                        bs.getBindings().add(new Binding("predicate", s.getPredicate().toString()));
                         bs.getBindings().add(new Binding("object", s.getObject().stringValue()));
                         bindingSets.add(bs);
                     }
+
+                    conn.close();
                 }
 
-                conn.close();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -186,47 +235,69 @@ public class QueryFeedbackGenerator {
     }// extractQueryResultSet
 
 
-    private ArrayList<BindingSet> extractQueryBindingSets(String subject) throws IOException {
+//    private ArrayList<BindingSet> extractQueryBindingSets(String subject) throws IOException {
+//
+//        ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
+//        File[] files = new File(filteredDataFolder).listFiles();
+//
+//        for (File file : files) {
+//            System.out.println(file.getName());
+//            bindingSets.addAll(extractFromFile(file, subject));
+//        }
+//
+//        return bindingSets;
+//    }
+
+
+    private ArrayList<BindingSet> extractQueryBS(String subject) {
 
         ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
-        File[] files = new File(filteredDataFolder).listFiles();
 
-        for (File file : files) {
-            System.out.println(file.getName());
-            bindingSets.addAll(extractFromFile(file, subject));
-        }
+        for (RDFTriple triple : filteredData) {
 
-        return bindingSets;
-    }
+            if (triple.getSubject().startsWith(subject)) {
 
-
-    private ArrayList<BindingSet> extractFromFile(File file, String subject) throws IOException {
-        ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
-
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String line = "";
-        String splits[];
-
-        while ((line = br.readLine()) != null) {
-            splits = line.split(" ");
-
-            // Check if the current subject starts with the trimmed subject.
-            String currentSubject = cleanString(splits[0]);
-
-            if (currentSubject.startsWith(subject)) {// If yes, add the predicate and object of this tuple to the BindingSet.
                 BindingSet bs = new BindingSet();
 
-                bs.getBindings().add(new Binding("subject", cleanString(splits[0])));
-                bs.getBindings().add(new Binding("predicate", cleanString(splits[1])));
-                bs.getBindings().add(new Binding("object", cleanString(splits[2])));
+                bs.getBindings().add(new Binding("subject", triple.getSubject()));
+                bs.getBindings().add(new Binding("predicate", triple.getPredicate()));
+                bs.getBindings().add(new Binding("object", triple.getObject()));
 
                 bindingSets.add(bs);
             }
         }
 
-        br.close();
         return bindingSets;
-    }
+    }// extractQueryBS
+
+
+//    private ArrayList<BindingSet> extractFromFile(File file, String subject) throws IOException {
+//        ArrayList<BindingSet> bindingSets = new ArrayList<BindingSet>();
+//
+//        BufferedReader br = new BufferedReader(new FileReader(file));
+//        String line = "";
+//        String splits[];
+//
+//        while ((line = br.readLine()) != null) {
+//            splits = line.split(" ");
+//
+//            // Check if the current subject starts with the trimmed subject.
+//            String currentSubject = cleanString(splits[0]);
+//
+//            if (currentSubject.startsWith(subject)) {// If yes, add the predicate and object of this tuple to the BindingSet.
+//                BindingSet bs = new BindingSet();
+//
+//                bs.getBindings().add(new Binding("subject", cleanString(splits[0])));
+//                bs.getBindings().add(new Binding("predicate", cleanString(splits[1])));
+//                bs.getBindings().add(new Binding("object", cleanString(splits[2])));
+//
+//                bindingSets.add(bs);
+//            }
+//        }
+//
+//        br.close();
+//        return bindingSets;
+//    }
 
 
     private String cleanString(String string) {

@@ -64,24 +64,25 @@ public class TestMainQueryFeedbackGenerate {
 ////            System.out.println(rdfQr.getQuery());
 //        }
 
-//        new QueryPool(trainingPool, evaluationPool).getTrainingQueryRecords();
 
-//        CustomCollection<RDFQueryRecord> collection = new CustomCollection<RDFQueryRecord>(trainingPool);
-//        Iterator<RDFQueryRecord> iter = collection.iterator();
-//        int i = 0;
-//        while (iter.hasNext()) {
-//           RDFQueryRecord rdfRq = iter.next();
-//            System.out.println(i++);
-//            for (BindingSet bs : rdfRq.getResultSet().getBindingSets()) {
-//                if (bs.getBindings().get(1).getValue().length() < 32)
-//                    System.out.println(">>>>> ");
-////                else
-////                    System.out.println(bs.getBindings().get(1).getValue());
-//            }
+        // --- Evaluation Pool Generator
+        // Read all training prefixes.
+//        qfg.savedPrefixes.addAll( allPrefixes );
+
 //
+//        for (int i=0; i<2; i++) {
+//            qr = qfg.generateEvaluationSet();
+//            System.out.println(qr.getQuery());
+//
+//            RDFQueryRecord rdfQr = (RDFQueryRecord)qr;
+//            // Get prefix
+//            String prefix = rdfQr.getLogQuery().getQueryStatements().get(0).getValue();
+//            String[] splits = prefix.split("/");
+//            writeToPool(evaluationPool, splits[splits.length - 1], rdfQr);
+//
+////            rdfQr = readFromPool(evaluationPool, splits[splits.length - 1]);
+////            System.out.println(rdfQr.getQuery());
 //        }
-
-//        System.out.println("http://aims.fao.org/aos/agrovoc/".length());
 
     }// main
 

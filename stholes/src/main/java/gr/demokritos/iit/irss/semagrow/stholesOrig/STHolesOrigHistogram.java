@@ -195,8 +195,31 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         }
 
         // Collect candidate hole statistics
-        long freq= (long)Math.ceil(Tb * ((double)c.getVolume())/
-                bucket.getIntersectionWithRecVolume(rect));
+        long freq = 0;
+
+
+
+        //!!Claim: if v(q intersection b) is 0, then b's children
+        //that are enclosed in c, cover all c's space. c will be drilled
+        // and will be merged later if needed
+        if (bucket.getIntersectionWithRecVolume(rect) == 0) {
+
+             freq= (long)Math.ceil(Tb * ((double)c.getVolume())/
+                    bucket.getBox().intersection(rect).getVolume());
+        } else {
+
+            freq = (long)Math.ceil(Tb * ((double)c.getVolume())/
+                    bucket.getIntersectionWithRecVolume(rect));
+
+            if ((double)c.getVolume() > bucket.getIntersectionWithRecVolume(rect) ) {
+
+                System.err.println("This should not happen! Original" +
+                        "frequency: " + Tb + " and new frequency: " + freq);
+                System.err.println(bucket.getIntersectionWithRecVolume(rect));
+            }
+
+        }
+
 
         // Create candidate hole bucket
 
