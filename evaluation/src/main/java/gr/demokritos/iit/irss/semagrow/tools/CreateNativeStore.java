@@ -22,11 +22,11 @@ public class CreateNativeStore {
 
     public static void main(String[] args) throws RepositoryException {
 
-//        String dataFolder = args[0];
-//        String nativeStoreFolder = args[1];
+        String dataFolder = args[0];
+        String nativeStoreFolder = args[1];
 
-        String dataFolder = "C:\\Users\\Nick\\Downloads\\filtered\\";
-        String nativeStoreFolder = "src\\main\\resources\\native_store\\";
+//        String dataFolder = "C:\\Users\\Nick\\Downloads\\filtered\\";
+//        String nativeStoreFolder = "src\\main\\resources\\native_store\\";
 
         // Create a local Sesame Native Store.
         Repository nativeRep = new SailRepository(new NativeStore(new File(nativeStoreFolder)));

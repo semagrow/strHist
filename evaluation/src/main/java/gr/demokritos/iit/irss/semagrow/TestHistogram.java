@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
@@ -34,7 +35,13 @@ public class TestHistogram {
         *  -b max bucket
         *  -d difference of inaccuracy (epsilon)
         * */
-        OptionParser parser = new OptionParser("nvt:e:o:h::b:d:");
+        OptionParser parser = new OptionParser("nvt:e:o:h::");
+        parser.accepts("maxbuckets", "Maximum Buckets").withRequiredArg();
+        parser.accepts("epsilon", "Max difference of accurate statistics").withRequiredArg();
+        parser.accepts("pcpenalty").withRequiredArg();
+        parser.accepts("sspenalty").withRequiredArg();
+        parser.accepts("?").forHelp();
+
         OptionSet options = parser.parse(args);
 
         if (options.has("n"))
@@ -52,11 +59,17 @@ public class TestHistogram {
 
         String outputDir = ".";
 
-        if (options.has("b") && options.hasArgument("b"))
-            h.setMaxBucketsNum(Integer.parseInt(options.valueOf("b").toString()));
+        if (options.has("maxbuckets") && options.hasArgument("maxbuckets"))
+            h.setMaxBucketsNum(Integer.parseInt(options.valueOf("maxbuckets").toString()));
 
-        if (options.has("d") && options.hasArgument("d"))
-            h.epsilon = Integer.parseInt(options.valueOf("d").toString());
+        if (options.has("epsilon") && options.hasArgument("epsilon"))
+            h.epsilon = Double.parseDouble(options.valueOf("epsilon").toString());
+
+        if (options.has("pcpenalty") && options.hasArgument("pcpenalty"))
+            h.PC_PENALTY_TYPE = Integer.parseInt(options.valueOf("pcpenalty").toString());
+
+        if (options.has("sspenalty") && options.hasArgument("sspenalty"))
+            h.SS_PENALTY_TYPE = Integer.parseInt(options.valueOf("sspenalty").toString());
 
         if (options.has("h") && options.hasArgument("h"))
              h = HistogramIO.read(options.valueOf("h").toString());
@@ -121,11 +134,11 @@ public class TestHistogram {
         String outputDir = ".";
 
 
-        if (options.has("b") && options.hasArgument("b"))
-            h.setMaxBucketsNum(Integer.parseInt(options.valueOf("b").toString()));
+        if (options.has("maxbuckets") && options.hasArgument("maxbuckets"))
+            h.setMaxBucketsNum(Integer.parseInt(options.valueOf("maxbuckets").toString()));
 
-        if (options.has("d") && options.hasArgument("d"))
-            h.epsilon = Integer.parseInt(options.valueOf("d").toString());
+        if (options.has("epsilon") && options.hasArgument("epsilon"))
+            h.epsilon = Integer.parseInt(options.valueOf("epsilon").toString());
 
         if (options.has("o") && options.hasArgument("o"))
             outputDir = options.valueOf("o").toString();
@@ -297,6 +310,12 @@ public class TestHistogram {
         bw.write("Max Buckets: " + h.maxBucketsNum);
         bw.newLine();
         bw.write("Total Buckets: " + h.getBucketsNum());
+        bw.newLine();
+        bw.write("PC Merges: " + h.pcMergesNum);
+        bw.newLine();
+        bw.write("SS Merges: " + h.ssMergesNum);
+        bw.newLine();
+        bw.write("Total Merges: " + (h.ssMergesNum + h.pcMergesNum));
         bw.newLine();
         bw.close();
     }

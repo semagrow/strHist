@@ -19,11 +19,14 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
     private STHolesBucket<R> root;
     public long maxBucketsNum;
-    public int epsilon = 0;
+    public Double epsilon = 0.0;
     private long bucketsNum = 0;
 
-    private long pcMergesNum = 0;
-    private long ssMergesNum = 0;
+    public long pcMergesNum = 0;
+    public long ssMergesNum = 0;
+
+    public int PC_PENALTY_TYPE = 0;
+    public int SS_PENALTY_TYPE = 1;
 
     public STHolesHistogram() {
         //todo: choose a constant
@@ -523,7 +526,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      */
     private Map.Entry<STHolesBucket<R>, Long>
     getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
-        return getPCMergePenalty( 0, bp, bc );
+        return getPCMergePenalty( PC_PENALTY_TYPE, bp, bc );
     }
 
     /**
@@ -589,7 +592,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      */
     private Map.Entry<STHolesBucket<R>, Long>
     getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
-    	return getSSMergePenalty(1, b1, b2);
+    	return getSSMergePenalty(SS_PENALTY_TYPE, b1, b2);
     }
     
     /**

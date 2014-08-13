@@ -54,7 +54,7 @@ public class QueryFeedbackGenerator {
         // ---
 
         // Load filtered files into memory. Caution: Heavy Process!
-        loadFilteredData();
+        //loadFilteredData();
 
     }// Constructor
 
