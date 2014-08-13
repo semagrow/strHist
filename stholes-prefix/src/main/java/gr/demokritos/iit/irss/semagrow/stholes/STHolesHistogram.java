@@ -25,8 +25,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
     public long pcMergesNum = 0;
     public long ssMergesNum = 0;
 
-    public int PC_PENALTY_TYPE = 0;
-    public int SS_PENALTY_TYPE = 1;
+    static public final int MAX_PENALTY_TYPE = 2;
+    public int PENALTY_TYPE = 1;
 
     public STHolesHistogram() {
         //todo: choose a constant
@@ -526,7 +526,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      */
     private Map.Entry<STHolesBucket<R>, Double>
     getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
-        return getPCMergePenalty( PC_PENALTY_TYPE, bp, bc );
+        return getPCMergePenalty( PENALTY_TYPE, bp, bc );
     }
 
     /**
@@ -538,7 +538,11 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @return pair of merge penalty and resulting box
      */
     private Map.Entry<STHolesBucket<R>, Double>
-    getPCMergePenalty(int type, STHolesBucket<R> bp, STHolesBucket<R> bc) {
+    getPCMergePenalty(int type, STHolesBucket<R> bp, STHolesBucket<R> bc)
+    {
+        double penalty;
+        double dd, dd2, bn_size, bc_size;
+        int dim;
 
         if (!bc.getParent().equals(bp)) {
             //todo: throw exception
@@ -551,30 +555,25 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         Stat newStatistics = new Stat(newFreq, newDistinct);
 
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, null, newParent);
-        double penalty;
-        double dd, dd2, acc;
-        int dim;
+
         switch( type ) {
         case 0:
         	penalty = Math.abs(estimate(bc.getBox()) - estimate(bp.getBox()));
         	break;
         case 1:
         	dd = Math.abs( bc.getStatistics().getDensity() - bp.getStatistics().getDensity() );
-        	//penalty = Math.round( dd );
             penalty = dd;
         	break;
         case 2:
         	dim = bp.getStatistics().getDistinctCount().size();
-        	acc = 0.0;
+        	penalty = 0.0;
+        	bn_size = bn.getStatistics().getFrequency();
+        	bc_size = bc.getStatistics().getFrequency();
         	for( int i=0; i<dim; ++i ) {
-        		dd = (double)bn.getStatistics().getFrequency() /
-        				(double)bn.getStatistics().getDistinctCount().get(i);
-        		dd2 = (double)bc.getStatistics().getFrequency() /
-        				(double)bc.getStatistics().getDistinctCount().get(i);
-        		acc += Math.abs( dd2 - dd );
+        		dd = bn_size / (double)bn.getStatistics().getDistinctCount().get(i);
+        		dd2 = bc_size / (double)bc.getStatistics().getDistinctCount().get(i);
+        		penalty += Math.abs( dd2 - dd );
         	}
-        	// penalty = Math.round( acc );
-            penalty = acc;
         	break;
         default:
         	throw new IllegalArgumentException( "Type must be 0..2" );
@@ -594,7 +593,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      */
     private Map.Entry<STHolesBucket<R>, Double>
     getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
-    	return getSSMergePenalty(SS_PENALTY_TYPE, b1, b2);
+    	return getSSMergePenalty( PENALTY_TYPE, b1, b2 );
     }
     
     /**
@@ -672,7 +671,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, newChildren, null);
 
         double penalty;
-        double dd, dd2, acc;
+        double dd, dd2, bn_size, b1_size, b2_size;
         int dim;
         switch( type ) {
         case 0:
@@ -684,24 +683,21 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         	dd =
         		Math.abs( b1.getStatistics().getDensity() - bn.getStatistics().getDensity() ) +
         		Math.abs( b2.getStatistics().getDensity() - bn.getStatistics().getDensity() );
-        	// penalty = Math.round( dd );
             penalty = dd;
         	break;
         case 2:
         	dim = b1.getStatistics().getDistinctCount().size();
-        	acc = 0.0;
+        	penalty = 0.0;
+        	bn_size = bn.getStatistics().getFrequency();
+        	b1_size = b1.getStatistics().getFrequency();
+        	b2_size = b2.getStatistics().getFrequency();
         	for( int i=0; i<dim; ++i ) {
-        		dd = (double)bn.getStatistics().getFrequency() /
-        				(double)bn.getStatistics().getDistinctCount().get(i);
-        		dd2 = (double)b1.getStatistics().getFrequency() /
-        				(double)b1.getStatistics().getDistinctCount().get(i);
-        		acc += Math.abs( dd2 - dd );
-        		dd2 = (double)b2.getStatistics().getFrequency() /
-        				(double)b2.getStatistics().getDistinctCount().get(i);
-        		acc += Math.abs( dd2 - dd );
+        		dd = bn_size / (double)bn.getStatistics().getDistinctCount().get(i);
+        		dd2 = b1_size / (double)b1.getStatistics().getDistinctCount().get(i);
+        		penalty += Math.abs( dd2 - dd );
+        		dd2 = b2_size / (double)b2.getStatistics().getDistinctCount().get(i);
+        		penalty += Math.abs( dd2 - dd );
         	}
-        	// penalty = Math.round( acc );
-            penalty = acc;
         	break;
         default:
         	throw new IllegalArgumentException( "Type must be 0..2" );

@@ -65,11 +65,13 @@ public class TestHistogram {
         if (options.has("epsilon") && options.hasArgument("epsilon"))
             h.epsilon = Double.parseDouble(options.valueOf("epsilon").toString());
 
-        if (options.has("pcpenalty") && options.hasArgument("pcpenalty"))
-            h.PC_PENALTY_TYPE = Integer.parseInt(options.valueOf("pcpenalty").toString());
-
-        if (options.has("sspenalty") && options.hasArgument("sspenalty"))
-            h.SS_PENALTY_TYPE = Integer.parseInt(options.valueOf("sspenalty").toString());
+        if (options.has("penalty") && options.hasArgument("penalty")) {
+            try { h.PENALTY_TYPE = Integer.parseInt(options.valueOf("penalty").toString()); }
+            catch( Exception ex ) { h.PENALTY_TYPE = 1; }
+            if( (h.PENALTY_TYPE<0) || (h.PENALTY_TYPE>h.MAX_PENALTY_TYPE) ) {
+            	h.PENALTY_TYPE = 1;
+            }
+        }
 
         if (options.has("h") && options.hasArgument("h"))
              h = HistogramIO.read(options.valueOf("h").toString());
