@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 
 public class RDFSTHolesHistogramTest extends TestCase {
@@ -28,16 +29,16 @@ public class RDFSTHolesHistogramTest extends TestCase {
     public void testNum() throws URISyntaxException
     {
         /*
+
     	//java.net.URL u1 = this.getClass().getResource("/3670788-3676597");
     	//java.net.URL u2 = this.getClass().getResource("/US197");
 
         STHolesOrigHistogram h = HistogramIO.readOrig(Paths.get(getClass().
-                getResource("/2127605-2164616").toURI()).toString());
+                getResource("/369914-374641").toURI()).toString());
         NumQueryRecord r = readFromPool(Paths.get(getClass().
-                getResource("/US89").toURI()).toString());
+                getResource("/NL").toURI()).toString());
         h.refine(r);
         */
-
 
     	/*
     	// Java 7-specific code:
@@ -52,11 +53,16 @@ public class RDFSTHolesHistogramTest extends TestCase {
     	Either way, these resources do not exist and the test fails
     	*/
 
+        /*
         String filename = "src/main/resources/test_output";
-        //outputHistogram(h, filename);
+        outputHistogram(h, filename);
+
+        */
 
     //    NumQueryRecord e = readFromPool(Paths.get(getClass().getResource("/BR19830838758").toURI()).toString());
     //    h.estimate(e.getRectangle());
+
+
     }
 
     private static void outputHistogram(STHolesOrigHistogram h, String filename) {
