@@ -141,7 +141,7 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         if (isEmpty()) {
             return 0;
         }
-        return high - low; }
+        return high - low + 1; }
 
     public int getLow() { return low; }
 

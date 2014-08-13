@@ -1,10 +1,7 @@
 package gr.demokritos.iit.irss.semagrow;
 
 
-import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
-import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import junit.framework.TestCase;
 
@@ -30,8 +27,17 @@ public class RDFSTHolesHistogramTest extends TestCase {
 
     public void testNum() throws URISyntaxException
     {
-    	java.net.URL u1 = this.getClass().getResource("/3670788-3676597");
-    	java.net.URL u2 = this.getClass().getResource("/US197");
+        /*
+    	//java.net.URL u1 = this.getClass().getResource("/3670788-3676597");
+    	//java.net.URL u2 = this.getClass().getResource("/US197");
+
+        STHolesOrigHistogram h = HistogramIO.readOrig(Paths.get(getClass().
+                getResource("/2127605-2164616").toURI()).toString());
+        NumQueryRecord r = readFromPool(Paths.get(getClass().
+                getResource("/US89").toURI()).toString());
+        h.refine(r);
+        */
+
 
     	/*
     	// Java 7-specific code:

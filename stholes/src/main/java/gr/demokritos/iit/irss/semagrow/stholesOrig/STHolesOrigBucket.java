@@ -243,7 +243,7 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
         newParent.setFrequency(freqN);
 
         if (freqN > freq) {
-            
+
             System.err.println("SSMerge2: This should not happen. New " +
                     "parent frequency is " + freqN + " while previous was " +
                      freq);
