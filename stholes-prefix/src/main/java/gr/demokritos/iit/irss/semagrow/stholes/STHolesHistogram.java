@@ -19,7 +19,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
     private STHolesBucket<R> root;
     public long maxBucketsNum;
-    public int epsilon = 0;
+    public Double epsilon = 0.0;
     private long bucketsNum = 0;
 
     public long pcMergesNum = 0;

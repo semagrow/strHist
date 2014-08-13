@@ -27,11 +27,11 @@ public class TestMainQueryFeedbackGenerateEval {
 
     public static void main(String[] args) throws IOException, RepositoryException {
 
-        prefixFile = args[0];
-        uniqueSubjectData = args[1];
-        evaluationPool = args[2];
-        nativeStoreFolder = args[3];
-
+        int size = Integer.parseInt(args[0]);
+        prefixFile = args[1];
+        uniqueSubjectData = args[2];
+        evaluationPool = args[3];
+        nativeStoreFolder = args[4];
 
         QueryFeedbackGenerator qfg = new QueryFeedbackGenerator(uniqueSubjectData, filteredDataFolder,
                 nativeStoreFolder);
@@ -44,7 +44,7 @@ public class TestMainQueryFeedbackGenerateEval {
             //allPrefixes.add("http://agris.fao.org/aos/records/" + f.getName());
         //}
 
-        evalGen(qfg, allPrefixes);
+        evalGen(size, qfg, allPrefixes);
 
     }// main
 
@@ -62,13 +62,13 @@ public class TestMainQueryFeedbackGenerateEval {
     }
 
 
-    private static void evalGen(QueryFeedbackGenerator qfg, ArrayList<String> allPrefixes) throws IOException, RepositoryException {
+    private static void evalGen(int s, QueryFeedbackGenerator qfg, ArrayList<String> allPrefixes) throws IOException, RepositoryException {
 
         // --- Evaluation Pool Generator
         // Read all training prefixes.
         qfg.savedPrefixes.addAll(allPrefixes);
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < s; i++) {
             QueryRecord qr = qfg.generateEvaluationSet();
             System.out.println(qr.getQuery());
 

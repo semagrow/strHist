@@ -63,7 +63,7 @@ public class TestHistogram {
             h.setMaxBucketsNum(Integer.parseInt(options.valueOf("maxbuckets").toString()));
 
         if (options.has("epsilon") && options.hasArgument("epsilon"))
-            h.epsilon = Integer.parseInt(options.valueOf("epsilon").toString());
+            h.epsilon = Double.parseDouble(options.valueOf("epsilon").toString());
 
         if (options.has("pcpenalty") && options.hasArgument("pcpenalty"))
             h.PC_PENALTY_TYPE = Integer.parseInt(options.valueOf("pcpenalty").toString());
