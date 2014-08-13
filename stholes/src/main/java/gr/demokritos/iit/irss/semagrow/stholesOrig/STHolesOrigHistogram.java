@@ -219,14 +219,21 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
             if ((double)c.getVolume() > bucket.getIntersectionWithRecVolume(rect) ) {
 
-                System.err.println("This should not happen! Original" +
-                        "frequency: " + Tb + " and new frequency: " + freq);
-                System.err.println(bucket.getIntersectionWithRecVolume(rect));
+                //System.err.println("This should not happen! Original" +
+                  //      "frequency: " + Tb + " and new frequency: " + freq);
+                //System.err.println(bucket.getIntersectionWithRecVolume(rect));
 
                 freq= (long)Math.ceil(Tb * ((double)c.getVolume())/
                         bucket.getBox().intersection(rect).getVolume());
 
+                if (freq > Tb) {
+                    System.err.println("This should not happen! Original" +
+                          "frequency: " + Tb + " and new frequency: " + freq);
+                }
+
             }
+
+
 
         }
 
@@ -586,6 +593,12 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         long newFrequency = (long)Math.ceil(b1.getFrequency() + b2.getFrequency()
                 + bp.getFrequency()* ((double) vold)/bp.getVolume());
 
+
+        if ((double) vold > bp.getVolume()) {
+            System.err.println("SSMerge:This should not happen. New frequency is: " +
+            newFrequency + " and fb1, fb2, fbp are: " + b1.getFrequency() + " " +
+            b2.getFrequency() + bp.getFrequency());
+        }
 
         //Add children
         Collection<STHolesOrigBucket<R>> newChildren = new ArrayList<STHolesOrigBucket<R>>();

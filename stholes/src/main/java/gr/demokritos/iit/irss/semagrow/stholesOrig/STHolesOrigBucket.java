@@ -236,8 +236,18 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
         newParent.removeChild(b1);
         newParent.removeChild(b2);
 
-        newParent.setFrequency((long)Math.ceil(newParent.frequency*
-                ( 1 - ((double)vold)/newParent.getVolume())));
+        long freq = newParent.getFrequency();
+        long freqN = (long)Math.ceil(newParent.frequency*
+                ( 1 - ((double)vold)/newParent.getVolume()));
+
+        newParent.setFrequency(freqN);
+
+        if (freqN > freq) {
+            
+            System.err.println("SSMerge2: This should not happen. New " +
+                    "parent frequency is " + freqN + " while previous was " +
+                     freq);
+        }
 
         for (STHolesOrigBucket<R> bi : bn.getChildren()) {
 
