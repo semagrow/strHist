@@ -216,6 +216,10 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                 System.err.println("This should not happen! Original" +
                         "frequency: " + Tb + " and new frequency: " + freq);
                 System.err.println(bucket.getIntersectionWithRecVolume(rect));
+                
+                freq= (long)Math.ceil(Tb * ((double)c.getVolume())/
+                        bucket.getBox().intersection(rect).getVolume());
+
             }
 
         }
