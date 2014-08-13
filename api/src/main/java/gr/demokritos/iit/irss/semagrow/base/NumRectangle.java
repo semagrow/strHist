@@ -157,8 +157,28 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
             originalLength = dims.get(i).getLength();
             newLength = dimsN.get(i).getLength();
 
-            reduced = ((double) newLength)/ originalLength *100;
-            lengths.add(reduced);
+
+            //If range was [x,x]
+            if (originalLength == 0) {
+
+                if (dimsN.get(i).isUnit()) {
+                    reduced = 100;
+                    lengths.add(reduced);
+                }
+                else if (dimsN.get(i).isEmpty()) {
+                    reduced = 0;
+                    lengths.add(reduced);
+                }
+                else {
+                    System.err.println("Minus operation was wrong.");
+                }
+            }
+            else {
+
+                reduced = ((double) newLength) / originalLength * 100;
+                lengths.add(reduced);
+            }
+
         }
 
 
