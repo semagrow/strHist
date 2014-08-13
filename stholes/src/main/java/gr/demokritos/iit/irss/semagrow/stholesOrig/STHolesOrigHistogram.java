@@ -590,14 +590,24 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         }
 
         // Set statistics
-        long newFrequency = (long)Math.ceil(b1.getFrequency() + b2.getFrequency()
-                + bp.getFrequency()* ((double) vold)/bp.getVolume());
+
+        long newFrequency = 0;
+        try {
+             newFrequency = (long) Math.ceil(b1.getFrequency() + b2.getFrequency()
+                    + bp.getFrequency() * ((double) vold)/bp.getVolume());
+
+            if (bp.getVolume() == 0) {
+                throw new ArithmeticException();
+            }
 
 
-        if ((double) vold > bp.getVolume()) {
-            System.err.println("SSMerge:This should not happen. New frequency is: " +
-            newFrequency + " and fb1, fb2, fbp are: " + b1.getFrequency() + " " +
-            b2.getFrequency() + bp.getFrequency());
+            if (newFrequency > 20000000) {
+                System.err.println("SSMerge:This should not happen. New frequency is: " +
+                        newFrequency + " and fb1, fb2, fbp are: " + b1.getFrequency() + " " +
+                        b2.getFrequency() + bp.getFrequency());
+            }
+        } catch (ArithmeticException ae) {
+            System.out.println("ArithmeticException occured in getSSMergePenalty!");
         }
 
         //Add children
