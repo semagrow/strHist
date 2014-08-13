@@ -10,9 +10,9 @@ public class MergeInfo<R extends Rectangle<R>> {
     private STHolesBucket<R> b1;
     private STHolesBucket<R> b2;
     private STHolesBucket<R> bn;
-    private long penalty;
+    private double penalty;
 
-    public MergeInfo(STHolesBucket<R> b1, STHolesBucket<R> b2, STHolesBucket<R> bn, long penalty) {
+    public MergeInfo(STHolesBucket<R> b1, STHolesBucket<R> b2, STHolesBucket<R> bn, double penalty) {
         this.b1 = b1;
         this.b2 = b2;
         this.bn = bn;
@@ -31,7 +31,7 @@ public class MergeInfo<R extends Rectangle<R>> {
         return bn;
     }
 
-    public long getPenalty() {
+    public double getPenalty() {
         return penalty;
     }
 

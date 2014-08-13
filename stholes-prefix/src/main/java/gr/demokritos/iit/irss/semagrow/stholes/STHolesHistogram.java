@@ -451,9 +451,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
         MergeInfo<R> bestMerge;
         MergeInfo<R> candidateMerge;
-        long minimumPenalty = Integer.MAX_VALUE;
-        long penalty;
-        Map.Entry<STHolesBucket<R>, Long> candidateMergedBucket;
+        double minimumPenalty = Integer.MAX_VALUE;
+        double penalty;
+        Map.Entry<STHolesBucket<R>, Double> candidateMergedBucket;
 
         // Initialize buckets to be merged and resulting bucket
         STHolesBucket<R> b1 = b;
@@ -524,7 +524,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @param bc child bucket
      * @return pair of merge penalty and resulting box
      */
-    private Map.Entry<STHolesBucket<R>, Long>
+    private Map.Entry<STHolesBucket<R>, Double>
     getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
         return getPCMergePenalty( PC_PENALTY_TYPE, bp, bc );
     }
@@ -537,7 +537,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @param bc child bucket
      * @return pair of merge penalty and resulting box
      */
-    private Map.Entry<STHolesBucket<R>, Long>
+    private Map.Entry<STHolesBucket<R>, Double>
     getPCMergePenalty(int type, STHolesBucket<R> bp, STHolesBucket<R> bc) {
 
         if (!bc.getParent().equals(bp)) {
@@ -551,7 +551,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         Stat newStatistics = new Stat(newFreq, newDistinct);
 
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, null, newParent);
-        long penalty;
+        double penalty;
         double dd, dd2, acc;
         int dim;
         switch( type ) {
@@ -560,7 +560,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         	break;
         case 1:
         	dd = Math.abs( bc.getStatistics().getDensity() - bp.getStatistics().getDensity() );
-        	penalty = Math.round( dd );
+        	//penalty = Math.round( dd );
+            penalty = dd;
         	break;
         case 2:
         	dim = bp.getStatistics().getDistinctCount().size();
@@ -572,13 +573,14 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         				(double)bc.getStatistics().getDistinctCount().get(i);
         		acc += Math.abs( dd2 - dd );
         	}
-        	penalty = Math.round( acc );
+        	// penalty = Math.round( acc );
+            penalty = acc;
         	break;
         default:
         	throw new IllegalArgumentException( "Type must be 0..2" );
         }
 
-        AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res = new AbstractMap.SimpleEntry<STHolesBucket<R>, Long>(bn, penalty);
+        AbstractMap.SimpleEntry<STHolesBucket<R>, Double> res = new AbstractMap.SimpleEntry<STHolesBucket<R>, Double>(bn, penalty);
 
         return res;
     }
@@ -590,7 +592,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @param b2 sibling 2
      * @return pair of merge penalty and resulting box
      */
-    private Map.Entry<STHolesBucket<R>, Long>
+    private Map.Entry<STHolesBucket<R>, Double>
     getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
     	return getSSMergePenalty(SS_PENALTY_TYPE, b1, b2);
     }
@@ -603,7 +605,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
      * @param b2 sibling 2
      * @return pair of merge penalty and resulting box
      */
-    private Map.Entry<STHolesBucket<R>, Long>
+    private Map.Entry<STHolesBucket<R>, Double>
         getSSMergePenalty(int type, STHolesBucket<R> b1, STHolesBucket<R> b2) {
 
         if (!b1.getParent().equals(b2.getParent())) {
@@ -669,7 +671,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         Stat newStatistics = new Stat(newFrequency, newDistinct);
         STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, newChildren, null);
 
-        long penalty;
+        double penalty;
         double dd, dd2, acc;
         int dim;
         switch( type ) {
@@ -682,7 +684,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         	dd =
         		Math.abs( b1.getStatistics().getDensity() - bn.getStatistics().getDensity() ) +
         		Math.abs( b2.getStatistics().getDensity() - bn.getStatistics().getDensity() );
-        	penalty = Math.round( dd );
+        	// penalty = Math.round( dd );
+            penalty = dd;
         	break;
         case 2:
         	dim = b1.getStatistics().getDistinctCount().size();
@@ -697,14 +700,15 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         				(double)b2.getStatistics().getDistinctCount().get(i);
         		acc += Math.abs( dd2 - dd );
         	}
-        	penalty = Math.round( acc );
+        	// penalty = Math.round( acc );
+            penalty = acc;
         	break;
         default:
         	throw new IllegalArgumentException( "Type must be 0..2" );
         }
 
-        AbstractMap.SimpleEntry<STHolesBucket<R>, Long> res =
-                new AbstractMap.SimpleEntry<STHolesBucket<R>, Long>(bn, penalty);
+        AbstractMap.SimpleEntry<STHolesBucket<R>, Double> res =
+                new AbstractMap.SimpleEntry<STHolesBucket<R>, Double>(bn, penalty);
 
         return res;
     }
