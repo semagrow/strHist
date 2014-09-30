@@ -12,14 +12,14 @@ public class TestMainSerializer {
     public static void main(String[] args) {
 
         // Read histogram from file.
-        STHolesBucket<RDFRectangle> rootBucket = HistogramIO.readJSON("/home/nickozoulis/git/sthist/rdf/src/main/resources/hist.txt");
+        STHolesBucket<RDFRectangle> rootBucket = HistogramIO.readJSON("/home/nickozoulis/git/sthist/rdf/src/main/resources/histogram.json.txt");
         System.out.println(rootBucket);
 
         STHolesHistogram<RDFRectangle> histogram = new STHolesHistogram();
         histogram.setRoot(rootBucket);
 
         // Serialize histogram to VOID.
-        Serializer<RDFRectangle> serializer = new Serializer<RDFRectangle>("application/rdf+xml", "/home/nickozoulis/git/sthist/rdf/src/main/resources/");
+        Serializer serializer = new Serializer("application/x-turtle", "/home/nickozoulis/git/sthist/rdf/src/main/resources/");
         serializer.serialize(histogram);
 
     }

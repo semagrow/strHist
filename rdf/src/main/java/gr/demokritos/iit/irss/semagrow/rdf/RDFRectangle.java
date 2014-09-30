@@ -14,7 +14,7 @@ import java.util.HashSet;
  */
 public class RDFRectangle implements Rectangle<RDFRectangle> {
 
-	private PrefixRange subjectRange;
+    private PrefixRange subjectRange;
 
 	private ExplicitSetRange<String> predicateRange;
 
@@ -227,5 +227,18 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         System.out.println(rect + " and " + rect3 + " are mergeable: " + rect.isMergeable(rect3));
 
         System.out.println(rect.isInfinite());
+    }
+
+
+    public RDFLiteralRange getObjectRange() {
+        return objectRange;
+    }
+
+    public ExplicitSetRange<String> getPredicateRange() {
+        return predicateRange;
+    }
+
+    public PrefixRange getSubjectRange() {
+        return subjectRange;
     }
 }

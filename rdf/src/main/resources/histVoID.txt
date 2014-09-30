@@ -1,22 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rdf:RDF
-	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 
-<rdf:Description rdf:about="http://www.semagrow.eu/metadata/histogram/1">
-	<distinctObjects xmlns="http://rdfs.org/ns/void#" rdf:datatype="http://www.w3.org/2001/XMLSchema#long">47</distinctObjects>
-	<distinctSubjects xmlns="http://rdfs.org/ns/void#" rdf:datatype="http://www.w3.org/2001/XMLSchema#long">724</distinctSubjects>
-	<properties xmlns="http://rdfs.org/ns/void#" rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1</properties>
-	<subset xmlns="http://rdfs.org/ns/void#" rdf:resource="http://www.semagrow.eu/metadata/histogram/1_1"/>
-	<triples xmlns="http://rdfs.org/ns/void#" rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1448</triples>
-	<rdf:type rdf:resource="http://rdfs.org/ns/void#Dataset"/>
-</rdf:Description>
+<http://www.semagrow.eu/metadata/histogram/1> <http://rdfs.org/ns/void#distinctObjects> "47"^^<http://www.w3.org/2001/XMLSchema#long> ;
+	<http://rdfs.org/ns/void#distinctSubjects> "724"^^<http://www.w3.org/2001/XMLSchema#long> ;
+	<http://rdfs.org/ns/void#properties> "1"^^<http://www.w3.org/2001/XMLSchema#long> ;
+	<http://rdfs.org/ns/void#property> "http://www.natural-europe.eu/ontology#height" ;
+	<http://rdfs.org/ns/void#subset> <http://www.semagrow.eu/metadata/histogram/1_1> ;
+	<http://rdfs.org/ns/void#triples> "1448"^^<http://www.w3.org/2001/XMLSchema#long> ;
+	<http://rdfs.org/ns/void#uriRegexPattern> "uriprefixes: { http://ac.collections.natural-europe.eu:8890/sw/resource/ }" ;
+	a <http://rdfs.org/ns/void#Dataset> .
 
-<rdf:Description rdf:about="http://www.semagrow.eu/metadata/histogram/1_1">
-	<distinctObjects xmlns="http://rdfs.org/ns/void#" rdf:datatype="http://www.w3.org/2001/XMLSchema#long">26</distinctObjects>
-	<distinctSubjects xmlns="http://rdfs.org/ns/void#" rdf:datatype="http://www.w3.org/2001/XMLSchema#long">53</distinctSubjects>
-	<properties xmlns="http://rdfs.org/ns/void#" rdf:datatype="http://www.w3.org/2001/XMLSchema#long">1</properties>
-	<triples xmlns="http://rdfs.org/ns/void#" rdf:datatype="http://www.w3.org/2001/XMLSchema#long">106</triples>
-	<rdf:type rdf:resource="http://rdfs.org/ns/void#Dataset"/>
-</rdf:Description>
-
-</rdf:RDF>
+<http://www.semagrow.eu/metadata/histogram/1_1> <http://rdfs.org/ns/void#distinctObjects> "26"^^<http://www.w3.org/2001/XMLSchema#long> ;
+	<http://rdfs.org/ns/void#distinctSubjects> "53"^^<http://www.w3.org/2001/XMLSchema#long> ;
+	<http://rdfs.org/ns/void#properties> "1"^^<http://www.w3.org/2001/XMLSchema#long> ;
+	<http://rdfs.org/ns/void#property> "http://www.natural-europe.eu/ontology#height" ;
+	<http://rdfs.org/ns/void#triples> "106"^^<http://www.w3.org/2001/XMLSchema#long> ;
+	<http://rdfs.org/ns/void#uriRegexPattern> "uriprefixes: { http://ac.collections.natural-europe.eu:8890/sw/resource/ }" ;
+	a <http://rdfs.org/ns/void#Dataset> .
