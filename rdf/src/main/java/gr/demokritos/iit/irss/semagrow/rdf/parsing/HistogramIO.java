@@ -1,21 +1,16 @@
 package gr.demokritos.iit.irss.semagrow.rdf.parsing;
 
-import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import com.cedarsoftware.util.io.JsonWriter;
-import gr.demokritos.iit.irss.semagrow.api.*;
+import gr.demokritos.iit.irss.semagrow.api.Rectangle;
+import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
+import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
-import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
@@ -27,6 +22,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class HistogramIO<R extends Rectangle<R>> {
 

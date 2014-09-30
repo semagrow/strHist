@@ -132,12 +132,12 @@ public class TestMain {
 
 
         // Read histogram from file.
-        STHolesBucket<RDFRectangle> rootBucket = HistogramIO.readJSON("src\\main\\resources\\hist.txt");
+        STHolesBucket<RDFRectangle> rootBucket = HistogramIO.readJSON("/home/nickozoulis/git/sthist/rdf/src/main/resources/hist.txt");
         System.out.println(rootBucket);
 
         STHolesHistogram<RDFRectangle> histogram = new STHolesHistogram();
         histogram.setRoot(rootBucket);
-        new HistogramIO("src\\main\\resources\\histTest", histogram).write();
+        new HistogramIO("/home/nickozoulis/git/sthist/rdf/src/main/resources/histTest", histogram).write();
 
 	}
 

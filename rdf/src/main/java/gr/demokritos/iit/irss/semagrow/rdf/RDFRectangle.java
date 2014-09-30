@@ -199,6 +199,7 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         return rectangle;
     }
 
+
     public static void main(String args[] ) {
         ArrayList<String> myRangePrefixList = new ArrayList<String>();
         myRangePrefixList.add("http://a/");
