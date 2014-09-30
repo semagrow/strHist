@@ -17,7 +17,7 @@ public class ExplicitSetRange<T>
         implements RangeLength<T>, Rangeable<ExplicitSetRange<T>>
 {
 
-	private Set<T> items;
+    private Set<T> items;
     private boolean infinite = false;
 
 	public ExplicitSetRange(Collection<T> items) {
@@ -208,4 +208,9 @@ public class ExplicitSetRange<T>
 
 
 	}
+
+    public Set<T> getItems() {
+        return items;
+    }
+
 }
