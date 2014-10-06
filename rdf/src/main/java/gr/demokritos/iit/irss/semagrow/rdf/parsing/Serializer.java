@@ -1,21 +1,29 @@
 package gr.demokritos.iit.irss.semagrow.rdf.parsing;
 
+import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
+import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
+import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
+import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Model;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
+import org.openrdf.model.*;
 import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.model.vocabulary.RDFS;
+import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.turtle.TurtleUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by nickozoulis on 30/9/2014.
@@ -26,6 +34,9 @@ public class Serializer {
         static final String NAMESPACE = "http://rdfs.org/ns/void#";
     }
 
+    private static int rangeCounter;
+    private static final String RANGE = "range";
+
     private int level;
     private Model model;
     private String histogramNamespace = "http://www.semagrow.eu/metadata/histogram/",
@@ -34,9 +45,7 @@ public class Serializer {
                    eleonFacet = "http://rdf.iit.demokritos.gr/2013/sevod#facet",
                    eleonFacetProperty = "http://rdf.iit.demokritos.gr/2013/sevod#propertyFacet",
                    eleonIssuedBy = "http://www.w3.org/2007/05/powder-s#issuedby",
-                   eleonUser = "http://eleon.iit.demokritos.gr/user#nick";
-
-
+                   eleonUser = "http://eleon.iit.demokritos.gr/user#irss2014hist";
 
     private String outputPath;
     private RDFFormat format;
@@ -49,7 +58,16 @@ public class Serializer {
                       properties = createURI(VOID.NAMESPACE, "properties"),
                       property = createURI(VOID.NAMESPACE, "property"),
                       uriRegexPattern = createURI(VOID.NAMESPACE, "uriRegexPattern"),
-                      title = createURI("http://purl.org/dc/terms/title");
+                      title = createURI("http://purl.org/dc/terms/title"),
+                      sevod = createURI("http://rdf.iit.demokritos.gr/2013/sevod#"),
+                      integerInterval = createURI(sevod.toString(), "intInterval"),
+                      dateInterval = createURI(sevod.toString(), "dateInterval"),
+                      from = createURI(sevod.toString(), "from"),
+                      to = createURI(sevod.toString(), "to"),
+                      stringObjectRegexPattern = createURI(sevod.toString(), "stringObjectRegexPattern");
+
+
+    private Map<String,String> namespaceTable;
 
 
     public Serializer(String format, String outputPath) {
@@ -58,6 +76,25 @@ public class Serializer {
         this.outputPath = outputPath;
         this.format = Rio.getWriterFormatForMIMEType(format);
         model = new TreeModel();
+        namespaceTable = new HashMap<String, String>();
+        setModelNamespaces();
+    }
+
+
+    private void setModelNamespaces() {
+
+        model.setNamespace(RDF.PREFIX, RDF.NAMESPACE);
+        model.setNamespace(RDFS.PREFIX, RDFS.NAMESPACE);
+        model.setNamespace("void", VOID.NAMESPACE);
+        model.setNamespace("agris", "http://agris.fao.org/aos/records/");
+        model.setNamespace("dc", "http://purl.org/dc/terms/");
+        model.setNamespace("svd", "http://rdf.iit.demokritos.gr/2013/sevod#");
+        model.setNamespace(XMLSchema.PREFIX, XMLSchema.NAMESPACE);
+        model.setNamespace("", histogramNamespace);
+        model.setNamespace("powder", "http://www.w3.org/2007/05/powder-s#");
+
+        for (Namespace ns : model.getNamespaces())
+            namespaceTable.put(ns.getName(), ns.getPrefix());
     }
 
 
@@ -75,16 +112,18 @@ public class Serializer {
         writeToFile(outputPath);
     }
 
+
     private void eleon(Resource bucketResource) {
         model.add(bucketResource, createURI(eleonFacet), createURI(eleonFacetProperty));
         model.add(bucketResource, createURI(eleonIssuedBy), createURI(eleonUser));
     }
 
+
     private void writeToFile(String outputPath) {
 
         FileOutputStream out = null;
         try {
-            out = new FileOutputStream(outputPath + "histVoID.ttl");
+            out = new FileOutputStream(outputPath + "histRangesVoID.ttl");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -114,23 +153,66 @@ public class Serializer {
         model.add(bucketResource, distinctObjects, createLiteral(bucket.getStatistics().getDistinctCount().get(2)));
         eleon(bucketResource);
 
-        String titleStr = "";
-        // Subject's Range
-        for (String s : bucket.getBox().getSubjectRange().getPrefixList()) {
-            model.add(bucketResource, uriRegexPattern, createLiteral(s));
-            titleStr += "/" + getLastPrefix(s) + " ";
-        }
-        // Predicate's Ranges
-        for (String s : bucket.getBox().getPredicateRange().getItems()) {
-            model.add(bucketResource, property, createURI(s));
-            titleStr += "/" + getLastPrefix(s) + " ";
+        // -- Title handling
+        String subjectStr = "";
+        if (bucket.getBox().getSubjectRange().getPrefixList().isEmpty())
+            subjectStr = "?s";
+        else {
+            // Subject Range
+            for (String s : bucket.getBox().getSubjectRange().getPrefixList()) {
+                model.add(bucketResource, uriRegexPattern, createLiteral(s));
+                try {
+                    subjectStr += getStrFromUri(createURI(s)) + "  ";
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
-        //TODO: Object's Ranges
-        titleStr += "?o";
+        String predicateStr = "";
+        if (bucket.getBox().getPredicateRange().getItems().isEmpty())
+            predicateStr = "?p";
+        else {
+            // Predicate Ranges
+            for (String s : bucket.getBox().getPredicateRange().getItems()) {
+                model.add(bucketResource, property, createURI(s));
+                try {
+                    predicateStr = getStrFromUri(createURI(s)) + "  ";
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
-        // Title is the subject(prefix)-predicate-object
-        model.add(bucketResource, title, createLiteral(titleStr));
+        String objectStr = "";
+        if (bucket.getBox().getObjectRange().isEmpty())
+            objectStr = "?o";
+        else {
+            for (Map.Entry<URI, RangeLength<?>> entry : bucket.getBox().getObjectRange().getRanges().entrySet()) {
+                URI key = entry.getKey();
+
+                if (key.equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.LONG)) {
+
+                    objectStr += ((IntervalRange)entry.getValue()).toString();
+                } else if (key.equals(XMLSchema.DATETIME)) {
+                    CalendarRange cr = (CalendarRange)entry.getValue();
+
+                    objectStr += " [" + cr.getBegin() + "-" + cr.getEnd() + "] ";
+                } else if (key.equals(XMLSchema.STRING)) {
+
+                    PrefixRange pr = (PrefixRange)entry.getValue();
+                    // TODO: Change, in histogram we consider each PrefixRange as always a URL
+                    for (String s : pr.getPrefixList())
+                        objectStr += " <" + s + "> ";
+                }
+            }
+        }
+
+        // Title is the subject-predicate-object
+        model.add(bucketResource, title, createLiteral(subjectStr + predicateStr + objectStr));
+        // -- End of title handling
+
+        addRangesToModel(bucketResource, bucket.getBox().getObjectRange().getRanges());
 
         // Declare each child as subset and serialize recursively each bucket.
         int count = 0;
@@ -141,8 +223,67 @@ public class Serializer {
         }
     }
 
-    private String getLastPrefix(String s) {
 
+    private void addRangesToModel(Resource bucketResource, Map<URI, RangeLength<?>> rangeMap) {
+
+        for (Map.Entry<URI, RangeLength<?>> entry : rangeMap.entrySet()) {
+            URI key = entry.getKey();
+
+            if (key.equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.LONG)) {
+
+                URI rangeURI = createURI(histogramNamespace, RANGE + "_" + rangeCounter++);
+                IntervalRange ir = ((IntervalRange)entry.getValue());
+                model.add(bucketResource, integerInterval, rangeURI);
+                model.add(rangeURI, from, createLiteral(ir.getLow()));
+                model.add(rangeURI, to, createLiteral(ir.getHigh()));
+            } else if (key.equals(XMLSchema.DATETIME)) {
+
+                URI rangeURI = createURI(histogramNamespace, RANGE + "_" + rangeCounter++);
+                CalendarRange cr = (CalendarRange)entry.getValue();
+                model.add(bucketResource, integerInterval, rangeURI);
+                model.add(rangeURI, from, createLiteral(cr.getBegin()));
+                model.add(rangeURI, to, createLiteral(cr.getEnd()));
+            } else if (key.equals(XMLSchema.STRING)) {
+
+                PrefixRange pr = (PrefixRange)entry.getValue();
+                for (String s : pr.getPrefixList())
+                    model.add(bucketResource, stringObjectRegexPattern, createLiteral(s));
+            }
+        }
+    }
+
+
+    private String getStrFromUri(URI uri) throws IOException {
+        String str = "";
+        String uriString = uri.toString();
+
+        // Try to find a prefix for the URI's namespace
+        String prefix = null;
+
+        int splitIdx = TurtleUtil.findURISplitIndex(uriString);
+        if (splitIdx > 0) {
+            String namespace = uriString.substring(0, splitIdx);
+            prefix = namespaceTable.get(namespace);
+        }
+
+        if (prefix != null) {
+            // Namespace is mapped to a prefix; write abbreviated URI
+            str += prefix;
+            str += ":";
+            str += uriString.substring(splitIdx);
+        }
+        else {
+            // Write full URI
+            str += "<";
+            str += TurtleUtil.encodeURIString(uriString);
+            str += ">";
+        }
+
+        return str;
+    }
+
+
+    private String getLastPrefix(String s) {
         String[] splits = s.split("/");
         return splits[splits.length - 1];
     }
@@ -175,6 +316,14 @@ public class Serializer {
 
     private Literal createLiteral(String s) {
         return ValueFactoryImpl.getInstance().createLiteral(s);
+    }
+
+    private Literal createLiteral(int i) {
+        return ValueFactoryImpl.getInstance().createLiteral(i);
+    }
+
+    private Literal createLiteral(Date d) {
+        return ValueFactoryImpl.getInstance().createLiteral(d);
     }
 
 }
