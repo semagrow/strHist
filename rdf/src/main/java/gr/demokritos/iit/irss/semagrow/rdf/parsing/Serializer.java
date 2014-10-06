@@ -240,7 +240,7 @@ public class Serializer {
 
                 URI rangeURI = createURI(histogramNamespace, RANGE + "_" + rangeCounter++);
                 CalendarRange cr = (CalendarRange)entry.getValue();
-                model.add(bucketResource, integerInterval, rangeURI);
+                model.add(bucketResource, dateInterval, rangeURI);
                 model.add(rangeURI, from, createLiteral(cr.getBegin()));
                 model.add(rangeURI, to, createLiteral(cr.getEnd()));
             } else if (key.equals(XMLSchema.STRING)) {
