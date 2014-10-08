@@ -1,6 +1,7 @@
-package gr.demokritos.iit.irss.semagrow.rdf.parsing;
+package gr.demokritos.iit.irss.semagrow.rdf.parsing.void_format;
 
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 
@@ -19,7 +20,7 @@ public class TestMainSerializer {
         histogram.setRoot(rootBucket);
 
         // Serialize histogram to VOID.
-        Serializer serializer = new Serializer("application/x-turtle", "/home/nickozoulis/git/sthist/rdf/src/main/resources/");
+        VoIDSerializer serializer = new VoIDSerializer("application/x-turtle", "/home/nickozoulis/git/sthist/rdf/src/main/resources/");
         serializer.serialize(histogram);
 
     }

@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.rdf.parsing;
+package gr.demokritos.iit.irss.semagrow.rdf.parsing.void_format;
 
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * Created by nickozoulis on 30/9/2014.
  */
-public class Serializer {
+public class VoIDSerializer {
 
     static class VOID {
         static final String NAMESPACE = "http://rdfs.org/ns/void#";
@@ -39,7 +39,7 @@ public class Serializer {
 
     private int level;
     private Model model;
-    private String histogramNamespace = "http://www.semagrow.eu/metadata/histogram/",
+    public static String histogramNamespace = "http://www.semagrow.eu/metadata/histogram/",
                    // Eleon centered variables
                    eleonRootNamespace = "http://rdf.iit.demokritos.gr/2013/sevod#datasetTop",
                    eleonFacet = "http://rdf.iit.demokritos.gr/2013/sevod#facet",
@@ -50,7 +50,7 @@ public class Serializer {
     private String outputPath;
     private RDFFormat format;
 
-    private final URI dataset = createURI(VOID.NAMESPACE, "Dataset"),
+    public static final URI dataset = createURI(VOID.NAMESPACE, "Dataset"),
                       subset = createURI(VOID.NAMESPACE, "subset"),
                       triples = createURI(VOID.NAMESPACE, "triples"),
                       distinctObjects = createURI(VOID.NAMESPACE, "distinctObjects"),
@@ -70,7 +70,7 @@ public class Serializer {
     private Map<String,String> namespaceTable;
 
 
-    public Serializer(String format, String outputPath) {
+    public VoIDSerializer(String format, String outputPath) {
 
         level = 0;
         this.outputPath = outputPath;
@@ -298,15 +298,15 @@ public class Serializer {
         return ValueFactoryImpl.getInstance().createURI(nameSpaceAndLevel + "_" + num);
     }
 
-    private Resource createResource(String nameSpace) {
+    public static Resource createResource(String nameSpace) {
         return ValueFactoryImpl.getInstance().createURI(nameSpace);
     }
 
-    private URI createURI(String nameSpace, String localName) {
+    public static URI createURI(String nameSpace, String localName) {
         return ValueFactoryImpl.getInstance().createURI(nameSpace, localName);
     }
 
-    private URI createURI(String s) {
+    public static URI createURI(String s) {
         return ValueFactoryImpl.getInstance().createURI(s);
     }
 

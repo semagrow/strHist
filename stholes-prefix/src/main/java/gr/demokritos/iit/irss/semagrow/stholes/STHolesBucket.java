@@ -23,6 +23,7 @@ public class STHolesBucket<R extends Rectangle> {
     private STHolesBucket<R> parent;
 
     public STHolesBucket() {
+        this.children = new ArrayList<STHolesBucket<R>>();
     }
 
     //Tested

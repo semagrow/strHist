@@ -713,12 +713,10 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
     public JSONObject toJSON() {
         return getRoot().toJSON();
     }
-
 	
 	public STHolesBucket<R> getRoot() {
 		return root;
 	}
-
 	
 	public void setRoot(STHolesBucket<R> root) {
 		this.root = root;
