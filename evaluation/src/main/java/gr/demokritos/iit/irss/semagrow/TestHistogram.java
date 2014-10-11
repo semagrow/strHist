@@ -1,11 +1,9 @@
 package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.json_format.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
-import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -38,8 +36,7 @@ public class TestHistogram {
         OptionParser parser = new OptionParser("nvt:e:o:h::");
         parser.accepts("maxbuckets", "Maximum Buckets").withRequiredArg();
         parser.accepts("epsilon", "Max difference of accurate statistics").withRequiredArg();
-        parser.accepts("pcpenalty").withRequiredArg();
-        parser.accepts("sspenalty").withRequiredArg();
+        parser.accepts("penalty").withRequiredArg();
         parser.accepts("?").forHelp();
 
         OptionSet options = parser.parse(args);
@@ -144,6 +141,9 @@ public class TestHistogram {
 
         if (options.has("o") && options.hasArgument("o"))
             outputDir = options.valueOf("o").toString();
+
+        if (options.has("h") && options.hasArgument("h"))
+            h = HistogramIO.readOrig(options.valueOf("h").toString());
 
         if (options.has("t") && options.hasArgument("t")) {
 
@@ -329,6 +329,12 @@ public class TestHistogram {
         bw.write("Max Buckets: " + h.maxBucketsNum);
         bw.newLine();
         bw.write("Total Buckets: " + h.getBucketsNum());
+        bw.newLine();
+        bw.write("PC Merges: " + h.pcMergesNum);
+        bw.newLine();
+        bw.write("SS Merges: " + h.ssMergesNum);
+        bw.newLine();
+        bw.write("Total Merges: " + (h.ssMergesNum + h.pcMergesNum));
         bw.newLine();
         bw.close();
     }

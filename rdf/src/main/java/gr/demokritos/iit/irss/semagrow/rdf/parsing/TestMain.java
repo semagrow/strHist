@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.rdf.parsing;
 
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.json_format.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 

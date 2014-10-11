@@ -1,8 +1,5 @@
 package gr.demokritos.iit.irss.semagrow;
 
-import gr.demokritos.iit.irss.semagrow.api.Histogram;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
-import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import gr.demokritos.iit.irss.semagrow.tools.NumericalMapper;
 
 /**

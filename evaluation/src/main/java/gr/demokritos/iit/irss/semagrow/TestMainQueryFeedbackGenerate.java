@@ -1,16 +1,12 @@
 package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.Binding;
 import gr.demokritos.iit.irss.semagrow.rdf.parsing.BindingSet;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
-import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.openrdf.repository.RepositoryException;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Created by Nick on 07-Aug-14.
