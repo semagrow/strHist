@@ -1,14 +1,12 @@
 package gr.demokritos.iit.irss.semagrow;
 
-import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * Created by Nick on 09-Aug-14.

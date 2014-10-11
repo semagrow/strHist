@@ -1,10 +1,10 @@
 package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.Binding;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.BindingSet;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.LogQuery;
-import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.rdf.io.log.Binding;
+import gr.demokritos.iit.irss.semagrow.rdf.io.log.BindingSet;
+import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogQuery;
+import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -26,8 +26,10 @@ public class QueryFeedbackGenerator {
     private String uniqueSubjectData, filteredDataFolder, natineStoreFolder;
     private int uniqueSubjectFileRows;
     public ArrayList<String> savedPrefixes;
+
     private Repository nativeRep;
     private RepositoryConnection conn;
+
     private ArrayList<RDFTriple> filteredData;
 
     private static Random rand = new Random();

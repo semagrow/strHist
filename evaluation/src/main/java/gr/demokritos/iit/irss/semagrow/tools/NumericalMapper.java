@@ -1,13 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.tools;
 
-import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.api.range;
 
-import gr.demokritos.iit.irss.semagrow.api.range.Range;
+
 import org.json.simple.JSONObject;
 
 /**
@@ -10,5 +10,6 @@ import org.json.simple.JSONObject;
 public interface RangeLength<T> extends Range<T> {
 
     long getLength();
+
     JSONObject toJSON();
 }

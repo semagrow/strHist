@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.rdf.parsing;
+package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
 import java.io.Serializable;
 

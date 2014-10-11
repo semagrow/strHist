@@ -542,7 +542,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                 ((double) bp.getVolume()) / bn.getVolume()));
 
         AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Double> res =
-                new AbstractMap.SimpleEntry<>(bn, penalty);
+                new AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Double>(bn, penalty);
 
         return res;
     }
@@ -635,7 +635,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                         ((double) b2.getVolume())/bn.getVolume());
 
         AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Double> res =
-                new AbstractMap.SimpleEntry<>(bn, penalty);
+                new AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Double>(bn, penalty);
 
         return res;
     }

@@ -3,9 +3,9 @@ package gr.demokritos.iit.irss.semagrow.rdf;
 import java.util.List;
 
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.json_format.HistogramIO;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.LogParser;
-import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
+import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 
 

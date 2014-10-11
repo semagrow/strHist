@@ -310,7 +310,6 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
         this.frequency = frequency;
     }
 
-
     public void setParent(STHolesOrigBucket<R> parent) {
 
         this.parent = parent;
@@ -319,8 +318,6 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
     public void setBox(R box) {
         this.box = box;
     }
-
-
 
     //Tested
     @Override
@@ -383,7 +380,6 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
 
         return bucket;
     }
-
 
     public static void main(String args[] ) {
 

@@ -1,7 +1,7 @@
 package gr.demokritos.iit.irss.semagrow;
 
 
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.json_format.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import junit.framework.TestCase;
 

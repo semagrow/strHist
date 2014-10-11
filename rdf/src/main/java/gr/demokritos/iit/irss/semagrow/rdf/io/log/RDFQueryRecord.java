@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.rdf.qfr;
+package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -15,10 +15,6 @@ import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.Binding;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.LogQuery;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.QueryFilter;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.Utilities;
 
 public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializable {
 

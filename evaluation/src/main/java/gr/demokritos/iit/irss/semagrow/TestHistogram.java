@@ -2,8 +2,8 @@ package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.json_format.HistogramIO;
-import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;

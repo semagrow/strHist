@@ -1,6 +1,5 @@
-package gr.demokritos.iit.irss.semagrow.rdf.parsing;
+package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
-import gr.demokritos.iit.irss.semagrow.rdf.qfr.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 
 import java.io.BufferedReader;
@@ -85,7 +84,7 @@ public class LogParser {
 		Matcher m = r.matcher(string);
 
 		while (m.find()) 		
-			lq.getQueryBindings().add(new Binding(m.group(2), m.group(3)));		
+			lq.getQueryBindings().add(new Binding(m.group(2), m.group(3)));
 		
 	}// processThree
 

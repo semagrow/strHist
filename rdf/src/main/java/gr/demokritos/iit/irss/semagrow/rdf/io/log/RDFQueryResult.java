@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.rdf.qfr;
+package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
@@ -6,9 +6,6 @@ import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.Binding;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.BindingSet;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.Utilities;
 
 import java.io.Serializable;
 import java.text.DateFormat;

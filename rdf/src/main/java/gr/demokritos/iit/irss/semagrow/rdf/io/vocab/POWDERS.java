@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.rdf.parsing.vocab;
+package gr.demokritos.iit.irss.semagrow.rdf.io.vocab;
 
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;

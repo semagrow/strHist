@@ -1,13 +1,13 @@
-package gr.demokritos.iit.irss.semagrow.rdf.parsing.void_format;
+package gr.demokritos.iit.irss.semagrow.rdf.io.sevod;
 
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.vocab.POWDERS;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.vocab.SEVOD;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.vocab.VOID;
+import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.POWDERS;
+import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.SEVOD;
+import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.VOID;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.openrdf.model.*;
