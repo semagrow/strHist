@@ -19,6 +19,7 @@ import java.util.Iterator;
 
 /**
  * Created by Nick on 10-Aug-14.
+ * Full Experiment Setup.
  */
 public class TestHistogram {
 

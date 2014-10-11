@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Nick on 07-Aug-14.
+ * Testing the generation training pools for the experiment.
  */
 public class TestMainQueryFeedbackGenerate {
 

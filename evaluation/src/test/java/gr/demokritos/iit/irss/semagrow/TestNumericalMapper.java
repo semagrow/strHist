@@ -4,6 +4,7 @@ import gr.demokritos.iit.irss.semagrow.tools.NumericalMapper;
 
 /**
  * Created by Nick on 12-Aug-14.
+ * Test of the mapping of the prefix-urls to numbers.
  */
 public class TestNumericalMapper {
 
