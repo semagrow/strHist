@@ -16,7 +16,19 @@ public class Workflow {
 
 
     static public void main(String[] args) {
+
         //TODO:
+        // for all different versions of agris repository
+        // Repository actualRepository = getRepository()
+        // Repository repo = getFedRepository(actualRepository).
+
+        // for all queries q in the set
+        // RepositoryConnection conn = repo.getConnection();
+        // TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, q);
+        // query.evaluate()
+        // the evaluation of the query will write logs (query feedback).
+        // histogram.refine(query feedback).
+        // compare with actual cardinalities using ActualCardinalityEstimator
     }
 
 
