@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.rdf.parsing;
+package gr.demokritos.iit.irss.semagrow.rdf.parsing.json_format;
 
 import com.cedarsoftware.util.io.JsonWriter;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;

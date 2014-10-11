@@ -5,11 +5,15 @@ import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.vocab.POWDERS;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.vocab.SEVOD;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.vocab.VOID;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -30,8 +34,11 @@ import java.util.Map;
  */
 public class VoIDSerializer {
 
-    static class VOID {
-        static final String NAMESPACE = "http://rdfs.org/ns/void#";
+    static ValueFactory vf = ValueFactoryImpl.getInstance();
+
+    static class ELEON {
+        static final String NAMESPACE = "http://eleon.iit.demokritos.gr/user#";
+
     }
 
     private static int rangeCounter;
@@ -39,33 +46,13 @@ public class VoIDSerializer {
 
     private int level;
     private Model model;
+
     public static String histogramNamespace = "http://www.semagrow.eu/metadata/histogram/",
-                   // Eleon centered variables
-                   eleonRootNamespace = "http://rdf.iit.demokritos.gr/2013/sevod#datasetTop",
-                   eleonFacet = "http://rdf.iit.demokritos.gr/2013/sevod#facet",
-                   eleonFacetProperty = "http://rdf.iit.demokritos.gr/2013/sevod#propertyFacet",
-                   eleonIssuedBy = "http://www.w3.org/2007/05/powder-s#issuedby",
                    eleonUser = "http://eleon.iit.demokritos.gr/user#irss2014hist";
 
     private String outputPath;
+
     private RDFFormat format;
-
-    public static final URI dataset = createURI(VOID.NAMESPACE, "Dataset"),
-                      subset = createURI(VOID.NAMESPACE, "subset"),
-                      triples = createURI(VOID.NAMESPACE, "triples"),
-                      distinctObjects = createURI(VOID.NAMESPACE, "distinctObjects"),
-                      distinctSubjects = createURI(VOID.NAMESPACE, "distinctSubjects"),
-                      properties = createURI(VOID.NAMESPACE, "properties"),
-                      property = createURI(VOID.NAMESPACE, "property"),
-                      uriRegexPattern = createURI(VOID.NAMESPACE, "uriRegexPattern"),
-                      title = createURI("http://purl.org/dc/terms/title"),
-                      sevod = createURI("http://rdf.iit.demokritos.gr/2013/sevod#"),
-                      integerInterval = createURI(sevod.toString(), "intInterval"),
-                      dateInterval = createURI(sevod.toString(), "dateInterval"),
-                      from = createURI(sevod.toString(), "from"),
-                      to = createURI(sevod.toString(), "to"),
-                      stringObjectRegexPattern = createURI(sevod.toString(), "stringObjectRegexPattern");
-
 
     private Map<String,String> namespaceTable;
 
@@ -85,13 +72,14 @@ public class VoIDSerializer {
 
         model.setNamespace(RDF.PREFIX, RDF.NAMESPACE);
         model.setNamespace(RDFS.PREFIX, RDFS.NAMESPACE);
-        model.setNamespace("void", VOID.NAMESPACE);
-        model.setNamespace("agris", "http://agris.fao.org/aos/records/");
-        model.setNamespace("dc", "http://purl.org/dc/terms/");
-        model.setNamespace("svd", "http://rdf.iit.demokritos.gr/2013/sevod#");
+        model.setNamespace(DCTERMS.PREFIX, DCTERMS.NAMESPACE);
+        model.setNamespace(VOID.PREFIX, VOID.NAMESPACE);
+        model.setNamespace(SEVOD.PREFIX, SEVOD.NAMESPACE);
         model.setNamespace(XMLSchema.PREFIX, XMLSchema.NAMESPACE);
+        model.setNamespace(POWDERS.PREFIX, POWDERS.NAMESPACE);
+        model.setNamespace("agris", "http://agris.fao.org/aos/records/");
         model.setNamespace("", histogramNamespace);
-        model.setNamespace("powder", "http://www.w3.org/2007/05/powder-s#");
+
 
         for (Namespace ns : model.getNamespaces())
             namespaceTable.put(ns.getName(), ns.getPrefix());
@@ -101,11 +89,11 @@ public class VoIDSerializer {
     public void serialize(STHolesHistogram<RDFRectangle> histogram) {
 
         // Eleon load fix: Add a root node with name 'datasetTop'
-        Resource bucketResource = createResource(eleonRootNamespace);
-        model.add(bucketResource, RDF.TYPE, dataset);
-        model.add(bucketResource, title, createLiteral(bucketResource.toString()));
-        model.add(bucketResource, subset, createResource(1));
-        model.add(bucketResource, createURI("http://purl.org/dc/terms/creator"), createLiteral("nick"));
+        Resource bucketResource = SEVOD.ROOT;
+        model.add(bucketResource, RDF.TYPE, VOID.DATASET);
+        model.add(bucketResource, DCTERMS.TITLE, createLiteral(bucketResource.toString()));
+        model.add(bucketResource, VOID.SUBSET, createResource(1));
+        model.add(bucketResource, DCTERMS.CREATOR, createLiteral("nick"));
         eleon(bucketResource);
 
         serializeBucket(histogram.getRoot(), createResource(++level), 0, true);
@@ -114,8 +102,8 @@ public class VoIDSerializer {
 
 
     private void eleon(Resource bucketResource) {
-        model.add(bucketResource, createURI(eleonFacet), createURI(eleonFacetProperty));
-        model.add(bucketResource, createURI(eleonIssuedBy), createURI(eleonUser));
+        model.add(bucketResource, SEVOD.FACET, SEVOD.FACET_PROPERTY);
+        model.add(bucketResource, POWDERS.ISSUEDBY, createURI(eleonUser));
     }
 
 
@@ -146,11 +134,11 @@ public class VoIDSerializer {
         if (!isRoot)
             bucketResource = createResource(bucketResource.toString(), num);
 
-        model.add(bucketResource, RDF.TYPE, dataset);
-        model.add(bucketResource, triples, createLiteral(bucket.getStatistics().getFrequency()));
-        model.add(bucketResource, distinctSubjects, createLiteral(bucket.getStatistics().getDistinctCount().get(0)));
-        model.add(bucketResource, properties, createLiteral(bucket.getStatistics().getDistinctCount().get(1)));
-        model.add(bucketResource, distinctObjects, createLiteral(bucket.getStatistics().getDistinctCount().get(2)));
+        model.add(bucketResource, RDF.TYPE, VOID.DATASET);
+        model.add(bucketResource, VOID.TRIPLES, createLiteral(bucket.getStatistics().getFrequency()));
+        model.add(bucketResource, VOID.DISTINCTSUBJECTS, createLiteral(bucket.getStatistics().getDistinctCount().get(0)));
+        model.add(bucketResource, VOID.PROPERTIES, createLiteral(bucket.getStatistics().getDistinctCount().get(1)));
+        model.add(bucketResource, VOID.DISTINCTOBJECTS, createLiteral(bucket.getStatistics().getDistinctCount().get(2)));
         eleon(bucketResource);
 
         // -- Title handling
@@ -160,7 +148,7 @@ public class VoIDSerializer {
         else {
             // Subject Range
             for (String s : bucket.getBox().getSubjectRange().getPrefixList()) {
-                model.add(bucketResource, uriRegexPattern, createLiteral(s));
+                model.add(bucketResource, VOID.URIREGEXPATTERN, createLiteral(s));
                 try {
                     subjectStr += getStrFromUri(createURI(s)) + "  ";
                 } catch (IOException e) {
@@ -175,7 +163,7 @@ public class VoIDSerializer {
         else {
             // Predicate Ranges
             for (String s : bucket.getBox().getPredicateRange().getItems()) {
-                model.add(bucketResource, property, createURI(s));
+                model.add(bucketResource, VOID.PROPERTY, createURI(s));
                 try {
                     predicateStr = getStrFromUri(createURI(s)) + "  ";
                 } catch (IOException e) {
@@ -209,7 +197,7 @@ public class VoIDSerializer {
         }
 
         // Title is the subject-predicate-object
-        model.add(bucketResource, title, createLiteral(subjectStr + predicateStr + objectStr));
+        model.add(bucketResource, DCTERMS.TITLE, createLiteral(subjectStr + predicateStr + objectStr));
         // -- End of title handling
 
         addRangesToModel(bucketResource, bucket.getBox().getObjectRange().getRanges());
@@ -218,7 +206,7 @@ public class VoIDSerializer {
         int count = 0;
         for (STHolesBucket<RDFRectangle> b : bucket.getChildren()) {
             count++;
-            model.add(bucketResource, subset, createResource(bucketResource.toString(), count));
+            model.add(bucketResource, VOID.SUBSET, createResource(bucketResource.toString(), count));
             serializeBucket(b, bucketResource, count, false);
         }
     }
@@ -233,21 +221,21 @@ public class VoIDSerializer {
 
                 URI rangeURI = createURI(histogramNamespace, RANGE + "_" + rangeCounter++);
                 IntervalRange ir = ((IntervalRange)entry.getValue());
-                model.add(bucketResource, integerInterval, rangeURI);
-                model.add(rangeURI, from, createLiteral(ir.getLow()));
-                model.add(rangeURI, to, createLiteral(ir.getHigh()));
+                model.add(bucketResource, SEVOD.INTINTERVAL, rangeURI);
+                model.add(rangeURI, SEVOD.FROM, createLiteral(ir.getLow()));
+                model.add(rangeURI, SEVOD.TO, createLiteral(ir.getHigh()));
             } else if (key.equals(XMLSchema.DATETIME)) {
 
                 URI rangeURI = createURI(histogramNamespace, RANGE + "_" + rangeCounter++);
                 CalendarRange cr = (CalendarRange)entry.getValue();
-                model.add(bucketResource, dateInterval, rangeURI);
-                model.add(rangeURI, from, createLiteral(cr.getBegin()));
-                model.add(rangeURI, to, createLiteral(cr.getEnd()));
+                model.add(bucketResource, SEVOD.DATEINTERVAL, rangeURI);
+                model.add(rangeURI, SEVOD.FROM, createLiteral(cr.getBegin()));
+                model.add(rangeURI, SEVOD.TO, createLiteral(cr.getEnd()));
             } else if (key.equals(XMLSchema.STRING)) {
 
                 PrefixRange pr = (PrefixRange)entry.getValue();
                 for (String s : pr.getPrefixList())
-                    model.add(bucketResource, stringObjectRegexPattern, createLiteral(s));
+                    model.add(bucketResource, SEVOD.STRINGOBJECTREGEXPATTERN, createLiteral(s));
             }
         }
     }

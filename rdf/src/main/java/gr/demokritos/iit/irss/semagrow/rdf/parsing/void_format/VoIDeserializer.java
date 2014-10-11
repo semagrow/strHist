@@ -8,7 +8,9 @@ import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.parsing.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.json_format.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.vocab.SEVOD;
+import gr.demokritos.iit.irss.semagrow.rdf.parsing.vocab.VOID;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.openrdf.model.*;
@@ -30,6 +32,7 @@ import java.util.*;
 public class VoIDeserializer {
 
     private Model model;
+
     private STHolesBucket<RDFRectangle> rootBucket;
 
     public VoIDeserializer(String path) {
@@ -37,8 +40,7 @@ public class VoIDeserializer {
         model = readModelFromFile(path);
 
         // Root node is set by Eleon as (svd:datasetTop, void:subset, rootResource).
-        Resource root = model.filter(VoIDSerializer.createResource(VoIDSerializer.eleonRootNamespace),
-                VoIDSerializer.subset, null).objectResource();
+        Resource root = model.filter(SEVOD.ROOT, VOID.SUBSET, null).objectResource();
 
         rootBucket = initBucket(root, null);
 
@@ -69,8 +71,8 @@ public class VoIDeserializer {
 
     private RDFRectangle getRectangle(Resource res) {
         return new RDFRectangle(
-                getPrefixRange(res, VoIDSerializer.uriRegexPattern),
-                getExplicitSetRange(res, VoIDSerializer.property),
+                getPrefixRange(res, VOID.URIREGEXPATTERN),
+                getExplicitSetRange(res, VOID.PROPERTY),
                 getRDFLiteralRange(res));
     }
 
@@ -88,7 +90,7 @@ public class VoIDeserializer {
     }
 
 
-    private ExplicitSetRange getExplicitSetRange(Resource res, URI predicate) {
+    private ExplicitSetRange<String> getExplicitSetRange(Resource res, URI predicate) {
 
         Set<String> hashSet = new HashSet<String>();
 
@@ -97,7 +99,7 @@ public class VoIDeserializer {
         for (Value v : set)
             hashSet.add(v.toString());
 
-        return new ExplicitSetRange(hashSet);
+        return new ExplicitSetRange<String>(hashSet);
     }
 
 
@@ -112,7 +114,7 @@ public class VoIDeserializer {
         if (calendarRange != null)
             objectRanges.put(XMLSchema.DATETIME, calendarRange);
 
-        PrefixRange prefixRange = getPrefixRange(res, VoIDSerializer.stringObjectRegexPattern);
+        PrefixRange prefixRange = getPrefixRange(res, SEVOD.STRINGOBJECTREGEXPATTERN);
         if (!prefixRange.isEmpty())
             objectRanges.put(XMLSchema.STRING, prefixRange);
 
@@ -122,15 +124,15 @@ public class VoIDeserializer {
 
     private CalendarRange getCalendarRange(Resource res) {
 
-        Model m = model.filter(res, VoIDSerializer.dateInterval, null);
+        Model m = model.filter(res, SEVOD.DATEINTERVAL, null);
         if (!m.isEmpty()) {
 
             SimpleDateFormat parserSDF = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy");
             Resource dateRange = m.objectResource();
             Date from = null, to = null;
             try {
-                from = parserSDF.parse(model.filter(dateRange, VoIDSerializer.from, null).objectString());
-                to = parserSDF.parse(model.filter(dateRange, VoIDSerializer.to, null).objectString());
+                from = parserSDF.parse(model.filter(dateRange, SEVOD.FROM, null).objectString());
+                to = parserSDF.parse(model.filter(dateRange, SEVOD.TO, null).objectString());
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -143,13 +145,13 @@ public class VoIDeserializer {
 
     private IntervalRange getIntInterval(Resource res) {
 
-        Model m = model.filter(res, VoIDSerializer.integerInterval, null);
+        Model m = model.filter(res, SEVOD.INTINTERVAL, null);
         if (!m.isEmpty()) {
 
             Resource intRange = m.objectResource();
 
-            int from = Integer.parseInt(model.filter(intRange, VoIDSerializer.from, null).objectString());
-            int to = Integer.parseInt(model.filter(intRange, VoIDSerializer.to, null).objectString());
+            int from = Integer.parseInt(model.filter(intRange, SEVOD.FROM, null).objectString());
+            int to = Integer.parseInt(model.filter(intRange, SEVOD.TO, null).objectString());
 
             return new IntervalRange<Integer>(from, to);
         } else
@@ -159,19 +161,19 @@ public class VoIDeserializer {
 
     private Stat getBucketStats(Resource res) {
 
-        Long frequency = Long.parseLong(model.filter(res, VoIDSerializer.triples, null).objectString());
+        Long frequency = Long.parseLong(model.filter(res, VOID.TRIPLES, null).objectString());
 
         List<Long> distinctCount = new ArrayList<Long>();
-        distinctCount.add(Long.parseLong(model.filter(res, VoIDSerializer.distinctSubjects, null).objectString()));
-        distinctCount.add(Long.parseLong(model.filter(res, VoIDSerializer.properties, null).objectString()));
-        distinctCount.add(Long.parseLong(model.filter(res, VoIDSerializer.distinctObjects, null).objectString()));
+        distinctCount.add(Long.parseLong(model.filter(res, VOID.DISTINCTSUBJECTS, null).objectString()));
+        distinctCount.add(Long.parseLong(model.filter(res, VOID.PROPERTIES, null).objectString()));
+        distinctCount.add(Long.parseLong(model.filter(res, VOID.DISTINCTOBJECTS, null).objectString()));
 
         return new Stat(frequency, distinctCount);
     }
 
 
     private Set<Value> getNodeChildren(Resource res) {
-        return model.filter(res, VoIDSerializer.subset, null).objects();
+        return model.filter(res, VOID.SUBSET, null).objects();
     }
 
 
