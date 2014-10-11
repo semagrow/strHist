@@ -1,8 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.stholesOrig;
 
 import gr.demokritos.iit.irss.semagrow.api.RectangleWithVolume;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -362,23 +360,6 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
         int childrenNum = children.size();
         res += "childrenNum: \n\t" + childrenNum + "\n";
         return res;
-    }
-
-    public JSONObject toJSON() {
-        JSONObject jSONObj = new JSONObject();
-        jSONObj.put("box", box.toJSON());
-        jSONObj.put("frequency", frequency);
-        jSONObj.put("childrenNumber", children.size());
-
-        JSONArray array = new JSONArray();
-        for (STHolesOrigBucket<R> child : children)
-            array.add(child.toJSON());
-        jSONObj.put("children", array);
-
-        JSONObject bucket = new JSONObject();
-        bucket.put("bucket", jSONObj);
-
-        return bucket;
     }
 
     public static void main(String args[] ) {

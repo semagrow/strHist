@@ -2,7 +2,8 @@ package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.io.json.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import joptsimple.OptionParser;
@@ -10,15 +11,16 @@ import joptsimple.OptionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 
 /**
  * Created by Nick on 10-Aug-14.
  */
 public class TestHistogram {
-
-    static  HistogramIO histIO;
 
     private static Logger logger = LoggerFactory.getLogger(TestHistogram.class);
 
@@ -71,7 +73,8 @@ public class TestHistogram {
         }
 
         if (options.has("h") && options.hasArgument("h"))
-             h = HistogramIO.read(options.valueOf("h").toString());
+             h = (RDFSTHolesHistogram)new JSONDeserializer(options.valueOf("h").toString()).
+                     getHistogram();
 
         if (options.has("o") && options.hasArgument("o"))
             outputDir = options.valueOf("o").toString();
@@ -143,7 +146,8 @@ public class TestHistogram {
             outputDir = options.valueOf("o").toString();
 
         if (options.has("h") && options.hasArgument("h"))
-            h = HistogramIO.readOrig(options.valueOf("h").toString());
+            h = new gr.demokritos.iit.irss.semagrow.stholesOrig.io.json.JSONDeserializer
+                    (options.valueOf("h").toString()).getHistogram();
 
         if (options.has("t") && options.hasArgument("t")) {
 
@@ -295,15 +299,12 @@ public class TestHistogram {
     }
 
     private static void outputHistogram(RDFSTHolesHistogram h, String filename) {
-        histIO = new HistogramIO(filename, h);
-        histIO.write();
+        new JSONSerializer(h, filename);
     }
 
     private static void outputHistogramNum(STHolesOrigHistogram<NumRectangle> h, String filename) {
-        histIO = new HistogramIO(filename, h);
-        histIO.write();
+        new gr.demokritos.iit.irss.semagrow.stholesOrig.io.json.JSONSerializer(h, filename);
     }
-
 
     private static void outputHistogramStats(RDFSTHolesHistogram h, String filename) throws IOException {
 

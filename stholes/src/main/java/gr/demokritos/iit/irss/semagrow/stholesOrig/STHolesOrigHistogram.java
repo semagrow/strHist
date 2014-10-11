@@ -1,10 +1,9 @@
 package gr.demokritos.iit.irss.semagrow.stholesOrig;
 
-import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.api.RectangleWithVolume;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
-import org.json.simple.JSONObject;
+import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 
 import java.util.*;
 
@@ -638,11 +637,6 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                 new AbstractMap.SimpleEntry<STHolesOrigBucket<R>, Double>(bn, penalty);
 
         return res;
-    }
-
-
-    public JSONObject toJSON() {
-        return getRoot().toJSON();
     }
 
 

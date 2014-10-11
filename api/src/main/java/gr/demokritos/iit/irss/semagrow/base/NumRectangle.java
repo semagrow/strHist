@@ -222,6 +222,10 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
        this.dims = new ArrayList<IntervalRange>(dims);
     }
 
+    public List<IntervalRange> getDims() {
+        return this.dims;
+    }
+
     public boolean isInfinite() {
 
         //todo: fix this, do we need infinite for intervalRange?
