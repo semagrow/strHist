@@ -7,9 +7,16 @@ import org.openrdf.query.algebra.TupleExpr;
  */
 public class CostEstimatorImpl implements CostEstimator {
 
+    private CardinalityEstimator cardinalityEstimator;
+
+    public CostEstimatorImpl(CardinalityEstimator cardEst) {
+        this.cardinalityEstimator = cardEst;
+    }
+
     @Override
     public double getCost(TupleExpr tupleExpr) {
         return 0;
     }
+
 
 }

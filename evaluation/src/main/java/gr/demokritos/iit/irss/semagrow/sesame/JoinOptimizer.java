@@ -1,6 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import eu.semagrow.stack.modules.api.estimator.CostEstimator;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.algebra.TupleExpr;
