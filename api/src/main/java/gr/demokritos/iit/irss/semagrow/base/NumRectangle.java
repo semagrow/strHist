@@ -1,14 +1,15 @@
 package gr.demokritos.iit.irss.semagrow.base;
 
-import gr.demokritos.iit.irss.semagrow.api.*;
-import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
+import gr.demokritos.iit.irss.semagrow.api.RectangleWithVolume;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by efi on 6/8/2014.
@@ -278,17 +279,6 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
 //        return res;
     }
 
-
-    public JSONObject toJSON() {
-        JSONObject rectangle = new JSONObject();
-        JSONArray array = new JSONArray();
-
-        for (IntervalRange ir : dims)
-            array.add(ir.toJSON());
-
-        rectangle.put("rectangle", array);
-        return rectangle;
-    }
 
     public static void main(String args[] ) {
 

@@ -3,8 +3,6 @@ package gr.demokritos.iit.irss.semagrow.stholes;
 
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -224,24 +222,6 @@ public class STHolesBucket<R extends Rectangle> {
         res += "childrenNum: \n\t" + childrenNum + "\n";
         return res;
     }
-
-    public JSONObject toJSON() {
-        JSONObject jSONObj = new JSONObject();
-        jSONObj.put("box", box.toJSON());
-        jSONObj.put("statistics", statistics.toJSON());
-        jSONObj.put("childrenNumber", children.size());
-
-        JSONArray array = new JSONArray();
-        for (STHolesBucket<R> child : children)
-            array.add(child.toJSON());
-        jSONObj.put("children", array);
-
-        JSONObject bucket = new JSONObject();
-        bucket.put("bucket", jSONObj);
-
-        return bucket;
-    }
-
 
     /*
     public static void main(String args[] ) {

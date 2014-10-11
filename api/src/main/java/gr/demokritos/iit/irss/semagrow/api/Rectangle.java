@@ -1,7 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
 import gr.demokritos.iit.irss.semagrow.api.range.Range;
-import org.json.simple.JSONObject;
 
 /**
  * Rectangle is essentially a multidimensional bounding box
@@ -39,5 +38,4 @@ public interface Rectangle<R> {
 
     boolean isEmpty();
 
-    JSONObject toJSON();
 }

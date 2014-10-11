@@ -8,7 +8,7 @@ import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.io.json.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.SEVOD;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.VOID;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
@@ -32,8 +32,7 @@ import java.util.*;
 public class VoIDeserializer {
 
     private Model model;
-
-    private STHolesBucket<RDFRectangle> rootBucket;
+    private STHolesHistogram<RDFRectangle> histogram;
 
     public VoIDeserializer(String path) {
 
@@ -42,9 +41,15 @@ public class VoIDeserializer {
         // Root node is set by Eleon as (svd:datasetTop, void:subset, rootResource).
         Resource root = model.filter(SEVOD.ROOT, VOID.SUBSET, null).objectResource();
 
-        rootBucket = initBucket(root, null);
+        histogram = new STHolesHistogram<RDFRectangle>();
+        histogram.setRoot(initBucket(root, null));
 
-        System.out.println(rootBucket);
+        System.out.println(histogram.getRoot());
+    }
+
+
+    public STHolesHistogram<RDFRectangle> getHistogram() {
+        return this.histogram;
     }
 
 
@@ -61,11 +66,6 @@ public class VoIDeserializer {
             bucket.getChildren().add(initBucket((Resource)v, bucket));
 
         return bucket;
-    }
-
-
-    public STHolesBucket<RDFRectangle> getRootBucket() {
-        return this.rootBucket;
     }
 
 
@@ -127,7 +127,7 @@ public class VoIDeserializer {
         Model m = model.filter(res, SEVOD.DATEINTERVAL, null);
         if (!m.isEmpty()) {
 
-            SimpleDateFormat parserSDF = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy");
+            SimpleDateFormat parserSDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm");
             Resource dateRange = m.objectResource();
             Date from = null, to = null;
             try {
@@ -202,15 +202,11 @@ public class VoIDeserializer {
 
 
     public static void main(String[] args) {
-        STHolesBucket<RDFRectangle> rootBucket =
+        STHolesHistogram<RDFRectangle> histogram =
                 new VoIDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histVoID.ttl").
-                        getRootBucket();
+                        getHistogram();
 
-        STHolesHistogram<RDFRectangle> histogram = new STHolesHistogram();
-        histogram.setRoot(rootBucket);
-
-        new HistogramIO("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON.txt", histogram).write();
-
+        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON.txt");
     }
 
 }

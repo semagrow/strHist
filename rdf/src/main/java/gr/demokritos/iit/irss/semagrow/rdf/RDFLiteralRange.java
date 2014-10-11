@@ -1,13 +1,11 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
 
+import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
-import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -128,33 +126,6 @@ public class RDFLiteralRange
         }
     		return res;
     }
-
-
-    public JSONObject toJSON() {
-        JSONObject object;
-        JSONArray array = new JSONArray();
-
-        for (Map.Entry<URI,RangeLength<?>> entry : ranges.entrySet()) {
-            object = new JSONObject();
-
-            if (entry.getKey().equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.LONG)) {
-                object.put("intervalRange", entry.getValue().toJSON());
-
-            } else if (entry.getKey().equals(XMLSchema.DATETIME)) {
-                object.put("calendarRange", entry.getValue().toJSON());
-
-            } else if (entry.getKey().equals(XMLSchema.STRING)) {
-                object.put("prefixRange", entry.getValue().toJSON());
-            }
-
-            array.add(object);
-        }// for
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("array", array);
-
-        return jsonObject;
-    }//toJSON
 
 
 	public RDFLiteralRange intersection(RDFLiteralRange literalRange) {

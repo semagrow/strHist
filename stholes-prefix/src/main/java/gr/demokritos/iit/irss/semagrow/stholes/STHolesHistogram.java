@@ -1,12 +1,10 @@
 package gr.demokritos.iit.irss.semagrow.stholes;
 
-import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
+import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
-
-import org.json.simple.JSONObject;
 
 import java.util.*;
 
@@ -710,10 +708,6 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
     }
 
 
-    public JSONObject toJSON() {
-        return getRoot().toJSON();
-    }
-	
 	public STHolesBucket<R> getRoot() {
 		return root;
 	}

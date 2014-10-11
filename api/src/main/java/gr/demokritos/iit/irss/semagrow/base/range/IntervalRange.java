@@ -1,8 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
-import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
-import org.json.simple.JSONObject;
+import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 
 import java.io.Serializable;
 
@@ -152,17 +151,6 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         return "[" + low + "-" + high + "]";
     }
 
-    public JSONObject toJSON() {
-        JSONObject range = new JSONObject();
-        range.put("low", low);
-        range.put("high", high);
-
-//        JSONObject intervalRange = new JSONObject();
-//        intervalRange.put("type", "intervalRange");
-//        intervalRange.put("value", range);
-
-        return range;
-    }
 
     public static void main(String [] args){
         IntervalRange myRange = new IntervalRange(1,6);

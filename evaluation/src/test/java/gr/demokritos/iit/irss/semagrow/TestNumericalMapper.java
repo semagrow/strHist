@@ -5,7 +5,7 @@ import gr.demokritos.iit.irss.semagrow.tools.NumericalMapper;
 /**
  * Created by Nick on 12-Aug-14.
  */
-public class MyTestMain {
+public class TestNumericalMapper {
 
     static String histogramPath = "C:\\Users\\Nick\\Desktop\\histogram.json.txt";
 

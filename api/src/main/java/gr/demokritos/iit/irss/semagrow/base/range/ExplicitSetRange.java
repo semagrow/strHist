@@ -1,9 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
-import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -118,23 +116,6 @@ public class ExplicitSetRange<T>
         res += "}";
 
         return res;
-    }
-
-    public JSONObject toJSON() {
-        JSONObject predicate;
-        JSONArray array = new JSONArray();
-
-        for (T p : items) {
-            predicate = new JSONObject();
-            predicate.put("value", p);
-            predicate.put("type", "uri");
-            array.add(predicate);
-        }
-
-        JSONObject jSONObj = new JSONObject();
-        jSONObj.put("array", array);
-
-        return jSONObj;
     }
 
 

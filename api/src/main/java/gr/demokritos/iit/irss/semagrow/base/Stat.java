@@ -1,7 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.base;
 
-import org.json.simple.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,16 +67,6 @@ public class Stat {
 
         return res;
 
-    }
-
-    public JSONObject toJSON() {
-    	JSONObject statistics = new JSONObject();
-    	statistics.put("triples", frequency);
-    	statistics.put("distinctSubjects", distinctCount.get(0));
-    	statistics.put("distinctPredicates", distinctCount.get(1));
-    	statistics.put("distinctObjects", distinctCount.get(2));
-
-    	return statistics;
     }
 
 

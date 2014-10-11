@@ -1,8 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
-import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
-import org.json.simple.JSONObject;
+import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -208,18 +207,6 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
 
     }
 
-
-    public JSONObject toJSON() {
-        JSONObject range = new JSONObject();
-        range.put("begin", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm").format(begin));
-        range.put("end", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm").format(end));
-
-//        JSONObject calendarRange = new JSONObject();
-//        calendarRange.put("type", "calendarRange");
-//        calendarRange.put("value", range);
-
-        return range;
-    }
 
     public static void main(String args[] ) throws ParseException {
 

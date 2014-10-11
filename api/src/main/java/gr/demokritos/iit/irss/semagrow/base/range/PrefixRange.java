@@ -1,9 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
-import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 
 import java.util.ArrayList;
 
@@ -287,23 +285,6 @@ public class PrefixRange
         return res;
     }
 
-
-    public JSONObject toJSON() {
-        JSONObject subject;
-        JSONArray array = new JSONArray();
-
-        for (String p : prefixList) {
-            subject = new JSONObject();
-            subject.put("value", p);
-            subject.put("type", "url");
-            array.add(subject);
-        }
-
-        JSONObject jSONObj = new JSONObject();
-        jSONObj.put("array", array);
-
-        return jSONObj;
-    }
 
     public static void main(String [] args){
 

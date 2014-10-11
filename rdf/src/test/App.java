@@ -1,12 +1,12 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
-import java.util.List;
-
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.io.json.HistogramIO;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
+
+import java.util.List;
 
 
 /**
@@ -23,11 +23,8 @@ public class App
 
         h = new STHolesHistogram();
         long start = System.currentTimeMillis();
-//        while( true ) {
-        	// open query log file
+
         	LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs_4.log");
-//        	LogParser lp = new LogParser("src\\main\\resources\\test_2.txt");
-//            LogParser lp = new LogParser("src\\main\\resources\\master_log.log");
 
         	List<RDFQueryRecord> list = lp.parse();
 
@@ -51,13 +48,8 @@ public class App
         	 h.refine(list);
         	 
         	 // Write histogram to file.
-        	 HistogramIO histIO = new HistogramIO("src\\main\\resources\\hist", ((STHolesHistogram) h));
-        	 histIO.write();
+            new JSONSerializer((STHolesHistogram) h, "/home/nickozoulis/git/sthist/rdf/src/main/resources/hist.txt");
 
-
-
-
-//        }
     }
 
 }
