@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
+import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
 import org.openrdf.query.algebra.*;
 import org.openrdf.query.impl.EmptyBindingSet;
 
@@ -16,7 +17,24 @@ public class CostEstimatorImpl implements CostEstimator {
 
     @Override
     public double getCost(TupleExpr tupleExpr) {
-        return 0;
+        if (tupleExpr instanceof StatementPattern)
+            return getCost((StatementPattern)tupleExpr);
+        else if (tupleExpr instanceof Join)
+            return getCost((Join)tupleExpr);
+        else if (tupleExpr instanceof Union)
+            return getCost((Union)tupleExpr);
+        else if (tupleExpr instanceof Plan)
+            return getCost((Plan)tupleExpr);
+        else if (tupleExpr instanceof UnaryTupleOperator)
+            return getCost((UnaryTupleOperator)tupleExpr);
+        else if (tupleExpr instanceof BinaryTupleOperator)
+            return getCost((BinaryTupleOperator)tupleExpr);
+        else
+            return 0;
+    }
+
+    public double getCost(Plan plan) {
+        return plan.getCost();
     }
 
     public double getCost(StatementPattern pattern) {

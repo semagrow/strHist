@@ -41,7 +41,7 @@ public class TestSailConnection extends SailConnectionBase {
         CardinalityEstimator card = new CardinalityEstimatorImpl(hist);
         CostEstimator cost = new CostEstimatorImpl(card);
 
-        QueryOptimizer opt = new JoinOptimizer(cost);
+        QueryOptimizer opt = new JoinOptimizer(cost, card);
 
         opt.optimize(tupleExpr, dataset, bindings);
 

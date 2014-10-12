@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import eu.semagrow.stack.modules.sails.semagrow.helpers.BPGCollector;
 import eu.semagrow.stack.modules.sails.semagrow.helpers.CombinationIterator;
+import eu.semagrow.stack.modules.sails.semagrow.optimizer.DecomposerContext;
 import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
 import eu.semagrow.stack.modules.sails.semagrow.optimizer.PlanCollection;
 import org.openrdf.query.BindingSet;
@@ -9,21 +10,22 @@ import org.openrdf.query.Dataset;
 import org.openrdf.query.algebra.Join;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.QueryOptimizer;
+import org.openrdf.query.impl.EmptyBindingSet;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by angel on 10/11/14.
  */
 public class JoinOptimizer implements QueryOptimizer {
 
+    private CostEstimator costEstimator;
+    private CardinalityEstimator cardinalityEstimator;
 
 
-    public JoinOptimizer(CostEstimator estimator) {
-
+    public JoinOptimizer(CostEstimator costEst, CardinalityEstimator cardEst) {
+        this.costEstimator = costEst;
+        this.cardinalityEstimator = cardEst;
     }
 
     @Override
@@ -113,8 +115,59 @@ public class JoinOptimizer implements QueryOptimizer {
         return plans;
     }
 
-    private Collection<Plan> prunePlans(Collection<Plan> expr) {
-        return expr;
+    private void prunePlans(Collection<Plan> plans) {
+
+        Collection<Plan> bestPlans = new ArrayList<Plan>();
+
+        boolean inComparable;
+
+        for (Plan candidatePlan : plans) {
+            inComparable = true;
+
+            for (Plan plan : bestPlans) {
+                int plan_comp = comparePlan(candidatePlan, plan);
+
+                if (plan_comp != 0)
+                    inComparable = false;
+
+                if (plan_comp == -1) {
+                    bestPlans.remove(plan);
+                    bestPlans.add(candidatePlan);
+                }
+            }
+            // check if plan is incomparable with all best plans yet discovered.
+            if (inComparable)
+                bestPlans.add(candidatePlan);
+        }
+
+        int planSize = plans.size();
+        plans.retainAll(bestPlans);
+    }
+
+    protected Plan createPlan(Set<TupleExpr> planId, TupleExpr innerExpr) {
+        Plan p = new Plan(planId, innerExpr);
+        updatePlan(p);
+        return p;
+    }
+
+    protected void updatePlan(Plan plan) {
+        TupleExpr innerExpr = plan.getArg();
+        TupleExpr e = innerExpr.clone();
+
+        // update cardinality and cost properties
+        plan.setCost(costEstimator.getCost(e));
+        plan.setCardinality(cardinalityEstimator.getCardinality(e, EmptyBindingSet.getInstance()));
+
+        // update site
+
+        // update ordering
+
+        plan.getArg().replaceWith(e);
+        //FIXME: update ordering, limit, distinct, group by
+    }
+
+    private int comparePlan(Plan plan1, Plan plan2) {
+        return plan1.getCost() < plan2.getCost() ? -1 : 1;
     }
 
     private static <T> Iterable<Set<T>> subsetsOf(Set<T> s, int k) {

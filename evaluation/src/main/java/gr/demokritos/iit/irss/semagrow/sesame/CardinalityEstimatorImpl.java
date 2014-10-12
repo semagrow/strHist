@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
+import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import org.openrdf.model.Value;
@@ -33,8 +34,14 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
             return getCardinality((Join)expr, bindings);
         else if (expr instanceof LeftJoin)
             return getCardinality((LeftJoin)expr, bindings);
+        else if (expr instanceof Plan)
+            return getCardinality((Plan)expr, bindings);
         else
             return 0;
+    }
+
+    public long getCardinality(Plan plan, BindingSet bindings) {
+        return plan.getCardinality();
     }
 
     public long getCardinality(Slice slice, BindingSet bindings) {

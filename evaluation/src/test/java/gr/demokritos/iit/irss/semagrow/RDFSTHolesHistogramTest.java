@@ -1,7 +1,6 @@
 package gr.demokritos.iit.irss.semagrow;
 
 
-import gr.demokritos.iit.irss.semagrow.rdf.io.json.HistogramIO;
 import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import junit.framework.TestCase;
 
@@ -33,11 +32,11 @@ public class RDFSTHolesHistogramTest extends TestCase {
     	//java.net.URL u1 = this.getClass().getResource("/3670788-3676597");
     	//java.net.URL u2 = this.getClass().getResource("/US197");
 
-        STHolesOrigHistogram h = HistogramIO.readOrig(Paths.get(getClass().
-                    getResource("/369914-374641").toURI()).toString());
-        NumQueryRecord r = readFromPool(Paths.get(getClass().
-                getResource("/NL").toURI()).toString());
-        h.refine(r);
+        //STHolesOrigHistogram h = HistogramIO.readOrig(Paths.get(getClass().
+        //            getResource("/369914-374641").toURI()).toString());
+        //NumQueryRecord r = readFromPool(Paths.get(getClass().
+        //        getResource("/NL").toURI()).toString());
+        //h.refine(r);
 
 
     	/*
@@ -54,8 +53,8 @@ public class RDFSTHolesHistogramTest extends TestCase {
     	*/
 
 
-        String filename = "src/main/resources/test_output";
-        outputHistogram(h, filename);
+        //String filename = "src/main/resources/test_output";
+        //outputHistogram(h, filename);
 
 
 
@@ -66,8 +65,8 @@ public class RDFSTHolesHistogramTest extends TestCase {
     }
 
     private static void outputHistogram(STHolesOrigHistogram h, String filename) {
-        HistogramIO histIO = new HistogramIO(filename, h);
-        histIO.write();
+       // HistogramIO histIO = new HistogramIO(filename, h);
+      //  histIO.write();
     }
 
     private static <T>  T readFromPool(String filename) {
