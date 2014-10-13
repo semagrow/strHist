@@ -2,10 +2,20 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
+import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
+import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
+import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
+import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.algebra.*;
+
+import java.util.Calendar;
 
 /**
  * Created by angel on 10/11/14.
@@ -81,17 +91,57 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
         return histogram.estimate(toRectangle(pattern, bindings));
     }
 
-    //TODO
-    private RDFRectangle toRectangle(StatementPattern pattern, BindingSet bindings) {
-        Value sVal = pattern.getPredicateVar().getValue();
-        Value pVal = pattern.getPredicateVar().getValue();
-        Value oVal = pattern.getPredicateVar().getValue();
 
-        //TODO: (zoulis) create the appropriate RDFRectangle based on the values of pattern
-        //      AND the bindings.
-        //      If variable then we should leave the corresponding dimension infinite.
-        //new RDFRectangle();
-        return null;
+    private RDFRectangle toRectangle(StatementPattern pattern, BindingSet bindings) {
+        Value sVal = pattern.getSubjectVar().getValue();
+        Value pVal = pattern.getPredicateVar().getValue();
+        Value oVal = pattern.getObjectVar().getValue();
+
+        PrefixRange subjectRange = new PrefixRange();
+
+        if (sVal == null)
+            sVal = bindings.getValue(pattern.getSubjectVar().getName());
+
+        subjectRange.getPrefixList().add(sVal.stringValue());
+
+
+        ExplicitSetRange<String> predicateRange = new ExplicitSetRange<String>();
+        if (pVal == null)
+            pVal = bindings.getValue(pattern.getPredicateVar().getName());
+
+        predicateRange.getItems().add(pVal.stringValue());
+
+
+        RDFLiteralRange objectRange = new RDFLiteralRange();
+        if (oVal == null)
+            oVal = bindings.getValue(pattern.getObjectVar().getName());
+        else {
+            if (oVal instanceof URI) {
+                URI uri = (URI)oVal;
+                PrefixRange pr = new PrefixRange();
+                pr.getPrefixList().add(uri.stringValue());
+                objectRange.getRanges().put(XMLSchema.STRING, pr);
+            } else if (oVal instanceof Literal) {
+                Literal l = (Literal)oVal;
+
+                if (l.getDatatype().equals(XMLSchema.INT))
+                    objectRange.getRanges().put(XMLSchema.INT, new IntervalRange(l.intValue(), l.intValue()));
+                else if (l.getDatatype().equals(XMLSchema.LONG))
+                    objectRange.getRanges().put(XMLSchema.LONG, new IntervalRange((int)l.longValue(), (int)l.longValue()));
+                else if (l.getDatatype().equals(XMLSchema.STRING)) {
+                    PrefixRange pr = new PrefixRange();
+                    pr.getPrefixList().add(l.stringValue());
+                    objectRange.getRanges().put(XMLSchema.STRING, pr);
+                }
+                else if (l.getDatatype().equals(XMLSchema.DATETIME)) {
+                    Calendar cal = l.calendarValue().toGregorianCalendar();
+                    CalendarRange cr = new CalendarRange(cal.getTime(), cal.getTime());
+                    objectRange.getRanges().put(XMLSchema.DATETIME, cr);
+                }
+            }
+        }
+
+        return new RDFRectangle(subjectRange, predicateRange, objectRange);
     }
 
 }

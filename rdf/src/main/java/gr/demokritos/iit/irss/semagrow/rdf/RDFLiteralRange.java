@@ -259,7 +259,7 @@ public class RDFLiteralRange
                 Literal literal = (Literal) value;
 
                 if (literal.getDatatype() == valueType) {
-                    if (valueType.equals(XMLSchema.INTEGER)) {
+                    if (valueType.equals(XMLSchema.INTEGER) || valueType.equals(XMLSchema.INT)) {
                         return ((IntervalRange<Integer>) range).contains(literal.intValue());
 
                     } else if (valueType.equals(XMLSchema.LONG)) {
