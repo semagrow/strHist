@@ -5,9 +5,12 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.Sail;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by angel on 10/11/14.
@@ -65,4 +68,28 @@ public class Workflow {
         */
         return null;
     }
+
+
+    private static List<String> loadAgrovocTerms(String path) {
+        List<String> list = new ArrayList<String>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(path));
+            String text = "";
+
+            while ((text = br.readLine()) != null) {
+                String[] split = text.split(",");
+                list.add(split[1].trim());
+            }
+
+            br.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }
