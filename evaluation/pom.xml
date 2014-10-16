@@ -54,7 +54,32 @@
           <artifactId>semagrow-stack-modules-sails-semagrow</artifactId>
           <version>1.0.0</version>
       </dependency>
+      <dependency>
+          <groupId>com.bigdata</groupId>
+          <artifactId>bigdata</artifactId>
+          <version>1.2.3</version>
+      </dependency>
   </dependencies>
+
+    <repositories>
+        <repository>
+            <id>systap-mvn-repo</id>
+            <url>http://systap.com/maven/releases/</url>
+        </repository>
+        <repository>
+            <id>nxparser-repo</id>
+            <url>http://nxparser.googlecode.com/svn/repository/</url>
+        </repository>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>apache-repo-releases</id>
+            <url>http://repository.apache.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

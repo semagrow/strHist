@@ -2,7 +2,6 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import eu.semagrow.stack.modules.sails.semagrow.helpers.BPGCollector;
 import eu.semagrow.stack.modules.sails.semagrow.helpers.CombinationIterator;
-import eu.semagrow.stack.modules.sails.semagrow.optimizer.DecomposerContext;
 import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
 import eu.semagrow.stack.modules.sails.semagrow.optimizer.PlanCollection;
 import org.openrdf.query.BindingSet;
