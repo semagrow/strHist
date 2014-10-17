@@ -7,8 +7,10 @@ import eu.semagrow.stack.modules.sails.semagrow.optimizer.PlanCollection;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.algebra.Join;
+import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.QueryOptimizer;
+import org.openrdf.query.algebra.helpers.StatementPatternCollector;
 import org.openrdf.query.impl.EmptyBindingSet;
 
 import java.util.*;
@@ -90,8 +92,16 @@ public class JoinOptimizer implements QueryOptimizer {
 
     private Collection<Plan> accessPlans(TupleExpr expr, Dataset dataset, BindingSet bindings) {
 
-        return null;
+        List<StatementPattern> patterns = StatementPatternCollector.process(expr);
+        Collection<Plan> plans = new LinkedList<Plan>();
 
+        for (StatementPattern p : patterns) {
+            Set<TupleExpr> id = new HashSet<TupleExpr>();
+            id.add(p);
+            plans.add(createPlan(id, p));
+        }
+
+        return plans;
     }
 
     private void finalizePlans(Collection<Plan> plans) { }
@@ -149,7 +159,8 @@ public class JoinOptimizer implements QueryOptimizer {
         return p;
     }
 
-    protected void updatePlan(Plan plan) {
+    protected void
+    updatePlan(Plan plan) {
         TupleExpr innerExpr = plan.getArg();
         TupleExpr e = innerExpr.clone();
 

@@ -91,57 +91,58 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
         return histogram.estimate(toRectangle(pattern, bindings));
     }
 
-
     private RDFRectangle toRectangle(StatementPattern pattern, BindingSet bindings) {
         Value sVal = pattern.getSubjectVar().getValue();
         Value pVal = pattern.getPredicateVar().getValue();
         Value oVal = pattern.getObjectVar().getValue();
 
         PrefixRange subjectRange = new PrefixRange();
-
-        if (sVal == null)
-            sVal = bindings.getValue(pattern.getSubjectVar().getName());
-
-        subjectRange.getPrefixList().add(sVal.stringValue());
-
+        if (sVal == null) {
+            if (bindings.hasBinding(pattern.getSubjectVar().getName()))
+                subjectRange.getPrefixList().add(bindings.getValue(pattern.getSubjectVar().getName()).stringValue());
+        } else
+            subjectRange.getPrefixList().add(sVal.stringValue());
 
         ExplicitSetRange<String> predicateRange = new ExplicitSetRange<String>();
-        if (pVal == null)
-            pVal = bindings.getValue(pattern.getPredicateVar().getName());
-
-        predicateRange.getItems().add(pVal.stringValue());
-
+        if (pVal == null) {
+            if (bindings.hasBinding(pattern.getPredicateVar().getName()))
+                predicateRange.getItems().add(bindings.getValue(pattern.getPredicateVar().getName()).stringValue());
+        } else
+            predicateRange.getItems().add(pVal.stringValue());
 
         RDFLiteralRange objectRange = new RDFLiteralRange();
-        if (oVal == null)
-            oVal = bindings.getValue(pattern.getObjectVar().getName());
-        else {
-            if (oVal instanceof URI) {
-                URI uri = (URI)oVal;
-                PrefixRange pr = new PrefixRange();
-                pr.getPrefixList().add(uri.stringValue());
-                objectRange.getRanges().put(XMLSchema.STRING, pr);
-            } else if (oVal instanceof Literal) {
-                Literal l = (Literal)oVal;
-
-                if (l.getDatatype().equals(XMLSchema.INT))
-                    objectRange.getRanges().put(XMLSchema.INT, new IntervalRange(l.intValue(), l.intValue()));
-                else if (l.getDatatype().equals(XMLSchema.LONG))
-                    objectRange.getRanges().put(XMLSchema.LONG, new IntervalRange((int)l.longValue(), (int)l.longValue()));
-                else if (l.getDatatype().equals(XMLSchema.STRING)) {
-                    PrefixRange pr = new PrefixRange();
-                    pr.getPrefixList().add(l.stringValue());
-                    objectRange.getRanges().put(XMLSchema.STRING, pr);
-                }
-                else if (l.getDatatype().equals(XMLSchema.DATETIME)) {
-                    Calendar cal = l.calendarValue().toGregorianCalendar();
-                    CalendarRange cr = new CalendarRange(cal.getTime(), cal.getTime());
-                    objectRange.getRanges().put(XMLSchema.DATETIME, cr);
-                }
-            }
-        }
+        if (oVal == null) {
+            if (bindings.hasBinding(pattern.getObjectVar().getName()))
+                fillObjectRange(objectRange, bindings.getValue(pattern.getObjectVar().getName()));
+        } else
+            fillObjectRange(objectRange, oVal);
 
         return new RDFRectangle(subjectRange, predicateRange, objectRange);
+    }
+
+    private void fillObjectRange(RDFLiteralRange objectRange, Value oVal) {
+        if (oVal instanceof URI) {
+            URI uri = (URI) oVal;
+            PrefixRange pr = new PrefixRange();
+            pr.getPrefixList().add(uri.stringValue());
+            objectRange.getRanges().put(XMLSchema.STRING, pr);
+        } else if (oVal instanceof Literal) {
+            Literal l = (Literal) oVal;
+
+            if (l.getDatatype().equals(XMLSchema.INT))
+                objectRange.getRanges().put(XMLSchema.INT, new IntervalRange(l.intValue(), l.intValue()));
+            else if (l.getDatatype().equals(XMLSchema.LONG))
+                objectRange.getRanges().put(XMLSchema.LONG, new IntervalRange((int) l.longValue(), (int) l.longValue()));
+            else if (l.getDatatype().equals(XMLSchema.STRING)) {
+                PrefixRange pr = new PrefixRange();
+                pr.getPrefixList().add(l.stringValue());
+                objectRange.getRanges().put(XMLSchema.STRING, pr);
+            } else if (l.getDatatype().equals(XMLSchema.DATETIME)) {
+                Calendar cal = l.calendarValue().toGregorianCalendar();
+                CalendarRange cr = new CalendarRange(cal.getTime(), cal.getTime());
+                objectRange.getRanges().put(XMLSchema.DATETIME, cr);
+            }
+        }
     }
 
 }
