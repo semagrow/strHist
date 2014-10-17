@@ -4,10 +4,7 @@ import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
+import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -23,17 +20,20 @@ import java.util.Properties;
  */
 public class Workflow {
 
-    private static String q = "prefix dc: <http://purl.org/dc/elements/1.1/> " +
-            "prefix semagrow: <http://www.semagrow.eu/rdf/> " +
-            "select * { " +
-            "?pub dc:title ?title ." +
-            "?pub semagrow:year \"%s\" ." +
-            "?pub semagrow:origin \"%s\" . }";
-    // Use it like this : String.format(q, "2012", "US");
+//    private static String q = "prefix dc: <http://purl.org/dc/elements/1.1/> " +
+//            "prefix semagrow: <http://www.semagrow.eu/rdf/> " +
+//            "select * { " +
+//            "?pub dc:title ?title ." +
+//            "?pub semagrow:year \"%s\" ." +
+//            "?pub semagrow:origin \"%s\" . }";
+//    // Use it like this : String.format(q, "2012", "US");
+//
+//    private static int startDate, endDate;
+//    private static String tripleStorePath = "/mnt/ocfs2/IDF_data/journals/exp_triples/histogram_data/data_";
+//    public static String logOutputPath;
 
-    private static int startDate, endDate;
-    private static String tripleStorePath = "/mnt/ocfs2/IDF_data/journals/exp_triples/histogram_data/data_";
-    public static String logOutputPath;
+    static String q = "select * {<http://agris.fao.org/aos/records/XF7590017> ?p ?o}";
+    static final String tripleStorePath = "/home/nickozoulis/data_";
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path
@@ -45,26 +45,31 @@ public class Workflow {
         OptionParser parser = new OptionParser("s:e:l:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l")) {
-            startDate = Integer.parseInt(options.valueOf("s").toString());
-            endDate = Integer.parseInt(options.valueOf("e").toString());
-            if (startDate > endDate) System.exit(1);
-            logOutputPath = options.valueOf("l").toString();
-        }
-        else System.exit(1);
+//        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l")) {
+//            startDate = Integer.parseInt(options.valueOf("s").toString());
+//            endDate = Integer.parseInt(options.valueOf("e").toString());
+//            if (startDate > endDate) System.exit(1);
+//            logOutputPath = options.valueOf("l").toString();
+//        }
+//        else System.exit(1);
 
         runExperiment();
     }
 
     private static void runExperiment() throws RepositoryException, IOException {
-        for (int i=startDate; i<=endDate; i++) {
+        for (int i=1975; i<=1975; i++) {
             // -- Query Evaluation
             try {
                 RepositoryConnection conn = getFedRepository(getRepository(i)).getConnection();
-
+                
                 TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, q);
 
-                query.evaluate();
+                TupleQueryResult res = query.evaluate();
+
+                while (res.hasNext())
+                    System.out.println(res.next());
+
+
             } catch (MalformedQueryException mqe) {mqe.printStackTrace();
             } catch (QueryEvaluationException e) {e.printStackTrace();}
 

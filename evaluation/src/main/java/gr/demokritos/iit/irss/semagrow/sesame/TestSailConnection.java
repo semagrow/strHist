@@ -11,9 +11,7 @@ import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.QueryOptimizer;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfig;
 import org.openrdf.sail.SailException;
-import org.openrdf.sail.helpers.SailBase;
 import org.openrdf.sail.helpers.SailConnectionBase;
 
 /**
