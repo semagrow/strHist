@@ -2,12 +2,12 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
+import info.aduna.iteration.Iteration;
+import info.aduna.iteration.Iterations;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
+import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -35,6 +35,8 @@ public class Workflow {
     private static String tripleStorePath = "/mnt/ocfs2/IDF_data/journals/exp_triples/histogram_data/data_";
     public static String logOutputPath;
 
+    public static RDFSTHolesHistogram histogram;
+
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path
      * @param args
@@ -42,6 +44,7 @@ public class Workflow {
      * @throws IOException
      */
     static public void main(String[] args) throws RepositoryException, IOException, NumberFormatException {
+
         OptionParser parser = new OptionParser("s:e:l:");
         OptionSet options = parser.parse(args);
 
@@ -64,16 +67,18 @@ public class Workflow {
 
                 TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, q);
 
-                query.evaluate();
-            } catch (MalformedQueryException mqe) {mqe.printStackTrace();
-            } catch (QueryEvaluationException e) {e.printStackTrace();}
+                TupleQueryResult result = query.evaluate();
+                consumeIteration(result);
+
+            } catch (MalformedQueryException | QueryEvaluationException mqe) {
+                mqe.printStackTrace();
+            }
 
             // -- Histogram Training
 
 //            // The evaluation of the query will write logs (query feedback).
 //            List<RDFQueryRecord> listQueryRecords = new LogParser(logOutputPath).parse();
 //
-//            STHolesHistogram<RDFRectangle> histogram = new STHolesHistogram<RDFRectangle>();
 //            histogram.refine(listQueryRecords);
 
 //            Maybe write histogram to file in void or json format
@@ -87,10 +92,18 @@ public class Workflow {
     }
 
     private static Repository getFedRepository(Repository actual) throws RepositoryException {
-        Sail sail = new TestSail(actual);
+        TestSail sail = new TestSail(actual);
+        histogram = sail.getHistogram();
         Repository repo = new SailRepository(sail);
         repo.initialize();
         return repo;
+    }
+
+    private static void consumeIteration(Iteration<BindingSet,QueryEvaluationException> iter) throws QueryEvaluationException {
+        while (iter.hasNext())
+            iter.next();
+
+        Iterations.closeCloseable(iter);
     }
 
     private static Repository getRepository(int year) throws RepositoryException, IOException {

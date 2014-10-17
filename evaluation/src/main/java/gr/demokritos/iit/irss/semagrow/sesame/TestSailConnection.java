@@ -7,6 +7,7 @@ import org.openrdf.model.*;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.algebra.QueryRoot;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.QueryOptimizer;
 import org.openrdf.repository.RepositoryConnection;
@@ -42,6 +43,8 @@ public class TestSailConnection extends SailConnectionBase {
         CostEstimator cost = new CostEstimatorImpl(card);
 
         QueryOptimizer opt = new JoinOptimizer(cost, card);
+
+        tupleExpr = new QueryRoot(tupleExpr);
 
         opt.optimize(tupleExpr, dataset, bindings);
 
@@ -127,6 +130,6 @@ public class TestSailConnection extends SailConnectionBase {
     }
 
     public Histogram<RDFRectangle> getHistogram() {
-        return null;
+        return sail.getHistogram();
     }
 }
