@@ -58,12 +58,12 @@ public class JoinOptimizer implements QueryOptimizer {
         int count = r.size();
 
         // bottom-up starting for subplans of size "k"
-        for (int k = 1; k <= count; k++) {
+        for (int k = 2; k <= count; k++) {
 
             // enumerate all subsets of r of size k
             for (Set<TupleExpr> s : subsetsOf(r, k)) {
 
-                for (int i = 1; i <= k; i++) {
+                for (int i = 1; i < k; i++) {
 
                     // let disjoint sets o1 and o2 such that s = o1 union o2
                     for (Set<TupleExpr> o1 : subsetsOf(s, i)) {
@@ -86,7 +86,8 @@ public class JoinOptimizer implements QueryOptimizer {
 
         if (!fullPlans.isEmpty()) {
             TupleExpr bestPlan = getBestPlan(fullPlans);
-            bgp.replaceWith(bestPlan);
+            //FIXME:
+//            bgp.replaceWith(bestPlan);
         }
     }
 
