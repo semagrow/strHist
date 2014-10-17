@@ -59,6 +59,16 @@
           <artifactId>bigdata</artifactId>
           <version>1.2.3</version>
       </dependency>
+      <dependency>
+          <groupId>com.lmax</groupId>
+          <artifactId>disruptor</artifactId>
+          <version>3.2.1</version>
+      </dependency>
+      <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.14</version>
+      </dependency>
   </dependencies>
 
     <repositories>
