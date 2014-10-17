@@ -1,5 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
+import gr.demokritos.iit.irss.semagrow.api.Histogram;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
@@ -17,12 +20,21 @@ public class TestSail extends SailBase {
 
     private Repository actualRepo;
 
+    private RDFSTHolesHistogram histogram;
+
     public TestSail(Repository actual) {
         actualRepo = actual;
     }
 
     public RepositoryConnection getRepositoryConnection() throws RepositoryException {
         return actualRepo.getConnection();
+    }
+
+    public RDFSTHolesHistogram getHistogram() {
+        if (histogram == null)
+            histogram = new RDFSTHolesHistogram();
+
+        return histogram;
     }
 
     @Override
