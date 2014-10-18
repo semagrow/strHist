@@ -42,7 +42,11 @@ public class TestSail extends SailBase {
 
     @Override
     protected SailConnection getConnectionInternal() throws SailException {
-        return new TestSailConnection(this);
+        try {
+            return new TestSailConnection(this);
+        } catch (RepositoryException e) {
+            throw new SailException(e);
+        }
     }
 
     @Override

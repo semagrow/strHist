@@ -21,15 +21,21 @@ import org.openrdf.sail.helpers.SailConnectionBase;
 public class TestSailConnection extends SailConnectionBase {
 
     private TestSail sail;
+    private RepositoryConnection conn;
 
-    public TestSailConnection(TestSail sailBase) {
+    public TestSailConnection(TestSail sailBase) throws RepositoryException {
         super(sailBase);
         sail = sailBase;
+        conn = sail.getRepositoryConnection();
     }
 
     @Override
     protected void closeInternal() throws SailException {
-
+        try {
+            conn.close();
+        } catch (RepositoryException e) {
+            throw new SailException(e);
+        }
     }
 
     @Override
@@ -47,12 +53,9 @@ public class TestSailConnection extends SailConnectionBase {
         opt.optimize(tupleExpr, dataset, bindings);
 
         try {
-            RepositoryConnection cnx = sail.getRepositoryConnection();
-            EvaluationStrategyImpl evalStrategy = new EvaluationStrategyImpl(cnx);
+            EvaluationStrategyImpl evalStrategy = new EvaluationStrategyImpl(conn);
             return evalStrategy.evaluate(tupleExpr, bindings);
         }catch(QueryEvaluationException e) {
-            throw new SailException(e);
-        } catch (RepositoryException e) {
             throw new SailException(e);
         }
     }
