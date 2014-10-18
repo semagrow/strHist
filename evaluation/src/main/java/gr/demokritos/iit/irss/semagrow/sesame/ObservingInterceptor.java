@@ -1,6 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import eu.semagrow.stack.modules.api.evaluation.QueryEvaluationSession;
 import eu.semagrow.stack.modules.sails.semagrow.evaluation.iteration.ObservingIteration;
 import gr.demokritos.iit.irss.semagrow.logging.LoggerWithQueue;
 import info.aduna.iteration.CloseableIteration;
@@ -116,12 +115,13 @@ public class ObservingInterceptor {
             super(iter);
             this.metadata = metadata;
             try {
+                queue.put("&&");
 				queue.put(metadata.getSessionId());
 				queue.put(Long.toString(System.currentTimeMillis()));
 				queue.put(metadata.getEndpoint());
-				queue.put("@");
+				queue.put("%%");
 				queue.put(metadata.getQuery());
-				queue.put("@");
+				queue.put("%%");
 				queue.put(metadata.bindingNames);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
