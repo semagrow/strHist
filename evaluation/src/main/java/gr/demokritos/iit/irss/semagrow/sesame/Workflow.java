@@ -30,23 +30,17 @@ public class Workflow {
 
     //TODO: Isws thelei count
     private static String testQ1 = prefixes + "select * {?x semagrow:year 1980 . }";
-
     private static String testQ2 = prefixes + "select * {?x semagrow:year 1980 . } filter regex(\".*US\"), str(?x)";
 
     // Use it like this : String.format(q, "2012", "US");
-//
-//    private static int startDate, endDate;
-    private static String tripleStorePath = "/home/nickozoulis/Downloads/bigdata_agris_data_";
-//    public static String logOutputPath;
 
-//    static String q = "select * {?uu dc:subject <tt> . ??uu sg:year ?yy }";
-//    static final String tripleStorePath = "/home/nickozoulis/data_";
-    static final String logOutputPath = "/home/nickozoulis/strhist_exp_logs/semagrow_logs.log";
 
     public static RDFSTHolesHistogram histogram;
 
     private static List<String> agroTerms =
             loadAgrovocTerms("/home/nickozoulis/git/sthist/evaluation/src/test/resources/agrovoc_terms.txt");
+    static final String logOutputPath = "/home/nickozoulis/strhist_exp_logs/semagrow_logs.log";
+    static final String tripleStorePath = "blabla/bigdata_agris_data_";
     private static int term = 0;
 
     /**
@@ -72,17 +66,17 @@ public class Workflow {
     }
 
     private static void runExperiment() throws RepositoryException, IOException {
-        for (int i=1980; i<=1980; i++) {
+        // Testing only for 1976
+        for (int i=1976; i<=1976; i++) {
             // -- Query Evaluation
             Repository repo = getFedRepository(getRepository(1980));
 
-            // For some agroTerms
+            // For now loop for some agroTerms
             for (int j=0; j<50; j++) {
 
                 try {
                     RepositoryConnection conn = repo.getConnection();
                     String quer = String.format(q, agroTerms.get(term++));
-                    System.out.println(">< TrainQuery: " + quer);
                     TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
 
                     TupleQueryResult result = query.evaluate();
@@ -99,7 +93,7 @@ public class Workflow {
                 System.out.println("---<");
                 if (listQueryRecords.size() > 0) {
                     histogram.refine(listQueryRecords);
-                    System.out.println("--->\n\n" + histogram.getRoot().toString());
+
 
 //            Maybe write histogram to file in void or json format
                     new JSONSerializer(histogram, "/home/nickozoulis/strhist_exp_logs/histJSON.txt");
