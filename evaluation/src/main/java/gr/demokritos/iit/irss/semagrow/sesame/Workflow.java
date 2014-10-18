@@ -92,8 +92,6 @@ public class Workflow {
             Repository repo = getFedRepository(getRepository(i));
             RepositoryConnection conn = null;
             term = 0;
-            Path path = Paths.get(Workflow.path.toString(), "results.csv");
-            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
 
             // For now loop for some agroTerms
             for (int j=0; j<150; j++) {
@@ -117,10 +115,12 @@ public class Workflow {
                 if (listQueryRecords.size() > 0) {
                     histogram.refine(listQueryRecords);
                 }
-
-            // Compare with actual cardinalities using ActualCardinalityEstimator
-                execTestQueries(conn, bw, term);
             }
+
+            Path path = Paths.get(Workflow.path.toString(), "results.csv");
+            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
+
+            execTestQueries(conn, bw, term);
 
             bw.close();
         }
