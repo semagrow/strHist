@@ -14,8 +14,8 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -24,23 +24,30 @@ import java.util.Properties;
  */
 public class Workflow {
 
-//    private static String q = "prefix dc: <http://purl.org/dc/elements/1.1/> " +
-//            "prefix semagrow: <http://www.semagrow.eu/rdf/> " +
-//            "select * { " +
-//            "?pub dc:title ?title ." +
-//            "?pub semagrow:year \"%s\" ." +
-//            "?pub semagrow:origin \"%s\" . }";
-//    // Use it like this : String.format(q, "2012", "US");
+    private static String agroTermsPath = "agrovoc_terms.txt";
+    private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix sg: <http://www.semagrow.eu/rdf/> ";
+    private static String q = prefixes + "select * {?u dc:subject <%s> . ?u sg:year ?y} limit 1";
+
+    //TODO: Isws thelei count
+    private static String testQ1 = prefixes + "select * {?x semagrow:year 1980 . }";
+
+    private static String testQ2 = prefixes + "select * {?x semagrow:year 1980 . } filter regex(\".*US\"), str(?x)";
+
+    // Use it like this : String.format(q, "2012", "US");
 //
 //    private static int startDate, endDate;
-//    private static String tripleStorePath = "/mnt/ocfs2/IDF_data/journals/exp_triples/histogram_data/data_";
+    private static String tripleStorePath = "/home/nickozoulis/Downloads/bigdata_agris_data_";
 //    public static String logOutputPath;
 
-    static String q = "select * {<http://agris.fao.org/aos/records/XF7590017> ?p ?o}";
-    static final String tripleStorePath = "/home/nickozoulis/data_";
+//    static String q = "select * {?uu dc:subject <tt> . ??uu sg:year ?yy }";
+//    static final String tripleStorePath = "/home/nickozoulis/data_";
     static final String logOutputPath = "/home/nickozoulis/strhist_exp_logs/semagrow_logs.log";
 
     public static RDFSTHolesHistogram histogram;
+
+    private static List<String> agroTerms =
+            loadAgrovocTerms("/home/nickozoulis/git/sthist/evaluation/src/test/resources/agrovoc_terms.txt");
+    private static int term = 0;
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path
@@ -65,36 +72,69 @@ public class Workflow {
     }
 
     private static void runExperiment() throws RepositoryException, IOException {
-        for (int i=1975; i<=1975; i++) {
+        for (int i=1980; i<=1980; i++) {
             // -- Query Evaluation
-            try {
-                RepositoryConnection conn = getFedRepository(getRepository(i)).getConnection();
+            Repository repo = getFedRepository(getRepository(1980));
 
-                TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, q);
+            // For some agroTerms
+            for (int j=0; j<50; j++) {
 
-                TupleQueryResult result = query.evaluate();
-                consumeIteration(result);
+                try {
+                    RepositoryConnection conn = repo.getConnection();
+                    String quer = String.format(q, agroTerms.get(term++));
+                    System.out.println(">< TrainQuery: " + quer);
+                    TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
 
-            } catch (MalformedQueryException | QueryEvaluationException mqe) {
-                mqe.printStackTrace();
-            }
+                    TupleQueryResult result = query.evaluate();
+                    consumeIteration(result);
 
-            // -- Histogram Training
+                } catch (MalformedQueryException | QueryEvaluationException mqe) {
+                    mqe.printStackTrace();
+                }
+
+                // -- Histogram Training
 
 //            // The evaluation of the query will write logs (query feedback).
-            List<RDFQueryRecord> listQueryRecords = new LogParser(logOutputPath).parse();
-//
-            histogram.refine(listQueryRecords);
-            System.out.println(histogram.getRoot().toString());
-            new JSONSerializer(histogram, "/home/nickozoulis/strhist_exp_logs/histJSON.txt");
-//            Maybe write histogram to file in void or json format
+                List<RDFQueryRecord> listQueryRecords = new LogParser(logOutputPath).parse();
+                System.out.println("---<");
+                if (listQueryRecords.size() > 0) {
+                    histogram.refine(listQueryRecords);
+                    System.out.println("--->\n\n" + histogram.getRoot().toString());
 
-            // -- Histogram Testing
+//            Maybe write histogram to file in void or json format
+                    new JSONSerializer(histogram, "/home/nickozoulis/strhist_exp_logs/histJSON.txt");
+
+                    // -- Histogram Testing
 
 //            Compare with actual cardinalities using ActualCardinalityEstimator
-
-
+//             execTestQueries();
+                }
+            }
         }
+    }
+
+    private static void execTestQueries() {
+        execHistogram();
+        execTripleStore();
+    }
+
+    private static void execHistogram() {
+        try {
+            RepositoryConnection conn = getFedRepository(getRepository(1980)).getConnection();
+
+            TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, testQ1);
+
+            TupleQueryResult result = query.evaluate();
+
+
+        } catch (MalformedQueryException | QueryEvaluationException | RepositoryException | IOException mqe) {
+            mqe.printStackTrace();
+        }
+
+    }
+
+    private static void execTripleStore() {
+
     }
 
     private static Repository getFedRepository(Repository actual) throws RepositoryException {
@@ -129,5 +169,29 @@ public class Workflow {
 
         return repo;
     }
+
+       private static List<String> loadAgrovocTerms(String path) {
+             List<String> list = new ArrayList<String>();
+
+                        try {
+                        BufferedReader br = new BufferedReader(new FileReader(path));
+                        String text = "";
+
+                                while ((text = br.readLine()) != null) {
+                                String[] split = text.split(",");
+                                list.add(split[1].trim());
+                            }
+
+                                br.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+            return list;
+        }
+
+
 
 }

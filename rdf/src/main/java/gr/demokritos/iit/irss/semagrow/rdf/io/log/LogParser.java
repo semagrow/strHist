@@ -74,6 +74,9 @@ public class LogParser {
 
 	private void processThree(String string, LogQuery lq) {
 
+        String split[] = string.split("\\r?\\n");
+        String statheres = split[0];
+
 		// Create a regex pattern.
 		String pattern = "(\\[?)(.*?)=(.*?)(;|])";
 		// Create a Pattern object
@@ -222,9 +225,13 @@ public class LogParser {
 		RDFQueryRecord qr = new RDFQueryRecord(lq);
 		// Construct query's BindingSet.
 		BindingSet bs = new BindingSet();
+
+        //
+        if (lq.getQueryBindings().size() == 0)
+            return;
 		
 		for (Binding binding : lq.getQueryBindings()) 
-			bs.getBindings().add(binding);				
+			bs.getBindings().add(binding);
 		
 		// Check if Query already exists in Collection.
 		int index = collection.indexOf(qr);
@@ -244,7 +251,7 @@ public class LogParser {
 			qr.getQueryResult().getBindingSets().add(bs);
 			// Add the Query into Collection.
 			collection.add(qr);
-			System.out.println(qr.getQuery());
+//			System.out.println(qr.getQuery());
 		}// else	
 				
 	}// processQuery
