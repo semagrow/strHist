@@ -220,13 +220,13 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
                 //System.err.println("This should not happen! Original" +
                   //      "frequency: " + Tb + " and new frequency: " + freq);
-                //System.err.println(bucket.getIntersectionWithRecVolume(rect));
+                //System.out.println(bucket.getIntersectionWithRecVolume(rect));
 
                 freq= (long)Math.ceil(Tb * ((double)c.getVolume())/
                         bucket.getBox().intersection(rect).getVolume());
 
                 if (freq > Tb) {
-                    System.err.println("This should not happen! Original" +
+                    System.out.println("This should not happen! Original" +
                           "frequency: " + Tb + " and new frequency: " + freq);
                 }
 
@@ -596,12 +596,17 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                     + bp.getFrequency() * ((double) vold)/bp.getVolume());
 
             if (bp.getVolume() == 0) {
+                System.out.println("SSMerge:This should not happen. Zero parent volume. " +
+                        "New frequency is: " +
+                        newFrequency + " and fb1, fb2, fbp are: " + b1.getFrequency() + " " +
+                        b2.getFrequency() + bp.getFrequency());
                 throw new ArithmeticException();
             }
 
 
+
             if (newFrequency > 20000000) {
-                System.err.println("SSMerge:This should not happen. New frequency is: " +
+                System.out.println("SSMerge:This should not happen. New frequency is: " +
                         newFrequency + " and fb1, fb2, fbp are: " + b1.getFrequency() + " " +
                         b2.getFrequency() + bp.getFrequency());
             }

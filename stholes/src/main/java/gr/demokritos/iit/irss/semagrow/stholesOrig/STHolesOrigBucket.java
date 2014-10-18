@@ -247,9 +247,16 @@ public class STHolesOrigBucket<R extends RectangleWithVolume<R>> {
                 throw new ArithmeticException();
             }
 
+            if (freqN > freq) {
+                System.out.println("SSMerge2: This should not happen. Greater FreqN. New " +
+                        "parent frequency is " + freqN + " while previous was " +
+                        freq + " . Parent volume: " + newParent.getVolume());
+            }
+
             if (freqN > 20000000 || freq > 20000000 ) {
 
-                System.err.println("SSMerge2: This should not happen. New " +
+                System.out.println("SSMerge2: This should not happen. Too big" +
+                        "numbers. New " +
                         "parent frequency is " + freqN + " while previous was " +
                         freq);
             }
