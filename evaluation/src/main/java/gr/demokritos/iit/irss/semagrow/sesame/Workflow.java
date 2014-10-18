@@ -14,10 +14,11 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.repository.sail.SailTupleQuery;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -38,6 +39,8 @@ public class Workflow {
     // Use it like this : String.format(q, "2012", "US");
 
 
+
+
     public static RDFSTHolesHistogram histogram;
 
 //    private static List<String> agroTerms = loadAgrovocTerms("/home/nickozoulis/agrovoc_terms.txt");
@@ -55,7 +58,7 @@ public class Workflow {
 
     private static int startDate, endDate ;
     public static Path path;
-
+    static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path
@@ -84,16 +87,19 @@ public class Workflow {
     }
 
     private static void runExperiment() throws RepositoryException, IOException {
-        // Testing
         for (int i=startDate; i<=endDate; i++) {
-            // -- Query Evaluation
+
             Repository repo = getFedRepository(getRepository(i));
+            RepositoryConnection conn = null;
+            term = 0;
+            Path path = Paths.get(Workflow.path.toString(), "results.csv");
+            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
 
             // For now loop for some agroTerms
             for (int j=0; j<150; j++) {
                 System.out.println(term + " -- " + agroTerms.get(term));
                 try {
-                    RepositoryConnection conn = repo.getConnection();
+                    conn = repo.getConnection();
                     String quer = String.format(q, agroTerms.get(term++));
                     TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
 
@@ -105,35 +111,62 @@ public class Workflow {
                     mqe.printStackTrace();
                 }
 
-                // -- Histogram Training
-
-//            // The evaluation of the query will write logs (query feedback).
-                List<RDFQueryRecord> listQueryRecords = new LogParser(logOutputPath + "semagrow_logs.log").parse();
+                // The evaluation of the query will write logs (query feedback).
+                List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
                 System.out.println("---<");
                 if (listQueryRecords.size() > 0) {
                     histogram.refine(listQueryRecords);
+                }
+
+            // Compare with actual cardinalities using ActualCardinalityEstimator
+                execTestQueries(conn, bw, term);
             }
 
-            // -- Histogram Testing
-//            new JSONSerializer(histogram, "/home/nickozoulis/strhist_exp_logs/histJSON.txt");
-
-//          Compare with actual cardinalities using ActualCardinalityEstimator
-//          execTestQueries();
-            }
+            bw.close();
         }
     }
 
-    private static void execTestQueries() {
-        execHistogram();
-        execTripleStore();
+    private static void execTestQueries(RepositoryConnection conn, BufferedWriter bw, int term) {
+        try {
+            bw.write(term + ", " + "Q1, " + execTripleStore(conn, testQ1) + ", " + execHistogram(conn, testQ1));
+            bw.newLine();
+            bw.write(term + ", " + "Q2, " + execTripleStore(conn, testQ2) + ", " + execHistogram(conn, testQ2));
+            bw.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private static void execHistogram() {
+    private static long execHistogram(RepositoryConnection conn, String query) {
+        SailTupleQuery sailQuery;
+        try {
+            sailQuery = (SailTupleQuery)conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+            return new CardinalityEstimatorImpl(histogram).
+                    getCardinality(sailQuery.getParsedQuery().getTupleExpr(), sailQuery.getBindings());
 
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 
-    private static void execTripleStore() {
+    private static long execTripleStore(RepositoryConnection conn, String query) {
+        SailTupleQuery sailQuery;
+        try {
+            sailQuery = (SailTupleQuery)conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+            return new ActualCardinalityEstimator(conn).
+                    getCardinality(sailQuery.getParsedQuery().getTupleExpr(), sailQuery.getBindings());
 
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 
     private static Repository getFedRepository(Repository actual) throws RepositoryException {
