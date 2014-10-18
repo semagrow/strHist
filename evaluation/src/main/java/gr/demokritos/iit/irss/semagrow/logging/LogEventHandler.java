@@ -9,8 +9,8 @@ import java.nio.file.*;
 
 public class LogEventHandler implements EventHandler<LogEvent>
 {
-	
-	static final Path path = Paths.get(System.getProperty("user.home"), "semagrow_logs.log");
+
+    static final Path path = Paths.get("/home/nickozoulis/strhist_exp_logs/", "semagrow_logs.log");
 	static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
 	private BufferedWriter writer;
 	

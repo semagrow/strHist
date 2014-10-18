@@ -2,11 +2,7 @@ package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -16,7 +12,7 @@ public class LogParser {
 
 	private String path;
 	
-	private String logQuerySeparator = "[]", inQuerySeparator = "%%";
+	private String logQuerySeparator = "&&", inQuerySeparator = "%%";
 	/**
 	 *  Holds the unique RDF Query Records, identified by their signature.
 	 */
@@ -48,17 +44,19 @@ public class LogParser {
 					// Vectorize log query
 					String[] split = text.split(inQuerySeparator);
 
-					processOne(split[0], lq);
+                    if (split.length == 3) {
+                        processOne(split[0], lq);
 
-					processTwo(split[1], lq);
+                        processTwo(split[1], lq);
 
-					processThree(split[2], lq);				
+                        processThree(split[2], lq);
 
-					// Reset the variables
-					text = "";
-					line = "";					
-					processQuery(lq);
-					lq = new LogQuery();
+                        // Reset the variables
+                        text = "";
+                        line = "";
+                        processQuery(lq);
+                        lq = new LogQuery();
+                    }
 				} 
 
 			} // while
@@ -203,7 +201,15 @@ public class LogParser {
 	 * Extracts sessionId, startTime and sparqlEndpoint.
 	 */
 	private void processOne(String string, LogQuery lq) {
-		String split[] = string.split("\\r?\\n");
+        String[] split = new String[3];
+        if (string.contains("&&")) {
+            String[] str = string.split("\\r?\\n");
+            split[0] = str[1];
+            split[1] = str[2];
+            split[2] = str[3];
+        }
+        else
+		    split = string.split("\\r?\\n");
 
 		lq.setSessionId(split[0]);
 		lq.setStartTime(Long.parseLong(split[1]));
