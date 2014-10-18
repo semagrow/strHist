@@ -40,13 +40,22 @@ public class Workflow {
 
     public static RDFSTHolesHistogram histogram;
 
+//    private static List<String> agroTerms = loadAgrovocTerms("/home/nickozoulis/agrovoc_terms.txt");
+//    public static String logOutputPath = "/home/nickozoulis/strhist_exp_logs/";
+//    private static String tripleStorePath = "/home/nickozoulis/Downloads/";
+//    private static int term = 0;
+//
+//    private static int startDate = 1980, endDate = 1980;
+//    public static Path path =  Paths.get(logOutputPath, "semagrow_logs.log");
+
     private static List<String> agroTerms;
     public static String logOutputPath;
     private static String tripleStorePath;
     private static int term = 0;
 
-    private static int startDate, endDate;
+    private static int startDate, endDate ;
     public static Path path;
+
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path
@@ -81,7 +90,7 @@ public class Workflow {
             Repository repo = getFedRepository(getRepository(i));
 
             // For now loop for some agroTerms
-            for (int j=0; j<50; j++) {
+            for (int j=0; j<150; j++) {
                 System.out.println(term + " -- " + agroTerms.get(term));
                 try {
                     RepositoryConnection conn = repo.getConnection();
@@ -99,7 +108,7 @@ public class Workflow {
                 // -- Histogram Training
 
 //            // The evaluation of the query will write logs (query feedback).
-                List<RDFQueryRecord> listQueryRecords = new LogParser(logOutputPath).parse();
+                List<RDFQueryRecord> listQueryRecords = new LogParser(logOutputPath + "semagrow_logs.log").parse();
                 System.out.println("---<");
                 if (listQueryRecords.size() > 0) {
                     histogram.refine(listQueryRecords);
