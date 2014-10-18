@@ -3,11 +3,12 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -15,6 +16,8 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -38,10 +41,13 @@ public class Workflow {
     public static RDFSTHolesHistogram histogram;
 
     private static List<String> agroTerms =
-            loadAgrovocTerms("/home/nickozoulis/git/sthist/evaluation/src/test/resources/agrovoc_terms.txt");
-    static final String logOutputPath = "/home/nickozoulis/strhist_exp_logs/semagrow_logs.log";
-    static final String tripleStorePath = "blabla/bigdata_agris_data_";
+            loadAgrovocTerms("agrovoc_terms.txt");
+    public static String logOutputPath;
+    private static String tripleStorePath;
     private static int term = 0;
+
+    private static int startDate, endDate;
+    public static Path path;
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path
@@ -51,35 +57,38 @@ public class Workflow {
      */
     static public void main(String[] args) throws RepositoryException, IOException, NumberFormatException {
 
-//        OptionParser parser = new OptionParser("s:e:l:");
-//        OptionSet options = parser.parse(args);
-//
-//        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l")) {
-//            startDate = Integer.parseInt(options.valueOf("s").toString());
-//            endDate = Integer.parseInt(options.valueOf("e").toString());
-//            if (startDate > endDate) System.exit(1);
-//            logOutputPath = options.valueOf("l").toString();
-//        }
-//        else System.exit(1);
+        OptionParser parser = new OptionParser("s:e:l:t");
+        OptionSet options = parser.parse(args);
+
+        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l") && options.hasArgument("t")) {
+            startDate = Integer.parseInt(options.valueOf("s").toString());
+            endDate = Integer.parseInt(options.valueOf("e").toString());
+            if (startDate > endDate) System.exit(1);
+
+            path = Paths.get(options.valueOf("l").toString(), "semagrow_logs.log");
+            tripleStorePath = options.valueOf("t").toString();
+        }
+        else System.exit(1);
 
         runExperiment();
     }
 
     private static void runExperiment() throws RepositoryException, IOException {
-        // Testing only for 1976
-        for (int i=1976; i<=1976; i++) {
+        // Testing
+        for (int i=startDate; i<=endDate; i++) {
             // -- Query Evaluation
-            Repository repo = getFedRepository(getRepository(1980));
+            Repository repo = getFedRepository(getRepository(i));
 
             // For now loop for some agroTerms
             for (int j=0; j<50; j++) {
-
+                System.out.println(term + " -- " + agroTerms.get(term++));
                 try {
                     RepositoryConnection conn = repo.getConnection();
                     String quer = String.format(q, agroTerms.get(term++));
                     TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
 
                     TupleQueryResult result = query.evaluate();
+                    conn.close();
                     consumeIteration(result);
 
                 } catch (MalformedQueryException | QueryEvaluationException mqe) {
@@ -93,16 +102,13 @@ public class Workflow {
                 System.out.println("---<");
                 if (listQueryRecords.size() > 0) {
                     histogram.refine(listQueryRecords);
+            }
 
+            // -- Histogram Testing
+//            new JSONSerializer(histogram, "/home/nickozoulis/strhist_exp_logs/histJSON.txt");
 
-//            Maybe write histogram to file in void or json format
-                    new JSONSerializer(histogram, "/home/nickozoulis/strhist_exp_logs/histJSON.txt");
-
-                    // -- Histogram Testing
-
-//            Compare with actual cardinalities using ActualCardinalityEstimator
-//             execTestQueries();
-                }
+//          Compare with actual cardinalities using ActualCardinalityEstimator
+//          execTestQueries();
             }
         }
     }
@@ -113,17 +119,6 @@ public class Workflow {
     }
 
     private static void execHistogram() {
-        try {
-            RepositoryConnection conn = getFedRepository(getRepository(1980)).getConnection();
-
-            TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, testQ1);
-
-            TupleQueryResult result = query.evaluate();
-
-
-        } catch (MalformedQueryException | QueryEvaluationException | RepositoryException | IOException mqe) {
-            mqe.printStackTrace();
-        }
 
     }
 
@@ -140,8 +135,10 @@ public class Workflow {
     }
 
     private static void consumeIteration(Iteration<BindingSet,QueryEvaluationException> iter) throws QueryEvaluationException {
-        while (iter.hasNext())
+        while (iter.hasNext()) {
             iter.next();
+            System.out.println("Has next");
+        }
 
         Iterations.closeCloseable(iter);
     }
@@ -149,7 +146,7 @@ public class Workflow {
     private static Repository getRepository(int year) throws RepositoryException, IOException {
         Properties properties = new Properties();
 
-        File journal = new File(tripleStorePath + year + ".jnl");
+        File journal = new File(tripleStorePath + "bigdata_agris_data_" + year + ".jnl");
 
         properties.setProperty(
                 BigdataSail.Options.FILE,
@@ -174,6 +171,7 @@ public class Workflow {
                                 while ((text = br.readLine()) != null) {
                                 String[] split = text.split(",");
                                 list.add(split[1].trim());
+//                                    list.add(text);
                             }
 
                                 br.close();

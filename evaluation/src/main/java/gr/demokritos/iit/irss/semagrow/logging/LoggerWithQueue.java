@@ -1,5 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.logging;
 
+import gr.demokritos.iit.irss.semagrow.sesame.Workflow;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +18,7 @@ public class LoggerWithQueue implements Runnable {
 	BlockingQueue<Object> queue;
 	private Boolean finished;
 	
-	static final Path path = Paths.get("/home/nickozoulis/strhist_exp_logs/", "semagrow_logs.log");
+//	static final Path path = Paths.get("/home/nickozoulis/strhist_exp_logs/", "semagrow_logs.log");
 	static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
 	private BufferedWriter writer;
 
@@ -24,8 +26,8 @@ public class LoggerWithQueue implements Runnable {
 		this.queue = queue;
 		finished = false;
 		try {
-			writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
-			if (Files.size(path) == 0) {
+			writer = Files.newBufferedWriter(Workflow.path, StandardCharsets.UTF_8, options);
+			if (Files.size(Workflow.path) == 0) {
 //				writer.write("start headers");
 //				writer.newLine();
 //				writer.write("session-id");
