@@ -27,7 +27,7 @@ import java.util.Properties;
  */
 public class Workflow {
 
-    private static String agroTermsPath = "agrovoc_terms.txt";
+
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix sg: <http://www.semagrow.eu/rdf/> ";
     private static String q = prefixes + "select * {?u dc:subject <%s> . ?u sg:year ?y} limit 1";
 
@@ -40,8 +40,7 @@ public class Workflow {
 
     public static RDFSTHolesHistogram histogram;
 
-    private static List<String> agroTerms =
-            loadAgrovocTerms("agrovoc_terms.txt");
+    private static List<String> agroTerms;
     public static String logOutputPath;
     private static String tripleStorePath;
     private static int term = 0;
@@ -57,16 +56,18 @@ public class Workflow {
      */
     static public void main(String[] args) throws RepositoryException, IOException, NumberFormatException {
 
-        OptionParser parser = new OptionParser("s:e:l:t");
+        OptionParser parser = new OptionParser("s:e:l:t:a:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l") && options.hasArgument("t")) {
+        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l") && options.hasArgument("t") && options.hasArgument("a")) {
             startDate = Integer.parseInt(options.valueOf("s").toString());
             endDate = Integer.parseInt(options.valueOf("e").toString());
             if (startDate > endDate) System.exit(1);
 
             path = Paths.get(options.valueOf("l").toString(), "semagrow_logs.log");
             tripleStorePath = options.valueOf("t").toString();
+            agroTerms = loadAgrovocTerms(options.valueOf("a").toString());
+
         }
         else System.exit(1);
 
@@ -81,7 +82,7 @@ public class Workflow {
 
             // For now loop for some agroTerms
             for (int j=0; j<50; j++) {
-                System.out.println(term + " -- " + agroTerms.get(term++));
+                System.out.println(term + " -- " + agroTerms.get(term));
                 try {
                     RepositoryConnection conn = repo.getConnection();
                     String quer = String.format(q, agroTerms.get(term++));
