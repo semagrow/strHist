@@ -1,7 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
-import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,22 +70,26 @@ public class LogParser {
 	}// parse
 
 
-	private void processThree(String string, LogQuery lq) {
-
+    private void processThree(String string, LogQuery lq) {
         String split[] = string.split("\\r?\\n");
-        String statheres = split[0];
 
-		// Create a regex pattern.
-		String pattern = "(\\[?)(.*?)=(.*?)(;|])";
-		// Create a Pattern object
-		Pattern r = Pattern.compile(pattern);
-		// Now create matcher object.
-		Matcher m = r.matcher(string);
+        for (String s : split) {
+            // Create a regex pattern.
+            String pattern = "(\\[?)(.*?)=(.*?)(;|])";
+            // Create a Pattern object
+            Pattern r = Pattern.compile(pattern);
+            // Now create matcher object.
+            Matcher m = r.matcher(s);
 
-		while (m.find()) 		
-			lq.getQueryBindings().add(new Binding(m.group(2), m.group(3)));
-		
-	}// processThree
+            BindingSet bs = new BindingSet();
+            while (m.find()) {
+                bs.getBindings().add(new Binding(m.group(2), m.group(3)));
+            }
+
+            if (!bs.getBindings().isEmpty())
+                lq.getQueryBindings().add(bs);
+        }
+    }
 
 
 	/**
@@ -224,14 +226,11 @@ public class LogParser {
 		// Just a dump object.
 		RDFQueryRecord qr = new RDFQueryRecord(lq);
 		// Construct query's BindingSet.
-		BindingSet bs = new BindingSet();
+		List<BindingSet> bsList = lq.getQueryBindings();
 
         //
         if (lq.getQueryBindings().size() == 0)
             return;
-		
-		for (Binding binding : lq.getQueryBindings()) 
-			bs.getBindings().add(binding);
 		
 		// Check if Query already exists in Collection.
 		int index = collection.indexOf(qr);
@@ -242,16 +241,15 @@ public class LogParser {
 			// Get this Query from the Collection.
 			RDFQueryRecord qrTemp = collection.get(index);
 			// Add BindingSet into Query.
-			qrTemp.getQueryResult().getBindingSets().add(bs);		
+			qrTemp.getQueryResult().getBindingSets().addAll(bsList);
 
 		} else { // Doesn't exist in Collection.
-			System.out.println("Query Not Contained");
+//			System.out.println("Query Not Contained");
 
 			// Add BindingSet into Query.
-			qr.getQueryResult().getBindingSets().add(bs);
+			qr.getQueryResult().getBindingSets().addAll(bsList);
 			// Add the Query into Collection.
 			collection.add(qr);
-//			System.out.println(qr.getQuery());
 		}// else	
 				
 	}// processQuery
@@ -266,7 +264,7 @@ public class LogParser {
 
 //		LogParser lp = new LogParser("src\\main\\resources\\semagrow_logs.log");
 //		LogParser lp = new LogParser("src\\main\\resources\\test_2.txt");
-		LogParser lp = new LogParser("src/main/resources/semagrow_logs_3.log");
+		LogParser lp = new LogParser("/home/nickozoulis/strhist_exp_logs/semagrow_logs.log");
 		lp.parse();		
 		
 		// Print the parsed queries signatures.
@@ -285,20 +283,20 @@ public class LogParser {
 				+ lp.getCollection().size());
 		System.out.println("********************************");
 		
-		RDFQueryRecord rdfqr = new RDFQueryRecord(lp.getCollection().get(0).getLogQuery());
-
-		RDFRectangle rec = rdfqr.getRectangle();
-		//System.out.println(rec);
-				
-//		RDFQueryRecord rdfqr1 = new RDFQueryRecord(lp.getCollection().get(1).getLogQuery());
-//		RDFRectangle rec1 = rdfqr1.getRectangle();
-//		System.out.println(rec1);
-
-        List<RDFRectangle> rects = lp.getCollection().get(0).getQueryResult().getRectangles(rec);
-		System.out.println("Check rectangles: ");
-        for (RDFRectangle r : rects) {
-            System.out.println(r);
-        }
+//		RDFQueryRecord rdfqr = new RDFQueryRecord(lp.getCollection().get(0).getLogQuery());
+//
+//		RDFRectangle rec = rdfqr.getRectangle();
+//		//System.out.println(rec);
+//
+////		RDFQueryRecord rdfqr1 = new RDFQueryRecord(lp.getCollection().get(1).getLogQuery());
+////		RDFRectangle rec1 = rdfqr1.getRectangle();
+////		System.out.println(rec1);
+//
+//        List<RDFRectangle> rects = lp.getCollection().get(0).getQueryResult().getRectangles(rec);
+//		System.out.println("Check rectangles: ");
+//        for (RDFRectangle r : rects) {
+//            System.out.println(r);
+//        }
 		
 		//System.out.println(lp.getCollection().get(0).getQueryResult().getCardinality(rec));
 		

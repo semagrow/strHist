@@ -13,14 +13,15 @@ public class LogQuery implements Serializable {
 	// Contains only the Query's Statements.
 	private List<Binding> queryStatements;
 	// Contains only the Query's Bindings.
-	private List<Binding> queryBindings;
+	private List<BindingSet> queryBindings;
 	private List<QueryFilter> queryFilters;
 
 
 	public LogQuery() {
 		setQueryStatements(new ArrayList<Binding>());
-		setQueryBindings(new ArrayList<Binding>());
+		setQueryBindings(new ArrayList<BindingSet>());
 		setQueryFilters(new ArrayList<QueryFilter>());
+//        setQueryBindingSets(new ArrayList<BindingSet>());
 	}
 
 
@@ -115,12 +116,12 @@ public class LogQuery implements Serializable {
 	}
 
 
-	public List<Binding> getQueryBindings() {
+	public List<BindingSet> getQueryBindings() {
 		return queryBindings;
 	}
 
 
-	public void setQueryBindings(List<Binding> queryBindings) {
+	public void setQueryBindings(List<BindingSet> queryBindings) {
 		this.queryBindings = queryBindings;
 	}
 
