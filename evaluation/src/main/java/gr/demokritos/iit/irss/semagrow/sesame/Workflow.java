@@ -35,7 +35,6 @@ public class Workflow {
 
 
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix sg: <http://www.semagrow.eu/rdf/> ";
-    private static String q = prefixes + "select * {?u dc:subject <%s> . ?u sg:year ?y} limit 1";
 
     //TODO: Isws thelei count
     private static String testQ1 = prefixes + "select * {?x semagrow:year 1980 . }";
@@ -128,11 +127,10 @@ public class Workflow {
             System.out.println( term + " --- " +  strTerm );
             try {
                 conn = repo.getConnection();
-
-                String quer = String.format( q, strTerm );
+                String qq = prefixes + "select * {?u dc:subject <%s> }";
+                String quer = String.format( qq, strTerm );
                 ++term;
                 TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
-
                 TupleQueryResult result = query.evaluate();
                 consumeIteration(result);
                 conn.close();
@@ -165,14 +163,14 @@ public class Workflow {
             RepositoryConnection conn = null;
             term = 0;
 
-
             // For now loop for some agroTerms
             for (int j=0; j<150; j++) {
                 System.out.println(term + " -- " + agroTerms.get(term));
                 try {
                     conn = repo.getConnection();
 
-                    String quer = String.format(q, agroTerms.get(term++));
+                    String qq = prefixes + "SELECT * {?u dc:subject <%s> . ?u sg:year ?y} LIMIT 1";
+                    String quer = String.format(qq, agroTerms.get(term++));
                     TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
 
                     TupleQueryResult result = query.evaluate();
@@ -251,11 +249,13 @@ public class Workflow {
     }
 
     private static void consumeIteration(Iteration<BindingSet,QueryEvaluationException> iter) throws QueryEvaluationException {
+    	int n = 0;
         while (iter.hasNext()) {
             iter.next();
+            ++n;
             System.out.println("Has next");
         }
-
+        System.out.println("Iterated over " + Integer.toString(n) + " items" );
         Iterations.closeCloseable(iter);
     }
 
