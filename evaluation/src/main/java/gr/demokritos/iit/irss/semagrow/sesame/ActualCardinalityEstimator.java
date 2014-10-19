@@ -37,7 +37,7 @@ public class ActualCardinalityEstimator implements CardinalityEstimator {
             TupleQueryResult res = query.evaluate();
 
             if (res.hasNext())
-                c = Long.parseLong(res.next().getBinding("card").getValue().stringValue());
+                c = Long.parseLong(res.next().getBinding("c").getValue().stringValue());
 
         } catch (NumberFormatException e) {e.printStackTrace();
         } catch (RepositoryException e) {e.printStackTrace();
