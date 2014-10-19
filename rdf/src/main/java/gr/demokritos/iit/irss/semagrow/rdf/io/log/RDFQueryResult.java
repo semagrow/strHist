@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
+import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
@@ -364,10 +365,11 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
         List<RDFRectangle> rectangles = new ArrayList<RDFRectangle>();
 
         // mappings to bindings
-        int[] mappings = new int[3];
-        mappings[0] = 0;
-        mappings[1] = 1;
-        mappings[2] = 2;
+        List<Integer> mappings = new ArrayList<Integer>(3);
+        //int[] mappings = new int[3];
+        mappings.add(-1);
+        mappings.add(-1);
+        mappings.add(-1);
 
         //Get variables
         int cnt = 0;
@@ -378,7 +380,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
             for (Binding b : bindingSets.get(0).getBindings()) {
 
                 types.add(getBindingType(b));
-                mappings[getBindingType(b)] = cnt;
+                mappings.set(getBindingType(b),cnt);
                 cnt += 1;
             }
 
@@ -442,6 +444,19 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
         //for every binding set
         for (BindingSet bs : bindingSets) {
 
+            cnt = 0;
+            mappings.set(0,-1);
+            mappings.set(1,-1);
+            mappings.set(2,-1);
+            for (Binding bi : bs.getBindings()) {
+
+                    types.add(getBindingType(bi));
+                    mappings.set(getBindingType(bi),cnt);
+                    cnt += 1;
+             }
+
+
+
 
             //get binding
              List<Binding> binding = bs.getBindings();
@@ -449,15 +464,17 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
             if (!isConstPredicate) {
 
                 //get Predicate from current binding
-                b = binding.get(mappings[1]);
-                value = clean(b.getValue());
+                if (mappings.get(1) != -1) {
+                    b = binding.get(mappings.get(1));
+                    value = clean(b.getValue());
 
-                //new predicate, add it to list
-                if (!predicateStrings.contains(value)) {
-                    predicateStrings.add(value);
-                    curRectangleIdx = predicateStrings.size()-1;
-                } else {
-                    curRectangleIdx = predicateStrings.indexOf(value);
+                    //new predicate, add it to list
+                    if (!predicateStrings.contains(value)) {
+                        predicateStrings.add(value);
+                        curRectangleIdx = predicateStrings.size() - 1;
+                    } else {
+                        curRectangleIdx = predicateStrings.indexOf(value);
+                    }
                 }
             }
 
@@ -472,20 +489,22 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                 //take subject from binding and compute
                 // new prefix from this subject and the subjectRange
                 // in position curRectangle
-                b = binding.get(mappings[0]);
-                value = clean(b.getValue());
+                if (mappings.get(0) != -1) {
+                    b = binding.get(mappings.get(0));
+                    value = clean(b.getValue());
 
 
-                if (curRectangleIdx != subjectRanges.size() - 1) {
+                    if (curRectangleIdx != subjectRanges.size() - 1) {
 
-                    System.out.println("Subject value: " + value);
-                    //todo: value is empty
-                    prefixList = new ArrayList<String>();
-                    prefixList.add(value);
-                    subjectRanges.add(new PrefixRange(prefixList));
-                } else {
+                        System.out.println("Subject value: " + value);
+                        //todo: value is empty
+                        prefixList = new ArrayList<String>();
+                        prefixList.add(value);
+                        subjectRanges.add(new PrefixRange(prefixList));
+                    } else {
 
-                    subjectRanges.get(curRectangleIdx).expand(value);
+                        subjectRanges.get(curRectangleIdx).expand(value);
+                    }
                 }
 
             }
@@ -500,51 +519,53 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                 //take object from binding and compute
                 // new interval/calendarRange/prefix from this
                 // object and the objectRange is position curObject
-                b = binding.get(mappings[2]);
-                value = clean(b.getValue());
+                if (mappings.get(2) != -1) {
+                    b = binding.get(mappings.get(2));
+                    value = clean(b.getValue());
 
-                // Find the type(Integer,Long,Date) of the URIS.
-                String type = Utilities.getTypeFromURI(value);
-                String v = Utilities.getValueFromURI(value);
+                    // Find the type(Integer,Long,Date) of the URIS.
+                    String type = Utilities.getTypeFromURI(value);
+                    String v = Utilities.getValueFromURI(value);
 
-                if (curRectangleIdx != objectRanges.size() - 1) {
+                    if (curRectangleIdx != objectRanges.size() - 1) {
 
-                    if (value.contains("^^") && value.contains("http://")) {
-                        //todo: check if it is xsd uri
-                        if (type.equals("int") || type.equals("integer")) {
-                            objectRanges.add(new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v)));
+                        if (value.contains("^^") && value.contains("http://")) {
+                            //todo: check if it is xsd uri
+                            if (type.equals("int") || type.equals("integer")) {
+                                objectRanges.add(new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v)));
 
-                        } else if (type.equals("long")) {
-                            objectRanges.add(new RDFLiteralRange(Long.parseLong(v), Long.parseLong(v)));
+                            } else if (type.equals("long")) {
+                                objectRanges.add(new RDFLiteralRange(Long.parseLong(v), Long.parseLong(v)));
 
-                        } else if (type.equals("dateTime")) {
+                            } else if (type.equals("dateTime")) {
 
 //                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm");
-                            Date dateLow = null, dateHigh = null;
+                                DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm");
+                                Date dateLow = null, dateHigh = null;
 
-                            try {
-                                dateLow = format.parse(v);
-                                dateHigh = format.parse(v);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
+                                try {
+                                    dateLow = format.parse(v);
+                                    dateHigh = format.parse(v);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+
+                                if (dateLow != null && dateHigh != null)
+                                    objectRanges.add(new RDFLiteralRange(dateLow, dateHigh));
+                                else
+                                    System.err.println("Date Format Error.");
                             }
-
-                            if (dateLow != null && dateHigh != null)
-                                objectRanges.add(new RDFLiteralRange(dateLow, dateHigh));
-                            else
-                                System.err.println("Date Format Error.");
-                        }
-                    } else if (!value.contains("^^") && value.contains("http://")) {// URL
+                        } else if (!value.contains("^^") && value.contains("http://")) {// URL
                             //todo: do i need this check above as well?
-                        objectRanges.add(new RDFLiteralRange(value));
+                            objectRanges.add(new RDFLiteralRange(value));
 
-                    } else {// Plain Literal
-                        objectRanges.add(new RDFLiteralRange(value));
+                        } else {// Plain Literal
+                            objectRanges.add(new RDFLiteralRange(value));
+                        }
+
+                    } else {
+                        objectRanges.get(curRectangleIdx).expand(v);
                     }
-
-                } else {
-                    objectRanges.get(curRectangleIdx).expand(value);
                 }
             }
 

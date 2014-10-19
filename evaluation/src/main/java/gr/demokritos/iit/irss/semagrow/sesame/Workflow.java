@@ -75,6 +75,22 @@ public class Workflow {
         OptionParser parser = new OptionParser("s:e:l:t:a:");
         OptionSet options = parser.parse(args);
 
+
+        /*******************************DEBUG**********************************
+        if (true) {
+            path = Paths.get("/home/efi/", "semagrow_logs2.log");
+            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
+            System.out.println("---<");
+            histogram = new RDFSTHolesHistogram();
+            if (listQueryRecords.size() > 0) {
+                histogram.refine(listQueryRecords);
+            }
+            System.exit(0);
+
+        }
+
+        **********************************************************************/
+
         if( options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l") && options.hasArgument("t") && options.hasArgument("a") )
         {
             startDate = Integer.parseInt(options.valueOf("s").toString());
