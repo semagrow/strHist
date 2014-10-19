@@ -4,6 +4,7 @@ import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
 
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import info.aduna.iteration.Iteration;
@@ -34,7 +35,7 @@ import java.util.Properties;
 public class Workflow {
 
 
-    private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix sg: <http://www.semagrow.eu/rdf/> ";
+    private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
 
     //TODO: Isws thelei count
     private static String testQ1 = prefixes + "select * {?x semagrow:year 1980 . }";
@@ -169,7 +170,7 @@ public class Workflow {
                 try {
                     conn = repo.getConnection();
 
-                    String qq = prefixes + "SELECT * {?u dc:subject <%s> . ?u sg:year ?y} LIMIT 1";
+                    String qq = prefixes + "select * {?u dc:subject <%s> }";
                     String quer = String.format(qq, agroTerms.get(term++));
                     TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
 
@@ -181,18 +182,24 @@ public class Workflow {
                     mqe.printStackTrace();
                 }
 
-                // The evaluation of the query will write logs (query feedback).
-                List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
-                System.out.println("---<");
-                if (listQueryRecords.size() > 0) {
-                    histogram.refine(listQueryRecords);
-                }
             }
 
-            Path path = Paths.get(Workflow.path.toString(), "results.csv");
+            // The evaluation of the query will write logs (query feedback).
+            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
+            System.out.println("---<");
+            if (listQueryRecords.size() > 0) {
+                histogram.refine(listQueryRecords);
+            }
+
+            System.out.println(histogram.getRoot().toString());
+            new JSONSerializer(histogram, Workflow.path.getParent().toString() + "histJSON.txt");
+
+            Path path = Paths.get(Workflow.path.getParent().toString(), "results.csv");
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
 
+            conn = repo.getConnection();
             execTestQueries(conn, bw, term);
+            conn.close();
 
             bw.close();
         }
