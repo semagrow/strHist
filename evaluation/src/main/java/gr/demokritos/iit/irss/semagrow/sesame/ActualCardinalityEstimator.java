@@ -33,7 +33,6 @@ public class ActualCardinalityEstimator implements CardinalityEstimator {
 
             String queryString = "SELECT (count(*) AS c) WHERE " + renderer.render(parsedQuery);
 
-
             TupleQuery query = cnx.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
             TupleQueryResult res = query.evaluate();
 
