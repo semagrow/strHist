@@ -2,16 +2,13 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
-
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
-import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-
 import org.openrdf.query.*;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedTupleQuery;
@@ -84,6 +81,7 @@ public class Workflow {
             endDate = Integer.parseInt(options.valueOf("e").toString());
             if (startDate > endDate) System.exit(1);
 
+            logOutputPath = options.valueOf("l").toString();
             path = Paths.get(options.valueOf("l").toString(), "semagrow_logs.log");
             tripleStorePath = options.valueOf("t").toString();
             agroTerms = loadAgrovocTerms(options.valueOf("a").toString());
@@ -160,17 +158,19 @@ public class Workflow {
     	
         for (int i=startDate; i<=endDate; i++) {
 
+            path = Paths.get(logOutputPath, "semagrow_log_" + i + ".log");
+
             Repository repo = getFedRepository(getRepository(i));
             RepositoryConnection conn = null;
             term = 0;
 
             // For now loop for some agroTerms
-            for (int j=0; j<150; j++) {
+            for (int j=0; j<200; j++) {
                 System.out.println(term + " -- " + agroTerms.get(term));
                 try {
                     conn = repo.getConnection();
 
-                    String qq = prefixes + "select * {?u dc:subject <%s> }";
+                    String qq = prefixes + "select * {?u dc:subject <%s> . ?u semagrow:year ?y }";
                     String quer = String.format(qq, agroTerms.get(term++));
                     TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
 
@@ -186,22 +186,22 @@ public class Workflow {
 
             // The evaluation of the query will write logs (query feedback).
             List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
-            System.out.println("---<");
-            if (listQueryRecords.size() > 0) {
-                histogram.refine(listQueryRecords);
-            }
 
-            System.out.println(histogram.getRoot().toString());
-            new JSONSerializer(histogram, Workflow.path.getParent().toString() + "histJSON.txt");
+//            if (listQueryRecords.size() > 0) {
+//                histogram.refine(listQueryRecords);
+//            }
+//
+//            System.out.println(histogram.getRoot().toString());
+//            new JSONSerializer(histogram, Workflow.path.getParent().toString() + "/histJSON_" + i + ".txt");
 
-            Path path = Paths.get(Workflow.path.getParent().toString(), "results.csv");
-            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
-
-            conn = repo.getConnection();
-            execTestQueries(conn, bw, term);
-            conn.close();
-
-            bw.close();
+//            Path path = Paths.get(Workflow.path.getParent().toString(), "results.csv");
+//            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
+//
+//            conn = repo.getConnection();
+//            execTestQueries(conn, bw, term);
+//            conn.close();
+//
+//            bw.close();
         }
     }
 
