@@ -10,6 +10,9 @@ import info.aduna.iteration.Iterations;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.openrdf.query.*;
+import org.openrdf.query.impl.EmptyBindingSet;
+import org.openrdf.query.parser.ParsedTupleQuery;
+import org.openrdf.query.parser.QueryParserUtil;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -93,11 +96,13 @@ public class Workflow {
             RepositoryConnection conn = null;
             term = 0;
 
+
             // For now loop for some agroTerms
             for (int j=0; j<150; j++) {
                 System.out.println(term + " -- " + agroTerms.get(term));
                 try {
                     conn = repo.getConnection();
+
                     String quer = String.format(q, agroTerms.get(term++));
                     TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
 
@@ -154,14 +159,13 @@ public class Workflow {
     }
 
     private static long execTripleStore(RepositoryConnection conn, String query) {
-        SailTupleQuery sailQuery;
-        try {
-            sailQuery = (SailTupleQuery)conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
-            return new ActualCardinalityEstimator(conn).
-                    getCardinality(sailQuery.getParsedQuery().getTupleExpr(), sailQuery.getBindings());
 
-        } catch (RepositoryException e) {
-            e.printStackTrace();
+        try {
+
+            ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, query, "http://example.org/");
+            return new ActualCardinalityEstimator(conn).
+                    getCardinality(q.getTupleExpr(), EmptyBindingSet.getInstance());
+
         } catch (MalformedQueryException e) {
             e.printStackTrace();
         }

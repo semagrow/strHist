@@ -23,21 +23,20 @@ public class ActualCardinalityEstimator implements CardinalityEstimator {
     public long getCardinality(TupleExpr expr, BindingSet bindings) {
         long c = 0;
 
-        if (expr instanceof Projection)
-            expr = ((Projection)expr).getArg();
-
         ParsedTupleQuery parsedQuery = new ParsedTupleQuery(expr);
         SPARQLQueryRenderer renderer = new SPARQLQueryRenderer();
 
         try {
 
-            String queryString = "SELECT (count(*) AS c) WHERE " + renderer.render(parsedQuery);
+            String queryString = renderer.render(parsedQuery);
 
             TupleQuery query = cnx.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
             TupleQueryResult res = query.evaluate();
 
-            if (res.hasNext())
-                c = Long.parseLong(res.next().getBinding("card").getValue().stringValue());
+            while (res.hasNext()) {
+                c++;
+                res.next();
+            }
 
         } catch (NumberFormatException e) {e.printStackTrace();
         } catch (RepositoryException e) {e.printStackTrace();
