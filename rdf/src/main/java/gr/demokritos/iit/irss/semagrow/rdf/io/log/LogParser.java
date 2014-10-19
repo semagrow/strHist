@@ -74,6 +74,7 @@ public class LogParser {
         String split[] = string.split("\\r?\\n");
 
         for (String s : split) {
+
             // Create a regex pattern.
             String pattern = "(\\[?)(.*?)=(.*?)(;|])";
             // Create a Pattern object
