@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
+
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
@@ -9,6 +10,7 @@ import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+
 import org.openrdf.query.*;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedTupleQuery;
@@ -69,12 +71,15 @@ public class Workflow {
      * @throws RepositoryException
      * @throws IOException
      */
-    static public void main(String[] args) throws RepositoryException, IOException, NumberFormatException {
+    static public void main(String[] args)
+    throws RepositoryException, IOException
+    {
 
         OptionParser parser = new OptionParser("s:e:l:t:a:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l") && options.hasArgument("t") && options.hasArgument("a")) {
+        if( options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l") && options.hasArgument("t") && options.hasArgument("a") )
+        {
             startDate = Integer.parseInt(options.valueOf("s").toString());
             endDate = Integer.parseInt(options.valueOf("e").toString());
             if (startDate > endDate) System.exit(1);
@@ -83,13 +88,77 @@ public class Workflow {
             tripleStorePath = options.valueOf("t").toString();
             agroTerms = loadAgrovocTerms(options.valueOf("a").toString());
 
+            runMultiAnnualExperiment();
         }
-        else System.exit(1);
-
-        runExperiment();
+        else if( options.hasArgument("l") && options.hasArgument("t") && options.hasArgument("a") )
+        {
+            path = Paths.get(options.valueOf("l").toString(), "semagrow_logs.log");
+            
+            String a = options.valueOf("a").toString();
+            if( a.compareTo( "def" ) == 0 ) {
+            	agroTerms = new ArrayList<String>( 1 );
+            	agroTerms.add( "http://aims.fao.org/aos/agrovoc/c_6326" );
+            }
+            else {
+            	agroTerms = loadAgrovocTerms( a );
+            }
+            
+            tripleStorePath = options.valueOf("t").toString();
+            if( tripleStorePath.compareTo("agris") == 0 ) {
+                runRemoteExperiment( "http://202.45.139.84:10035/catalogs/fao/repositories/agris" );
+            }
+            else {
+                runRemoteExperiment( tripleStorePath );
+            }
+        }
+        else { System.exit(1); }
     }
 
-    private static void runExperiment() throws RepositoryException, IOException {
+    private static void runRemoteExperiment( String url )
+    throws RepositoryException, IOException
+    {
+    	Repository agris = new org.openrdf.repository.sparql.SPARQLRepository( url );
+        agris.initialize();
+        Repository repo = getFedRepository( agris );
+        RepositoryConnection conn = null;
+        term = 0;
+        
+        // For now loop for some agroTerms
+        for( String strTerm : agroTerms ) {
+            System.out.println( term + " --- " +  strTerm );
+            try {
+                conn = repo.getConnection();
+
+                String quer = String.format( q, strTerm );
+                ++term;
+                TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
+
+                TupleQueryResult result = query.evaluate();
+                consumeIteration(result);
+                conn.close();
+
+            } catch (MalformedQueryException | QueryEvaluationException mqe) {
+                mqe.printStackTrace();
+            }
+
+            // The evaluation of the query will write logs (query feedback).
+            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
+            System.out.println("---<");
+            if (listQueryRecords.size() > 0) {
+                histogram.refine(listQueryRecords);
+            }
+        }
+
+        Path path = Paths.get(Workflow.path.toString(), "results.csv");
+        BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
+        execTestQueries(conn, bw, term);
+        bw.close();
+    }
+   
+    private static void runMultiAnnualExperiment()
+    throws RepositoryException, IOException
+    {
+    	
         for (int i=startDate; i<=endDate; i++) {
 
             Repository repo = getFedRepository(getRepository(i));
@@ -107,8 +176,8 @@ public class Workflow {
                     TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
 
                     TupleQueryResult result = query.evaluate();
-                    conn.close();
                     consumeIteration(result);
+                    conn.close();
 
                 } catch (MalformedQueryException | QueryEvaluationException mqe) {
                     mqe.printStackTrace();
@@ -190,7 +259,9 @@ public class Workflow {
         Iterations.closeCloseable(iter);
     }
 
-    private static Repository getRepository(int year) throws RepositoryException, IOException {
+
+    private static Repository getRepository( int year )
+    throws RepositoryException, IOException {
         Properties properties = new Properties();
 
         File journal = new File(tripleStorePath + "bigdata_agris_data_" + year + ".jnl");
