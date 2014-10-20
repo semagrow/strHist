@@ -81,7 +81,7 @@ public class Workflow {
 
         /*******************************DEBUG**********************************
         if (true) {
-            path = Paths.get("/home/efi/", "semagrow_logs2.log");
+            path = Paths.get("/home/efi/", "semagrow_log_1983.log");
             List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
             System.out.println("---<");
             histogram = new RDFSTHolesHistogram();
