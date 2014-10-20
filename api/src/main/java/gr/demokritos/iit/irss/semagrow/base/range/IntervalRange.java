@@ -101,13 +101,30 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
             int candidate1 = intervalRange.low - low;
             int candidate2 = high - intervalRange.high;
 
+
             if (candidate1 > candidate2) {
 
-                return new IntervalRange(low, intervalRange.low);
+                lowN = low;
+                highN = intervalRange.low;
+               // return new IntervalRange(low, intervalRange.low);
             } else {
-
-                return new IntervalRange(intervalRange.high, high);
+                lowN = intervalRange.high;
+                highN = high;
+               // return new IntervalRange(intervalRange.high, high);
             }
+
+            //If intervalRange and this are adjacent
+            if (lowN == intervalRange.high) {
+
+                lowN += 1;
+            }
+
+            if (highN == intervalRange.low) {
+
+                highN -= 1;
+            }
+
+            return new IntervalRange(lowN,highN);
 
         }
         //Scenario 3: default case
