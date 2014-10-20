@@ -2,13 +2,19 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.openrdf.model.Literal;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.*;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedTupleQuery;
@@ -17,7 +23,8 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.repository.sail.SailTupleQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -25,25 +32,20 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 
 /**
  * Created by angel on 10/11/14.
  */
 public class Workflow {
 
-
-    private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
-
-    //TODO: Isws thelei count
-    private static String testQ1 = prefixes + "select * {?x semagrow:year 1980 . }";
-    private static String testQ2 = prefixes + "select * {?x semagrow:year 1980 . } filter regex(\".*US\"), str(?x)";
-
-    // Use it like this : String.format(q, "2012", "US");
-
-
-
-
+    static final Logger logger = LoggerFactory.getLogger(Workflow.class);
     public static RDFSTHolesHistogram histogram;
+    private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
+    private static String testQ1 = prefixes + "select * {?x semagrow:year %s . }";
+
+//    private static String testQ2 = prefixes + "select * {?x semagrow:year 1980 . } filter regex(\".*US\"), str(?x)";
+
 
 //    private static List<String> agroTerms = loadAgrovocTerms("/home/nickozoulis/agrovoc_terms.txt");
 //    public static String logOutputPath = "/home/nickozoulis/strhist_exp_logs/";
@@ -78,7 +80,7 @@ public class Workflow {
 
         /*******************************DEBUG**********************************
         if (true) {
-            path = Paths.get("/home/efi/", "semagrow_logs2.log");
+            path = Paths.get("/home/nickozoulis/strhist_exp_logs", "semagrow_log_1980.log");
             List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
             System.out.println("---<");
             histogram = new RDFSTHolesHistogram();
@@ -107,7 +109,7 @@ public class Workflow {
         else if( options.hasArgument("l") && options.hasArgument("t") && options.hasArgument("a") )
         {
             path = Paths.get(options.valueOf("l").toString(), "semagrow_logs.log");
-            
+
             String a = options.valueOf("a").toString();
             if( a.compareTo( "def" ) == 0 ) {
             	agroTerms = new ArrayList<String>( 1 );
@@ -116,7 +118,7 @@ public class Workflow {
             else {
             	agroTerms = loadAgrovocTerms( a );
             }
-            
+
             tripleStorePath = options.valueOf("t").toString();
             if( tripleStorePath.compareTo("agris") == 0 ) {
                 runRemoteExperiment( "http://202.45.139.84:10035/catalogs/fao/repositories/agris" );
@@ -162,27 +164,41 @@ public class Workflow {
             }
         }
 
-        Path path = Paths.get(Workflow.path.toString(), "results.csv");
-        BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
-        execTestQueries(conn, bw, term);
-        bw.close();
+//        Path path = Paths.get(Workflow.path.toString(), "results.csv");
+//        BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
+//        execTestQueries(conn, bw, term);
+//        bw.close();
     }
    
-    private static void runMultiAnnualExperiment()
-    throws RepositoryException, IOException
-    {
-    	
-        for (int i=startDate; i<=endDate; i++) {
+    private static void runMultiAnnualExperiment() throws RepositoryException, IOException {
+        for (int date=startDate; date<=endDate; date++) {
 
-            path = Paths.get(logOutputPath, "semagrow_log_" + i + ".log");
+            path = Paths.get(logOutputPath, "semagrow_log_" + date + ".log");
 
-            Repository repo = getFedRepository(getRepository(i));
-            RepositoryConnection conn = null;
-            term = 0;
+            Repository repo = getFedRepository(getRepository(date));
 
+//            queryTripleStores(repo, date);
+//
+//            refineHistogram(histogram, date);
+
+            Path pathJson = Paths.get(logOutputPath, "histJSON_" + date + ".txt");
+
+            logger.info("Deserializing histogram.. %s", path.toString());
+            STHolesHistogram<RDFRectangle> histogram =
+                    new JSONDeserializer(pathJson.toString()).
+                            getHistogram();
+
+            execTestQueries(repo, histogram, date);
+        }
+    }
+
+    private static void queryTripleStores(Repository repo, int date) throws RepositoryException, IOException {
+        RepositoryConnection conn;
+        int term = 0;
+        logger.info("-- Starting quering triples store " + date);
             // For now loop for some agroTerms
             for (int j=0; j<200; j++) {
-                System.out.println(term + " -- " + agroTerms.get(term));
+                logger.info(term + " -- " + agroTerms.get(term));
                 try {
                     conn = repo.getConnection();
 
@@ -199,48 +215,76 @@ public class Workflow {
                 }
 
             }
-
-            // The evaluation of the query will write logs (query feedback).
-            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
-
-//            if (listQueryRecords.size() > 0) {
-//                histogram.refine(listQueryRecords);
-//            }
-//
-//            System.out.println(histogram.getRoot().toString());
-//            new JSONSerializer(histogram, Workflow.path.getParent().toString() + "/histJSON_" + i + ".txt");
-
-//            Path path = Paths.get(Workflow.path.getParent().toString(), "results.csv");
-//            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
-//
-//            conn = repo.getConnection();
-//            execTestQueries(conn, bw, term);
-//            conn.close();
-//
-//            bw.close();
-        }
     }
 
-    private static void execTestQueries(RepositoryConnection conn, BufferedWriter bw, int term) {
+    private static void refineHistogram(STHolesHistogram<RDFRectangle> histogram, int date) {
+        logger.info("-- Starting log parsing " + path.toString());
+        // The evaluation of the query will write logs (query feedback).
+        List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
+
+        logger.info("-- Starting refining " + date);
+        histogram = new RDFSTHolesHistogram(); //TODO: Remove from here
+        if (listQueryRecords.size() > 0) {
+            histogram.refine(listQueryRecords);
+        }
+
+        System.out.println(histogram.getRoot().toString());
+        new JSONSerializer(histogram, Workflow.path.getParent().toString() + "/histJSON_" + date + ".txt");
+    }
+
+    private static void execTestQueries(Repository repo,
+                                        STHolesHistogram<RDFRectangle> histogram,
+                                        int date) throws RepositoryException, IOException {
+        RepositoryConnection conn;
+        logger.info("-- Starting executing test queries.. " + date);
+        Path path = Paths.get(Workflow.path.getParent().toString(), "results.csv");
+        BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
+        bw.write("Date, Q, QYear, Act, Est");
+        bw.newLine();
+
+        Random r = new Random();
+
+        for (int j=0; j<10; j++) {
+            conn = repo.getConnection();
+
+            int year = date - r.nextInt(10);
+            execTestQueries(conn, histogram, year, bw, date);
+            conn.close();
+        }
+
+        bw.close();
+    }
+
+    private static void execTestQueries(RepositoryConnection conn,
+                                        STHolesHistogram<RDFRectangle> histogram,
+                                        int year,
+                                        BufferedWriter bw, int numPass) {
+
+        Literal lit = ValueFactoryImpl.getInstance().createLiteral(year);
+        String testQ1str = String.format(testQ1, lit.toString());
+
         try {
-            bw.write(term + ", " + "Q1, " + execTripleStore(conn, testQ1) + ", " + execHistogram(conn, testQ1));
+            bw.write(numPass + ", Q1, " + year + ", " + execTripleStore(conn, testQ1str) + ", " + execHistogram(conn, histogram, testQ1str));
             bw.newLine();
-            bw.write(term + ", " + "Q2, " + execTripleStore(conn, testQ2) + ", " + execHistogram(conn, testQ2));
-            bw.newLine();
+//            bw.write(numPass + ", " + "Q2, " + execTripleStore(conn, testQ2) + ", " + execHistogram(conn, testQ2));
+//            bw.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static long execHistogram(RepositoryConnection conn, String query) {
-        SailTupleQuery sailQuery;
-        try {
-            sailQuery = (SailTupleQuery)conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
-            return new CardinalityEstimatorImpl(histogram).
-                    getCardinality(sailQuery.getParsedQuery().getTupleExpr(), sailQuery.getBindings());
+    private static long execHistogram(RepositoryConnection conn,
+                                      STHolesHistogram<RDFRectangle> histogram,
+                                      String query) {
 
-        } catch (RepositoryException e) {
-            e.printStackTrace();
+        try {
+            logger.info("Executing on Histogram " + query);
+            ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, query, "http://example.org/");
+            long card = new CardinalityEstimatorImpl(histogram).
+                    getCardinality(q.getTupleExpr(), EmptyBindingSet.getInstance());
+
+            return card;
+
         } catch (MalformedQueryException e) {
             e.printStackTrace();
         }
@@ -249,12 +293,14 @@ public class Workflow {
     }
 
     private static long execTripleStore(RepositoryConnection conn, String query) {
-
         try {
 
+            logger.info("Executing on Triple Store " + query);
             ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, query, "http://example.org/");
-            return new ActualCardinalityEstimator(conn).
+            long card = new ActualCardinalityEstimator(conn).
                     getCardinality(q.getTupleExpr(), EmptyBindingSet.getInstance());
+
+            return card;
 
         } catch (MalformedQueryException e) {
             e.printStackTrace();
@@ -312,7 +358,6 @@ public class Workflow {
                                 while ((text = br.readLine()) != null) {
                                 String[] split = text.split(",");
                                 list.add(split[1].trim());
-//                                    list.add(text);
                             }
 
                                 br.close();
