@@ -11,6 +11,7 @@ import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.TupleExpr;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -109,7 +110,11 @@ public class QueryLogInterceptor {
             try {
                 return super.next();
             } catch(QueryEvaluationException e) {
-                handle.destroy();
+                try {
+                    handle.destroy();
+                } catch (IOException e2) {
+                    throw new QueryEvaluationException(e2);
+                }
                 throw e;
             }
         }
@@ -120,7 +125,16 @@ public class QueryLogInterceptor {
 
             queryLogRecord.setCardinality(measure.getCount());
             queryLogRecord.setDuration(measure.getStartTime(), measure.getEndTime());
-            queryLogRecord.setResults(handle);
+
+            if (queryLogRecord.getCardinality() == 0) {
+                try {
+                    handle.destroy();
+                } catch (IOException e) {
+                    throw new QueryEvaluationException(e);
+                }
+            } else {
+                queryLogRecord.setResults(handle);
+            }
 
             try {
                 qfrHandler.handleQueryRecord(queryLogRecord);

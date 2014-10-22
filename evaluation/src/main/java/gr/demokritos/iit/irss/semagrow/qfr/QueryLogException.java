@@ -8,4 +8,6 @@ public class QueryLogException extends Exception {
     public QueryLogException(Exception e) {
         super(e);
     }
+
+    public QueryLogException(String msg) { super(msg); }
 }

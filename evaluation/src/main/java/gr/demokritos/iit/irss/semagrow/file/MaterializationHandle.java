@@ -2,6 +2,9 @@ package gr.demokritos.iit.irss.semagrow.file;
 
 import org.openrdf.model.URI;
 import org.openrdf.query.QueryResultHandler;
+import org.openrdf.query.TupleQueryResultHandlerException;
+
+import java.io.IOException;
 
 /**
  * A QueryResultHandler that is used as materialization point
@@ -14,5 +17,5 @@ public interface MaterializationHandle extends QueryResultHandler {
 
     public URI getId();
 
-    public void destroy();
+    public void destroy() throws IOException;
 }

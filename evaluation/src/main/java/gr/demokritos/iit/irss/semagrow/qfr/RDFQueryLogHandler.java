@@ -5,6 +5,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
@@ -12,6 +13,8 @@ import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.helpers.StatementPatternCollector;
 import org.openrdf.query.impl.EmptyBindingSet;
+import org.openrdf.query.parser.ParsedTupleQuery;
+import org.openrdf.queryrender.sparql.SPARQLQueryRenderer;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
@@ -24,11 +27,10 @@ import java.util.UUID;
 public class RDFQueryLogHandler implements QueryLogHandler {
 
     private RDFHandler handler;
-    private ValueFactory vf;
+    private ValueFactory vf = ValueFactoryImpl.getInstance();
 
-    public RDFQueryLogHandler(RDFHandler handler, ValueFactory vf) {
+    public RDFQueryLogHandler(RDFHandler handler) {
         this.handler = handler;
-        this.vf = vf;
     }
 
     @Override
@@ -43,70 +45,49 @@ public class RDFQueryLogHandler implements QueryLogHandler {
 
     @Override
     public void handleQueryRecord(QueryLogRecord queryLogRecord) throws QueryLogException {
-        URI qrId = vf.createURI("urn:" + UUID.randomUUID().toString());
-        handleQueryRecord(qrId, queryLogRecord);
+        createQueryRecord(queryLogRecord);
     }
 
     private void createStatement(Resource subject, URI predicate, Value object)
             throws QueryLogException
     {
         try {
-            handler.handleStatement(vf.createStatement(subject, predicate, object));
+            if (subject != null && predicate != null && object != null)
+                handler.handleStatement(vf.createStatement(subject, predicate, object));
+
         } catch (RDFHandlerException e) {
             throw new QueryLogException(e);
         }
     }
 
-    private Resource createBNodeStatement(Resource subject, URI predicate)
-            throws QueryLogException
-    {
-        Resource q = vf.createBNode();
-        createStatement(subject, predicate, q);
-        return q;
-    }
+    private Value createQueryRecord(QueryLogRecord qr) throws QueryLogException {
 
-    private void handleQueryRecord(Resource record, QueryLogRecord qr) throws QueryLogException {
+        Resource record = vf.createURI("urn:" + UUID.randomUUID().toString());
 
         createStatement(record, RDF.TYPE, QFR.QUERYRECORD);
-        createStatement(record, QFR.SESSION, vf.createURI("urn:"+qr.getSession()));
+        //createStatement(record, QFR.SESSION, qr.getSession().getSessionId().toURI());
         createStatement(record, QFR.ENDPOINT, qr.getEndpoint());
         createStatement(record, QFR.RESULTFILE, qr.getResults().getId());
         createStatement(record, QFR.CARDINALITY, vf.createLiteral(qr.getCardinality()));
         createStatement(record, QFR.START, vf.createLiteral(qr.getStartTime()));
         createStatement(record, QFR.END, vf.createLiteral(qr.getEndTime()));
         createStatement(record, QFR.DURATION, vf.createLiteral(qr.getDuration()));
+        createStatement(record, QFR.QUERY, createTupleExpr(qr.getQuery(), EmptyBindingSet.getInstance()));
 
-        Resource q = createBNodeStatement(record, QFR.QUERY);
-        handleTupleExpr(q, qr.getQuery(), EmptyBindingSet.getInstance());
+        return record;
     }
 
-    private void handleTupleExpr(Resource r, TupleExpr expr, BindingSet bindings)
+    private Value createTupleExpr(TupleExpr expr, BindingSet bindings)
             throws QueryLogException
     {
-        List<StatementPattern> patterns = StatementPatternCollector.process(expr);
-
-        for (StatementPattern p : patterns) {
-            Resource r1 = createBNodeStatement(r, QFR.PATTERN);
-            handleStatementPattern(r1, p);
+        try {
+            String queryString = null;
+            ParsedTupleQuery query = new ParsedTupleQuery(expr);
+            queryString = new SPARQLQueryRenderer().render(query);
+            return vf.createLiteral(queryString);
+        } catch (Exception e) {
+            throw new QueryLogException(e);
         }
-    }
-
-    private void handleStatementPattern(Resource r, StatementPattern pattern)
-            throws QueryLogException
-    {
-        //createStatement(r, pattern.getSubjectVar().getValue());
-    }
-
-    private void handleBindingSet(Resource r, BindingSet bs)
-            throws QueryLogException
-    {
-
-    }
-
-    private void handleBinding(Resource r, Binding binding)
-            throws QueryLogException
-    {
-
     }
 
     @Override
@@ -117,5 +98,4 @@ public class RDFQueryLogHandler implements QueryLogHandler {
             throw new QueryLogException(e);
         }
     }
-
 }

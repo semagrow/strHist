@@ -1,6 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
-import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.RDFWriterFactory;
 
@@ -22,7 +21,7 @@ public class RDFQueryLogFactory implements QueryLogFactory {
 
         RDFWriter writer = writerFactory.getWriter(out);
 
-        QueryLogHandler handler = new RDFQueryLogHandler(writer, ValueFactoryImpl.getInstance());
+        QueryLogHandler handler = new RDFQueryLogHandler(writer);
         try {
             handler.startQueryLog();
         } catch (QueryLogException e) {
