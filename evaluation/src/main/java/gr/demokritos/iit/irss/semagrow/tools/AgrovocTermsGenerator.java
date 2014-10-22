@@ -1,7 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.tools;
 
-import gr.demokritos.iit.irss.semagrow.RDFTriple;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
