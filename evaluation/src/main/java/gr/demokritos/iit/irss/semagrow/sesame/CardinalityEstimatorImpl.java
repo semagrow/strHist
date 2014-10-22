@@ -79,7 +79,7 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
     }
 
     public long getCardinality(UnaryTupleOperator op, BindingSet bindings) {
-        return getCardinality(op, bindings);
+        return getCardinality(op.getArg(), bindings);
     }
 
     public long getCardinality(Union union, BindingSet bindings) {
