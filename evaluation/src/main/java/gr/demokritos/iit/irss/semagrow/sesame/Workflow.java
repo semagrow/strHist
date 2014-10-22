@@ -3,11 +3,11 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.rdf.io.sevod.VoIDSerializer;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
@@ -41,21 +41,21 @@ public class Workflow {
      /*
         Variables for local run
      */
-//    private static List<String> agroTerms = loadAgrovocTerms("/home/nickozoulis/agrovoc_terms.txt");
-//    public static String logOutputPath = "/home/nickozoulis/strhist_exp_logs/";
+//    private static List<String> agroTerms = loadAgroTerms("/home/nickozoulis/agrovoc_terms.txt");
+//    public static String logFolder = "/home/nickozoulis/strhist_exp_logs/";
 //    private static String tripleStorePath = "/home/nickozoulis/Downloads/";
 //    private static int term = 0;
 //    private static int startDate = 1980, endDate = 1980;
-//    public static Path path =  Paths.get(logOutputPath, "semagrow_logs.log");
+//    public static Path path =  Paths.get(logFolder, "semagrow_logs.log");
 
 
     static final Logger logger = LoggerFactory.getLogger(Workflow.class);
-    public static RDFSTHolesHistogram histogram;
+
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
     private static String testQ1 = prefixes + "select * {?x semagrow:year %s . }";
 
     private static List<String> agroTerms;
-    private static String logOutputPath, tripleStorePath;
+    private static String logFolder, tripleStorePath;
     private static int term = 0, startDate, endDate;
     public static Path path;
     static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
@@ -67,134 +67,55 @@ public class Workflow {
      * @throws IOException
      */
     static public void main(String[] args) throws RepositoryException, IOException {
-
         OptionParser parser = new OptionParser("s:e:l:t:a:");
         OptionSet options = parser.parse(args);
 
+        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l")
+                && options.hasArgument("t") && options.hasArgument("a")) {
 
-        /*******************************DEBUG**********************************
-        if (true) {
-            path = Paths.get("/home/nickozoulis/strhist_exp_logs", "semagrow_log_1980.log");
-            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
-            System.out.println("---<");
-            histogram = new RDFSTHolesHistogram();
-            if (listQueryRecords.size() > 0) {
-                histogram.refine(listQueryRecords);
-            }
-            System.exit(0);
-
-        }
-
-        **********************************************************************/
-
-        if( options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l") && options.hasArgument("t") && options.hasArgument("a") )
-        {
             startDate = Integer.parseInt(options.valueOf("s").toString());
             endDate = Integer.parseInt(options.valueOf("e").toString());
-            if (startDate > endDate) System.exit(1);
+            if (startDate > endDate) {
+                logger.error("Invalid arguments");
+                System.exit(1);
+            }
 
-            logOutputPath = options.valueOf("l").toString();
-            path = Paths.get(options.valueOf("l").toString(), "semagrow_logs.log");
+            logFolder = options.valueOf("l").toString();
             tripleStorePath = options.valueOf("t").toString();
-            agroTerms = loadAgrovocTerms(options.valueOf("a").toString());
+            agroTerms = loadAgroTerms(options.valueOf("a").toString());
 
             runMultiAnnualExperiment();
         }
-        else if( options.hasArgument("l") && options.hasArgument("t") && options.hasArgument("a") )
-        {
-            path = Paths.get(options.valueOf("l").toString(), "semagrow_logs.log");
-
-            String a = options.valueOf("a").toString();
-            if( a.compareTo( "def" ) == 0 ) {
-            	agroTerms = new ArrayList<String>( 1 );
-            	agroTerms.add( "http://aims.fao.org/aos/agrovoc/c_6326" );
-            }
-            else {
-            	agroTerms = loadAgrovocTerms( a );
-            }
-
-            tripleStorePath = options.valueOf("t").toString();
-            if( tripleStorePath.compareTo("agris") == 0 ) {
-                runRemoteExperiment( "http://202.45.139.84:10035/catalogs/fao/repositories/agris" );
-            }
-            else {
-                runRemoteExperiment( tripleStorePath );
-            }
+        else {
+            logger.error("Invalid arguments");
+            System.exit(1);
         }
-        else { logger.error("Invalid arguments");System.exit(1); }
     }
 
-    private static void runRemoteExperiment( String url )
-    throws RepositoryException, IOException
-    {
-    	Repository agris = new org.openrdf.repository.sparql.SPARQLRepository( url );
-        agris.initialize();
-        Repository repo = getFedRepository( agris );
-        RepositoryConnection conn = null;
-        term = 0;
-        
-        // For now loop for some agroTerms
-        for ( String strTerm : agroTerms ) {
-            logger.info(term + " --- " +  strTerm);
-            try {
-                conn = repo.getConnection();
-                String qq = prefixes + "select * {?u dc:subject <%s> }";
-                String quer = String.format( qq, strTerm );
-                ++term;
-                if (term > 10)
-                    break;
-                TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
-                TupleQueryResult result = query.evaluate();
-                consumeIteration(result);
-                conn.close();
-
-            } catch (MalformedQueryException | QueryEvaluationException mqe) {
-                mqe.printStackTrace();
-            }
-
-            /*
-            // The evaluation of the query will write logs (query feedback).
-            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
-
-            if (listQueryRecords.size() > 0) {
-                histogram.refine(listQueryRecords);
-            }
-            */
-        }
-/*
-        Path path = Paths.get(Workflow.path.toString(), "results.csv");
-        BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
-        execTestQueries(conn, bw, term);
-        bw.close();
-        */
-    }
-   
     private static void runMultiAnnualExperiment() throws RepositoryException, IOException {
         for (int date=startDate; date<=endDate; date++) {
 
-            path = Paths.get(logOutputPath, "semagrow_log_" + date + ".log");
+            path = Paths.get(logFolder, "semagrow_log_" + date + ".log");
 
-            Repository repo = getFedRepository(getRepository(date));
-
+            // Query triple stores and get feedback.
+//            Repository repo = getFedRepository(getRepository(date));
 //            queryTripleStores(repo, date);
-//
-//            refineHistogram(histogram, date);
 
-            Path pathJson = Paths.get(logOutputPath, "histJSON_" + date + ".txt");
+            // Parse feedback logs.
+            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
 
-            logger.info("Deserializing histogram.. {}", path.toString());
-            STHolesHistogram<RDFRectangle> histogram =
-                    new JSONDeserializer(pathJson.toString()).
-                            getHistogram();
+            // Refine histogram according to the feedback.
+            STHolesHistogram histogram = refineHistogram(listQueryRecords, date);
 
-            execTestQueries(repo, histogram, date);
+            // Execute test queries on triple store and refined histogram.
+//            execTestQueries(repo, histogram, date);
         }
     }
 
     private static void queryTripleStores(Repository repo, int date) throws RepositoryException, IOException {
         RepositoryConnection conn;
         int term = 0;
-        logger.info("-- Starting quering triples store " + date);
+        logger.info("Starting quering triples store: " + date);
             // For now loop for some agroTerms
             for (int j=0; j<200; j++) {
                 logger.info(term + " -- " + agroTerms.get(term));
@@ -216,20 +137,19 @@ public class Workflow {
             }
     }
 
-    private static void refineHistogram(STHolesHistogram<RDFRectangle> histogram, int date) {
-        logger.info("Parsing logs " + path.toString());
-        // The evaluation of the query will write logs (query feedback).
-        List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
+    private static STHolesHistogram refineHistogram(List<RDFQueryRecord> listQueryRecords, int date) {
+        STHolesHistogram histogram = loadPreviousHistogram(logFolder, date);
 
-        logger.info("Refining " + date);
-        histogram = new RDFSTHolesHistogram(); //TODO: Remove from here
         if (listQueryRecords.size() > 0) {
+            logger.info("Refining histogram " + date);
             histogram.refine(listQueryRecords);
+            logger.info("Refinement is over.");
         }
-        logger.info("Refinement is over.");
+        else logger.debug("No query records. No histogram refinement.");
 
-        logger.info("Serializing histogram to JSON.");
-        new JSONSerializer(histogram, Workflow.path.getParent().toString() + "/histJSON_" + date + ".txt");
+        serializeHistogram(histogram, logFolder, date);
+
+        return histogram;
     }
 
     private static void execTestQueries(Repository repo,
@@ -237,7 +157,7 @@ public class Workflow {
                                         int date) throws RepositoryException, IOException {
         RepositoryConnection conn;
         logger.info("Executing test queries of: " + date);
-        Path path = Paths.get(Workflow.path.getParent().toString(), "results.csv");
+        Path path = Paths.get(logFolder, "results.csv");
         BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
         bw.write("Date, Q, QYear, Act, Est");
         bw.newLine();
@@ -264,7 +184,9 @@ public class Workflow {
         String testQ1str = String.format(testQ1, lit.toString());
 
         try {
-            bw.write(numPass + ", Q1, " + year + ", " + execTripleStore(conn, testQ1str) + ", " + execHistogram(conn, histogram, testQ1str));
+            bw.write(numPass + ", Q1, " + year + ", " +
+                    execTripleStore(conn, testQ1str) + ", " +
+                    execHistogram(conn, histogram, testQ1str));
             bw.newLine();
         } catch (IOException e) {
             e.printStackTrace();
@@ -274,7 +196,6 @@ public class Workflow {
     private static long execHistogram(RepositoryConnection conn,
                                       STHolesHistogram<RDFRectangle> histogram,
                                       String query) {
-
         try {
             logger.info("Cardinality estimation on Histogram for query: " + query);
             ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, query, "http://example.org/");
@@ -309,7 +230,7 @@ public class Workflow {
 
     private static Repository getFedRepository(Repository actual) throws RepositoryException {
         TestSail sail = new TestSail(actual);
-        histogram = sail.getHistogram();
+//        histogram = sail.getHistogram();
         Repository repo = new SailRepository(sail);
         repo.initialize();
         return repo;
@@ -326,9 +247,7 @@ public class Workflow {
         Iterations.closeCloseable(iter);
     }
 
-
-    private static Repository getRepository( int year )
-    throws RepositoryException, IOException {
+    private static Repository getRepository(int year) throws RepositoryException, IOException {
         Properties properties = new Properties();
 
         File journal = new File(tripleStorePath + "bigdata_agris_data_" + year + ".jnl");
@@ -346,28 +265,44 @@ public class Workflow {
         return repo;
     }
 
-       private static List<String> loadAgrovocTerms(String path) {
-             List<String> list = new ArrayList<String>();
+    private static void serializeHistogram(STHolesHistogram histogram, String path, int date) {
+        logger.info("Serializing histogram to JSON in : " + logFolder + "histJSON_" + date + ".txt");
+        new JSONSerializer(histogram, logFolder + "histJSON_" + date + ".txt");
+        logger.info("Serializing histogram to VOID in : " + logFolder + "histVOID_" + date + ".txt");
+        new VoIDSerializer("application/x-turtle", logFolder + "histVOID_" + date + ".ttl").serialize(histogram);
+    }
 
-                        try {
-                        BufferedReader br = new BufferedReader(new FileReader(path));
-                        String text = "";
+    private static STHolesHistogram loadPreviousHistogram(String logFolder, int date) {
+        if (date == startDate)
+            logger.info("Creating a new histogram.");
+        else
+            logger.info("Deserializing histogram: " + (date - 1));
 
-                                while ((text = br.readLine()) != null) {
-                                String[] split = text.split(",");
-                                list.add(split[1].trim());
-                            }
+        return (date == startDate)
+                ? new STHolesHistogram<RDFRectangle>()
+                : new JSONDeserializer(logFolder + "histJSON_" + (date - 1) + ".txt").getHistogram();
+    }
 
-                                br.close();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+    private static List<String> loadAgroTerms(String path) {
+        List<String> list = new ArrayList<String>();
 
-            return list;
+        try {
+              BufferedReader br = new BufferedReader(new FileReader(path));
+              String text = "";
+
+              while ((text = br.readLine()) != null) {
+                  String[] split = text.split(",");
+                  list.add(split[1].trim());
+              }
+
+              br.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-
+        return list;
+    }
 
 }

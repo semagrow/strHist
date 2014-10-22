@@ -5,6 +5,7 @@ import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.POWDERS;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.SEVOD;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.VOID;
@@ -111,7 +112,7 @@ public class VoIDSerializer {
 
         FileOutputStream out = null;
         try {
-            out = new FileOutputStream(outputPath + "histRangesVoID.ttl");
+            out = new FileOutputStream(outputPath);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -312,6 +313,15 @@ public class VoIDSerializer {
 
     private Literal createLiteral(Date d) {
         return ValueFactoryImpl.getInstance().createLiteral(d);
+    }
+
+
+    public static void main(String[] args) {
+        STHolesHistogram<RDFRectangle> histogram =
+                new JSONDeserializer("/home/nickozoulis/histJSON_1982.txt").
+                        getHistogram();
+
+        new VoIDSerializer("application/x-turtle", "/home/nickozoulis/exp_hist_void/").serialize(histogram);
     }
 
 }

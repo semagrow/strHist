@@ -35,7 +35,6 @@ public class VoIDeserializer {
     private STHolesHistogram<RDFRectangle> histogram;
 
     public VoIDeserializer(String path) {
-
         model = readModelFromFile(path);
 
         // Root node is set by Eleon as (svd:datasetTop, void:subset, rootResource).
@@ -43,8 +42,6 @@ public class VoIDeserializer {
 
         histogram = new STHolesHistogram<RDFRectangle>();
         histogram.setRoot(initBucket(root, null));
-
-        System.out.println(histogram.getRoot());
     }
 
 

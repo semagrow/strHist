@@ -1,5 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LogParser {
+
+    static final Logger logger = LoggerFactory.getLogger(LogParser.class);
 
 	private String path;
 	
@@ -24,6 +29,7 @@ public class LogParser {
 
 
 	public List<RDFQueryRecord> parse() {
+        logger.info("Parsing log " + path);
 
 		String line = "", text = "";
 
@@ -31,8 +37,7 @@ public class LogParser {
 
 		try {
 
-			BufferedReader br = new BufferedReader(new FileReader(
-					new File(path)));
+			BufferedReader br = new BufferedReader(new FileReader(path));
 
 			while ((line = br.readLine()) != null) {
 				text += line + "\n";
