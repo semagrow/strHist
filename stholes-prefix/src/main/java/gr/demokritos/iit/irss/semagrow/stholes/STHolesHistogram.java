@@ -5,6 +5,8 @@ import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -15,6 +17,7 @@ import java.util.*;
 public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,Stat> {
 
 
+    static final Logger logger = LoggerFactory.getLogger(STHolesHistogram.class);
     private STHolesBucket<R> root;
     public long maxBucketsNum;
     public Double epsilon = 0.0;
@@ -113,16 +116,12 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
     public void refine(Iterable<? extends QueryRecord<R,Stat>> workload) {
 
+        logger.info("Number of buckets before refine: " + bucketsNum);
+
         for (QueryRecord<R,Stat> qfr : workload)
             refine(qfr);
 
-        System.out.println(bucketsNum);
-        for (STHolesBucket<R> bc : root.getChildren()) {
-            System.out.println(bc);
-            for (STHolesBucket<R> bcc : bc.getChildren()) {
-                System.out.println(bcc);
-            }
-        }
+        logger.info("Number of buckets after refine: " + bucketsNum);
     }
 
     /**
@@ -195,7 +194,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         }
 
         // check if histogram must be compacted after refinement
-        System.out.println("Histogram refined with query: " + queryRecord.getRectangle().getRange(0));
+        logger.info("Histogram refined with query: " + queryRecord.getQuery());
+        logger.info("Compacting histogram.");
         compact();
     }
 
@@ -431,9 +431,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
              STHolesBucket<R> bn = bestMerge.getBn();
 
             STHolesBucket.merge(b1, b2, bn, this);
-            System.out.println(bestMerge.toString());
-            System.out.println("Number of PC merges:" + pcMergesNum);
-            System.out.println("Number of SS merges: " + ssMergesNum);
+            logger.info(bestMerge.toString());
+            logger.info("Number of PC merges: " + pcMergesNum);
+            logger.info("Number of SS merges: " + ssMergesNum);
             bucketsNum -= 1;
         }
     }
