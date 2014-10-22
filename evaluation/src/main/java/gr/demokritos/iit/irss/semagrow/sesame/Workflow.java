@@ -147,6 +147,8 @@ public class Workflow {
                 String qq = prefixes + "select * {?u dc:subject <%s> }";
                 String quer = String.format( qq, strTerm );
                 ++term;
+                if (term > 10)
+                    break;
                 TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, quer);
                 TupleQueryResult result = query.evaluate();
                 consumeIteration(result);
@@ -156,18 +158,21 @@ public class Workflow {
                 mqe.printStackTrace();
             }
 
+            /*
             // The evaluation of the query will write logs (query feedback).
             List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
             System.out.println("---<");
             if (listQueryRecords.size() > 0) {
                 histogram.refine(listQueryRecords);
             }
+            */
         }
-
+/*
         Path path = Paths.get(Workflow.path.toString(), "results.csv");
         BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
         execTestQueries(conn, bw, term);
         bw.close();
+        */
     }
    
     private static void runMultiAnnualExperiment()
