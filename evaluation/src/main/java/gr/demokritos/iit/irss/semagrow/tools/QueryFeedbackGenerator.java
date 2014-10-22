@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow;
+package gr.demokritos.iit.irss.semagrow.tools;
 
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.Binding;

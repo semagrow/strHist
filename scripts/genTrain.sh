@@ -12,7 +12,7 @@ while [[ 1==1 ]]; do
     java -cp ./lib/*:./lib/cp gr.demokritos.iit.irss.semagrow.TestMainQueryFeedbackGenerate 50 sorted f/ "$D"
     DNUM="train_num/$P$F/"
     mkdir -p $DNUM
-    java -cp ./lib/*:./lib/cp gr.demokritos.iit.irss.semagrow.RDFtoNumQueryConverter -s sorted -t "$D" -o "$DNUM"
+    java -cp ./lib/*:./lib/cp gr.demokritos.iit.irss.semagrow.tools.RDFtoNumQueryConverter -s sorted -t "$D" -o "$DNUM"
 
     i=$((i+1))
 done

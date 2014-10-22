@@ -3,6 +3,7 @@ package gr.demokritos.iit.irss.semagrow;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
+import gr.demokritos.iit.irss.semagrow.tools.QueryFeedbackGenerator;
 import org.openrdf.repository.RepositoryException;
 
 import java.io.*;

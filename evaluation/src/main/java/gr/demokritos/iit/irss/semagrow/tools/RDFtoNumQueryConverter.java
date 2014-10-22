@@ -1,5 +1,9 @@
-package gr.demokritos.iit.irss.semagrow;
+package gr.demokritos.iit.irss.semagrow.tools;
 
+import gr.demokritos.iit.irss.semagrow.CustomCollection;
+import gr.demokritos.iit.irss.semagrow.NumQuery;
+import gr.demokritos.iit.irss.semagrow.NumQueryRecord;
+import gr.demokritos.iit.irss.semagrow.NumQueryResult;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
