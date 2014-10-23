@@ -7,18 +7,14 @@ import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
-import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.TupleExpr;
-import org.openrdf.query.algebra.helpers.StatementPatternCollector;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedTupleQuery;
 import org.openrdf.queryrender.sparql.SPARQLQueryRenderer;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -67,7 +63,10 @@ public class RDFQueryLogHandler implements QueryLogHandler {
         createStatement(record, RDF.TYPE, QFR.QUERYRECORD);
         //createStatement(record, QFR.SESSION, qr.getSession().getSessionId().toURI());
         createStatement(record, QFR.ENDPOINT, qr.getEndpoint());
-        createStatement(record, QFR.RESULTFILE, qr.getResults().getId());
+
+        if (qr.getResults() != null)
+            createStatement(record, QFR.RESULTFILE, qr.getResults().getId());
+
         createStatement(record, QFR.CARDINALITY, vf.createLiteral(qr.getCardinality()));
         createStatement(record, QFR.START, vf.createLiteral(qr.getStartTime()));
         createStatement(record, QFR.END, vf.createLiteral(qr.getEndTime()));

@@ -3,6 +3,7 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
+import gr.demokritos.iit.irss.semagrow.qfr.QueryLogInterceptor;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -19,8 +20,8 @@ import org.openrdf.sail.federation.evaluation.RepositoryTripleSource;
 public class EvaluationStrategyImpl extends org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl {
 
 
-//    private QueryLogInterceptor interceptor;
-    private ObservingInterceptor interceptor;
+    private QueryLogInterceptor interceptor;
+//    private ObservingInterceptor interceptor;
     private URI endpoint = ValueFactoryImpl.getInstance().createURI("http://histogramnamespace/example");
 
     private QueryLogHandler queryLogHandler;
@@ -30,8 +31,8 @@ public class EvaluationStrategyImpl extends org.openrdf.query.algebra.evaluation
         super(new RepositoryTripleSource(cnx));
         queryLogHandler = handler;
         materializationManager = manager;
-//        interceptor = new QueryLogInterceptor(queryLogHandler, materializationManager);
-        interceptor = new ObservingInterceptor(endpoint.toString());
+        interceptor = new QueryLogInterceptor(queryLogHandler, materializationManager);
+//        interceptor = new ObservingInterceptor(endpoint.toString());
     }
 
     public CloseableIteration<BindingSet, QueryEvaluationException>

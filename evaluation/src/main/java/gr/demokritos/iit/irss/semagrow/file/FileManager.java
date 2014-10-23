@@ -7,7 +7,6 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryResultHandler;
-import org.openrdf.query.TupleQueryResultHandlerException;
 import org.openrdf.query.resultio.*;
 
 import java.io.*;
@@ -99,7 +98,7 @@ public class FileManager implements ResultMaterializationManager {
         public void destroy() throws IOException {
 
             try {
-                super.endQueryResult();
+                //super.endQueryResult();
                 File f = null;
                 f = new File(convertbackURI(id));
                 f.delete();
