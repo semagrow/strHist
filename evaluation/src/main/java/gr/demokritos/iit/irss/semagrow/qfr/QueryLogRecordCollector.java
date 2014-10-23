@@ -10,7 +10,7 @@ public class QueryLogRecordCollector implements QueryLogHandler {
 
     private Collection<QueryLogRecord> collection;
 
-    public QueryLogRecordCollector() { }
+    public QueryLogRecordCollector(Collection<QueryLogRecord> collection) { this.collection = collection; }
 
     @Override
     public void startQueryLog() throws QueryLogException {
@@ -25,5 +25,4 @@ public class QueryLogRecordCollector implements QueryLogHandler {
     @Override
     public void endQueryLog() throws QueryLogException { }
 
-    public Collection<QueryLogRecord> getCollection() { return collection; }
 }
