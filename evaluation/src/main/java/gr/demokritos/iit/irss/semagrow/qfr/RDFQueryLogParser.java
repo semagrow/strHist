@@ -75,8 +75,9 @@ public class RDFQueryLogParser implements QueryLogParser {
 
         //r.setDuration(startTime, endTime);
 
-        //r.setCardinality(model.filter(qr, QFR.));
-        return null;
+        r.setCardinality(cardinality);
+        r.setDuration(startTime.getTime(), endTime.getTime());
+        return r;
     }
 
     private Date parseDate(Literal literal, Model model) {
