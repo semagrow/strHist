@@ -6,7 +6,7 @@ import java.io.InputStream;
 /**
  * Created by angel on 10/21/14.
  */
-public interface QueryRecordLogParser {
+public interface QueryLogParser {
 
     void setQueryRecordHandler(QueryLogHandler handler);
 
