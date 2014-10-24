@@ -9,6 +9,8 @@ import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
+import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
+import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import info.aduna.iteration.CloseableIteration;
@@ -35,8 +37,25 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
     private StatementPattern pattern;
 
-    public QueryRecordAdapter(QueryLogRecord queryLogRecord) {
+    private Collection<ValueExpr> filters;
+
+    private ResultMaterializationManager fileManager;
+
+    public QueryRecordAdapter(QueryLogRecord queryLogRecord, ResultMaterializationManager fileManager)
+        throws IllegalArgumentException
+    {
         this.queryLogRecord = queryLogRecord;
+        this.fileManager = fileManager;
+
+        TupleExpr expr = queryLogRecord.getQuery();
+        Collection<StatementPattern> patterns = StatementPatternCollector.process(expr);
+        filters = FilterCollector.process(expr);
+
+        if (patterns.size() != 1)
+            throw new IllegalArgumentException("Only single-pattern queries are supported");
+
+        pattern = patterns.iterator().next();
+
     }
 
     @Override
@@ -48,25 +67,9 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
     public RDFRectangle getRectangle() {
 
         if (rectangle == null)
-            rectangle = computeQueryRectangle(queryLogRecord.getQuery());
+            rectangle = computePatternRectangle(pattern, filters);
 
         return rectangle;
-    }
-
-    private RDFRectangle computeQueryRectangle(TupleExpr expr) {
-
-        Collection<StatementPattern> patterns = StatementPatternCollector.process(expr);
-        Collection<ValueExpr> filters = FilterCollector.process(expr);
-
-        if (patterns.size() == 1)
-        {
-            pattern = patterns.iterator().next();
-            RDFRectangle rect = computePatternRectangle(pattern, filters);
-
-            return rect;
-        }
-
-        return null;
     }
 
     private List<Var> getDimensions() {
@@ -254,7 +257,15 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         }
 
         private CloseableIteration<BindingSet, QueryEvaluationException>
-            getResult() { return null; }
+            getResult()
+        {
+            try {
+                return fileManager.getResult(queryLogRecord.getResults().getId());
+            } catch (QueryEvaluationException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
 
         private Stat getStat(Iteration<BindingSet, QueryEvaluationException> iter)
                 throws QueryEvaluationException
@@ -304,7 +315,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
         @Override
         public List<RDFRectangle> getRectangles(RDFRectangle rect) {
-            return null;
+            return getRectangles();
         }
 
         public List<RDFRectangle> getRectangles() {
@@ -319,13 +330,18 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
                     BindingSet b = iter.next();
                     RDFRectangle rect;
 
-                    Var predVar = pattern.getPredicateVar();
-                    Value predVal = (predVar.hasValue()) ? predVar.getValue() : b.getValue(predVar.getName());
+                    Value sVal = (pattern.getSubjectVar().hasValue()) ? pattern.getSubjectVar().getValue() : b.getValue(pattern.getSubjectVar().getName());
+                    Value oVal = (pattern.getObjectVar().hasValue())  ? pattern.getObjectVar().getValue() : b.getValue(pattern.getObjectVar().getName());
+                    Value pVal = (pattern.getPredicateVar().hasValue())  ? pattern.getPredicateVar().getValue() : b.getValue(pattern.getPredicateVar().getName());
 
-                    if (rectangles.containsKey(predVal)) {
-                        rect = rectangles.get(predVal);
+                    if (rectangles.containsKey(pVal)) {
+                        rect = rectangles.get(pVal);
+                        rect.getSubjectRange().expand(sVal.stringValue());
+                        //rect.getPredicateRange().expand(pVal.stringValue());
+                        rect.getObjectRange().expand(oVal);
                     } else {
-
+                        rect = computeRectangle(sVal, pVal, oVal);
+                        rectangles.put(pVal, rect);
                     }
                 }
 

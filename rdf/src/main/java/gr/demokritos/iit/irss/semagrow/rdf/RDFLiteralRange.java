@@ -489,7 +489,7 @@ public class RDFLiteralRange
 
     @Deprecated
     public void expand(String v) {
-
+        throw new NotImplementedException();
     }
 
     /**
