@@ -8,6 +8,8 @@ import java.util.List;
  */
 public class Stat {
 
+    public static final Stat emptyStat = new Stat();
+
     private Long frequency;
 
     private List<Long> distinctCount;

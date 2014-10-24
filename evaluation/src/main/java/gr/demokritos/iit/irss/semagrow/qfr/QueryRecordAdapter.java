@@ -12,6 +12,7 @@ import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import info.aduna.iteration.CloseableIteration;
+import info.aduna.iteration.Iteration;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -68,6 +69,14 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         return null;
     }
 
+    private List<Var> getDimensions() {
+        List<Var> list = new ArrayList<Var>();
+        list.add(pattern.getSubjectVar());
+        list.add(pattern.getPredicateVar());
+        list.add(pattern.getObjectVar());
+        return list;
+    }
+
     private RDFRectangle computePatternRectangle(StatementPattern pattern, Collection<ValueExpr> filters) {
         Value sVal = pattern.getSubjectVar().getValue();
         Value pVal = pattern.getPredicateVar().getValue();
@@ -97,6 +106,34 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         } else  {
             // oVal is a variable but can have filters
             oRange = computeObjectRange(pattern.getObjectVar(), filters);
+        }
+
+        return new RDFRectangle(sRange, pRange, oRange);
+    }
+
+    private RDFRectangle computeRectangle(Value s, Value p, Value o) {
+
+        PrefixRange sRange = new PrefixRange();
+        ExplicitSetRange<String> pRange = new ExplicitSetRange<String>();
+        RDFLiteralRange oRange = new RDFLiteralRange();
+
+        if (s != null) {
+            ArrayList<String> subjects = new ArrayList<String>();
+            subjects.add(s.stringValue());
+            sRange = new PrefixRange(subjects);
+        }
+
+        if (p != null) {
+            ArrayList<String> predicates = new ArrayList<String>();
+            predicates.add(s.stringValue());
+            pRange = new ExplicitSetRange<String>(predicates);
+        }
+
+        if (o != null) {
+            if (o instanceof Literal) {
+                Literal l = (Literal)o;
+                oRange = new RDFLiteralRange(l.getDatatype(), computeObjectRange(l));
+            }
         }
 
         return new RDFRectangle(sRange, pRange, oRange);
@@ -178,32 +215,127 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
     private class QueryResultImpl implements QueryResult<RDFRectangle, Stat> {
 
+        private Stat emptyStat = new Stat();
+
         @Override
         public Stat getCardinality(RDFRectangle rect) {
 
+            RDFRectangle queryRect = getRectangle();
+
+            if (!queryRect.contains(rect))
+                return emptyStat;
+
             CloseableIteration<BindingSet,QueryEvaluationException> iter = getResult();
+
             iter = filter(rect, iter);
-            return null;
+
+            try {
+                Stat stat =  getStat(iter);
+                iter.close();
+                return stat;
+            } catch (QueryEvaluationException e) { }
+
+            return emptyStat;
         }
 
         private CloseableIteration<BindingSet, QueryEvaluationException>
-            filter(RDFRectangle rectangle, CloseableIteration<BindingSet, QueryEvaluationException> iter) {
+            filter(RDFRectangle rectangle, CloseableIteration<BindingSet, QueryEvaluationException> iter)
+        {
+            if (!pattern.getSubjectVar().hasValue())
+                iter = new StringRangeFilterIteration(pattern.getSubjectVar().getName(), rectangle.getSubjectRange(), iter);
 
+            if (!pattern.getPredicateVar().hasValue())
+                iter = new StringRangeFilterIteration(pattern.getPredicateVar().getName(), rectangle.getPredicateRange(), iter);
 
+            if (!pattern.getObjectVar().hasValue())
+                iter = new ValueRangeFilterIteration(pattern.getObjectVar().getName(), rectangle.getObjectRange(), iter);
 
             return iter;
         }
 
         private CloseableIteration<BindingSet, QueryEvaluationException>
-            getResult() {
+            getResult() { return null; }
 
-            return null;
+        private Stat getStat(Iteration<BindingSet, QueryEvaluationException> iter)
+                throws QueryEvaluationException
+        {
+            Stat stat = new Stat();
+            long count = 0;
+            Map<String, Set<Value>> distinctValues = new HashMap<String,Set<Value>>();
+
+            while (iter.hasNext()) {
+                count++;
+                BindingSet b = iter.next();
+
+                for (String bindingName : b.getBindingNames()) {
+                    if (!distinctValues.containsKey(bindingName)){
+                        Set<Value> d = new HashSet<Value>();
+                        d.add(b.getValue(bindingName));
+                        distinctValues.put(bindingName, d);
+                    }
+                }
+            }
+
+            stat.setFrequency(count);
+
+            ArrayList<Long> distinctCounts = new ArrayList<Long>();
+
+            List<Var> dimensions = getDimensions();
+
+            for (Var dim : dimensions) {
+
+                if (dim.hasValue())
+                    distinctCounts.add((long)1);
+                else
+                {
+                    Set<Value> values = distinctValues.get(dim.getName());
+
+                    if (values == null)
+                        distinctCounts.add((long) 0);
+                    else
+                        distinctCounts.add((long) values.size());
+                }
+            }
+
+            stat.setDistinctCount(distinctCounts);
+
+            return stat;
         }
 
         @Override
         public List<RDFRectangle> getRectangles(RDFRectangle rect) {
             return null;
         }
+
+        public List<RDFRectangle> getRectangles() {
+
+            Map<Value, RDFRectangle> rectangles = new HashMap<Value, RDFRectangle>();
+
+            CloseableIteration<BindingSet, QueryEvaluationException> iter = getResult();
+
+            try {
+
+                while (iter.hasNext()) {
+                    BindingSet b = iter.next();
+                    RDFRectangle rect;
+
+                    Var predVar = pattern.getPredicateVar();
+                    Value predVal = (predVar.hasValue()) ? predVar.getValue() : b.getValue(predVar.getName());
+
+                    if (rectangles.containsKey(predVal)) {
+                        rect = rectangles.get(predVal);
+                    } else {
+
+                    }
+                }
+
+            } catch(QueryEvaluationException e) {
+                return Collections.<RDFRectangle>emptyList();
+            }
+
+            return new LinkedList<RDFRectangle>(rectangles.values());
+        }
+
     }
 
 }
