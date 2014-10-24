@@ -1,27 +1,22 @@
 package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
-import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
-import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
+import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
+import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import org.openrdf.model.Value;
+import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.XMLSchema;
 
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.openrdf.model.Value;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.XMLSchema;
 
 public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializable {
 
