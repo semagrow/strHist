@@ -55,7 +55,7 @@ public class TestLogParser {
 
         handlerSer.startQueryLog();
         for (QueryLogRecord queryRecord : logs) {
-            handlerSer.handleQueryRecord(new SerialQueryLogRecord(queryRecord));
+            handlerSer.handleQueryRecord(queryRecord);
         }
         handlerSer.endQueryLog();
     }

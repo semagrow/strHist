@@ -30,7 +30,7 @@ public class SerialQueryLogHandler implements QueryLogHandler {
     @Override
     public void handleQueryRecord(QueryLogRecord queryLogRecord) throws QueryLogException {
         try {
-            oout.writeObject(queryLogRecord);
+            oout.writeObject(new SerialQueryLogRecord(queryLogRecord));
         } catch (IOException e) {
             throw new QueryLogException(e);
         }
