@@ -31,9 +31,10 @@ public class ExplicitSetRange<T>
 
 
     //Tested
-	// TODO: It should be T, but complains.
-    public boolean contains(String value) {
-        if (infinite) return true;
+    public boolean includes(T value) {
+
+        if (infinite)
+            return true;
 
         return items.contains(value);
     }
@@ -161,10 +162,10 @@ public class ExplicitSetRange<T>
         s4.add("d");
         ExplicitSetRange<String> esr4 = new ExplicitSetRange<String>(s4);
 
-        //Test contains
+        //Test includes
         String v1 = "a";
-        System.out.println(esr1 + " contains " + v1 + " : " +
-                esr1.contains(v1));
+        System.out.println(esr1 + " includes " + v1 + " : " +
+                esr1.includes(v1));
         System.out.println(esr1 + " contains " + esr3 + " : " +
                 esr1.contains(esr3));
 

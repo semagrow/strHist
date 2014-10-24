@@ -8,4 +8,6 @@ public interface Range<T> {
     boolean isUnit();
 
     boolean isEmpty();
+
+    boolean includes(T elem);
 }

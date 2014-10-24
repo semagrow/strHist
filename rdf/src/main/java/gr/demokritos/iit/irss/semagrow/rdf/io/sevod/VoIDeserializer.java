@@ -150,7 +150,7 @@ public class VoIDeserializer {
             int from = Integer.parseInt(model.filter(intRange, SEVOD.FROM, null).objectString());
             int to = Integer.parseInt(model.filter(intRange, SEVOD.TO, null).objectString());
 
-            return new IntervalRange<Integer>(from, to);
+            return new IntervalRange(from, to);
         } else
             return null;
     }

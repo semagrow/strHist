@@ -101,7 +101,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
                 // expand root
                 if (!root.getBox().contains(rect)) {
 
-                    // expand root box so that it contains q
+                    // expand root box so that it includes q
                     R boxN = root.getBox().computeTightBox(rect);
                     //     System.out.println("Rectangle: " + queryRecord.getRectangle());
                     //     System.out.println("Box: " + root.getBox());
@@ -152,7 +152,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
     //Tested
     /**
      * creates a new bucket that has a rectangle that does not intersect with the children of {bucket}
-     * and contains the number of tuples that matches the queryRecord
+     * and includes the number of tuples that matches the queryRecord
      * @param bucket parent bucket
      * @param queryRecord query feedback
      * @return shrinked bucket
@@ -565,7 +565,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         // intersect partially with any other of bp
 
 
-        // I contains bp's children which are enclosed by bn box
+        // I includes bp's children which are enclosed by bn box
         Collection<STHolesOrigBucket<R>> I = new ArrayList<STHolesOrigBucket<R>>();
         STHolesOrigBucket<R> bp = b1.getParent();
 
