@@ -1,7 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
-import eu.semagrow.stack.modules.api.evaluation.QueryEvaluationSession;
-import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
 import org.openrdf.model.URI;
 import org.openrdf.query.algebra.TupleExpr;
 
@@ -26,7 +24,7 @@ public interface QueryLogRecord {
 
     void setDuration(long start, long end);
 
-    void setResults(MaterializationHandle handle);
+    void setResults(URI handle);
 
     Date getStartTime();
 
@@ -34,5 +32,5 @@ public interface QueryLogRecord {
 
     long getDuration();
 
-    MaterializationHandle getResults();
+    URI getResults();
 }

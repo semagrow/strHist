@@ -77,6 +77,7 @@ public class RDFQueryLogParser implements QueryLogParser {
 
         r.setCardinality(cardinality);
         r.setDuration(startTime.getTime(), endTime.getTime());
+        r.setResults(results);
         return r;
     }
 

@@ -67,7 +67,7 @@ public class RDFQueryLogHandler implements QueryLogHandler {
         createStatement(record, RDF.TYPE, QFR.QUERYRECORD);
         //createStatement(record, QFR.SESSION, qr.getSession().getSessionId().toURI());
         createStatement(record, QFR.ENDPOINT, qr.getEndpoint());
-        createStatement(record, QFR.RESULTFILE, qr.getResults().getId());
+        createStatement(record, QFR.RESULTFILE, qr.getResults());
         createStatement(record, QFR.CARDINALITY, vf.createLiteral(qr.getCardinality()));
         createStatement(record, QFR.START, vf.createLiteral(qr.getStartTime()));
         createStatement(record, QFR.END, vf.createLiteral(qr.getEndTime()));

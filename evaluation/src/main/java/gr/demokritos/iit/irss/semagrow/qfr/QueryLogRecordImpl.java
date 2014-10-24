@@ -27,7 +27,7 @@ public class QueryLogRecordImpl implements QueryLogRecord {
 
     private long duration;
 
-    private MaterializationHandle results;
+    private URI results;
 
     public QueryLogRecordImpl(UUID session, URI endpoint, TupleExpr query) {
         this.session = session;
@@ -69,7 +69,7 @@ public class QueryLogRecordImpl implements QueryLogRecord {
     }
 
     @Override
-    public void setResults(MaterializationHandle handle) { results = handle; }
+    public void setResults(URI handle) { results = handle; }
 
     @Override
     public Date getStartTime() { return startTime; }
@@ -81,5 +81,5 @@ public class QueryLogRecordImpl implements QueryLogRecord {
     public long getDuration() { return duration; }
 
     @Override
-    public MaterializationHandle getResults() { return results; }
+    public URI getResults() { return results; }
 }

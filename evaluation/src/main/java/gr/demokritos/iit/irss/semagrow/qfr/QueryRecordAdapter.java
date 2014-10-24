@@ -9,11 +9,11 @@ import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
-import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import info.aduna.iteration.CloseableIteration;
+import info.aduna.iteration.EmptyIteration;
 import info.aduna.iteration.Iteration;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
@@ -259,8 +259,10 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         private CloseableIteration<BindingSet, QueryEvaluationException>
             getResult()
         {
+            if (queryLogRecord.getCardinality() == 0)
+                return new EmptyIteration<BindingSet, QueryEvaluationException>();
             try {
-                return fileManager.getResult(queryLogRecord.getResults().getId());
+                return fileManager.getResult(queryLogRecord.getResults());
             } catch (QueryEvaluationException e) {
                 e.printStackTrace();
             }
@@ -295,10 +297,12 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
             for (Var dim : dimensions) {
 
-                if (dim.hasValue())
-                    distinctCounts.add((long)1);
-                else
-                {
+                if (dim.hasValue()) {
+                    if (count == 0)
+                        distinctCounts.add((long) 0);
+                    else
+                        distinctCounts.add((long) 1);
+                } else {
                     Set<Value> values = distinctValues.get(dim.getName());
 
                     if (values == null)

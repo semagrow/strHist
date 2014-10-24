@@ -133,7 +133,7 @@ public class QueryLogInterceptor {
                     throw new QueryEvaluationException(e);
                 }
             } else {
-                queryLogRecord.setResults(handle);
+                queryLogRecord.setResults(handle.getId());
             }
 
             try {
