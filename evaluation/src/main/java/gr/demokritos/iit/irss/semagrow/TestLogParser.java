@@ -1,16 +1,12 @@
 package gr.demokritos.iit.irss.semagrow;
 
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogRecord;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogRecordCollector;
-import gr.demokritos.iit.irss.semagrow.qfr.RDFQueryLogParser;
+import gr.demokritos.iit.irss.semagrow.qfr.*;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -21,32 +17,68 @@ public class TestLogParser {
 
     static final Logger logger = LoggerFactory.getLogger(TestLogParser.class);
 
-    public static void main(String[] args) throws FileNotFoundException, IOException, QueryLogException {
+    // Input and output file paths.
+    private static String input, output;
 
+    public static void main(String[] args) throws IOException, QueryLogException, ClassNotFoundException {
+
+        OptionParser parser = new OptionParser("i:o:");
+        OptionSet options = parser.parse(args);
+
+        if (options.hasArgument("i") && options.hasArgument("o")) {
+            input = options.valueOf("i").toString();
+            output = options.valueOf("o").toString();
+        } else {
+            logger.error("Invalid arguments");
+            System.exit(1);
+        }
+
+        writeRDFQueryLogSerial();
+
+        parseRDFQueryLogSerial();
+    }
+
+    private static void writeRDFQueryLogSerial() throws IOException, QueryLogException {
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
         QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+        // Load query logs using RDFQueryLogParser
+        QueryLogParser parser = new RDFQueryLogParser(handler);
 
-        RDFQueryLogParser parser = new RDFQueryLogParser(handler);
+        File f = new File(input);
+        logger.info("Parsing file : " + f.getName());
+        parser.parseQueryLog(new FileInputStream(f));
+        logger.info("Number of parsed query logs: " + logs.size());
 
+        OutputStream out = new FileOutputStream(output);
 
-            File f = new File("/home/nickozoulis/semagrow/test_rdf_log");
+        QueryLogHandler handlerSer = new SerialQueryLogFactory().getQueryRecordLogger(out);
 
-            logger.info("Parsing file : " + f.getName());
+        handlerSer.startQueryLog();
+        for (QueryLogRecord queryRecord : logs) {
+            handlerSer.handleQueryRecord(new SerialQueryLogRecord(queryRecord));
+        }
+        handlerSer.endQueryLog();
+    }
 
-            parser.parseQueryLog(new FileInputStream(f));
+    private static void parseRDFQueryLogSerial() throws IOException, QueryLogException {
+        Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
 
-            logger.info("Number of parsed query logs: " + logs.size());
+        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+        QueryLogParser parser = new SerialQueryLogParser();
+        parser.setQueryRecordHandler(handler);
 
-            for (QueryLogRecord queryRecord : logs) {
-                logger.info(queryRecord.getQuery().toString());
-                logger.info("Endpoint: " + queryRecord.getEndpoint());
-                logger.info("Cardinality: " + queryRecord.getCardinality());
-                logger.info("Duration: " + queryRecord.getDuration());
-                logger.info("Binding names: " + queryRecord.getBindingNames().toString());
-            }
+        File f = new File(output);
+        logger.info("Parsing file : " + f.getName());
+        parser.parseQueryLog(new FileInputStream(f));
+        logger.info("Number of parsed query logs: " + logs.size());
 
-
-
+        for (QueryLogRecord queryRecord : logs) {
+            logger.info(queryRecord.getQuery().toString());
+            logger.info("Endpoint: " + queryRecord.getEndpoint());
+            logger.info("Cardinality: " + queryRecord.getCardinality());
+            logger.info("Duration: " + queryRecord.getDuration());
+            logger.info("Binding names: " + queryRecord.getBindingNames().toString());
+        }
     }
 
 }

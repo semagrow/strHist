@@ -10,4 +10,6 @@ public interface Range<T> {
     boolean isEmpty();
 
     boolean includes(T elem);
+
+    void expand(T v);
 }

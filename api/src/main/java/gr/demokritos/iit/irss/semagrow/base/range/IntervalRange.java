@@ -54,13 +54,12 @@ public class IntervalRange implements RangeLength<Integer>, Rangeable<IntervalRa
     }
 
 
-    public void expand(String v) {
+    public void expand(Integer value) {
 
-        int value = java.lang.Integer.parseInt(v);
-
-        if (value < low ) low = value;
-        else if (value > high) high = value;
-
+        if (value < low )
+            low = value;
+        else if (value > high)
+            high = value;
     }
 
     //Tested

@@ -85,21 +85,14 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
     }
 
 
-    public void expand(String v) {
+    public void expand(Date date) {
 
-//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+hh:mm");
-        Date date = null;
+        assert date != null;
 
-        try {date = format.parse(v);}
-        catch (ParseException e) {e.printStackTrace();}
-
-        if (date != null) {
-
-            if (date.compareTo(begin) < 0) begin = date;
-            else if (date.compareTo(end) > 0) end = date;
-        } else
-            logger.debug("Date Format Error.");
+        if (date.compareTo(begin) < 0)
+            begin = date;
+        else if (date.compareTo(end) > 0)
+            end = date;
     }
 
     //Tested

@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
 
+import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
@@ -11,6 +12,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.XMLSchema;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -484,48 +486,37 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
         return null;
     }
 
+    @Deprecated
+    public void expand(String v) {
+        throw new NotImplementedException();
+    }
 
     /**
      * expands an RDFLiteralRange containing ONLY
      * one subrange, so that is includes {v}
      * @param v
      */
-    public void expand(String v) {
 
-        if (ranges.size() != 1) {
-            logger.debug("This method cannot be called" +
-                    "for RDFLiteralRange ranges with " +
-                    "more than one subrange.");
+    public void expand(Value v) {
+
+        if (v instanceof Literal)
+        {
+            Literal l = (Literal)v;
+            URI type = l.getDatatype();
+
+            if (ranges.containsKey(type)) {
+                if (type.equals(XMLSchema.INTEGER)) {
+                    Range<Integer> r =  (Range<Integer>) ranges.get(l.getDatatype());
+                    r.expand(l.intValue());
+                } else if (type.equals(XMLSchema.DATETIME)) {
+                    Range<Date> r =  (Range<Date>) ranges.get(l.getDatatype());
+                    r.expand(l.calendarValue().toGregorianCalendar().getTime());
+                }
+            } else {
+                // FIXME: add a new range for that type.
+                throw new NotImplementedException();
+            }
         }
-
-        URI valueType = ValueFactoryImpl.getInstance().createURI("http://uri");
-        RangeLength<?> range = null;
-        for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
-
-           valueType = entry.getKey();
-           range = entry.getValue();
-        }
-
-        if (valueType.equals(XMLSchema.INTEGER)) {
-
-            assert ((IntervalRange) range) != null;
-            ((IntervalRange) range).expand(v);
-        } else if (valueType.equals(XMLSchema.LONG)) {
-
-            assert ((IntervalRange) range) != null;
-            ((IntervalRange) range).expand(v);
-        } else if (valueType.equals(XMLSchema.STRING)) {
-
-            assert ((PrefixRange) range) != null;
-            ((PrefixRange) range).expand(v);
-        } else if (valueType.equals(XMLSchema.DATETIME)) {
-
-            assert ((CalendarRange) range) != null;
-            ((CalendarRange) range).expand(v);
-
-        }
-
-
     }
 
     /*
