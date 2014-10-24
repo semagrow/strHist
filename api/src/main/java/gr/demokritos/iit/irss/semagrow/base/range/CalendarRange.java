@@ -2,6 +2,8 @@ package gr.demokritos.iit.irss.semagrow.base.range;
 
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -15,6 +17,8 @@ import java.util.GregorianCalendar;
  * Created by efi on 16/7/2014.
  */
 public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange> {
+
+    static final Logger logger = LoggerFactory.getLogger(CalendarRange.class);
 
     private Date begin;
     private Date end;
@@ -95,7 +99,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
             if (date.compareTo(begin) < 0) begin = date;
             else if (date.compareTo(end) > 0) end = date;
         } else
-            System.err.println("Date Format Error.");
+            logger.debug("Date Format Error.");
     }
 
     //Tested
@@ -138,7 +142,6 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
         //Scenario 1: participant contains bucket
         // in this dimension
         if (calendarRange.contains(this)) {
-            System.out.println("boom");
             return new CalendarRange(dummyDate, dummyDate);
         }
         //Scenario 2: bucket encloses participant range

@@ -1,5 +1,14 @@
 package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
+import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.base.Stat;
+import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
+import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -9,14 +18,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
-import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
-import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.base.Stat;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-
 public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializable {
+
+    static final Logger logger = LoggerFactory.getLogger(RDFQueryRecord.class);
 
 	// Contains the Query's signature elements.
 	private LogQuery logQuery;
@@ -34,8 +38,6 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 	 * Returns a Rectangle over the Query.
 	 */
 	public RDFRectangle getRectangle() {
-
-		System.out.println("SIZE: "+logQuery.getQueryStatements().size());
 		
 		PrefixRange subjectRange = getSubjectRange(logQuery.getQueryStatements().get(0));
 
@@ -100,8 +102,8 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 						
 						if (dateLow != null && dateHigh != null)
 							objectRange = new RDFLiteralRange(dateLow, dateHigh);
-						else 
-							System.err.println("Date Format Error.");
+						else
+                            logger.debug("Date Format Error.");
 					}				
 					
 				} else if (qf.getFilterType().equals("Regex")) {// Filter: Regex -> Plain Literal or URL
@@ -110,7 +112,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 				
 			} else {
 				objectRange = new RDFLiteralRange();
-				System.err.println("Empty Object");
+                logger.debug("Empty Object");
 				//TODO: Apeiro Object. 
 				// Xtypaei nullpointerexception giati ston keno constructor tou RDFLiteralRange
 				// den dinetai timi sti metavliti range i ipoia xrisimopoieitai stin toString
@@ -134,8 +136,8 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 				
 				if (date != null)
 					objectRange = new RDFLiteralRange(date, date);
-				else 
-					System.err.println("Date Format Error.");
+				else
+                    logger.debug("Date Format Error.");
 			}
 			
 		} else {// Plain Literal or URL

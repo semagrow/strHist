@@ -1,30 +1,28 @@
 package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
-import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
-import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
-import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
+import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
+import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import org.openrdf.model.Value;
+import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openrdf.model.Value;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.XMLSchema;
-
 public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializable {
+
+    static final Logger logger = LoggerFactory.getLogger(RDFQueryResult.class);
 
 	private ArrayList<BindingSet> bindingSets;
 	// Query's statements stored for Cardinality estimation
@@ -57,8 +55,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 		// First check if all const variables of the query exist in rectangle.
 		// If not, then cardinality is surely 0.
 		if (areConstContained(rect)) {
-			System.err.println("BindingSet Size: " + bindingSets.size());
-			
+
 			for (BindingSet bs : bindingSets) {				
 
                 boolean contained = true;
@@ -131,8 +128,8 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 									    objectDateSet.add(date);
 									
 									break;								
-								} else 
-									System.err.println("Date Format Error at: " + getClass().getName());
+								} else
+									logger.debug("Date Format Error at: " + getClass().getName());
 								
 							}// if	
 							
@@ -171,7 +168,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 			}// for
 		}// if
 		else
-			System.err.println("Not all query's const variables exist in Rectangle");	
+			logger.debug("Not all query's const variables exist in Rectangle");
 		
 		// Subject distinct count				 
 		distinctCount.add(prefixSet.isEmpty() ? 1 : (long)prefixSet.size()); 
@@ -272,7 +269,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 								
 								break;								
 							} else 
-								System.err.println("Date Format Error at: " + getClass().getName());
+								logger.debug("Date Format Error at: " + getClass().getName());
 							
 						}// if	
 						
@@ -312,7 +309,6 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 		Matcher m = r.matcher(string);
 
 		if (m.find()) {
-			System.err.println("MATCH");
 			string = string.replace(m.group(0), "");
 		}
 
@@ -374,7 +370,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
         //Get variables
         int cnt = 0;
         List<Integer> types = new ArrayList<Integer>();
-        System.out.println("BindingSet size : " + bindingSets.size());
+       logger.debug("BindingSet size : " + bindingSets.size());
         if (!bindingSets.isEmpty()) {
 
             for (Binding b : bindingSets.get(0).getBindings()) {
@@ -427,7 +423,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                     }
                     break;
                 default:
-                    System.err.println("Not a valid Binding.");
+                    logger.debug("Not a valid Binding.");
                     break;
             }
 
@@ -496,7 +492,6 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 
                     if (curRectangleIdx != subjectRanges.size() - 1) {
 
-                        System.out.println("Subject value: " + value);
                         //todo: value is empty
                         prefixList = new ArrayList<String>();
                         prefixList.add(value);
@@ -553,7 +548,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                                 if (dateLow != null && dateHigh != null)
                                     objectRanges.add(new RDFLiteralRange(dateLow, dateHigh));
                                 else
-                                    System.err.println("Date Format Error.");
+                                    logger.debug("Date Format Error.");
                             }
                         } else if (!value.contains("^^") && value.contains("http://")) {// URL
                             //todo: do i need this check above as well?
