@@ -16,7 +16,7 @@ public class QueryResultObservingIteration extends ObservingIteration<BindingSet
 
     private QueryResultHandler handler;
 
-    private boolean initialized = false;
+    private boolean initialized2 = false;
 
     public QueryResultObservingIteration(QueryResultHandler handler, Iteration<BindingSet,QueryEvaluationException> iter) {
         super(iter);
@@ -29,9 +29,10 @@ public class QueryResultObservingIteration extends ObservingIteration<BindingSet
 
         try {
 
-            if (!initialized)
+            if (!initialized2) {
                 handler.startQueryResult(new ArrayList<String>(bindings.getBindingNames()));
-
+                initialized2 = true;
+            }
             handler.handleSolution(bindings);
 
         } catch(Exception e) {
@@ -47,7 +48,7 @@ public class QueryResultObservingIteration extends ObservingIteration<BindingSet
         super.handleClose();
 
         try {
-            if (initialized)
+            if (initialized2)
                 handler.endQueryResult();
         } catch (TupleQueryResultHandlerException e) {
             throw new QueryEvaluationException(e);

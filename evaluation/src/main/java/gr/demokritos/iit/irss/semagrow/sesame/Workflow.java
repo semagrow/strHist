@@ -69,7 +69,7 @@ public class Workflow {
     static public void main(String[] args) throws RepositoryException, IOException {
         OptionParser parser = new OptionParser("s:e:l:t:a:");
         OptionSet options = parser.parse(args);
-
+        
         if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l")
                 && options.hasArgument("t") && options.hasArgument("a")) {
 
@@ -98,7 +98,7 @@ public class Workflow {
             path = Paths.get(logFolder, "semagrow_log_" + date + ".log");
 
             // Query triple stores and get feedback.
-//            Repository repo = getFedRepository(getRepository(date));
+            Repository repo = getFedRepository(getRepository(date));
 //            queryTripleStores(repo, date);
 
             // Parse feedback logs.
@@ -108,17 +108,17 @@ public class Workflow {
             STHolesHistogram histogram = refineHistogram(listQueryRecords, date);
 
             // Execute test queries on triple store and refined histogram.
-//            execTestQueries(repo, histogram, date);
+            execTestQueries(repo, histogram, date);
         }
     }
 
     private static void queryTripleStores(Repository repo, int date) throws RepositoryException, IOException {
         RepositoryConnection conn;
         int term = 0;
-        logger.info("Starting quering triples store: " + date);
+        logger.debug("Starting quering triples store: " + date);
             // For now loop for some agroTerms
             for (int j=0; j<200; j++) {
-                logger.info(term + " -- " + agroTerms.get(term));
+                logger.debug(term + " -- " + agroTerms.get(term));
                 try {
                     conn = repo.getConnection();
 
@@ -141,9 +141,9 @@ public class Workflow {
         STHolesHistogram histogram = loadPreviousHistogram(logFolder, date);
 
         if (listQueryRecords.size() > 0) {
-            logger.info("Refining histogram " + date);
+            logger.debug("Refining histogram " + date);
             histogram.refine(listQueryRecords);
-            logger.info("Refinement is over.");
+            logger.debug("Refinement is over.");
         }
         else logger.debug("No query records. No histogram refinement.");
 
@@ -156,7 +156,7 @@ public class Workflow {
                                         STHolesHistogram<RDFRectangle> histogram,
                                         int date) throws RepositoryException, IOException {
         RepositoryConnection conn;
-        logger.info("Executing test queries of: " + date);
+        logger.debug("Executing test queries of: " + date);
         Path path = Paths.get(logFolder, "results.csv");
         BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
         bw.write("Date, Q, QYear, Act, Est");
@@ -197,7 +197,7 @@ public class Workflow {
                                       STHolesHistogram<RDFRectangle> histogram,
                                       String query) {
         try {
-            logger.info("Cardinality estimation on Histogram for query: " + query);
+            logger.debug("Cardinality estimation on Histogram for query: " + query);
             ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, query, "http://example.org/");
             long card = new CardinalityEstimatorImpl(histogram).
                     getCardinality(q.getTupleExpr(), EmptyBindingSet.getInstance());
@@ -214,7 +214,7 @@ public class Workflow {
     private static long execTripleStore(RepositoryConnection conn, String query) {
         try {
 
-            logger.info("Cardinality estimation on Triple Store for query: " + query);
+            logger.debug("Cardinality estimation on Triple Store for query: " + query);
             ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, query, "http://example.org/");
             long card = new ActualCardinalityEstimator(conn).
                     getCardinality(q.getTupleExpr(), EmptyBindingSet.getInstance());
@@ -238,12 +238,12 @@ public class Workflow {
 
     private static void consumeIteration(Iteration<BindingSet,QueryEvaluationException> iter) throws QueryEvaluationException {
     	int n = 0;
+        logger.debug("Consuming items.");
         while (iter.hasNext()) {
             iter.next();
             ++n;
-            logger.info("Item consumed.");
         }
-        logger.info("Iterated over " + n + " items." );
+        logger.debug("Iterated over " + n + " items." );
         Iterations.closeCloseable(iter);
     }
 
@@ -266,17 +266,17 @@ public class Workflow {
     }
 
     private static void serializeHistogram(STHolesHistogram histogram, String path, int date) {
-        logger.info("Serializing histogram to JSON in : " + logFolder + "histJSON_" + date + ".txt");
+        logger.debug("Serializing histogram to JSON in : " + logFolder + "histJSON_" + date + ".txt");
         new JSONSerializer(histogram, logFolder + "histJSON_" + date + ".txt");
-        logger.info("Serializing histogram to VOID in : " + logFolder + "histVOID_" + date + ".txt");
+        logger.debug("Serializing histogram to VOID in : " + logFolder + "histVOID_" + date + ".txt");
         new VoIDSerializer("application/x-turtle", logFolder + "histVOID_" + date + ".ttl").serialize(histogram);
     }
 
     private static STHolesHistogram loadPreviousHistogram(String logFolder, int date) {
         if (date == startDate)
-            logger.info("Creating a new histogram.");
+            logger.debug("Creating a new histogram.");
         else
-            logger.info("Deserializing histogram: " + (date - 1));
+            logger.debug("Deserializing histogram: " + (date - 1));
 
         return (date == startDate)
                 ? new STHolesHistogram<RDFRectangle>()

@@ -223,7 +223,11 @@ public class LogParser {
 		    split = string.split("\\r?\\n");
 
 		lq.setSessionId(split[0]);
-		lq.setStartTime(Long.parseLong(split[1]));
+//        try {
+            lq.setStartTime(Long.parseLong(split[1]));
+//        } catch (NumberFormatException e) {
+//            e.printStackTrace();
+//            lq.setStartTime(-1);}
 		lq.setSparqlEndpoint(split[2]);
 	}// processOne
 	

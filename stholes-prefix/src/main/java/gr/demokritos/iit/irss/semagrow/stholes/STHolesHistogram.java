@@ -84,8 +84,11 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         getEnclosingBuckets(rec, b, enclosingBuckets);
 
         for (STHolesBucket<R> enclosingB : enclosingBuckets) {
-
-            est += enclosingB.getEstimate(rec);
+            long bucketEstimation = enclosingB.getEstimate(rec);
+            est += bucketEstimation;
+            logger.debug("Enclosing  " + enclosingB.toString());
+            logger.debug("Estimated triples: [" + bucketEstimation + "]");
+            logger.debug("Current estimation sum: [" + est + "]");
         }
 
         return est;
@@ -116,12 +119,12 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
     public void refine(Iterable<? extends QueryRecord<R,Stat>> workload) {
 
-        logger.info("Number of buckets before refine: " + bucketsNum);
+        logger.debug("Number of buckets before refine: " + bucketsNum);
 
         for (QueryRecord<R,Stat> qfr : workload)
             refine(qfr);
 
-        logger.info("Number of buckets after refine: " + bucketsNum);
+        logger.debug("Number of buckets after refine: " + bucketsNum);
     }
 
     /**
@@ -194,8 +197,8 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         }
 
         // check if histogram must be compacted after refinement
-        logger.info("Histogram refined with query: " + queryRecord.getQuery());
-        logger.info("Compacting histogram.");
+        logger.debug("Histogram refined with query: " + queryRecord.getQuery());
+        logger.debug("Compacting histogram.");
         compact();
     }
 
@@ -431,9 +434,9 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
              STHolesBucket<R> bn = bestMerge.getBn();
 
             STHolesBucket.merge(b1, b2, bn, this);
-            logger.info(bestMerge.toString());
-            logger.info("Number of PC merges: " + pcMergesNum);
-            logger.info("Number of SS merges: " + ssMergesNum);
+            logger.debug("Bert merge info: " + bestMerge.toString());
+            logger.debug("Number of PC merges: " + pcMergesNum);
+            logger.debug("Number of SS merges: " + ssMergesNum);
             bucketsNum -= 1;
         }
     }

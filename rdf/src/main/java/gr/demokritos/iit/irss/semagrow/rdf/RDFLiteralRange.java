@@ -13,8 +13,9 @@ import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.XMLSchema;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.crypto.dsig.XMLSignContext;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,11 +24,9 @@ import java.util.Map;
 /**
  * Created by angel on 7/15/14.
  */
-public class RDFLiteralRange
-        implements RangeLength<Value>, Rangeable<RDFLiteralRange>
-{
+public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteralRange> {
 
-
+    static final Logger logger = LoggerFactory.getLogger(RDFLiteralRange.class);
 
     private Map<URI,RangeLength<?>> ranges = new HashMap<URI, RangeLength<?>>();
    // private URI valueType;
@@ -138,7 +137,7 @@ public class RDFLiteralRange
         RDFLiteralRange res = null;
 
         if (literalRange.ranges.size() != 1) {
-            System.err.println("Argument should be a " +
+            logger.debug("Argument should be a " +
                     "range of single type");
             return null;
         }
@@ -198,7 +197,7 @@ public class RDFLiteralRange
 
         if (literalRange.ranges.size() != 1
                 || ranges.size() != 1) {
-            System.err.println("Argument should be a " +
+            logger.debug("Argument should be a " +
                     "range of single type");
             return res;
         }
@@ -294,7 +293,7 @@ public class RDFLiteralRange
 
 
         if (literalRange.ranges.size() != 1) {
-            System.err.println("Argument should be a " +
+            logger.debug("Argument should be a " +
                     "range of single type");
             return false;
         }
@@ -344,7 +343,7 @@ public class RDFLiteralRange
         if (infinite) return true;
 
         if (literalRange.ranges.size() != 1) {
-            System.err.println("Argument should be a " +
+            logger.debug("Argument should be a " +
                     "range of single type");
             return false;
         }
@@ -394,7 +393,7 @@ public class RDFLiteralRange
 
 
         if (literalRange.ranges.size() != 1) {
-            System.err.println("Argument should be a " +
+            logger.debug("Argument should be a " +
                     "range of single type");
             return null;
         }
@@ -497,10 +496,8 @@ public class RDFLiteralRange
      * one subrange, so that is includes {v}
      * @param v
      */
-    public void expand(Value v) {
 
-        URI valueType = ValueFactoryImpl.getInstance().createURI("http://uri");
-        RangeLength<?> range = null;
+    public void expand(Value v) {
 
         if (v instanceof Literal)
         {
@@ -554,7 +551,7 @@ public class RDFLiteralRange
         if (infinite) return Integer.MAX_VALUE;
 
         if (ranges.size() != 1) {
-            System.err.println("This method cannot be called" +
+            logger.debug("This method cannot be called" +
                     "for RDFLiteralRange ranges with " +
                     "more than one subrange.");
             return 0;
@@ -580,7 +577,7 @@ public class RDFLiteralRange
     public boolean hasSameType(RDFLiteralRange literalRange) {
 
         if (literalRange.ranges.size() != 1 || ranges.size() != 1) {
-            System.err.println("This method cannot be called" +
+            logger.debug("This method cannot be called" +
                     "for RDFLiteralRange ranges with " +
                     "more than one subrange " +
                     "and argument should be a " +
