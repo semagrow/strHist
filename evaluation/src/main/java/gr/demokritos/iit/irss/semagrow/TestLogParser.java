@@ -15,13 +15,16 @@ public class TestLogParser {
 
     static final Logger logger = LoggerFactory.getLogger(TestLogParser.class);
 
-    public static void main(String[] args) throws FileNotFoundException, IOException, QueryLogException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, QueryLogException, ClassNotFoundException {
 
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
-        Collection<RDFQueryLogRecordSerialWrapper> seriaLogs = new LinkedList<RDFQueryLogRecordSerialWrapper>();
+        Collection<SerialQueryLogRecord> seriaLogs = new LinkedList<SerialQueryLogRecord>();
         QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
 
-        RDFQueryLogParser parser = new RDFQueryLogParser(handler);
+        //QueryLogParser parser = new RDFQueryLogParser();
+        QueryLogParser parser = new SerialQueryLogParser();
+
+        parser.setQueryRecordHandler(handler);
 
 
         File f = new File("/home/nickozoulis/semagrow/test_rdf_log");
@@ -40,20 +43,6 @@ public class TestLogParser {
             logger.info("Binding names: " + queryRecord.getBindingNames().toString());
         }
 
-    }
-
-    private static Collection<RDFQueryLogRecordSerialWrapper> readSerialObject(String path) throws IOException, ClassNotFoundException{
-        Collection<RDFQueryLogRecordSerialWrapper> seriaLogs;
-
-        ObjectInputStream iis = new ObjectInputStream(new FileInputStream(path));
-        seriaLogs = (Collection<RDFQueryLogRecordSerialWrapper>)iis.readObject();
-
-        return seriaLogs;
-    }
-
-    private static void writeSerialObject(Collection<RDFQueryLogRecordSerialWrapper> seriaLogs, String path) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path));
-        oos.writeObject(seriaLogs);
     }
 
 }

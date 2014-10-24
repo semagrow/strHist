@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
+import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.query.algebra.*;
@@ -13,15 +14,15 @@ import java.util.UUID;
 /**
  * Created by nickozoulis on 24/10/2014.
  */
-public class RDFQueryLogRecordSerialWrapper implements Serializable {
+public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
 
     private static final long serialVersionUID = 2159354069707133543L;
 
     private transient QueryLogRecord queryLogRecord;
 
-    public RDFQueryLogRecordSerialWrapper(){}
+    public SerialQueryLogRecord(){}
 
-    public RDFQueryLogRecordSerialWrapper(QueryLogRecord queryLogRecord) {
+    public SerialQueryLogRecord(QueryLogRecord queryLogRecord) {
         this.queryLogRecord = queryLogRecord;
     }
 
@@ -38,7 +39,6 @@ public class RDFQueryLogRecordSerialWrapper implements Serializable {
 
         // TODO: out.writeObject(queryLogRecord.getResult());
     }
-
 
     private static void writeTupleExpr(java.io.ObjectOutputStream out, TupleExpr query) throws IOException {
         if (query instanceof Projection) {
@@ -96,4 +96,63 @@ public class RDFQueryLogRecordSerialWrapper implements Serializable {
         return queryLogRecord;
     }
 
+    @Override
+    public URI getEndpoint() {
+        return getQueryLogRecord().getEndpoint();
+    }
+
+    @Override
+    public TupleExpr getQuery() {
+        return getQueryLogRecord().getQuery();
+    }
+
+    @Override
+    public UUID getSession() {
+        return getQueryLogRecord().getSession();
+    }
+
+    @Override
+    public List<String> getBindingNames() {
+        return getQueryLogRecord().getBindingNames();
+    }
+
+    @Override
+    public void setCardinality(long card) {
+        getQueryLogRecord().setCardinality(card);
+    }
+
+    @Override
+    public long getCardinality() {
+        return getQueryLogRecord().getCardinality();
+    }
+
+    @Override
+    public void setDuration(long start, long end) {
+        getQueryLogRecord().setDuration(start,end);
+    }
+
+    @Override
+    public void setResults(MaterializationHandle handle) {
+        getQueryLogRecord().setResults(handle);
+    }
+
+    @Override
+    public Date getStartTime() {
+        return getQueryLogRecord().getStartTime();
+    }
+
+    @Override
+    public Date getEndTime() {
+        return getQueryLogRecord().getEndTime();
+    }
+
+    @Override
+    public long getDuration() {
+        return getQueryLogRecord().getDuration();
+    }
+
+    @Override
+    public MaterializationHandle getResults() {
+        return getQueryLogRecord().getResults();
+    }
 }
