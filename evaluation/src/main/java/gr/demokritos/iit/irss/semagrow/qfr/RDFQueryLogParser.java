@@ -2,7 +2,6 @@ package gr.demokritos.iit.irss.semagrow.qfr;
 
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.QFR;
 import org.openrdf.model.*;
-import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
@@ -10,14 +9,11 @@ import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.QueryParserUtil;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
-import org.openrdf.rio.ntriples.NTriplesParser;
-import org.openrdf.rio.ntriples.NTriplesParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -71,7 +67,7 @@ public class RDFQueryLogParser implements QueryLogParser {
         long cardinality = parseCardinality(model.filter(qr, QFR.CARDINALITY, null).objectLiteral(), model);
         TupleExpr expr = parseQuery(model.filter(qr, QFR.QUERY, null).objectValue(), model);
 
-        QueryLogRecord r = new QueryLogRecordImpl(null, endpoint, expr, null);
+        QueryLogRecord r = new QueryLogRecordImpl(null, endpoint, expr, Collections.<String>emptyList());
 
         //r.setDuration(startTime, endTime);
 
@@ -92,7 +88,7 @@ public class RDFQueryLogParser implements QueryLogParser {
         if (literal instanceof Literal) {
             String queryString = ((Literal)literal).stringValue();
             try {
-                ParsedQuery query = QueryParserUtil.parseQuery(QueryLanguage.SPARQL, queryString, "");
+                ParsedQuery query = QueryParserUtil.parseQuery(QueryLanguage.SPARQL, queryString, "http://www.iamabsoluteuri.com");
                 return query.getTupleExpr();
             } catch (MalformedQueryException e) {
                 return null;

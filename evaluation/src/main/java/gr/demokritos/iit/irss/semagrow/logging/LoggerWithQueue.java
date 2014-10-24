@@ -17,8 +17,7 @@ public class LoggerWithQueue implements Runnable {
 
 	BlockingQueue<Object> queue;
 	private Boolean finished;
-	
-//	static final Path path = Paths.get("/home/nickozoulis/strhist_exp_logs/", "semagrow_logs.log");
+
 	static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
 	private BufferedWriter writer;
 
