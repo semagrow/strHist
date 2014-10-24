@@ -142,7 +142,7 @@ public class Workflow {
 
         if (listQueryRecords.size() > 0) {
             logger.debug("Refining histogram " + date);
-            histogram.refine(listQueryRecords);
+            histogram.refine(listQueryRecords.iterator());
             logger.debug("Refinement is over.");
         }
         else logger.debug("No query records. No histogram refinement.");

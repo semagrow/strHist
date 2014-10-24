@@ -39,9 +39,9 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
 
 
     public RDFLiteralRange() {
-
         infinite = true;
     }
+
     public RDFLiteralRange(URI valueType, RangeLength<?> range) {
 
         this.ranges.put(valueType, range);

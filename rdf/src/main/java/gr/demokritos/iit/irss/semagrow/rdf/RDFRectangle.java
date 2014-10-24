@@ -214,7 +214,6 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         System.out.println(rect.isInfinite());
     }
 
-
     public RDFLiteralRange getObjectRange() {
         return objectRange;
     }

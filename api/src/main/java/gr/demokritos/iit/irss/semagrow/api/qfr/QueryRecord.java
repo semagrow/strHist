@@ -8,6 +8,7 @@ import gr.demokritos.iit.irss.semagrow.api.Rectangle;
  */
 public interface QueryRecord<R extends Rectangle<R>,S> {
 
+    @Deprecated
     String getQuery();
 
     R getRectangle();

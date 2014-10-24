@@ -30,7 +30,7 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
         bucketsNum += bucketsNum;
     }
 
-    public STHolesOrigHistogram(Iterable<QueryRecord<R,Long>> workload) {
+    public STHolesOrigHistogram(Iterator<QueryRecord<R,Long>> workload) {
         this();
         refine(workload);
     }
@@ -52,10 +52,10 @@ public class STHolesOrigHistogram<R extends RectangleWithVolume<R>> implements S
 
 
 
-    public void refine(Iterable<? extends QueryRecord<R,Long>> workload) {
+    public void refine(Iterator<? extends QueryRecord<R,Long>> workload) {
 
-        for (QueryRecord<R,Long> qfr : workload)
-            refine(qfr);
+        while (workload.hasNext())
+            refine(workload.next());
 
         System.out.println(bucketsNum);
         for (STHolesOrigBucket<R> bc : root.getChildren()) {
