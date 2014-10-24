@@ -28,7 +28,7 @@ public class PrefixRange
 	}
 
     //Tested
-	public boolean contains(String item) {
+	public boolean includes(String item) {
 
         if (infinite) return true;
 
@@ -127,7 +127,7 @@ public class PrefixRange
 
         for (String p : prefixRange.prefixList ) {
 
-            if (!this.contains(p)) {
+            if (!this.includes(p)) {
 
                 prefixListN.add(p);
             }
@@ -293,14 +293,14 @@ public class PrefixRange
         PrefixRange myRange = new PrefixRange(myRangePrefixList);
         String item1 = "http://a/b/c/d";
         String item2 = "http://b/c";
-        boolean res1 = myRange.contains(item1);
-        boolean res2 = myRange.contains(item2);
+        boolean res1 = myRange.includes(item1);
+        boolean res2 = myRange.includes(item2);
 
         // Test getters
         System.out.println("My range is " + myRange.getPrefixList());
-        //Test contains item method
+        //Test includes item method
         if (res1)
-            System.out.println("My range contains " + item1);
+            System.out.println("My range includes " + item1);
         else
             System.out.println("Test failed");
 
@@ -308,7 +308,7 @@ public class PrefixRange
             System.out.println("My range does not contain " + item2);
         else
             System.out.println("Test failed");
-        //Test contains range method
+        //Test includes range method
         ArrayList<String> testRange1PrefixList = new ArrayList<String>();
         ArrayList<String> testRange2PrefixList = new ArrayList<String>();
         testRange1PrefixList.add("http://a/b");
@@ -319,9 +319,9 @@ public class PrefixRange
         res1 = myRange.contains(testRange1);
         res2 = myRange.contains(testRange2);
 
-        System.out.println("Range " + myRange.toString() + " contains range "
+        System.out.println("Range " + myRange.toString() + " includes range "
                 + testRange1.toString() + ": " + res1);
-        System.out.println("Range " + myRange.toString() + " contains range "
+        System.out.println("Range " + myRange.toString() + " includes range "
                 + testRange2.toString() + ": " + res2);
 
         //Test intersection method

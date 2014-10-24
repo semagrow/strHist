@@ -80,12 +80,12 @@ public class NumericalMapper {
     }// loadIndex
 
 
-    public IntervalRange<Integer> getMapping(String string, boolean isPrefix) {
+    public IntervalRange getMapping(String string, boolean isPrefix) {
         return isPrefix ? getPrefixRange(string) : getSubjectRow(string);
     }
 
 
-    private IntervalRange<Integer> getPrefixRange(String prefix)  {
+    private IntervalRange getPrefixRange(String prefix)  {
 
         int startRange = -1, endRange = -1;
 
@@ -100,11 +100,11 @@ public class NumericalMapper {
              }
         }
 
-        return new IntervalRange<Integer>(startRange, endRange);
+        return new IntervalRange(startRange, endRange);
     }// getPrefixRange
 
 
-    private IntervalRange<Integer> getSubjectRow(String subject) {
+    private IntervalRange getSubjectRow(String subject) {
 
           int row = index.get(subject);
           return new IntervalRange(row, row);

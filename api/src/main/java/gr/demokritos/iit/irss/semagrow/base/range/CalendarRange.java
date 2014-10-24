@@ -25,7 +25,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
     }
 
     //Tested
-    public boolean contains(Date date) {
+    public boolean includes(Date date) {
 
         return ((begin.compareTo(date)) <= 0) &&
                 ((date.compareTo(end)) <= 0);
@@ -135,7 +135,7 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
 
         Date dummyDate = new Date();
 
-        //Scenario 1: participant contains bucket
+        //Scenario 1: participant includes bucket
         // in this dimension
         if (calendarRange.contains(this)) {
             System.out.println("boom");

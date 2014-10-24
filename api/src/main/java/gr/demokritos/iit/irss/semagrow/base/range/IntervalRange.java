@@ -12,7 +12,7 @@ import static java.lang.Math.min;
  * Defines a set of numbers that lies on an interval
  * Created by angel on 7/12/14.
  */
-public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<IntervalRange>, Serializable {
+public class IntervalRange implements RangeLength<Integer>, Rangeable<IntervalRange>, Serializable {
 
     //todo: maybe replace int with long
     private int low;
@@ -24,10 +24,10 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         this.high = high;
     }
 
-    // Tested
-    public boolean contains(int item) {
+    public boolean includes(Integer item) {
         return (item >= low) && (item <= high);
     }
+
 
     //Tested
     public boolean contains(IntervalRange range) {
@@ -87,7 +87,7 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         int lowN = low;
         int highN = high;
 
-        //Scenario 1: participant contains bucket
+        //Scenario 1: participant includes bucket
         // in this dimension
         if (intervalRange.contains(this)) {
 
@@ -173,15 +173,15 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
         IntervalRange myRange = new IntervalRange(1,6);
         int item1 = 3;
         int item2 = 7;
-        boolean res1 = myRange.contains(item1);
-        boolean res2 = myRange.contains(item2);
+        boolean res1 = myRange.includes(item1);
+        boolean res2 = myRange.includes(item2);
 
         // Test getters
         System.out.println("My range is (" + myRange.getLow() + "," +
                 myRange.getHigh() + ")");
-        //Test contains item method
+        //Test includes item method
         if (res1)
-            System.out.println("My range contains " + item1);
+            System.out.println("My range includes " + item1);
         else
             System.out.println("Test failed");
 
@@ -189,16 +189,16 @@ public class IntervalRange<Integer> implements RangeLength<Integer>, Rangeable<I
             System.out.println("My range does not contain " + item2);
         else
             System.out.println("Test failed");
-        //Test contains range method
+        //Test includes range method
         IntervalRange testRange1 = new IntervalRange(3,5);
         IntervalRange testRange2 = new IntervalRange(1,8);
 
         res1 = myRange.contains(testRange1);
         res2 = myRange.contains(testRange2);
 
-        System.out.println("Range " + myRange.toString() + "contains range "
+        System.out.println("Range " + myRange.toString() + "includes range "
                 + testRange1.toString() + ":" + res1);
-        System.out.println("Range " + myRange.toString() + "contains range "
+        System.out.println("Range " + myRange.toString() + "includes range "
                 + testRange2.toString() + ":" + res2);
 
         //Test intersection method

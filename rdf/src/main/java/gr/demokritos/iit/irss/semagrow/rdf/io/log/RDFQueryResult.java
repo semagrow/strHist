@@ -1,7 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.rdf.io.log;
 
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
-import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
@@ -73,13 +72,13 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 //					System.out.println(">>>" + value);
 					switch (type) {
 					case 0:		// Subjects
-						if (! ((PrefixRange) rect.getRange(type)).contains(value))
+						if (! ((PrefixRange) rect.getRange(type)).includes(value))
 							contained = false;
 						else
 						    prefixSet.add(value);
 						break;
 					case 1:		// Predicates
-						if (!((ExplicitSetRange) rect.getRange(type)).contains(value))
+						if (!((ExplicitSetRange<String>) rect.getRange(type)).includes(value))
 							contained = false;
 						else
 						    predicateSet.add(value);
@@ -100,7 +99,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 								val = ValueFactoryImpl.getInstance()
 										.createLiteral(valueURI, XMLSchema.INTEGER);
 
-                                if (!((RDFLiteralRange) rect.getRange(type)).contains(val))
+                                if (!((RDFLiteralRange) rect.getRange(type)).includes(val))
                                     contained = false;
                                 else
 								    objectIntegerSet.add(Integer.parseInt(valueURI));
@@ -108,7 +107,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 							} else if (typeURI.equals("long")) {
 								val = ValueFactoryImpl.getInstance()
 										.createLiteral(valueURI, XMLSchema.LONG);
-                                if (!((RDFLiteralRange) rect.getRange(type)).contains(val))
+                                if (!((RDFLiteralRange) rect.getRange(type)).includes(val))
                                     contained = false;
 								else
                                     objectLongSet.add(Long.parseLong(valueURI));
@@ -140,7 +139,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 							val = ValueFactoryImpl.getInstance()
 									.createURI(value);
 
-                            if (!((RDFLiteralRange) rect.getRange(type)).contains(val))
+                            if (!((RDFLiteralRange) rect.getRange(type)).includes(val))
                                 contained = false;
                             else
 							    objectStringSet.add(value);
@@ -149,7 +148,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 							val = ValueFactoryImpl.getInstance()
 									.createLiteral(value, XMLSchema.STRING);
 
-                            if (!((RDFLiteralRange) rect.getRange(type)).contains(val))
+                            if (!((RDFLiteralRange) rect.getRange(type)).includes(val))
                                 contained = false;
 							else
                                 objectStringSet.add(value);
@@ -230,10 +229,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 				
 				switch (i) {
 				case 0:
-					//b = b && ((PrefixRange) rect.getRange(i)).contains(value);
+					//b = b && ((PrefixRange) rect.getRange(i)).includes(value);
 					break;
 				case 1:
-					b = b && ((ExplicitSetRange) rect.getRange(i)).contains(value);					
+					b = b && ((ExplicitSetRange<String>) rect.getRange(i)).includes(value);
 					break;
 				case 2:
 					// TODO: change!
@@ -286,7 +285,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 								.createLiteral(value, XMLSchema.STRING);						
 					}					
 												
-					b = b && ((RDFLiteralRange) rect.getRange(i)).contains(val);
+					b = b && ((RDFLiteralRange) rect.getRange(i)).includes(val);
 					break;
 				}
 				

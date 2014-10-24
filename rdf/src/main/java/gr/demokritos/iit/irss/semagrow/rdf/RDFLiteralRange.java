@@ -50,11 +50,11 @@ public class RDFLiteralRange
 
     public RDFLiteralRange(int low, int high)
     {
-        this(XMLSchema.INTEGER, new IntervalRange<Integer>(low, high));
+        this(XMLSchema.INTEGER, new IntervalRange(low, high));
     }
 
     public RDFLiteralRange(long low, long high) {
-        this(XMLSchema.INTEGER, new IntervalRange<Integer>((int) low, (int) high));
+        this(XMLSchema.INTEGER, new IntervalRange((int) low, (int) high));
     }
 
     public RDFLiteralRange(String range) {
@@ -157,13 +157,13 @@ public class RDFLiteralRange
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
                     res = new RDFLiteralRange(literalValueType,
-                            ((IntervalRange<Integer>) range).intersection(
-                                    (IntervalRange<Integer>) literalrange));
+                            ((IntervalRange) range).intersection(
+                                    (IntervalRange) literalrange));
                 } else if (literalValueType.equals(XMLSchema.LONG)) {
 
                     res = new RDFLiteralRange(literalValueType,
-                            ((IntervalRange<Integer>) range).intersection(
-                                    (IntervalRange<Integer>) literalrange));
+                            ((IntervalRange) range).intersection(
+                                    (IntervalRange) literalrange));
                 } else if (literalValueType.equals(XMLSchema.STRING)) {
 
                     res = new RDFLiteralRange(literalValueType,
@@ -217,13 +217,13 @@ public class RDFLiteralRange
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
                     res = new RDFLiteralRange(literalValueType,
-                            ((IntervalRange<Integer>) range).minus(
-                                    (IntervalRange<Integer>) literalrange));
+                            ((IntervalRange) range).minus(
+                                    (IntervalRange) literalrange));
                 } else if (literalValueType.equals(XMLSchema.LONG)) {
 
                     res = new RDFLiteralRange(literalValueType,
-                            ((IntervalRange<Integer>) range).minus(
-                                    (IntervalRange<Integer>) literalrange));
+                            ((IntervalRange) range).minus(
+                                    (IntervalRange) literalrange));
                 } else if (literalValueType.equals(XMLSchema.STRING)) {
 
                     res = new RDFLiteralRange(literalValueType,
@@ -246,7 +246,7 @@ public class RDFLiteralRange
 
 
 
-	public boolean contains(Value value) {
+	public boolean includes(Value value) {
 
         if (infinite) return true;
 
@@ -260,23 +260,23 @@ public class RDFLiteralRange
 
                 if (literal.getDatatype() == valueType) {
                     if (valueType.equals(XMLSchema.INTEGER) || valueType.equals(XMLSchema.INT)) {
-                        return ((IntervalRange<Integer>) range).contains(literal.intValue());
+                        return ((IntervalRange) range).includes(literal.intValue());
 
                     } else if (valueType.equals(XMLSchema.LONG)) {
-                        return ((IntervalRange<Integer>) range).contains(literal.intValue());
+                        return ((IntervalRange) range).includes(literal.intValue());
 
                     } else if (valueType.equals(XMLSchema.STRING)) {
-                        return ((PrefixRange) range).contains(literal.stringValue());
+                        return ((PrefixRange) range).includes(literal.stringValue());
 
                     } else if (valueType.equals(XMLSchema.DATETIME)) {
                         return ((CalendarRange) range).
-                                contains(literal.calendarValue().
+                                includes(literal.calendarValue().
                                         toGregorianCalendar().getTime());
                     }
                 }
             } else if (value instanceof URI) {
                 if (range instanceof PrefixRange)
-                    return ((PrefixRange) range).contains(((URI) value).stringValue());
+                    return ((PrefixRange) range).includes(((URI) value).stringValue());
             }
         }
     		
@@ -312,12 +312,12 @@ public class RDFLiteralRange
             if (entry.getKey().equals(literalValueType)) {
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
-                    return  ((IntervalRange<Integer>) range).contains(
-                                    (IntervalRange<Integer>) literalrange);
+                    return  ((IntervalRange) range).contains(
+                                    (IntervalRange) literalrange);
                 } else if (literalValueType.equals(XMLSchema.LONG)) {
 
-                    return  ((IntervalRange<Integer>) range).contains(
-                                    (IntervalRange<Integer>) literalrange);
+                    return  ((IntervalRange) range).contains(
+                                    (IntervalRange) literalrange);
                 } else if (literalValueType.equals(XMLSchema.STRING)) {
 
                     return ((PrefixRange) range).contains(
@@ -362,12 +362,12 @@ public class RDFLiteralRange
             if (entry.getKey().equals(literalValueType)) {
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
-                    return  ((IntervalRange<Integer>) range).intersects(
-                            (IntervalRange<Integer>) literalrange);
+                    return  ((IntervalRange) range).intersects(
+                            (IntervalRange) literalrange);
                 } else if (literalValueType.equals(XMLSchema.LONG)) {
 
-                    return  ((IntervalRange<Integer>) range).intersects(
-                            (IntervalRange<Integer>) literalrange);
+                    return  ((IntervalRange) range).intersects(
+                            (IntervalRange) literalrange);
                 } else if (literalValueType.equals(XMLSchema.STRING)) {
 
                     return ((PrefixRange) range).intersects(
@@ -423,15 +423,15 @@ public class RDFLiteralRange
 
                 if (literalValueType.equals(XMLSchema.INTEGER)) {
 
-                    IntervalRange ires = ((IntervalRange<Integer>) range).tightRange(
-                            (IntervalRange<Integer>) literalrange);
+                    IntervalRange ires = ((IntervalRange) range).tightRange(
+                            (IntervalRange) literalrange);
                     RDFLiteralRange res = new RDFLiteralRange(this);
                     res.setValue(literalValueType, ires);
                     return res;
                 } else if (literalValueType.equals(XMLSchema.LONG)) {
 
-                    IntervalRange ires = ((IntervalRange<Integer>) range).tightRange(
-                            (IntervalRange<Integer>) literalrange);
+                    IntervalRange ires = ((IntervalRange) range).tightRange(
+                            (IntervalRange) literalrange);
                     RDFLiteralRange res = new RDFLiteralRange(this);
                     res.setValue(literalValueType, ires);
                     return res;
@@ -487,7 +487,7 @@ public class RDFLiteralRange
 
     /**
      * expands an RDFLiteralRange containing ONLY
-     * one subrange, so that is contains {v}
+     * one subrange, so that is includes {v}
      * @param v
      */
     public void expand(String v) {
