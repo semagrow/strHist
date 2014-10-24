@@ -16,8 +16,7 @@ import java.util.UUID;
  */
 public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
 
-    private static final long serialVersionUID = 2159354069707133543L;
-
+    private static final long serialVersionUID = 3274204530379085447L;
     private transient QueryLogRecord queryLogRecord;
 
     public SerialQueryLogRecord(){}
@@ -44,7 +43,12 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
         if (query instanceof Projection) {
             Projection proj = (Projection)query;
 
-            //TODO: Write also ProjectElemList
+            // Write projectionElemList size in order to know inside readObject()
+            // how many ProjectionElem the loop must expect.
+            out.writeObject(proj.getProjectionElemList().getElements().size());
+
+            for (ProjectionElem projElem : proj.getProjectionElemList().getElements())
+                out.writeObject(projElem.getSourceName());
 
             if (proj.getArg() instanceof StatementPattern) {
                 StatementPattern sp = (StatementPattern)proj.getArg();
@@ -65,14 +69,19 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
     }
 
     private static TupleExpr readTupleExpr(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        // The size of the ProjectionElemList
+        int size = (int)in.readObject();
+
+        ProjectionElemList projElemList = new ProjectionElemList();
+        for (int i=0; i<size; i++)
+            projElemList.addElement(new ProjectionElem((String)in.readObject()));
+
         StatementPattern sp = new StatementPattern();
         sp.setSubjectVar(new Var((String)in.readObject(), (Value)in.readObject()));
         sp.setPredicateVar(new Var((String) in.readObject(), (Value) in.readObject()));
         sp.setObjectVar(new Var((String) in.readObject(), (Value) in.readObject()));
 
-        //TODO: Read also ProjectElemList
-
-        return new Projection(sp);
+        return new Projection(sp, projElemList);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
