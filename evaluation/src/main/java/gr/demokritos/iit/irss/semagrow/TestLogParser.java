@@ -19,37 +19,18 @@ public class TestLogParser {
 
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
         Collection<RDFQueryLogRecordSerialWrapper> seriaLogs = new LinkedList<RDFQueryLogRecordSerialWrapper>();
-//        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
-//
-//        RDFQueryLogParser parser = new RDFQueryLogParser(handler);
-//
-//
-//            File f = new File("/home/nickozoulis/semagrow/test_rdf_log");
-//
-//            logger.info("Parsing file : " + f.getName());
-//
-//            parser.parseQueryLog(new FileInputStream(f));
-//
-//            logger.info("Number of parsed query logs: " + logs.size());
-//
-//            for (QueryLogRecord queryRecord : logs) {
-//                logger.info(queryRecord.getQuery().toString());
-//                logger.info("Endpoint: " + queryRecord.getEndpoint());
-//                logger.info("Cardinality: " + queryRecord.getCardinality());
-//                logger.info("Duration: " + queryRecord.getDuration());
-//                logger.info("Binding names: " + queryRecord.getBindingNames().toString());
-//
-//                seriaLogs.add(new RDFQueryLogRecordSerialWrapper(queryRecord));
-//            }
-//
-//
-//        writeSerialObject(seriaLogs, "/home/nickozoulis/semagrow/log.ser");
+        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
 
-        seriaLogs = readSerialObject("/home/nickozoulis/semagrow/log.ser");
+        RDFQueryLogParser parser = new RDFQueryLogParser(handler);
 
-        for (RDFQueryLogRecordSerialWrapper seriaLog : seriaLogs) {
-            logs.add(seriaLog.getQueryLogRecord());
-        }
+
+        File f = new File("/home/nickozoulis/semagrow/test_rdf_log");
+
+        logger.info("Parsing file : " + f.getName());
+
+        parser.parseQueryLog(new FileInputStream(f));
+
+        logger.info("Number of parsed query logs: " + logs.size());
 
         for (QueryLogRecord queryRecord : logs) {
             logger.info(queryRecord.getQuery().toString());
@@ -58,7 +39,6 @@ public class TestLogParser {
             logger.info("Duration: " + queryRecord.getDuration());
             logger.info("Binding names: " + queryRecord.getBindingNames().toString());
         }
-
 
     }
 
