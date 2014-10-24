@@ -74,10 +74,7 @@ public class ExplicitSetRange<T>
     }
 
 
-    public void expand(String v) {
-       //todo: fix me
-        items.add((T) v);
-    }
+    public void expand(T v) { items.add(v); }
 
     //Tested
     public ExplicitSetRange<T> intersection(ExplicitSetRange<T> range) {

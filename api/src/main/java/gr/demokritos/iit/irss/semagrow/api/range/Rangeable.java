@@ -15,6 +15,4 @@ public interface Rangeable<R> {
 
     R tightRange(R r);
 
-    void expand(String v);
-
 }
