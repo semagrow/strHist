@@ -16,6 +16,7 @@ import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.EmptyIteration;
 import info.aduna.iteration.Iteration;
 import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
@@ -128,7 +129,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
         if (p != null) {
             ArrayList<String> predicates = new ArrayList<String>();
-            predicates.add(s.stringValue());
+            predicates.add(p.stringValue());
             pRange = new ExplicitSetRange<String>(predicates);
         }
 
@@ -160,6 +161,9 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
     private RDFLiteralRange computeObjectRange(Var var, Collection<ValueExpr> filters) {
         //FIXME
         Collection<ValueExpr> relevantFilters = findRelevantFilters(var, filters);
+
+        Map<URI, Value> lows = new HashMap<URI,Value>();
+        Map<URI, Value> highs = new HashMap<URI,Value>();
 
         ValueExpr high = null, low = null;
 
@@ -194,8 +198,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             }
         }
         */
-
-        return null;
+        return new RDFLiteralRange();
     }
 
     private Collection<ValueExpr> findRelevantFilters(Var var, Collection<ValueExpr> filters) {

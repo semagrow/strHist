@@ -505,16 +505,27 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
             URI type = l.getDatatype();
 
             if (ranges.containsKey(type)) {
-                if (type.equals(XMLSchema.INTEGER)) {
+                if (type.equals(XMLSchema.INTEGER) || type.equals(XMLSchema.INT)) {
                     Range<Integer> r =  (Range<Integer>) ranges.get(l.getDatatype());
                     r.expand(l.intValue());
                 } else if (type.equals(XMLSchema.DATETIME)) {
                     Range<Date> r =  (Range<Date>) ranges.get(l.getDatatype());
                     r.expand(l.calendarValue().toGregorianCalendar().getTime());
+                } else {
+                    throw new NotImplementedException();
                 }
             } else {
                 // FIXME: add a new range for that type.
-                throw new NotImplementedException();
+                if (type.equals(XMLSchema.INTEGER) || type.equals(XMLSchema.INT)) {
+                    IntervalRange r = new IntervalRange(l.intValue(), l.intValue());
+                    ranges.put(type, r);
+                } else if (type.equals(XMLSchema.DATETIME)) {
+                    CalendarRange r = new CalendarRange(l.calendarValue().toGregorianCalendar().getTime(),
+                                                        l.calendarValue().toGregorianCalendar().getTime());
+                    ranges.put(type, r);
+                } else {
+                    throw new NotImplementedException();
+                }
             }
         }
     }
