@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by nickozoulis on 25/10/2014.
@@ -26,6 +28,7 @@ import java.util.List;
 public class TestQueryRecordAdapter {
 
     static final Logger logger = LoggerFactory.getLogger(TestQueryRecordAdapter.class);
+    static ExecutorService executors;
 
     public static void main(String[] args) throws IOException, QueryLogException {
 
@@ -34,8 +37,7 @@ public class TestQueryRecordAdapter {
 
         RDFQueryLogParser parser = new RDFQueryLogParser(handler);
 
-        File f = new File("/home/nickozoulis/semagrow/test_rdf_log");
-        //TODO: Na stiso query logs manually
+        File f = new File("/home/nickozoulis/semagrow/test/test_rdf_log");
 
         logger.info("Parsing file : " + f.getName());
 
@@ -45,10 +47,11 @@ public class TestQueryRecordAdapter {
 
         Iterator iter = logs.iterator();
         int i = 0;
+
+        executors = Executors.newCachedThreadPool();
+
         while (iter.hasNext()) {
             QueryLogRecord queryLogRecord = (QueryLogRecord)iter.next();
-
-//            logger.info(queryLogRecord.getQuery().toString());
 
             QueryRecord<RDFRectangle, Stat> queryRecord = new QueryRecordAdapter(queryLogRecord, getMateralizationManager());
 
@@ -56,16 +59,14 @@ public class TestQueryRecordAdapter {
 
             logger.info(rectangle.toString());
 
-
             List<RDFRectangle> rectangles = queryRecord.getResultSet().getRectangles(rectangle);
 
-            logger.info("->>"+rectangles.size());
+            logger.info("Numbers of rectangles: " + rectangles.size());
 
             if (!rectangles.isEmpty()) {
                 for (RDFRectangle rect : rectangles)
                     logger.info("getRectanglesss: " + rect.toString());
             }
-
         }
 
 
@@ -73,11 +74,11 @@ public class TestQueryRecordAdapter {
     }
 
     private static ResultMaterializationManager getMateralizationManager(){
-        File baseDir = new File("/home/nickozoulis/semagrow/");
+        File baseDir = new File("/home/nickozoulis/semagrow/test/");
         TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
 
         TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
         TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
-        return new FileManager(baseDir, writerFactory);
+        return new FileManager(baseDir, writerFactory, executors);
     }
 }

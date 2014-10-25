@@ -16,6 +16,7 @@ import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.EmptyIteration;
 import info.aduna.iteration.Iteration;
 import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
@@ -105,6 +106,9 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             if (oVal instanceof Literal) {
                 Literal oLit = (Literal)oVal;
                 oRange = new RDFLiteralRange(oLit.getDatatype(), computeObjectRange(oLit));
+            } else if (oVal instanceof URI) {
+                URI uri = (URI)oVal;
+                oRange = new RDFLiteralRange(uri.stringValue());
             }
         } else  {
             // oVal is a variable but can have filters
@@ -128,7 +132,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
         if (p != null) {
             ArrayList<String> predicates = new ArrayList<String>();
-            predicates.add(s.stringValue());
+            predicates.add(p.stringValue());
             pRange = new ExplicitSetRange<String>(predicates);
         }
 
@@ -136,6 +140,9 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             if (o instanceof Literal) {
                 Literal l = (Literal)o;
                 oRange = new RDFLiteralRange(l.getDatatype(), computeObjectRange(l));
+            } else if (o instanceof URI) {
+                URI uri = (URI)o;
+                oRange = new RDFLiteralRange(uri.stringValue());
             }
         }
 
