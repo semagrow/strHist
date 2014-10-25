@@ -1,8 +1,13 @@
 package gr.demokritos.iit.irss.semagrow;
 
+import gr.demokritos.iit.irss.semagrow.file.FileManager;
+import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.qfr.*;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
+import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,13 +77,23 @@ public class TestLogParser {
         parser.parseQueryLog(new FileInputStream(f));
         logger.info("Number of parsed query logs: " + logs.size());
 
-        for (QueryLogRecord queryRecord : logs) {
-            logger.info(queryRecord.getQuery().toString());
-            logger.info("Endpoint: " + queryRecord.getEndpoint());
-            logger.info("Cardinality: " + queryRecord.getCardinality());
-            logger.info("Duration: " + queryRecord.getDuration());
-            logger.info("Binding names: " + queryRecord.getBindingNames().toString());
+        for (QueryLogRecord queryLogRecord : logs) {
+            logger.info(queryLogRecord.getQuery().toString());
+            logger.info("Endpoint: " + queryLogRecord.getEndpoint());
+            logger.info("Cardinality: " + queryLogRecord.getCardinality());
+            logger.info("Duration: " + queryLogRecord.getDuration());
+            logger.info("Binding names: " + queryLogRecord.getBindingNames().toString());
         }
+    }
+
+
+    private static ResultMaterializationManager getMateralizationManager(){
+        File baseDir = new File("/home/nickozoulis/semagrow/");
+        TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
+
+        TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
+        TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
+        return new FileManager(baseDir, writerFactory);
     }
 
 }
