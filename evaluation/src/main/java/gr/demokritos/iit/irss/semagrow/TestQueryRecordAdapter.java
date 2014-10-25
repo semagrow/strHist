@@ -64,9 +64,17 @@ public class TestQueryRecordAdapter {
             logger.info("Numbers of rectangles: " + rectangles.size());
 
             if (!rectangles.isEmpty()) {
-                for (RDFRectangle rect : rectangles)
+                for (RDFRectangle rect : rectangles) {
                     logger.info("getRectanglesss: " + rect.toString());
+
+                    logger.info("Cardinality: " + queryRecord.getResultSet().getCardinality(rect));
+                }
             }
+
+
+
+
+
         }
 
 
