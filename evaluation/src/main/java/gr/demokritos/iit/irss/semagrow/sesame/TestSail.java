@@ -12,6 +12,9 @@ import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.SailBase;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Created by angel on 10/11/14.
  */
@@ -22,8 +25,12 @@ public class TestSail extends SailBase {
 
     private RDFSTHolesHistogram histogram;
 
+    private ExecutorService executorService;
+
     public TestSail(Repository actual) {
+
         actualRepo = actual;
+        executorService = Executors.newFixedThreadPool(10);
     }
 
     public RepositoryConnection getRepositoryConnection() throws RepositoryException {
@@ -38,7 +45,9 @@ public class TestSail extends SailBase {
     }
 
     @Override
-    protected void shutDownInternal() throws SailException { }
+    protected void shutDownInternal() throws SailException {
+        executorService.shutdown();
+    }
 
     @Override
     protected SailConnection getConnectionInternal() throws SailException {
@@ -56,4 +65,6 @@ public class TestSail extends SailBase {
 
     @Override
     public ValueFactory getValueFactory() { return ValueFactoryImpl.getInstance(); }
+
+    public ExecutorService getExecutorService() { return executorService; }
 }

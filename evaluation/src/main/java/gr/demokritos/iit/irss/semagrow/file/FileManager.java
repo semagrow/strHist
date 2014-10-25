@@ -11,6 +11,7 @@ import org.openrdf.query.resultio.*;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by angel on 10/20/14.
@@ -23,9 +24,12 @@ public class FileManager implements ResultMaterializationManager {
 
     private File baseDir;
 
-    public FileManager(File baseDir, TupleQueryResultWriterFactory writerFactory) {
+    private ExecutorService executor;
+
+    public FileManager(File baseDir, TupleQueryResultWriterFactory writerFactory, ExecutorService executorService) {
         this.writerFactory = writerFactory;
         this.baseDir = baseDir;
+        this.executor = executorService;
     }
 
     @Override
@@ -39,8 +43,10 @@ public class FileManager implements ResultMaterializationManager {
             TupleQueryResultParserFactory factory = registry.get(ff);
             TupleQueryResultParser parser = factory.getParser();
             InputStream in = new FileInputStream(f);
-            return new BackgroundTupleResult(parser, in, null);
+            BackgroundTupleResult result = new BackgroundTupleResult(parser, in, null);
             //return new BackgroundTupleResult(parser, in);
+            execute(result);
+            return result;
         } catch (URISyntaxException | FileNotFoundException e) {
             throw new QueryEvaluationException(e);
         }
@@ -58,6 +64,10 @@ public class FileManager implements ResultMaterializationManager {
         } catch (IOException e) {
             throw new QueryEvaluationException(e);
         }
+    }
+
+    public void execute(Runnable runnable) {
+        executor.execute(runnable);
     }
 
     private File getNewFile() throws IOException

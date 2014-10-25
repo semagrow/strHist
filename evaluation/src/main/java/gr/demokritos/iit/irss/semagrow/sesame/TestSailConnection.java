@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by angel on 10/11/14.
@@ -42,12 +44,14 @@ public class TestSailConnection extends SailConnectionBase {
 
     private QueryLogHandler handler;
     private ResultMaterializationManager manager;
+    private ExecutorService executorService;
 
     public TestSailConnection(TestSail sailBase) throws RepositoryException {
         super(sailBase);
         sail = sailBase;
         conn = sail.getRepositoryConnection();
         handler = getQueryLogHandler();
+        executorService = sail.getExecutorService();
         manager = getMateralizationManager();
     }
 
@@ -77,7 +81,11 @@ public class TestSailConnection extends SailConnectionBase {
 
         TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
         TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
-        return new FileManager(baseDir, writerFactory);
+        return new FileManager(baseDir, writerFactory, getExecutorService());
+    }
+
+    private ExecutorService getExecutorService() {
+        return executorService;
     }
 
     @Override
