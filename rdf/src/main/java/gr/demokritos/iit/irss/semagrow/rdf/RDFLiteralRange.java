@@ -289,8 +289,13 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
 	public boolean contains(RDFLiteralRange literalRange) {
 
         //for estimation
-        if (literalRange.isInfinite()) return true;
+        //
+        //
+        if (isInfinite())
+            return true;
 
+        if (literalRange.isInfinite())
+            return false;
 
         if (literalRange.ranges.size() != 1) {
             logger.debug("Argument should be a " +

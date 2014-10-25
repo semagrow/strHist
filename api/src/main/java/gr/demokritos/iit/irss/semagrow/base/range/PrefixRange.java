@@ -44,10 +44,15 @@ public class PrefixRange
     //Tested
     public boolean contains(PrefixRange range) {
 
+        if (isInfinite())
+            return true;
+
         //for estimation
-        if (range.isInfinite()) return true;
+        if (range.isInfinite())
+            return false;
 
         boolean contained = true;
+
         for (String p : range.getPrefixList()) {
 
             boolean b = false;
@@ -57,6 +62,7 @@ public class PrefixRange
                     continue;
                 }
             }
+
             if (!b)
                 return false;
             else
