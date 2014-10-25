@@ -55,7 +55,7 @@ public class TestQueryRecordAdapter {
             RDFRectangle rectangle = queryRecord.getRectangle();
 
             logger.info(rectangle.toString());
-            logger.info(queryRecord.getResultSet().);
+            logger.info(queryRecord.getResultSet().toString());
 
             List<RDFRectangle> rectangles = queryRecord.getResultSet().getRectangles(rectangle);
 
