@@ -34,7 +34,7 @@ public class TestQueryRecordAdapter {
 
         RDFQueryLogParser parser = new RDFQueryLogParser(handler);
 
-        File f = new File("/var/tmp/qfr.log");
+        File f = new File("/home/nickozoulis/semagrow/test_rdf_log");
         //TODO: Na stiso query logs manually
 
         logger.info("Parsing file : " + f.getName());
@@ -55,9 +55,11 @@ public class TestQueryRecordAdapter {
             RDFRectangle rectangle = queryRecord.getRectangle();
 
             logger.info(rectangle.toString());
-            logger.info(queryRecord.getResultSet().toString());
+
 
             List<RDFRectangle> rectangles = queryRecord.getResultSet().getRectangles(rectangle);
+
+            logger.info("->>"+rectangles.size());
 
             if (!rectangles.isEmpty()) {
                 for (RDFRectangle rect : rectangles)
@@ -71,7 +73,7 @@ public class TestQueryRecordAdapter {
     }
 
     private static ResultMaterializationManager getMateralizationManager(){
-        File baseDir = new File("/var/tmp/");
+        File baseDir = new File("/home/nickozoulis/semagrow/");
         TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
 
         TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
