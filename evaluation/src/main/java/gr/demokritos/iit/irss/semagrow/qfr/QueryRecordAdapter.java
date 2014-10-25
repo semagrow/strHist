@@ -144,10 +144,10 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
     }
 
     private RangeLength<?> computeObjectRange(Literal lit) {
-        if (lit.getDatatype() == XMLSchema.INT) {
+        if (lit.getDatatype().equals(XMLSchema.INT)) {
             int val = lit.intValue();
             return new IntervalRange(val,val);
-        } else if (lit.getDatatype() == XMLSchema.DATE) {
+        } else if (lit.getDatatype().equals(XMLSchema.DATETIME)) {
             Date val = lit.calendarValue().toGregorianCalendar().getTime();
             return new CalendarRange(val,val);
         }
@@ -162,14 +162,13 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         //FIXME
         Collection<ValueExpr> relevantFilters = findRelevantFilters(var, filters);
 
-        Map<URI, Value> lows = new HashMap<URI,Value>();
-        Map<URI, Value> highs = new HashMap<URI,Value>();
-
-        ValueExpr high = null, low = null;
+        Map<URI, Literal> lows = new HashMap<URI,Literal>();
+        Map<URI, Literal> highs = new HashMap<URI,Literal>();
 
         for (ValueExpr e : relevantFilters) {
             if (e instanceof Compare) {
                 Compare c = (Compare)e;
+                ValueExpr high = null, low = null;
                 if (c.getOperator().equals(Compare.CompareOp.LE))
                 {
                     if (c.getLeftArg().equals(var))
@@ -182,23 +181,52 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
                     else if (c.getLeftArg().equals(var))
                         low = c.getRightArg();
                 }
+
+                if (low != null && low instanceof Var) {
+                    Var l = (Var)low;
+                    if (l.hasValue() && l.getValue() instanceof Literal) {
+                        Literal lowLit = (Literal)l.getValue();
+                        if (lowLit.getDatatype() != null) {
+                            lows.put(lowLit.getDatatype(), lowLit);
+                        }
+                    }
+                }
+
+                if (high != null && high instanceof Var) {
+                    Var l = (Var)high;
+                    if (l.hasValue() && l.getValue() instanceof Literal) {
+                        Literal highLit = (Literal)l.getValue();
+                        if (highLit.getDatatype() != null) {
+                            highs.put(highLit.getDatatype(), highLit);
+                        }
+                    }
+                }
             }
         }
 
-        /*
-        if (low != null && high != null &&
-            low instanceof Var && high instanceof Var)
-        {
-            Value lowVal = ((Var)low).getValue();
-            Value highVal = ((Var)high).getValue();
+        Set<URI> types = lows.keySet();
+        types.retainAll(highs.keySet());
+        //FIXME: we should take the union of types (not the intersection)
+        //TODO: find the ultimate MIN and MAX of each type.
 
-            if (lowVal != null && highVal != null &&
-                lowVal instanceof Literal && highVal instanceof Literal) {
+        Map<URI, RangeLength<?>> ranges = new HashMap<URI, RangeLength<?>>();
+        for (URI t : types) {
+            RangeLength<?> r = null;
 
-            }
+            if (t.equals(XMLSchema.INT))
+                r = new IntervalRange(lows.get(t).intValue(), highs.get(t).intValue());
+            else if (t.equals(XMLSchema.DATETIME))
+                r = new CalendarRange(lows.get(t).calendarValue().toGregorianCalendar().getTime(),
+                                      highs.get(t).calendarValue().toGregorianCalendar().getTime());
+
+            if (r != null)
+                ranges.put(t, r);
         }
-        */
-        return new RDFLiteralRange();
+
+        if (ranges.isEmpty())
+            return new RDFLiteralRange();
+        else
+            return new RDFLiteralRange(ranges);
     }
 
     private Collection<ValueExpr> findRelevantFilters(Var var, Collection<ValueExpr> filters) {
