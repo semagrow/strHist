@@ -202,7 +202,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         }
         */
 
-        return null;
+        return new RDFLiteralRange();
     }
 
     private Collection<ValueExpr> findRelevantFilters(Var var, Collection<ValueExpr> filters) {

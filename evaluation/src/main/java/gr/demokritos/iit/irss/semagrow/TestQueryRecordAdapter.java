@@ -37,7 +37,7 @@ public class TestQueryRecordAdapter {
 
         RDFQueryLogParser parser = new RDFQueryLogParser(handler);
 
-        File f = new File("/home/nickozoulis/semagrow/test/test_rdf_log");
+        File f = new File("/home/nickozoulis/semagrow/test_2/test_rdf_log");
 
         logger.info("Parsing file : " + f.getName());
 
@@ -74,7 +74,7 @@ public class TestQueryRecordAdapter {
     }
 
     private static ResultMaterializationManager getMateralizationManager(){
-        File baseDir = new File("/home/nickozoulis/semagrow/test/");
+        File baseDir = new File("/home/nickozoulis/semagrow/test_2/");
         TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
 
         TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
