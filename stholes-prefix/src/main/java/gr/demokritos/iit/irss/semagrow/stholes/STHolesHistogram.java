@@ -14,7 +14,9 @@ import java.util.*;
 /**
  * Created by angel on 7/11/14.
  */
-public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,Stat> {
+public class STHolesHistogram<R extends Rectangle<R>>
+        extends STHistogramBase<R,Stat>
+        implements STHistogram<R,Stat> {
 
 
     static final Logger logger = LoggerFactory.getLogger(STHolesHistogram.class);
@@ -36,7 +38,7 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
         bucketsNum += bucketsNum;
     }
 
-    public STHolesHistogram(Iterable<QueryRecord<R,Stat>> workload) {
+    public STHolesHistogram(Iterator<QueryRecord<R,Stat>> workload) {
         this();
         refine(workload);
     }
@@ -115,16 +117,6 @@ public class STHolesHistogram<R extends Rectangle<R>> implements STHistogram<R,S
 
         if (isEnclosingBucket)
             enclosingBuckets.add(b);
-    }
-
-    public void refine(Iterable<? extends QueryRecord<R,Stat>> workload) {
-
-        logger.debug("Number of buckets before refine: " + bucketsNum);
-
-        for (QueryRecord<R,Stat> qfr : workload)
-            refine(qfr);
-
-        logger.debug("Number of buckets after refine: " + bucketsNum);
     }
 
     /**
