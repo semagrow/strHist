@@ -260,7 +260,7 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
             if (value instanceof Literal) {
                 Literal literal = (Literal) value;
 
-                if (literal.getDatatype() == valueType) {
+                if (literal.getDatatype().equals(valueType)) {
                     if (valueType.equals(XMLSchema.INTEGER) || valueType.equals(XMLSchema.INT)) {
                         return ((IntervalRange) range).includes(literal.intValue());
 
