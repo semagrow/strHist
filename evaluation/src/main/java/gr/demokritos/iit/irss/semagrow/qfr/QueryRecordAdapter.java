@@ -106,9 +106,6 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             if (oVal instanceof Literal) {
                 Literal oLit = (Literal)oVal;
                 oRange = new RDFLiteralRange(oLit.getDatatype(), computeObjectRange(oLit));
-            } else if (oVal instanceof URI) {
-                URI uri = (URI)oVal;
-                oRange = new RDFLiteralRange(uri.stringValue());
             }
         } else  {
             // oVal is a variable but can have filters
@@ -140,9 +137,6 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             if (o instanceof Literal) {
                 Literal l = (Literal)o;
                 oRange = new RDFLiteralRange(l.getDatatype(), computeObjectRange(l));
-            } else if (o instanceof URI) {
-                URI uri = (URI)o;
-                oRange = new RDFLiteralRange(uri.stringValue());
             }
         }
 
@@ -167,6 +161,9 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
     private RDFLiteralRange computeObjectRange(Var var, Collection<ValueExpr> filters) {
         //FIXME
         Collection<ValueExpr> relevantFilters = findRelevantFilters(var, filters);
+
+        Map<URI, Value> lows = new HashMap<URI,Value>();
+        Map<URI, Value> highs = new HashMap<URI,Value>();
 
         ValueExpr high = null, low = null;
 
@@ -201,7 +198,6 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             }
         }
         */
-
         return new RDFLiteralRange();
     }
 
