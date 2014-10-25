@@ -249,6 +249,7 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
         return false;
     }
 
+    public boolean isEnclosing(NumRectangle r) { return contains(r); }
 
     public long getVolume() {
 
@@ -283,8 +284,4 @@ public class NumRectangle implements RectangleWithVolume<NumRectangle>, Serializ
 //        return res;
     }
 
-
-    public static void main(String args[] ) {
-
-    }
 }

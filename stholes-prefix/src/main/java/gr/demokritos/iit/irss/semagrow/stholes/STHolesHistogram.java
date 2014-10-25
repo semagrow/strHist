@@ -101,13 +101,13 @@ public class STHolesHistogram<R extends Rectangle<R>>
         boolean isEnclosingBucket = false;
 
 
-        if ((b.getBox()).contains(rec)) { //unnecessary
+        if ((b.getBox()).isEnclosing(rec)) { //unnecessary
 
             isEnclosingBucket = true;
 
             for (STHolesBucket<R> bc : b.getChildren()) {
 
-                if ((bc.getBox()).contains(rec)) {
+                if ((bc.getBox()).isEnclosing(rec)) {
 
                     isEnclosingBucket = false;
                     getEnclosingBuckets(rec, bc, enclosingBuckets);

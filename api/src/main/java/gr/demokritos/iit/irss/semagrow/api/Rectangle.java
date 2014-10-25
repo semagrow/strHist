@@ -38,4 +38,5 @@ public interface Rectangle<R> {
 
     boolean isEmpty();
 
+    boolean isEnclosing(R rec);
 }

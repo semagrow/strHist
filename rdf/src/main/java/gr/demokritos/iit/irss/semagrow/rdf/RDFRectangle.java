@@ -175,6 +175,30 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         return subjectRange.isEmpty() || predicateRange.isEmpty() || objectRange.isEmpty();
     }
 
+    public boolean isEnclosing(RDFRectangle r) {
+        // ASSUMPTION: Infinite is considered to be enclosed in every rectangle.
+
+        boolean b = true;
+
+        if (r.subjectRange.isInfinite())
+            b = b && true;
+        else
+            b = b && subjectRange.contains(r.subjectRange);
+
+
+        if (r.predicateRange.isInfinite())
+            b = b && true;
+        else
+            b = b && predicateRange.contains(r.predicateRange);
+
+        if (r.objectRange.isInfinite())
+            b = b && true;
+        else
+            b = b && objectRange.contains(r.objectRange);
+
+        return b;
+    }
+
     public String toString() {
 
         String res = "rectangle:\n" +
