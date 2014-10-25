@@ -312,11 +312,14 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
                 BindingSet b = iter.next();
 
                 for (String bindingName : b.getBindingNames()) {
+                    Set<Value> d;
                     if (!distinctValues.containsKey(bindingName)){
-                        Set<Value> d = new HashSet<Value>();
-                        d.add(b.getValue(bindingName));
-                        distinctValues.put(bindingName, d);
+                        d = new HashSet<Value>();
+                    } else {
+                        d  = distinctValues.get(bindingName);
                     }
+                    d.add(b.getValue(bindingName));
+                    distinctValues.put(bindingName, d);
                 }
             }
 
