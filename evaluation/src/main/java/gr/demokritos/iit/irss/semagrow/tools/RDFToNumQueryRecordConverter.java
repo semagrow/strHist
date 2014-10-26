@@ -46,7 +46,7 @@ public class RDFToNumQueryRecordConverter {
         queryStatements.add(new IntervalRange(Integer.MIN_VALUE, Integer.MAX_VALUE));  // predicate
 
         for (Map.Entry<URI, RangeLength<?>> entry :
-                rdfRq.getRectangle().getObjectRange().getRanges().entrySet()) {        // object
+                rdfRq.getRectangle().getObjectRange().getLiteralRange().getRanges().entrySet()) {        // object
 
             RangeLength<?> objRange = entry.getValue();
 

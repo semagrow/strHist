@@ -144,7 +144,7 @@ public class VoIDSerializer {
 
         // -- Title handling
         String subjectStr = "";
-        if (bucket.getBox().getSubjectRange().getPrefixList().isEmpty())
+        if (bucket.getBox().getSubjectRange().isInfinite())
             subjectStr = "?s";
         else {
             // Subject Range
@@ -163,10 +163,10 @@ public class VoIDSerializer {
             predicateStr = "?p";
         else {
             // Predicate Ranges
-            for (String s : bucket.getBox().getPredicateRange().getItems()) {
-                model.add(bucketResource, VOID.PROPERTY, createURI(s));
+            for (URI s : bucket.getBox().getPredicateRange().getItems()) {
+                model.add(bucketResource, VOID.PROPERTY, s);
                 try {
-                    predicateStr = getStrFromUri(createURI(s)) + "  ";
+                    predicateStr = getStrFromUri(s) + "  ";
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -177,7 +177,7 @@ public class VoIDSerializer {
         if (bucket.getBox().getObjectRange().isEmpty())
             objectStr = "?o";
         else {
-            for (Map.Entry<URI, RangeLength<?>> entry : bucket.getBox().getObjectRange().getRanges().entrySet()) {
+            for (Map.Entry<URI, RangeLength<?>> entry : bucket.getBox().getObjectRange().getLiteralRange().getRanges().entrySet()) {
                 URI key = entry.getKey();
 
                 if (key.equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.LONG)) {
@@ -201,7 +201,7 @@ public class VoIDSerializer {
         model.add(bucketResource, DCTERMS.TITLE, createLiteral(subjectStr + predicateStr + objectStr));
         // -- End of title handling
 
-        addRangesToModel(bucketResource, bucket.getBox().getObjectRange().getRanges());
+        addRangesToModel(bucketResource, bucket.getBox().getObjectRange().getLiteralRange().getRanges());
 
         // Declare each child as subset and serialize recursively each bucket.
         int count = 0;

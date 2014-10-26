@@ -6,6 +6,10 @@ import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
+import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -81,7 +85,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 					case 2:		// Objects
 						// TODO: Change! 		
 						
-						Value val = null;
+						Literal val = null;
 						
 						if (value.contains("^^") && value.contains("http://")) {// XSD URI
 							
@@ -131,8 +135,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 							}// if	
 							
 						} else if (!value.contains("^^") && value.contains("http://")) {// URL							
-							val = ValueFactoryImpl.getInstance()
-									.createURI(value);
+							URI valURI = ValueFactoryImpl.getInstance().createURI(value);
 
                             if (!((RDFLiteralRange) rect.getRange(type)).includes(val))
                                 contained = false;
@@ -280,7 +283,7 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 								.createLiteral(value, XMLSchema.STRING);						
 					}					
 												
-					b = b && ((RDFLiteralRange) rect.getRange(i)).includes(val);
+					b = b && ((RDFLiteralRange) rect.getRange(i)).includes((Literal)val);
 					break;
 				}
 				
@@ -348,13 +351,13 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
     public List<RDFRectangle> getRectangles(RDFRectangle queryRect) {
 
         //initialize structures
-        List<PrefixRange> subjectRanges = new ArrayList<PrefixRange>();
-        List<String> predicateStrings =
-                new ArrayList<String>();
-        List<ExplicitSetRange<String>> predicateRanges =
-                new ArrayList<ExplicitSetRange<String>>();
-        List<RDFLiteralRange> objectRanges =
-                new ArrayList<RDFLiteralRange>();
+        List<RDFURIRange> subjectRanges = new ArrayList<RDFURIRange>();
+        List<URI> predicateStrings =
+                new ArrayList<URI>();
+        List<ExplicitSetRange<URI>> predicateRanges =
+                new ArrayList<ExplicitSetRange<URI>>();
+        List<RDFValueRange> objectRanges =
+                new ArrayList<RDFValueRange>();
 
         List<RDFRectangle> rectangles = new ArrayList<RDFRectangle>();
 
@@ -388,9 +391,9 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
         boolean isConstPredicate = false;
         boolean isConstSubject = false;
         boolean isConstObject = false;
-        PrefixRange constSubject = null;
-        ExplicitSetRange<String> constPredicate = null;
-        RDFLiteralRange constObject = null;
+        RDFURIRange constSubject = null;
+        ExplicitSetRange<URI> constPredicate = null;
+        RDFValueRange constObject = null;
 
 
         for (int i = 0; i < 3; i++) {
@@ -401,23 +404,23 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 
             switch (i) {
                 case 0 :
-                    if (!((PrefixRange) queryRect.getRange(i)).isInfinite()) {
+                    if (!((RDFURIRange) queryRect.getRange(i)).isInfinite()) {
                         isConstSubject = true;
-                        constSubject = (PrefixRange) queryRect.getRange(i);
+                        constSubject = (RDFURIRange) queryRect.getRange(i);
                     }
                     break;
                 case 1 :
-                    if (!((ExplicitSetRange<String>) queryRect.getRange(i)).isInfinite()) {
+                    if (!((ExplicitSetRange<URI>) queryRect.getRange(i)).isInfinite()) {
                         isConstPredicate = true;
-                        constPredicate = (ExplicitSetRange<String>) queryRect.getRange(i);
+                        constPredicate = (ExplicitSetRange<URI>) queryRect.getRange(i);
                         //add it to predicateRanges
                         predicateRanges.add(constPredicate);
                     }
                     break;
                 case 2 :
-                    if (!((RDFLiteralRange) queryRect.getRange(i)).isInfinite()) {
+                    if (!((RDFValueRange) queryRect.getRange(i)).isInfinite()) {
                         isConstObject = true;
-                        constObject = (RDFLiteralRange) queryRect.getRange(i);
+                        constObject = (RDFValueRange) queryRect.getRange(i);
                     }
                     break;
                 default:
@@ -463,11 +466,11 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                     value = clean(b.getValue());
 
                     //new predicate, add it to list
-                    if (!predicateStrings.contains(value)) {
-                        predicateStrings.add(value);
+                    if (!predicateStrings.contains(ValueFactoryImpl.getInstance().createURI(value))) {
+                        predicateStrings.add(ValueFactoryImpl.getInstance().createURI(value));
                         curRectangleIdx = predicateStrings.size() - 1;
                     } else {
-                        curRectangleIdx = predicateStrings.indexOf(value);
+                        curRectangleIdx = predicateStrings.indexOf(ValueFactoryImpl.getInstance().createURI(value));
                     }
                 }
             }
@@ -494,10 +497,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                         //todo: value is empty
                         prefixList = new ArrayList<String>();
                         prefixList.add(value);
-                        subjectRanges.add(new PrefixRange(prefixList));
+                        subjectRanges.add(new RDFURIRange(prefixList));
                     } else {
 
-                        subjectRanges.get(curRectangleIdx).expand(value);
+                        subjectRanges.get(curRectangleIdx).expand(ValueFactoryImpl.getInstance().createURI(value));
                     }
                 }
 
@@ -526,10 +529,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                         if (value.contains("^^") && value.contains("http://")) {
                             //todo: check if it is xsd uri
                             if (type.equals("int") || type.equals("integer")) {
-                                objectRanges.add(new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v)));
+                                objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v))));
 
                             } else if (type.equals("long")) {
-                                objectRanges.add(new RDFLiteralRange(Long.parseLong(v), Long.parseLong(v)));
+                                objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(Long.parseLong(v), Long.parseLong(v))));
 
                             } else if (type.equals("dateTime")) {
 
@@ -545,20 +548,21 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                                 }
 
                                 if (dateLow != null && dateHigh != null)
-                                    objectRanges.add(new RDFLiteralRange(dateLow, dateHigh));
+                                    objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(dateLow, dateHigh)));
                                 else
                                     System.err.println("Date Format Error.");
                             }
                         } else if (!value.contains("^^") && value.contains("http://")) {// URL
                             //todo: do i need this check above as well?
-                            objectRanges.add(new RDFLiteralRange(value));
+                            objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(value)));
 
                         } else {// Plain Literal
-                            objectRanges.add(new RDFLiteralRange(value));
+                            objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(value)));
                         }
 
                     } else {
-                        objectRanges.get(curRectangleIdx).expand(v);
+                        //objectRanges.get(curRectangleIdx).expand(v);
+                        //?
                     }
                 }
             }
@@ -568,14 +572,14 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 
 
         //Create predicateRanges from predicates
-        Set<String> items = new HashSet<String>();
-        for (String p : predicateStrings) {
+        Set<URI> items = new HashSet<URI>();
+        for (URI p : predicateStrings) {
             //make an explicitRange and add it
             // to predicateRanges list
-            items = new HashSet<String>();
+            items = new HashSet<URI>();
             items.add(p);
             if (predicateRanges.isEmpty()) {
-                predicateRanges.add(new ExplicitSetRange<String>(items));
+                predicateRanges.add(new ExplicitSetRange<URI>(items));
             }
 
         }
@@ -583,10 +587,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
         //Create rectangles from ranges
         for (int i = 0; i < predicateRanges.size(); i++) {
 
-            PrefixRange subjectR = subjectRanges.get(i);
-            ExplicitSetRange<String> predicateR = predicateRanges.get(i);
-            RDFLiteralRange objectR = objectRanges.get(i);
-            rectangles.add(new RDFRectangle (subjectRanges.get(i),
+            RDFURIRange subjectR = subjectRanges.get(i);
+            ExplicitSetRange<URI> predicateR = predicateRanges.get(i);
+            RDFValueRange objectR = objectRanges.get(i);
+            rectangles.add(new RDFRectangle(subjectRanges.get(i),
                     predicateRanges.get(i), objectRanges.get(i)));
         }
         return rectangles;

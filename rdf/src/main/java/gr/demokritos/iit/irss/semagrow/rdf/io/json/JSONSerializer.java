@@ -9,6 +9,8 @@ import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
 import gr.demokritos.iit.irss.semagrow.rdf.io.sevod.VoIDeserializer;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
@@ -99,11 +101,13 @@ public class JSONSerializer {
     }
 
 
-    private JSONObject getJSONObject(RDFLiteralRange objectRange) {
+    private JSONObject getJSONObject(RDFValueRange objectRange) {
         JSONObject object;
         JSONArray array = new JSONArray();
 
-        for (Map.Entry<URI,RangeLength<?>> entry : objectRange.getRanges().entrySet()) {
+        RDFLiteralRange literalRange = objectRange.getLiteralRange();
+
+        for (Map.Entry<URI,RangeLength<?>> entry : literalRange.getRanges().entrySet()) {
             object = new JSONObject();
 
             if (entry.getKey().equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.LONG)) {
@@ -151,13 +155,13 @@ public class JSONSerializer {
     }
 
 
-    private JSONObject getJSONPredicate(ExplicitSetRange<String> predicateRange) {
+    private JSONObject getJSONPredicate(ExplicitSetRange<URI> predicateRange) {
         JSONObject predicate;
         JSONArray array = new JSONArray();
 
-        for (String p : predicateRange.getItems()) {
+        for (URI p : predicateRange.getItems()) {
             predicate = new JSONObject();
-            predicate.put("value", p);
+            predicate.put("value", p.stringValue());
             predicate.put("type", "uri");
             array.add(predicate);
         }
@@ -168,6 +172,25 @@ public class JSONSerializer {
         return jSONObj;
     }
 
+
+    private JSONObject getJSONSubject(RDFURIRange subjectRange) {
+        JSONObject jsonObject;
+
+        JSONArray array = new JSONArray();
+
+        for (String p : subjectRange.getPrefixList()) {
+            jsonObject = new JSONObject();
+            jsonObject.put("value", p);
+            jsonObject.put("type", "url");
+            array.add(jsonObject);
+        }
+
+        JSONObject jSONObj = new JSONObject();
+        jSONObj.put("array", array);
+
+
+        return jSONObj;
+    }
 
     private JSONObject getJSONSubject(PrefixRange subjectRange) {
         JSONObject jsonObject;

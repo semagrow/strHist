@@ -12,11 +12,18 @@ import org.openrdf.model.Value;
  */
 public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRange> {
 
-    private PrefixRange uriRange;
+    private RDFURIRange uriRange;
 
     private RDFLiteralRange literalRange;
 
-    public RDFValueRange() {}
+    public RDFValueRange() {
+        this(new RDFURIRange(), new RDFLiteralRange());
+    }
+
+    public RDFValueRange(RDFURIRange uriRange, RDFLiteralRange literalRange) {
+        this.uriRange = uriRange;
+        this.literalRange = literalRange;
+    }
 
     public long getLength() {
         long length = 0;
@@ -39,41 +46,59 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
         return uriRange.isEmpty() && literalRange.isEmpty();
     }
 
+    public boolean isInfinite() { return uriRange.isInfinite() && literalRange.isInfinite(); }
+
     public boolean includes(Value elem) {
         if (elem instanceof URI)
-            return uriRange.includes(elem.stringValue());
+            return uriRange.includes((URI)elem);
         else if (elem instanceof Literal)
             return literalRange.includes((Literal)elem);
         else
             return false;
     }
 
-    public void expand(Value elem)
-    {
+    public void expand(Value elem) {
         if (elem instanceof URI)
-            uriRange.expand(elem.stringValue());
+            uriRange.expand((URI)elem);
         else if (elem instanceof Literal)
             literalRange.expand((Literal) elem);
     }
 
     public RDFValueRange intersection(RDFValueRange rdfValueRange) {
-        uriRange.intersection(rdfValueRange.uriRange);
-        return null;
+        return new RDFValueRange(
+                uriRange.intersection(rdfValueRange.uriRange),
+                literalRange.intersection(rdfValueRange.literalRange));
     }
 
     public RDFValueRange minus(RDFValueRange rdfValueRange) {
-        return null;
+        return new RDFValueRange(
+                uriRange.minus(rdfValueRange.uriRange),
+                literalRange.minus(rdfValueRange.literalRange));
     }
 
     public boolean contains(RDFValueRange rdfValueRange) {
-        return false;
+        return uriRange.contains(rdfValueRange.uriRange) &&
+               literalRange.contains(rdfValueRange.literalRange);
     }
 
     public boolean intersects(RDFValueRange rdfValueRange) {
-        return false;
+        return uriRange.intersects(rdfValueRange.uriRange) ||
+                literalRange.intersects(rdfValueRange.literalRange);
     }
 
     public RDFValueRange tightRange(RDFValueRange rdfValueRange) {
-        return null;
+        return new RDFValueRange(uriRange.tightRange(rdfValueRange.uriRange),
+                literalRange.tightRange(literalRange));
     }
+
+    public boolean hasSameType(RDFValueRange rdfValueRange) {
+        if (literalRange.isInfinite() && rdfValueRange.isInfinite())
+            return true;
+        else
+            return literalRange.hasSameType(rdfValueRange.literalRange);
+    }
+
+    public RDFLiteralRange getLiteralRange() { return literalRange; }
+
+    public RDFURIRange getUriRange() { return uriRange; }
 }

@@ -12,6 +12,8 @@ import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
 import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.EmptyIteration;
 import info.aduna.iteration.Iteration;
@@ -86,26 +88,29 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         Value pVal = pattern.getPredicateVar().getValue();
         Value oVal = pattern.getObjectVar().getValue();
 
-        PrefixRange sRange = new PrefixRange();
-        ExplicitSetRange<String> pRange = new ExplicitSetRange<String>();
-        RDFLiteralRange oRange = new RDFLiteralRange();
+        RDFURIRange sRange = new RDFURIRange();
+        ExplicitSetRange<URI> pRange = new ExplicitSetRange<URI>();
+        RDFValueRange oRange = new RDFValueRange();
 
         if (sVal != null) {
             ArrayList<String> singletonSubject = new ArrayList<String>();
             singletonSubject.add(sVal.stringValue());
-            sRange = new PrefixRange(singletonSubject);
+            sRange = new RDFURIRange(singletonSubject);
         }
 
         if (pVal != null) {
-            ArrayList<String> singletonPredicate = new ArrayList<String>();
-            singletonPredicate.add(pVal.stringValue());
-            pRange = new ExplicitSetRange<String>(singletonPredicate);
+            ArrayList<URI> singletonPredicate = new ArrayList<URI>();
+            if (pVal instanceof URI) {
+                singletonPredicate.add((URI)pVal);
+                pRange = new ExplicitSetRange<URI>(singletonPredicate);
+            }
         }
 
         if (oVal != null) {
             if (oVal instanceof Literal) {
                 Literal oLit = (Literal)oVal;
-                oRange = new RDFLiteralRange(oLit.getDatatype(), computeObjectRange(oLit));
+                RDFLiteralRange lRange = new RDFLiteralRange(oLit.getDatatype(), computeObjectRange(oLit));
+                oRange = new RDFValueRange(null, lRange);
             }
         } else  {
             // oVal is a variable but can have filters
@@ -117,26 +122,27 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
     private RDFRectangle computeRectangle(Value s, Value p, Value o) {
 
-        PrefixRange sRange = new PrefixRange();
-        ExplicitSetRange<String> pRange = new ExplicitSetRange<String>();
-        RDFLiteralRange oRange = new RDFLiteralRange();
+        RDFURIRange sRange = new RDFURIRange();
+        ExplicitSetRange<URI> pRange = new ExplicitSetRange<URI>();
+        RDFValueRange oRange = new RDFValueRange();
 
         if (s != null) {
             ArrayList<String> subjects = new ArrayList<String>();
             subjects.add(s.stringValue());
-            sRange = new PrefixRange(subjects);
+            sRange = new RDFURIRange(subjects);
         }
 
         if (p != null) {
-            ArrayList<String> predicates = new ArrayList<String>();
-            predicates.add(p.stringValue());
-            pRange = new ExplicitSetRange<String>(predicates);
+            ArrayList<URI> predicates = new ArrayList<URI>();
+            predicates.add((URI)p);
+            pRange = new ExplicitSetRange<URI>(predicates);
         }
 
         if (o != null) {
             if (o instanceof Literal) {
                 Literal l = (Literal)o;
-                oRange = new RDFLiteralRange(l.getDatatype(), computeObjectRange(l));
+                RDFLiteralRange lRange = new RDFLiteralRange(l.getDatatype(), computeObjectRange(l));
+                oRange = new RDFValueRange(null, lRange);
             }
         }
 
@@ -158,7 +164,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         }
     }
 
-    private RDFLiteralRange computeObjectRange(Var var, Collection<ValueExpr> filters) {
+    private RDFValueRange computeObjectRange(Var var, Collection<ValueExpr> filters) {
         //FIXME
         Collection<ValueExpr> relevantFilters = findRelevantFilters(var, filters);
 
@@ -224,9 +230,9 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         }
 
         if (ranges.isEmpty())
-            return new RDFLiteralRange();
+            return new RDFValueRange();
         else
-            return new RDFLiteralRange(ranges);
+            return new RDFValueRange(null, new RDFLiteralRange(ranges));
     }
 
     private Collection<ValueExpr> findRelevantFilters(Var var, Collection<ValueExpr> filters) {
@@ -276,10 +282,10 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             filter(RDFRectangle rectangle, CloseableIteration<BindingSet, QueryEvaluationException> iter)
         {
             if (!pattern.getSubjectVar().hasValue())
-                iter = new StringRangeFilterIteration(pattern.getSubjectVar().getName(), rectangle.getSubjectRange(), iter);
+                iter = new URIRangeFilterIteration(pattern.getSubjectVar().getName(), rectangle.getSubjectRange(), iter);
 
             if (!pattern.getPredicateVar().hasValue())
-                iter = new StringRangeFilterIteration(pattern.getPredicateVar().getName(), rectangle.getPredicateRange(), iter);
+                iter = new URIRangeFilterIteration(pattern.getPredicateVar().getName(), rectangle.getPredicateRange(), iter);
 
             if (!pattern.getObjectVar().hasValue())
                 iter = new ValueRangeFilterIteration(pattern.getObjectVar().getName(), rectangle.getObjectRange(), iter);
@@ -374,7 +380,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
                     if (rectangles.containsKey(pVal)) {
                         rect = rectangles.get(pVal);
-                        rect.getSubjectRange().expand(sVal.stringValue());
+                        rect.getSubjectRange().expand((URI)sVal);
                         //rect.getPredicateRange().expand(pVal.stringValue());
                         rect.getObjectRange().expand(oVal);
                     } else {
