@@ -3,6 +3,7 @@ package gr.demokritos.iit.irss.semagrow.base.range;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import junit.framework.*;
 
+import java.lang.Exception;
 import java.lang.Override;
 import java.lang.String;
 import java.util.HashSet;
@@ -132,6 +133,16 @@ public class ExplicitSetRangeTest extends TestCase {
     public void testIsEmpty2() throws Exception {
         ExplicitSetRange<String> setRange = new ExplicitSetRange<String>();
         assertFalse(setRange.isEmpty());
+    }
+
+    public void testEquals() throws Exception {
+        assertTrue(predicates.equals(predicates));
+    }
+
+    public void testEqualsNot() throws Exception {
+        ExplicitSetRange setRange = new ExplicitSetRange(predicates.getItems());
+        setRange.getItems().add("examplestring");
+        assertFalse(predicates.equals(setRange));
     }
 
 }
