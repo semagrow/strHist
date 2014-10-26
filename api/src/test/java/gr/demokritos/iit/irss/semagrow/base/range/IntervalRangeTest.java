@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
-import junit.framework.TestCase;
+import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
+import junit.framework.*;
 
 public class IntervalRangeTest extends TestCase {
 
@@ -66,40 +67,121 @@ public class IntervalRangeTest extends TestCase {
         assertTrue(intersection3.isEmpty());
     }
 
-    public void testTightRange() throws Exception {
+    public void testTightRange1() throws Exception {
+        IntervalRange ir1 = new IntervalRange(1, 2);
+        IntervalRange ir2 = new IntervalRange(3, 4);
 
+        IntervalRange tightRange = ir1.tightRange(ir2);
+        assertTrue(tightRange.equals(new IntervalRange(1, 4)));
     }
 
-    public void testExpand() throws Exception {
+    public void testTightRange2() throws Exception {
+        IntervalRange ir1 = new IntervalRange(1, 1);
+        IntervalRange ir2 = new IntervalRange(1, 4);
 
+        IntervalRange tightRange = ir1.tightRange(ir2);
+        assertTrue(tightRange.equals(new IntervalRange(1, 4)));
+    }
+
+    public void testTightRange3() throws Exception {
+        IntervalRange ir1 = new IntervalRange(1, 3);
+        IntervalRange ir2 = new IntervalRange(2, 4);
+
+        IntervalRange tightRange = ir1.tightRange(ir2);
+        assertTrue(tightRange.equals(new IntervalRange(1, 4)));
+    }
+
+    public void testTightRange4() throws Exception {
+        IntervalRange ir1 = new IntervalRange(1, 5);
+        IntervalRange ir2 = new IntervalRange(3, 4);
+
+        IntervalRange tightRange = ir1.tightRange(ir2);
+        assertTrue(tightRange.equals(new IntervalRange(1, 5)));
+    }
+
+    public void testTightRange5() throws Exception {
+        IntervalRange ir1 = new IntervalRange(1, 4);
+        IntervalRange ir2 = new IntervalRange(3, 5);
+
+        IntervalRange tightRange = ir1.tightRange(ir2);
+        assertTrue(tightRange.equals(new IntervalRange(1, 5)));
+    }
+
+    public void testTightRange6() throws Exception {
+        IntervalRange ir1 = new IntervalRange(1, 1);
+        IntervalRange ir2 = new IntervalRange(1, 1);
+
+        IntervalRange tightRange = ir1.tightRange(ir2);
+        assertTrue(tightRange.equals(new IntervalRange(1, 1)));
+    }
+
+    public void testExpand1() throws Exception {
+        IntervalRange ir = new IntervalRange(1, 1);
+        ir.expand(1);
+        assertTrue(ir.equals(new IntervalRange(1, 1)));
+    }
+
+    public void testExpand2() throws Exception {
+        IntervalRange ir = new IntervalRange(1, 1);
+        ir.expand(-1);
+        assertTrue(ir.equals(new IntervalRange(-1, 1)));
+    }
+
+    public void testExpand3() throws Exception {
+        IntervalRange ir = new IntervalRange(1, 2);
+        ir.expand(3);
+        assertTrue(ir.equals(new IntervalRange(1, 3)));
+    }
+
+    /**
+     * Scenario 1: Participant includes bucket in this dimension.
+     * @throws Exception
+     */
+    public void testMinus1() throws Exception {
+        IntervalRange ir = new IntervalRange(5, 10);
+        IntervalRange ir2 = new IntervalRange(4, 11);
+
+        IntervalRange minus = ir.minus(ir2);
+        assertTrue(minus.equals(new IntervalRange(1, 0)));
+    }
+
+    /**
+     * Scenario 2: Bucket encloses participant range in this dimension.
+     * @throws Exception
+     */
+    public void testMinus2() throws Exception {
+        IntervalRange ir = new IntervalRange(5, 10);
+        IntervalRange ir2 = new IntervalRange(6, 8);
+
+        IntervalRange minus = ir.minus(ir2);
+        assertTrue(minus.equals(new IntervalRange(9, 10)));
+    }
+
+    /**
+     * Scenario 3: Default Case
+     * @throws Exception
+     */
+    public void testMinus3() throws Exception {
+        IntervalRange ir = new IntervalRange(5, 10);
+        IntervalRange ir2 = new IntervalRange(8, 11);
+
+        IntervalRange minus = ir.minus(ir2);
+        assertTrue(minus.equals(new IntervalRange(5, 7)));
+    }
+
+    /**
+     * Scenario 3: Default Case
+     * @throws Exception
+     */
+    public void testMinus4() throws Exception {
+        IntervalRange ir = new IntervalRange(5, 10);
+        IntervalRange ir2 = new IntervalRange(4, 6);
+
+        IntervalRange minus = ir.minus(ir2);
+        assertTrue(minus.equals(new IntervalRange(7, 10)));
     }
 
 
-    public void testMinus() throws Exception {
-        /*
-        //Test minus
-        IntervalRange b = new IntervalRange(5,10);
-        IntervalRange p1 = new IntervalRange(4,6);
-
-        IntervalRange p2 = new IntervalRange(8,11);
-        IntervalRange p3 = new IntervalRange(7,9);
-        IntervalRange p4 = new IntervalRange(4,11);
-
-
-        System.out.println(b + " minus " + p1 + " = " + b.minus(p1));
-        System.out.println(b + " minus " + p2 + " = " + b.minus(p2));
-        System.out.println(b + " minus " + p3 + " = " + b.minus(p3));
-        System.out.println(b + " minus " + p4 + " = " + b.minus(p4));
-
-        //Test tightRange
-        IntervalRange r1 = new IntervalRange(14,20);
-
-        System.out.println("Tight range of " + b + " and " +
-                p2 + " is " + b.tightRange(p2));
-        System.out.println("Tight range of " + b + " and " +
-                r1 + " is " + b.tightRange(r1));
-        */
-    }
 
     public void testIsUnit() throws Exception {
 
