@@ -257,7 +257,8 @@ public class PrefixRange
 
     public boolean isUnit() {
 
-        if (infinite) return false;
+        if (infinite)
+            return false;
 
         return (prefixList.size() == 1);
     }
@@ -291,87 +292,19 @@ public class PrefixRange
         return res;
     }
 
-
-    public static void main(String [] args){
-
-        ArrayList<String> myRangePrefixList = new ArrayList<String>();
-        myRangePrefixList.add("http://a/");
-        PrefixRange myRange = new PrefixRange(myRangePrefixList);
-        String item1 = "http://a/b/c/d";
-        String item2 = "http://b/c";
-        boolean res1 = myRange.includes(item1);
-        boolean res2 = myRange.includes(item2);
-
-        // Test getters
-        System.out.println("My range is " + myRange.getPrefixList());
-        //Test includes item method
-        if (res1)
-            System.out.println("My range includes " + item1);
-        else
-            System.out.println("Test failed");
-
-        if (!res2 )
-            System.out.println("My range does not contain " + item2);
-        else
-            System.out.println("Test failed");
-        //Test includes range method
-        ArrayList<String> testRange1PrefixList = new ArrayList<String>();
-        ArrayList<String> testRange2PrefixList = new ArrayList<String>();
-        testRange1PrefixList.add("http://a/b");
-        testRange2PrefixList.add("http://b");
-        PrefixRange testRange1 = new PrefixRange(testRange1PrefixList);
-        PrefixRange testRange2 = new PrefixRange(testRange2PrefixList);
-
-        res1 = myRange.contains(testRange1);
-        res2 = myRange.contains(testRange2);
-
-        System.out.println("Range " + myRange.toString() + " includes range "
-                + testRange1.toString() + ": " + res1);
-        System.out.println("Range " + myRange.toString() + " includes range "
-                + testRange2.toString() + ": " + res2);
-
-        //Test intersection method
-        testRange2PrefixList.clear();
-        testRange2PrefixList.add("http://");
-        testRange2 = new PrefixRange(testRange2PrefixList);
-        ArrayList<String> testRange3PrefixList = new ArrayList<String>();
-        testRange3PrefixList.add("http://b");
-        PrefixRange testRange3 = new PrefixRange(testRange3PrefixList);
-
-
-        PrefixRange intersection1 = myRange.intersection(
-                testRange1);
-        PrefixRange intersection2 = myRange.intersection(
-                testRange2);
-        PrefixRange intersection3 = myRange.intersection(
-                testRange3);
-
-        System.out.println("Intersection of range " + myRange.toString() +
-                " and range " + testRange1.toString() + ": " + intersection1);
-        System.out.println("Intersection of range " + myRange.toString() +
-                " and range " + testRange2.toString() + ": " + intersection2);
-        if (myRange.intersects(testRange3)) {
-            System.out.println("Intersection of range " + myRange.toString() +
-                    " and range " + testRange3.toString() + ": " + intersection3);
-        }
-
-        testRange3PrefixList.add("http://c");
-        System.out.println(new PrefixRange(testRange3PrefixList));
-
-        //Test tight range
-        PrefixRange testRange4 = new PrefixRange(testRange3PrefixList);
-        System.out.println("Tight range of " + myRange + " and " + testRange4 +
-                " = " + myRange.tightRange(testRange4));
-
-        //Test minus
-        PrefixRange testRange5 = myRange.tightRange(testRange4);
-        System.out.println(testRange5 + " minus " + testRange1 + " = " +
-                testRange5.minus(testRange1));
-    }
-
     public long getLength() {
 
         if (infinite) return Integer.MAX_VALUE;
         return prefixList.size();
+    }
+
+    public boolean equals(Object o) {
+
+        if (o instanceof PrefixRange) {
+            PrefixRange range = (PrefixRange)o;
+            boolean p = this.prefixList.equals(range.prefixList);
+            return this.infinite == range.infinite && p;
+        }
+        return false;
     }
 }
