@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.qfr;
 
 import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
 import org.openrdf.model.URI;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.algebra.TupleExpr;
@@ -37,6 +38,7 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
         out.writeObject(queryLogRecord.getStartTime());
         out.writeObject(queryLogRecord.getEndTime());
         out.writeObject(queryLogRecord.getDuration());
+        out.writeObject(queryLogRecord.getBindings());
 
         ParsedTupleQuery q = new ParsedTupleQuery(queryLogRecord.getQuery());
         out.writeObject(new SPARQLQueryRenderer().render(q)); // String
@@ -47,18 +49,19 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException, MalformedQueryException {
         UUID uuid = (UUID)in.readObject();
         URI endpoint = (URI)in.readObject();
-        List<String> bindingNames = (List<String>)in.readObject();
+        List<String> bindingNames = (List<String>) in.readObject();
         long cardinality = (long)in.readObject();
         Date startTime = (Date)in.readObject();
         Date endTime = (Date)in.readObject();
         long duration = (long)in.readObject();
+        BindingSet bindings = (BindingSet)in.readObject();
 
         ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL,
                                                             (String)in.readObject(),
                                                             "http://example.org/");
         TupleExpr query = q.getTupleExpr();
 
-        this.queryLogRecord = new QueryLogRecordImpl(uuid, endpoint, query , bindingNames);
+        this.queryLogRecord = new QueryLogRecordImpl(uuid, endpoint, query, bindings, bindingNames);
         this.queryLogRecord.setCardinality(cardinality);
         this.queryLogRecord.setDuration(startTime.getTime(), endTime.getTime());
         //TODO: this.queryLogRecord.setResults();
@@ -72,6 +75,9 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
     public URI getEndpoint() {
         return getQueryLogRecord().getEndpoint();
     }
+
+    @Override
+    public BindingSet getBindings() { return getQueryLogRecord().getBindings(); }
 
     @Override
     public TupleExpr getQuery() {
