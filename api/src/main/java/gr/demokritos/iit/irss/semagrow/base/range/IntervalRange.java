@@ -168,6 +168,8 @@ public class IntervalRange implements RangeLength<Integer>, Rangeable<IntervalRa
     }
 
     public boolean equals(Object o) {
+        if (this == o) return true;
+
         if (o instanceof IntervalRange) {
             IntervalRange i = (IntervalRange)o;
             return low == i.low && high == i.high;

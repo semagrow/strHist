@@ -299,6 +299,7 @@ public class PrefixRange
     }
 
     public boolean equals(Object o) {
+        if (this == o) return true;
 
         if (o instanceof PrefixRange) {
             PrefixRange range = (PrefixRange)o;

@@ -120,6 +120,18 @@ public class ExplicitSetRange<T>
         return res;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        if (obj instanceof ExplicitSetRange) {
+            ExplicitSetRange<T> setRange = (ExplicitSetRange<T>)obj;
+
+            return (this.getItems().equals(setRange.getItems())) ? true : false;
+        }
+
+        return false;
+    }
 
     public boolean isUnit() {
 
