@@ -26,6 +26,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.*;
 import org.openrdf.query.algebra.helpers.StatementPatternCollector;
 import org.openrdf.query.algebra.helpers.VarNameCollector;
+import org.openrdf.query.impl.EmptyBindingSet;
 
 import java.util.*;
 
@@ -42,11 +43,12 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
     private Collection<ValueExpr> filters;
 
+    private BindingSet bindings = EmptyBindingSet.getInstance();
+
     private ResultMaterializationManager fileManager;
 
     public QueryRecordAdapter(QueryLogRecord queryLogRecord, ResultMaterializationManager fileManager)
-        throws IllegalArgumentException
-    {
+        throws IllegalArgumentException {
         this.queryLogRecord = queryLogRecord;
         this.fileManager = fileManager;
 
@@ -58,6 +60,8 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             throw new IllegalArgumentException("Only single-pattern queries are supported");
 
         pattern = patterns.iterator().next();
+
+        //if (queryLogRecord.get)
 
     }
 
@@ -83,10 +87,17 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         return list;
     }
 
+    private Value getValue(Var v) {
+        if (v.hasValue())
+            return v.getValue();
+        else
+            return bindings.getValue(v.getName());
+    }
+
     private RDFRectangle computePatternRectangle(StatementPattern pattern, Collection<ValueExpr> filters) {
-        Value sVal = pattern.getSubjectVar().getValue();
-        Value pVal = pattern.getPredicateVar().getValue();
-        Value oVal = pattern.getObjectVar().getValue();
+        Value sVal = getValue(pattern.getSubjectVar());
+        Value pVal = getValue(pattern.getPredicateVar());
+        Value oVal = getValue(pattern.getObjectVar());
 
         RDFURIRange sRange = new RDFURIRange();
         ExplicitSetRange<URI> pRange = new ExplicitSetRange<URI>();
@@ -190,8 +201,9 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
                 if (low != null && low instanceof Var) {
                     Var l = (Var)low;
-                    if (l.hasValue() && l.getValue() instanceof Literal) {
-                        Literal lowLit = (Literal)l.getValue();
+                    Value v = getValue(l);
+                    if (v != null && v instanceof Literal) {
+                        Literal lowLit = (Literal)v;
                         if (lowLit.getDatatype() != null) {
                             lows.put(lowLit.getDatatype(), lowLit);
                         }
@@ -200,8 +212,9 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
                 if (high != null && high instanceof Var) {
                     Var l = (Var)high;
-                    if (l.hasValue() && l.getValue() instanceof Literal) {
-                        Literal highLit = (Literal)l.getValue();
+                    Value v = getValue(l);
+                    if (v != null && v instanceof Literal) {
+                        Literal highLit = (Literal)v;
                         if (highLit.getDatatype() != null) {
                             highs.put(highLit.getDatatype(), highLit);
                         }
@@ -281,13 +294,17 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         private CloseableIteration<BindingSet, QueryEvaluationException>
             filter(RDFRectangle rectangle, CloseableIteration<BindingSet, QueryEvaluationException> iter)
         {
-            if (!pattern.getSubjectVar().hasValue())
+            Value sVal = getValue(pattern.getSubjectVar());
+            Value pVal = getValue(pattern.getPredicateVar());
+            Value oVal = getValue(pattern.getObjectVar());
+
+            if (sVal != null)
                 iter = new URIRangeFilterIteration(pattern.getSubjectVar().getName(), rectangle.getSubjectRange(), iter);
 
-            if (!pattern.getPredicateVar().hasValue())
+            if (pVal != null)
                 iter = new URIRangeFilterIteration(pattern.getPredicateVar().getName(), rectangle.getPredicateRange(), iter);
 
-            if (!pattern.getObjectVar().hasValue())
+            if (oVal != null)
                 iter = new ValueRangeFilterIteration(pattern.getObjectVar().getName(), rectangle.getObjectRange(), iter);
 
             return iter;
@@ -337,7 +354,9 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
             for (Var dim : dimensions) {
 
-                if (dim.hasValue()) {
+                Value v = getValue(dim);
+
+                if (v != null) {
                     if (count == 0)
                         distinctCounts.add((long) 0);
                     else
@@ -374,9 +393,14 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
                     BindingSet b = iter.next();
                     RDFRectangle rect;
 
-                    Value sVal = (pattern.getSubjectVar().hasValue()) ? pattern.getSubjectVar().getValue() : b.getValue(pattern.getSubjectVar().getName());
-                    Value oVal = (pattern.getObjectVar().hasValue())  ? pattern.getObjectVar().getValue() : b.getValue(pattern.getObjectVar().getName());
-                    Value pVal = (pattern.getPredicateVar().hasValue())  ? pattern.getPredicateVar().getValue() : b.getValue(pattern.getPredicateVar().getName());
+                    Value sVal = getValue(pattern.getSubjectVar());
+                    Value pVal = getValue(pattern.getPredicateVar());
+                    Value oVal = getValue(pattern.getObjectVar());
+
+                    sVal = (sVal == null) ? b.getValue(pattern.getSubjectVar().getName()) : sVal;
+                    pVal = (pVal == null) ? b.getValue(pattern.getPredicateVar().getName()) : pVal;
+                    oVal = (oVal == null) ? b.getValue(pattern.getObjectVar().getName()) : oVal;
+
 
                     if (rectangles.containsKey(pVal)) {
                         rect = rectangles.get(pVal);

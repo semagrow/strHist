@@ -6,6 +6,7 @@ import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.algebra.TupleExpr;
+import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.QueryParserUtil;
 import org.openrdf.rio.RDFFormat;
@@ -67,7 +68,7 @@ public class RDFQueryLogParser implements QueryLogParser {
         long cardinality = parseCardinality(model.filter(qr, QFR.CARDINALITY, null).objectLiteral(), model);
         TupleExpr expr = parseQuery(model.filter(qr, QFR.QUERY, null).objectValue(), model);
 
-        QueryLogRecord r = new QueryLogRecordImpl(null, endpoint, expr, Collections.<String>emptyList());
+        QueryLogRecord r = new QueryLogRecordImpl(null, endpoint, expr, EmptyBindingSet.getInstance(), Collections.<String>emptyList());
 
         //r.setDuration(startTime, endTime);
 

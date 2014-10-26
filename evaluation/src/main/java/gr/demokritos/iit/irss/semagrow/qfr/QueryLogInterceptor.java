@@ -10,6 +10,7 @@ import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.TupleExpr;
+import org.openrdf.query.impl.EmptyBindingSet;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,7 +37,7 @@ public class QueryLogInterceptor {
     public CloseableIteration<BindingSet, QueryEvaluationException>
         afterExecution(URI endpoint, TupleExpr expr, BindingSet bindings, CloseableIteration<BindingSet, QueryEvaluationException> result) {
 
-        QueryLogRecordImpl metadata = createMetadata(endpoint, expr, bindings.getBindingNames());
+        QueryLogRecordImpl metadata = createMetadata(endpoint, expr, bindings, bindings.getBindingNames());
         return observe(metadata, result);
     }
 
@@ -57,13 +58,13 @@ public class QueryLogInterceptor {
 
         Set<String> bindingNames = (bindings.size() == 0) ? new HashSet<String>() : bindings.get(0).getBindingNames();
 
-        QueryLogRecordImpl metadata = createMetadata(endpoint, expr, bindingNames);
+        QueryLogRecordImpl metadata = createMetadata(endpoint, expr, EmptyBindingSet.getInstance(), bindingNames);
 
         return observe(metadata, result);
     }
 
-    protected QueryLogRecordImpl createMetadata(URI endpoint, TupleExpr expr, Set<String> bindingNames) {
-        return new QueryLogRecordImpl(UUID.randomUUID(), endpoint, expr, bindingNames);
+    protected QueryLogRecordImpl createMetadata(URI endpoint, TupleExpr expr, BindingSet bindings, Set<String> bindingNames) {
+        return new QueryLogRecordImpl(UUID.randomUUID(), endpoint, expr, bindings, bindingNames);
     }
 
     protected CloseableIteration<BindingSet, QueryEvaluationException>

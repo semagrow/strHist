@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
 import org.openrdf.model.URI;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.algebra.TupleExpr;
 
 import java.util.Date;
@@ -13,6 +14,8 @@ public interface QueryLogRecord {
     URI getEndpoint();
 
     TupleExpr getQuery();
+
+    BindingSet getBindings();
 
     java.util.UUID getSession();
 
