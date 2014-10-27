@@ -127,49 +127,46 @@ public class STHolesHistogram<R extends Rectangle<R>>
 
 
         List<R> rects = new ArrayList<R>();
+
         if (queryRecord.getRectangle().isInfinite()) {
-            rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
+            //rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
+            rects.addAll(queryRecord.getResultSet().getRectangles());
         } else {
             rects.add(queryRecord.getRectangle());
         }
 
         for (R rect : rects) {
-            // check if root is null
-            if (root == null) {
 
-                root = new STHolesBucket<R>(rect, new Stat(), null, null);
+            if (this.getRoot() == null) {
+
+                setRoot(new STHolesBucket<R>(rect, new Stat(), null, null));
                 bucketsNum += 1;
+
             } else {
 
                 // expand root
                 if (!root.getBox().contains(rect)) {
 
                     // expand root box so that it includes q
+
                     R boxN = root.getBox().computeTightBox(rect);
+
                     //     System.out.println("Rectangle: " + queryRecord.getRectangle());
                     //     System.out.println("Box: " + root.getBox());
 
                     Stat statsN = countMatchingTuples(rect, queryRecord);
-                    // freqN = freq(root) + freq(q)
-                    // dN(i) = max(d(i,root), d(i,q))
-                    long freqN = statsN.getFrequency() +
-                            root.getStatistics().getFrequency();
-                    List<Long> distinctN = new ArrayList<Long>();
-                    for (int i = 0; i < statsN.getDistinctCount().size(); i++) {
+                    Stat rootStatsN = computeRootStats(root.getStatistics(), statsN);
 
-                        distinctN.add(Math.max(statsN.getDistinctCount().get(i),
-                                root.getStatistics().getDistinctCount().get(i)));
-                    }
                     //Collection<STHolesBucket<R>> childrenN =
-                      //      new ArrayList<STHolesBucket<R>>();
+                    //      new ArrayList<STHolesBucket<R>>();
                     //STHolesBucket<R> rootN =
-                      //      new STHolesBucket<R>(boxN, new Stat(freqN, distinctN), childrenN, null);
+                    //      new STHolesBucket<R>(boxN, new Stat(freqN, distinctN), childrenN, null);
                     //bucketsNum += 1;
                     //rootN.addChild(root);
-                   // root = rootN;
-                    statsN = new Stat(freqN, distinctN);
+                    // root = rootN;
+
                     root.setBox(boxN);
-                    root.setStatistics(statsN);
+                    root.setStatistics(rootStatsN);
 
                 }
             }
@@ -192,6 +189,24 @@ public class STHolesHistogram<R extends Rectangle<R>>
         logger.debug("Histogram refined with query: " + queryRecord.getQuery());
         logger.debug("Compacting histogram.");
         compact();
+    }
+
+
+    private Stat computeRootStats(Stat oldStats, Stat deltaStats) {
+        // freqN = freq(root) + freq(q)
+        // dN(i) = max(d(i,root), d(i,q))
+
+        long freqN = deltaStats.getFrequency() + oldStats.getFrequency();
+
+        List<Long> distinctN = new ArrayList<Long>();
+
+        for (int i = 0; i < deltaStats.getDistinctCount().size(); i++) {
+
+            distinctN.add(Math.max(deltaStats.getDistinctCount().get(i),
+                    oldStats.getDistinctCount().get(i)));
+        }
+
+        return new Stat(freqN, distinctN);
     }
 
     //Tested
