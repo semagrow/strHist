@@ -37,6 +37,10 @@ public class NumQueryResult implements QueryResult<NumRectangle, Long>, Serializ
     }// getCardinality
 
 
+    public List<NumRectangle> getRectangles() {
+        return getRectangles(null);
+    }
+
     @Override
     public List<NumRectangle> getRectangles(NumRectangle rect) {
 

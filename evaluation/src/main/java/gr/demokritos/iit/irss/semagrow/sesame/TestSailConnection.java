@@ -39,7 +39,7 @@ public class TestSailConnection extends SailConnectionBase {
     private RepositoryConnection conn;
 
     private QueryLogHandler handler;
-    private ResultMaterializationManager manager;
+    static private ResultMaterializationManager manager;
     private ExecutorService executorService;
 
     public TestSailConnection(TestSail sailBase) throws RepositoryException {
@@ -55,7 +55,7 @@ public class TestSailConnection extends SailConnectionBase {
 
         QueryLogHandler handler;
 
-        File qfrLog = new File("/home/nickozoulis/semagrow/serial/qfr_log.ser");
+        File qfrLog = new File("/var/tmp/qfr_log.ser");
         RDFFormat rdfFF = RDFFormat.NTRIPLES;
 
 //        RDFWriterRegistry writerRegistry = RDFWriterRegistry.getInstance();
@@ -73,12 +73,16 @@ public class TestSailConnection extends SailConnectionBase {
     }
 
     private ResultMaterializationManager getMateralizationManager(){
-        File baseDir = new File("/var/tmp/");
-        TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
 
-        TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
-        TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
-        return new FileManager(baseDir, writerFactory, getExecutorService());
+        if (manager == null) {
+            File baseDir = new File("/var/tmp/");
+            TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
+
+            TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
+            TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
+            manager = new FileManager(baseDir, writerFactory, getExecutorService());
+        }
+        return manager;
     }
 
     private ExecutorService getExecutorService() {

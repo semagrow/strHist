@@ -341,6 +341,9 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
 	}
 
 
+    public List<RDFRectangle> getRectangles() {
+        return getRectangles(null);
+    }
     /**
      *
      * @param queryRect the rectangle extracted from query statements
