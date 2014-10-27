@@ -6,10 +6,12 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryResultHandler;
+import org.openrdf.query.TupleQueryResultHandlerException;
 import org.openrdf.query.resultio.*;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -87,6 +89,7 @@ public class FileManager implements ResultMaterializationManager {
             implements MaterializationHandle
     {
         private URI id;
+        private boolean started = false;
 
         public StoreHandler(URI id, QueryResultHandler handler) {
             super(handler);
@@ -103,10 +106,18 @@ public class FileManager implements ResultMaterializationManager {
             }
         }
 
+        @Override
+        public void startQueryResult(List<String> bindingNames) throws TupleQueryResultHandlerException {
+            super.startQueryResult(bindingNames);
+            started = true;
+        }
+
         public void destroy() throws IOException {
 
             try {
-                //super.endQueryResult();
+                if (started)
+                    super.endQueryResult();
+
                 File f = null;
                 f = new File(convertbackURI(id));
                 f.delete();
