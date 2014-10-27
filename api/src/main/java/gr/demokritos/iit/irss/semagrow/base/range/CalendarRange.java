@@ -97,7 +97,13 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
 
     //Tested
     public CalendarRange intersection(CalendarRange range) {
+        // Full intersection
+        if (this.contains(range))
+            return range;
+        if (range.contains(this))
+            return this;
 
+        // Partial Intersection
         CalendarRange res;
         Date nBegin = begin;
         Date nEnd = end;
@@ -203,6 +209,18 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
 
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        if (obj instanceof CalendarRange) {
+            CalendarRange cr = (CalendarRange)obj;
+
+            return (this.getBegin().equals(cr.getBegin()) && this.getEnd().equals(cr.getEnd())) ? true : false;
+        }
+
+        return false;
+    }
 
     public static void main(String args[] ) throws ParseException {
 

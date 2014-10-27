@@ -72,12 +72,12 @@ public class TestLogParser {
         parser.parseQueryLog(new FileInputStream(f));
         logger.info("Number of parsed query logs: " + logs.size());
 
-        for (QueryLogRecord queryRecord : logs) {
-            logger.info(queryRecord.getQuery().toString());
-            logger.info("Endpoint: " + queryRecord.getEndpoint());
-            logger.info("Cardinality: " + queryRecord.getCardinality());
-            logger.info("Duration: " + queryRecord.getDuration());
-            logger.info("Binding names: " + queryRecord.getBindingNames().toString());
+        for (QueryLogRecord queryLogRecord : logs) {
+            logger.info(queryLogRecord.getQuery().toString());
+            logger.info("Endpoint: " + queryLogRecord.getEndpoint());
+            logger.info("Cardinality: " + queryLogRecord.getCardinality());
+            logger.info("Duration: " + queryLogRecord.getDuration());
+            logger.info("Binding names: " + queryLogRecord.getBindingNames().toString());
         }
     }
 
