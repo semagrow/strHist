@@ -5,7 +5,6 @@ import com.bigdata.rdf.sail.BigdataSailRepository;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
-import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.io.sevod.VoIDSerializer;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
@@ -69,7 +68,7 @@ public class Workflow {
     static public void main(String[] args) throws RepositoryException, IOException {
         OptionParser parser = new OptionParser("s:e:l:t:a:");
         OptionSet options = parser.parse(args);
-        
+
         if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l")
                 && options.hasArgument("t") && options.hasArgument("a")) {
 
@@ -99,16 +98,16 @@ public class Workflow {
 
             // Query triple stores and get feedback.
             Repository repo = getFedRepository(getRepository(date));
-//            queryTripleStores(repo, date);
+            queryTripleStores(repo, date);
 
-            // Parse feedback logs.
-            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
-
-            // Refine histogram according to the feedback.
-            STHolesHistogram histogram = refineHistogram(listQueryRecords, date);
-
-            // Execute test queries on triple store and refined histogram.
-            execTestQueries(repo, histogram, date);
+//            // Parse feedback logs.
+//            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
+//
+//            // Refine histogram according to the feedback.
+//            STHolesHistogram histogram = refineHistogram(listQueryRecords, date);
+//
+//            // Execute test queries on triple store and refined histogram.
+//            execTestQueries(repo, histogram, date);
         }
     }
 

@@ -48,8 +48,10 @@ public class QueryResultObservingIteration extends ObservingIteration<BindingSet
         super.handleClose();
 
         try {
-            if (initialized2)
+            if (initialized2) {
                 handler.endQueryResult();
+                System.out.println("__ENDQUERYRESULT");
+            }
         } catch (TupleQueryResultHandlerException e) {
             throw new QueryEvaluationException(e);
         }

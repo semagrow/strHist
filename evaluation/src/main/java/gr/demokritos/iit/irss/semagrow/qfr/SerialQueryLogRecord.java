@@ -1,16 +1,17 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
-import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
 import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.algebra.TupleExpr;
+import org.openrdf.query.algebra.evaluation.QueryBindingSet;
+import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedTupleQuery;
 import org.openrdf.query.parser.QueryParserUtil;
 import org.openrdf.queryrender.sparql.SPARQLQueryRenderer;
 
-import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +22,8 @@ import java.util.UUID;
  */
 public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
 
-    private static final long serialVersionUID = 3274204530379085447L;
+    private static final long serialVersionUID = -5389996019343297997L;
+
     private transient QueryLogRecord queryLogRecord;
 
     public SerialQueryLogRecord(){}
@@ -39,6 +41,7 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
         out.writeObject(queryLogRecord.getEndTime());
         out.writeObject(queryLogRecord.getDuration());
         out.writeObject(queryLogRecord.getBindings());
+//        writeBindings(out, queryLogRecord.getBindings());
 
         ParsedTupleQuery q = new ParsedTupleQuery(queryLogRecord.getQuery());
         out.writeObject(new SPARQLQueryRenderer().render(q)); // String
@@ -46,7 +49,28 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
         // TODO: out.writeObject(queryLogRecord.getResult());
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException, MalformedQueryException {
+    private void writeBindings(ObjectOutputStream out, BindingSet bindings) throws Exception {
+        // The size of the BindingSet
+        out.writeObject(bindings.size());
+
+       if (bindings instanceof QueryBindingSet)
+            System.out.println("QueryBindingSet");
+
+        if (bindings.size() > 0) {
+
+        }
+    }
+
+    private BindingSet readBindings(ObjectInputStream in) throws Exception {
+        int size = (int)in.readObject();
+
+        if (size == 0)
+            return new EmptyBindingSet();
+
+        return null;
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws Exception {
         UUID uuid = (UUID)in.readObject();
         URI endpoint = (URI)in.readObject();
         List<String> bindingNames = (List<String>) in.readObject();
@@ -55,6 +79,7 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
         Date endTime = (Date)in.readObject();
         long duration = (long)in.readObject();
         BindingSet bindings = (BindingSet)in.readObject();
+//        BindingSet bindings = readBindings(in);
 
         ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL,
                                                             (String)in.readObject(),
@@ -66,6 +91,8 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
         this.queryLogRecord.setDuration(startTime.getTime(), endTime.getTime());
         //TODO: this.queryLogRecord.setResults();
     }
+
+
 
     public QueryLogRecord getQueryLogRecord() {
         return queryLogRecord;

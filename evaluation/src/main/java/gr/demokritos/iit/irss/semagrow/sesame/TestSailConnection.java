@@ -4,9 +4,8 @@ import gr.demokritos.iit.irss.semagrow.api.Histogram;
 import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.qfr.RDFQueryLogFactory;
+import gr.demokritos.iit.irss.semagrow.qfr.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.*;
@@ -22,8 +21,6 @@ import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFWriterFactory;
-import org.openrdf.rio.RDFWriterRegistry;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.SailConnectionBase;
 
@@ -32,7 +29,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by angel on 10/11/14.
@@ -59,12 +55,13 @@ public class TestSailConnection extends SailConnectionBase {
 
         QueryLogHandler handler;
 
-        File qfrLog  = new File("/var/tmp/qfr.log");
+        File qfrLog = new File("/home/nickozoulis/semagrow/serial/qfr_log.ser");
         RDFFormat rdfFF = RDFFormat.NTRIPLES;
 
-        RDFWriterRegistry writerRegistry = RDFWriterRegistry.getInstance();
-        RDFWriterFactory rdfWriterFactory = writerRegistry.get(rdfFF);
-        QueryLogFactory factory = new RDFQueryLogFactory(rdfWriterFactory);
+//        RDFWriterRegistry writerRegistry = RDFWriterRegistry.getInstance();
+//        RDFWriterFactory rdfWriterFactory = writerRegistry.get(rdfFF);
+//        QueryLogFactory factory = new RDFQueryLogFactory(rdfWriterFactory);
+        SerialQueryLogFactory factory = new SerialQueryLogFactory();
         try {
             OutputStream out = new FileOutputStream(qfrLog, true);
             handler = factory.getQueryRecordLogger(out);
