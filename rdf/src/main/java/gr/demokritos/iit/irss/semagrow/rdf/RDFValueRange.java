@@ -21,17 +21,20 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     }
 
     public RDFValueRange(RDFURIRange uriRange, RDFLiteralRange literalRange) {
-        assert uriRange != null && literalRange != null;
+        assert uriRange != null;
+        assert literalRange != null;
         this.uriRange = uriRange;
         this.literalRange = literalRange;
     }
 
     public RDFValueRange(RDFURIRange uriRange) {
         this(uriRange, new RDFLiteralRange());
+        assert uriRange != null;
     }
 
     public RDFValueRange(RDFLiteralRange literalRange) {
         this(new RDFURIRange(), literalRange);
+        assert literalRange != null;
     }
 
     public long getLength() {

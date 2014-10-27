@@ -103,9 +103,9 @@ public class Workflow {
 
         for (int date=startDate; date<=endDate; date++) {
             // Query triple stores and write feedback.
-            Repository repo = getFedRepository(getRepository(date), date);
-            queryTripleStores(repo, date);
-            repo.shutDown();
+            //Repository repo = getFedRepository(getRepository(date), date);
+            //queryTripleStores(repo, date);
+            //repo.shutDown();
 
             // Load feedback
             Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "_log.ser");
@@ -117,6 +117,7 @@ public class Workflow {
 //            // Execute test queries on triple store and refined histogram.
 //            execTestQueries(repo, histogram, date);
         }
+        executors.shutdown();
     }
 
     private static void queryTripleStores(Repository repo, int date) throws RepositoryException, IOException {

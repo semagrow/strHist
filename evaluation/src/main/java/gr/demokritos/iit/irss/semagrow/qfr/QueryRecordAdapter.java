@@ -298,13 +298,13 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             Value pVal = getValue(pattern.getPredicateVar());
             Value oVal = getValue(pattern.getObjectVar());
 
-            if (sVal != null)
+            if (sVal == null)
                 iter = new URIRangeFilterIteration(pattern.getSubjectVar().getName(), rectangle.getSubjectRange(), iter);
 
-            if (pVal != null)
+            if (pVal == null)
                 iter = new URIRangeFilterIteration(pattern.getPredicateVar().getName(), rectangle.getPredicateRange(), iter);
 
-            if (oVal != null)
+            if (oVal == null)
                 iter = new ValueRangeFilterIteration(pattern.getObjectVar().getName(), rectangle.getObjectRange(), iter);
 
             return iter;

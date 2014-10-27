@@ -132,6 +132,9 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
 
         if (infinite) return literalRange;
 
+        if (literalRange.isInfinite())
+            return this;
+
         RDFLiteralRange res = null;
 
         if (literalRange.ranges.size() != 1) {
@@ -155,7 +158,7 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
             RangeLength<?> range = entry.getValue();
             if (entry.getKey().equals(literalValueType)) {
 
-                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                if (literalValueType.equals(XMLSchema.INTEGER) || literalValueType.equals(XMLSchema.INT)) {
                     res = new RDFLiteralRange(literalValueType,
                             ((IntervalRange) range).intersection(
                                     (IntervalRange) literalrange));
@@ -180,6 +183,8 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         }
 
 
+        if (res == null)
+            return res;
 
         return res;
     }
@@ -189,7 +194,8 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
 	public RDFLiteralRange minus(RDFLiteralRange literalRange) {
 
 
-        if (infinite) return literalRange;
+        if (infinite)
+            return literalRange;
 
         RDFLiteralRange res = null;
 
@@ -215,7 +221,7 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
             RangeLength<?> range = entry.getValue();
             if (entry.getKey().equals(literalValueType)) {
 
-                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                if (literalValueType.equals(XMLSchema.INTEGER) || literalValueType.equals(XMLSchema.INT)) {
                     res = new RDFLiteralRange(literalValueType,
                             ((IntervalRange) range).minus(
                                     (IntervalRange) literalrange));
@@ -240,6 +246,8 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         }
 
 
+        if (res == null)
+            return res;
 
         return res;
 	}
@@ -386,7 +394,8 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
     //TODO: Fix me! na kanw add map entry
     public RDFLiteralRange tightRange(RDFLiteralRange literalRange) {
 
-        if (infinite) return new RDFLiteralRange();
+        if (infinite)
+            return new RDFLiteralRange();
 
 
 
@@ -421,7 +430,7 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
             RangeLength<?> range = entry.getValue();
             if (entry.getKey().equals(literalValueType)) {
 
-                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                if (literalValueType.equals(XMLSchema.INTEGER) || literalValueType.equals(XMLSchema.INT)) {
 
                     IntervalRange ires = ((IntervalRange) range).tightRange(
                             (IntervalRange) literalrange);

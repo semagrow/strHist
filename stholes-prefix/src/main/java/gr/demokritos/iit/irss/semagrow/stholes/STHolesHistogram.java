@@ -276,14 +276,16 @@ public class STHolesHistogram<R extends Rectangle<R>>
     private void  updateParticipants(List<STHolesBucket<R>> participants,
                                     STHolesBucket<R> bucket, R c) {
 
-        participants.clear();
+        List<STHolesBucket<R>> participantsNew = new LinkedList<STHolesBucket<R>>();
 
         for (STHolesBucket<R> bi : bucket.getChildren()) {
             if ((c.intersects(bi.getBox())) && (!c.contains(bi.getBox()))) {
 
-                participants.add(bi);
+                participantsNew.add(bi);
             }
         }
+
+        participants.retainAll(participantsNew);
     }
 
     /**
