@@ -281,11 +281,16 @@ public class PrefixRange
 
         String res;
 
-        res = "uriprefixes: { ";
+        res = "{";
+        boolean comma = false;
 
         for (String p : prefixList) {
 
-            res = res + p + " ";
+            if (comma)
+                res += ",";
+            res = "\"" + p + "\"";
+
+            comma = true;
         }
 
         res += "}";

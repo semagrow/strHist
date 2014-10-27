@@ -14,4 +14,6 @@ public interface QueryResult<R extends Rectangle<R>, S> {
     S getCardinality(R rect);
 
     List<R> getRectangles(R rect);
+
+    List<R> getRectangles();
 }

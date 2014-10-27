@@ -484,10 +484,6 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         return null;
     }
 
-    @Deprecated
-    public void expand(String v) {
-        throw new NotImplementedException();
-    }
 
     /**
      * expands an RDFLiteralRange containing ONLY

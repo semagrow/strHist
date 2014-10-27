@@ -108,11 +108,17 @@ public class ExplicitSetRange<T>
     public String toString() {
         String res;
 
-        res = "uris: { ";
+        res = "{ ";
+        boolean comma = false;
 
         for (T p : items) {
 
-            res = res + p + " ";
+            if (comma)
+                res +=", ";
+
+            res += p;
+
+            comma = true;
         }
 
         res += "}";

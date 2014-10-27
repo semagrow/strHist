@@ -25,6 +25,14 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
         this.literalRange = literalRange;
     }
 
+    public RDFValueRange(RDFURIRange uriRange) {
+        this(uriRange, null);
+    }
+
+    public RDFValueRange(RDFLiteralRange literalRange) {
+        this(null, literalRange);
+    }
+
     public long getLength() {
         long length = 0;
 
