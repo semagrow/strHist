@@ -46,24 +46,24 @@ public class Workflow {
         Variables for local run
      */
 //    private static List<String> agroTerms = loadAgroTerms("/home/nickozoulis/agrovoc_terms.txt");
-//    public static String logFolder = "/home/nickozoulis/strhist_exp_logs/";
+//    public static String logFolder = "/home/nickozoulis/semagrow/serial/";
 //    private static String tripleStorePath = "/home/nickozoulis/Downloads/";
 //    private static int term = 0;
 //    private static int startDate = 1980, endDate = 1980;
-//    public static Path path =  Paths.get(logFolder, "semagrow_logs.log");
 
 
     static final Logger logger = LoggerFactory.getLogger(Workflow.class);
-
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
     private static String testQ1 = prefixes + "select * {?x semagrow:year %s . }";
+    static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
+    private static ExecutorService executors;
+
 
     private static List<String> agroTerms;
     private static String logFolder, tripleStorePath;
     private static int term = 0, startDate, endDate;
     public static Path path;
-    static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
-    private static ExecutorService executors;
+
 
 
     /**
@@ -106,9 +106,9 @@ public class Workflow {
 //            path = Paths.get(logFolder, "semagrow_log_" + date + ".log");
 
             // Query triple stores and write feedback.
-            Repository repo = getFedRepository(getRepository(date), date);
-            queryTripleStores(repo, date);
-            repo.shutDown();
+//            Repository repo = getFedRepository(getRepository(date), date);
+//            queryTripleStores(repo, date);
+//            repo.shutDown();
 
             // Load feedback
             Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "_log.ser");
