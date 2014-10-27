@@ -153,7 +153,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             if (o instanceof Literal) {
                 Literal l = (Literal)o;
                 RDFLiteralRange lRange = new RDFLiteralRange(l.getDatatype(), computeObjectRange(l));
-                oRange = new RDFValueRange(null, lRange);
+                oRange = new RDFValueRange(lRange);
             }
         }
 
@@ -245,7 +245,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         if (ranges.isEmpty())
             return new RDFValueRange();
         else
-            return new RDFValueRange(null, new RDFLiteralRange(ranges));
+            return new RDFValueRange(new RDFLiteralRange(ranges));
     }
 
     private Collection<ValueExpr> findRelevantFilters(Var var, Collection<ValueExpr> filters) {

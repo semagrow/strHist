@@ -117,7 +117,7 @@ public class VoIDeserializer {
     private RDFValueRange getRDFValueRange(Resource res) {
         //RDFURIRange r = get
         RDFLiteralRange lr = getRDFLiteralRange(res);
-        return new RDFValueRange(null,lr);
+        return new RDFValueRange(lr);
     }
 
     private RDFLiteralRange getRDFLiteralRange(Resource res) {

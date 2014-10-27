@@ -121,7 +121,7 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
             fillObjectRange(literalRange, oVal);
 
 
-        RDFValueRange objectRange = new RDFValueRange(null, literalRange);
+        RDFValueRange objectRange = new RDFValueRange(literalRange);
 
         return new RDFRectangle(subjectRange, predicateRange, objectRange);
     }

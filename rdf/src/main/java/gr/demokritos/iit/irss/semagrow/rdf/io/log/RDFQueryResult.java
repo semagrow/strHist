@@ -532,10 +532,10 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                         if (value.contains("^^") && value.contains("http://")) {
                             //todo: check if it is xsd uri
                             if (type.equals("int") || type.equals("integer")) {
-                                objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v))));
+                                objectRanges.add(new RDFValueRange(new RDFLiteralRange(Integer.parseInt(v), Integer.parseInt(v))));
 
                             } else if (type.equals("long")) {
-                                objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(Long.parseLong(v), Long.parseLong(v))));
+                                objectRanges.add(new RDFValueRange(new RDFLiteralRange(Long.parseLong(v), Long.parseLong(v))));
 
                             } else if (type.equals("dateTime")) {
 
@@ -551,16 +551,16 @@ public class RDFQueryResult implements QueryResult<RDFRectangle,Stat>, Serializa
                                 }
 
                                 if (dateLow != null && dateHigh != null)
-                                    objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(dateLow, dateHigh)));
+                                    objectRanges.add(new RDFValueRange(new RDFLiteralRange(dateLow, dateHigh)));
                                 else
                                     System.err.println("Date Format Error.");
                             }
                         } else if (!value.contains("^^") && value.contains("http://")) {// URL
                             //todo: do i need this check above as well?
-                            objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(value)));
+                            objectRanges.add(new RDFValueRange(new RDFLiteralRange(value)));
 
                         } else {// Plain Literal
-                            objectRanges.add(new RDFValueRange(null,new RDFLiteralRange(value)));
+                            objectRanges.add(new RDFValueRange(new RDFLiteralRange(value)));
                         }
 
                     } else {
