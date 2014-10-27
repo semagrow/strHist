@@ -33,10 +33,10 @@ public class TestSail extends SailBase {
 
     private ExecutorService executorService;
 
-    private int fileName;
+    private int year;
 
-    public TestSail(Repository actual, int fileName) {
-        this.fileName = fileName;
+    public TestSail(Repository actual, int year) {
+        this.year = year;
         actualRepo = actual;
         executorService = Executors.newFixedThreadPool(10);
     }
@@ -65,11 +65,14 @@ public class TestSail extends SailBase {
             SerialQueryLogFactory factory = new SerialQueryLogFactory();
             try {
 //                File qfrLog = File.createTempFile("qfr", ".log", new File("/var/tmp/"));
-                File qfrLog = new File("/var/tmp/" + fileName + "_log.ser");
+                File dir = new File("/var/tmp/" + year + "/");
+                if (!dir.exists())
+                    dir.mkdir();
+
+                File qfrLog = new File("/var/tmp/" + year + "/" + year + "_log.ser");
                 OutputStream out = new FileOutputStream(qfrLog, true);
                 handler = factory.getQueryRecordLogger(out);
-            } catch (IOException e) {
-            }
+            } catch (IOException e) {e.printStackTrace();}
         }
 
         return handler;
@@ -92,7 +95,7 @@ public class TestSail extends SailBase {
     @Override
     protected SailConnection getConnectionInternal() throws SailException {
         try {
-            return new TestSailConnection(this);
+            return new TestSailConnection(this, year);
         } catch (RepositoryException e) {
             throw new SailException(e);
         }

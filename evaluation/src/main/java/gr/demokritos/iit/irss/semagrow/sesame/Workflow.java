@@ -64,6 +64,8 @@ public class Workflow {
     private static int term = 0, startDate, endDate;
     public static Path path;
 
+    public static int YEAR;
+
 
 
     /**
@@ -102,17 +104,18 @@ public class Workflow {
         executors = Executors.newCachedThreadPool();
 
         for (int date=startDate; date<=endDate; date++) {
+            YEAR = date;
             // Query triple stores and write feedback.
             Repository repo = getFedRepository(getRepository(date), date);
             queryTripleStores(repo, date);
             repo.shutDown();
 
-            // Load feedback
-            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "_log.ser");
-            Collection<QueryRecord> queryRecords = adaptLogs(logs);
-
-            // Refine histogram according to the feedback.
-            STHolesHistogram histogram = refineHistogram(queryRecords, date);
+//            // Load feedback
+//            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "/" + date + "_log.ser");
+//            Collection<QueryRecord> queryRecords = adaptLogs(logs, date);
+//
+//            // Refine histogram according to the feedback.
+//            STHolesHistogram histogram = refineHistogram(queryRecords, date);
 
 //            // Execute test queries on triple store and refined histogram.
 //            execTestQueries(repo, histogram, date);
@@ -161,12 +164,12 @@ public class Workflow {
         return logs;
     }
 
-    private static Collection<QueryRecord> adaptLogs(Collection<QueryLogRecord> logs) {
+    private static Collection<QueryRecord> adaptLogs(Collection<QueryLogRecord> logs, int year) {
         Collection<QueryRecord> queryRecords = new LinkedList<QueryRecord>();
         Iterator iter = logs.iterator();
 
         while (iter.hasNext()) {
-            queryRecords.add(new QueryRecordAdapter((QueryLogRecord)iter.next(), getMateralizationManager()));
+            queryRecords.add(new QueryRecordAdapter((QueryLogRecord)iter.next(), getMateralizationManager(year)));
         }
 
         return queryRecords;
@@ -340,8 +343,8 @@ public class Workflow {
         return list;
     }
 
-    private static ResultMaterializationManager getMateralizationManager() {
-        File baseDir = new File("/var/tmp/");
+    private static ResultMaterializationManager getMateralizationManager(int year) {
+        File baseDir = new File("/var/tmp/" + year + "/");
         TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
 
         TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
