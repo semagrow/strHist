@@ -65,6 +65,7 @@ public class Workflow {
     static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
     private static ExecutorService executors;
 
+
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path, t = TripleStore, a = AgroknowTerms
      * @param args
@@ -102,14 +103,15 @@ public class Workflow {
 
         for (int date=startDate; date<=endDate; date++) {
 
-            path = Paths.get(logFolder, "semagrow_log_" + date + ".log");
+//            path = Paths.get(logFolder, "semagrow_log_" + date + ".log");
 
             // Query triple stores and write feedback.
-            Repository repo = getFedRepository(getRepository(date));
+            Repository repo = getFedRepository(getRepository(date), date);
             queryTripleStores(repo, date);
+            repo.shutDown();
 
             // Load feedback
-            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/qfr_log.ser");
+            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "_log.ser");
             Collection<QueryRecord> queryRecords = adaptLogs(logs);
 
             // Refine histogram according to the feedback.
@@ -264,8 +266,8 @@ public class Workflow {
         return 0;
     }
 
-    private static Repository getFedRepository(Repository actual) throws RepositoryException {
-        TestSail sail = new TestSail(actual);
+    private static Repository getFedRepository(Repository actual, int date) throws RepositoryException {
+        TestSail sail = new TestSail(actual, date);
 //        histogram = sail.getHistogram();
         Repository repo = new SailRepository(sail);
         repo.initialize();
