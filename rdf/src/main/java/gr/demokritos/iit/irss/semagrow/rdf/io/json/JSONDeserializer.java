@@ -159,7 +159,7 @@ public class JSONDeserializer {
 
         }// while
 
-        return new RDFValueRange(null,new RDFLiteralRange(ranges));
+        return new RDFValueRange(new RDFLiteralRange(ranges));
     }
 
 

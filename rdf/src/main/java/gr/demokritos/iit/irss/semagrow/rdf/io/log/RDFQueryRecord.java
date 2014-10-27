@@ -148,7 +148,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 			objectRange = new RDFLiteralRange(binding.getValue());
 		}	
 		
-		return new RDFValueRange(null,objectRange);
+		return new RDFValueRange(objectRange);
 	}// getObjectRange
 	
 	
