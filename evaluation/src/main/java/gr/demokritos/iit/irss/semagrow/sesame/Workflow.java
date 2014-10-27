@@ -102,13 +102,10 @@ public class Workflow {
         executors = Executors.newCachedThreadPool();
 
         for (int date=startDate; date<=endDate; date++) {
-
-//            path = Paths.get(logFolder, "semagrow_log_" + date + ".log");
-
             // Query triple stores and write feedback.
-//            Repository repo = getFedRepository(getRepository(date), date);
-//            queryTripleStores(repo, date);
-//            repo.shutDown();
+            Repository repo = getFedRepository(getRepository(date), date);
+            queryTripleStores(repo, date);
+            repo.shutDown();
 
             // Load feedback
             Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "_log.ser");
