@@ -3,9 +3,7 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
 import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.qfr.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.*;
@@ -20,14 +18,10 @@ import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
 import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.SailConnectionBase;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -41,14 +35,16 @@ public class TestSailConnection extends SailConnectionBase {
     private QueryLogHandler handler;
     static private ResultMaterializationManager manager;
     private ExecutorService executorService;
+    private int year;
 
-    public TestSailConnection(TestSail sailBase) throws RepositoryException {
+    public TestSailConnection(TestSail sailBase, int year) throws RepositoryException {
         super(sailBase);
         sail = sailBase;
         conn = sail.getRepositoryConnection();
         handler = sail.getQueryLogHandler();
         executorService = sail.getExecutorService();
         manager = getMateralizationManager();
+        this.year = year;
     }
 
     public QueryLogHandler getQueryLogHandler() { return handler; }
@@ -56,7 +52,10 @@ public class TestSailConnection extends SailConnectionBase {
     private ResultMaterializationManager getMateralizationManager(){
 
         if (manager == null) {
-            File baseDir = new File("/var/tmp/");
+            File baseDir = new File("/var/tmp/" + Workflow.YEAR + "/");
+            if (!baseDir.exists())
+                baseDir.mkdir();
+
             TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
 
             TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
