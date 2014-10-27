@@ -1,6 +1,9 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
+import gr.demokritos.iit.irss.semagrow.qfr.QueryLogException;
+import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
+import gr.demokritos.iit.irss.semagrow.qfr.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import org.openrdf.model.ValueFactory;
@@ -8,10 +11,13 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
+import org.openrdf.sail.config.SailConfigException;
 import org.openrdf.sail.helpers.SailBase;
 
+import java.io.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,9 +50,40 @@ public class TestSail extends SailBase {
         return histogram;
     }
 
+    QueryLogHandler handler;
+
+    public QueryLogHandler getQueryLogHandler() {
+
+        RDFFormat rdfFF = RDFFormat.NTRIPLES;
+
+        if (handler == null) {
+//        RDFWriterRegistry writerRegistry = RDFWriterRegistry.getInstance();
+//        RDFWriterFactory rdfWriterFactory = writerRegistry.get(rdfFF);
+//        QueryLogFactory factory = new RDFQueryLogFactory(rdfWriterFactory);
+            SerialQueryLogFactory factory = new SerialQueryLogFactory();
+            try {
+                File qfrLog = File.createTempFile("qfr", ".log", new File("/var/tmp/"));
+                OutputStream out = new FileOutputStream(qfrLog, true);
+                handler = factory.getQueryRecordLogger(out);
+            } catch (IOException e) {
+            }
+        }
+
+        return handler;
+    }
+
     @Override
     protected void shutDownInternal() throws SailException {
+
         executorService.shutdown();
+
+        if (handler != null)
+            try {
+                handler.endQueryLog();
+            } catch (QueryLogException e) {
+                throw new SailException(e);
+            }
+
     }
 
     @Override

@@ -46,31 +46,12 @@ public class TestSailConnection extends SailConnectionBase {
         super(sailBase);
         sail = sailBase;
         conn = sail.getRepositoryConnection();
-        handler = getQueryLogHandler();
+        handler = sail.getQueryLogHandler();
         executorService = sail.getExecutorService();
         manager = getMateralizationManager();
     }
 
-    private QueryLogHandler getQueryLogHandler() {
-
-        QueryLogHandler handler;
-
-        File qfrLog = new File("/var/tmp/qfr_log.ser");
-        RDFFormat rdfFF = RDFFormat.NTRIPLES;
-
-//        RDFWriterRegistry writerRegistry = RDFWriterRegistry.getInstance();
-//        RDFWriterFactory rdfWriterFactory = writerRegistry.get(rdfFF);
-//        QueryLogFactory factory = new RDFQueryLogFactory(rdfWriterFactory);
-        SerialQueryLogFactory factory = new SerialQueryLogFactory();
-        try {
-            OutputStream out = new FileOutputStream(qfrLog, true);
-            handler = factory.getQueryRecordLogger(out);
-            return handler;
-        } catch (FileNotFoundException e) {
-
-        }
-        return null;
-    }
+    public QueryLogHandler getQueryLogHandler() { return handler; }
 
     private ResultMaterializationManager getMateralizationManager(){
 
@@ -93,9 +74,7 @@ public class TestSailConnection extends SailConnectionBase {
     protected void closeInternal() throws SailException {
         try {
             conn.close();
-            if (handler != null)
-                handler.endQueryLog();
-        } catch (RepositoryException | QueryLogException e) {
+        } catch (RepositoryException e) {
             throw new SailException(e);
         }
     }
