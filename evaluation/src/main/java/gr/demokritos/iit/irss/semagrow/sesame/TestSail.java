@@ -1,10 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import gr.demokritos.iit.irss.semagrow.api.Histogram;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
 import gr.demokritos.iit.irss.semagrow.qfr.SerialQueryLogFactory;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -14,10 +12,12 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
-import org.openrdf.sail.config.SailConfigException;
 import org.openrdf.sail.helpers.SailBase;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,8 +33,10 @@ public class TestSail extends SailBase {
 
     private ExecutorService executorService;
 
-    public TestSail(Repository actual) {
+    private int fileName;
 
+    public TestSail(Repository actual, int fileName) {
+        this.fileName = fileName;
         actualRepo = actual;
         executorService = Executors.newFixedThreadPool(10);
     }
@@ -62,7 +64,8 @@ public class TestSail extends SailBase {
 //        QueryLogFactory factory = new RDFQueryLogFactory(rdfWriterFactory);
             SerialQueryLogFactory factory = new SerialQueryLogFactory();
             try {
-                File qfrLog = File.createTempFile("qfr", ".log", new File("/var/tmp/"));
+//                File qfrLog = File.createTempFile("qfr", ".log", new File("/var/tmp/"));
+                File qfrLog = new File("/var/tmp/" + fileName + "_log.ser");
                 OutputStream out = new FileOutputStream(qfrLog, true);
                 handler = factory.getQueryRecordLogger(out);
             } catch (IOException e) {
