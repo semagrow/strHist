@@ -2,10 +2,13 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
+import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.file.FileManager;
+import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
+import gr.demokritos.iit.irss.semagrow.qfr.*;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
-import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.io.sevod.VoIDSerializer;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import info.aduna.iteration.Iteration;
@@ -18,6 +21,9 @@ import org.openrdf.query.*;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedTupleQuery;
 import org.openrdf.query.parser.QueryParserUtil;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
+import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -28,10 +34,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by angel on 10/11/14.
@@ -58,6 +63,7 @@ public class Workflow {
     private static int term = 0, startDate, endDate;
     public static Path path;
     static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
+    private static ExecutorService executors;
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path, t = TripleStore, a = AgroknowTerms
@@ -92,20 +98,23 @@ public class Workflow {
     }
 
     private static void runMultiAnnualExperiment() throws RepositoryException, IOException {
+        executors = Executors.newCachedThreadPool();
+
         for (int date=startDate; date<=endDate; date++) {
 
             path = Paths.get(logFolder, "semagrow_log_" + date + ".log");
 
-            // Query triple stores and get feedback.
+            // Query triple stores and write feedback.
             Repository repo = getFedRepository(getRepository(date));
             queryTripleStores(repo, date);
 
-//            // Parse feedback logs.
-//            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
-//
-//            // Refine histogram according to the feedback.
-//            STHolesHistogram histogram = refineHistogram(listQueryRecords, date);
-//
+            // Load feedback
+            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/qfr_log.ser");
+            Collection<QueryRecord> queryRecords = adaptLogs(logs);
+
+            // Refine histogram according to the feedback.
+            STHolesHistogram histogram = refineHistogram(queryRecords, date);
+
 //            // Execute test queries on triple store and refined histogram.
 //            execTestQueries(repo, histogram, date);
         }
@@ -136,7 +145,35 @@ public class Workflow {
             }
     }
 
-    private static STHolesHistogram refineHistogram(List<RDFQueryRecord> listQueryRecords, int date) {
+    private static Collection<QueryLogRecord> parseFeedbackLog(String path) {
+        Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
+        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+        QueryLogParser parser = new SerialQueryLogParser();
+        parser.setQueryRecordHandler(handler);
+
+        logger.info("Parsing file : " + path);
+        try {
+            parser.parseQueryLog(new FileInputStream(path));
+        } catch (FileNotFoundException e) {e.printStackTrace();
+        } catch (QueryLogException e) {e.printStackTrace();
+        } catch (IOException e) {e.printStackTrace();}
+        logger.info("Number of parsed query logs: " + logs.size());
+
+        return logs;
+    }
+
+    private static Collection<QueryRecord> adaptLogs(Collection<QueryLogRecord> logs) {
+        Collection<QueryRecord> queryRecords = new LinkedList<QueryRecord>();
+        Iterator iter = logs.iterator();
+
+        while (iter.hasNext()) {
+            queryRecords.add(new QueryRecordAdapter((QueryLogRecord)iter.next(), getMateralizationManager()));
+        }
+
+        return queryRecords;
+    }
+
+    private static STHolesHistogram refineHistogram(Collection<QueryRecord> listQueryRecords, int date) {
         STHolesHistogram histogram = loadPreviousHistogram(logFolder, date);
 
         if (listQueryRecords.size() > 0) {
@@ -302,6 +339,15 @@ public class Workflow {
         }
 
         return list;
+    }
+
+    private static ResultMaterializationManager getMateralizationManager() {
+        File baseDir = new File("/var/tmp/");
+        TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
+
+        TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
+        TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
+        return new FileManager(baseDir, writerFactory, executors);
     }
 
 }
