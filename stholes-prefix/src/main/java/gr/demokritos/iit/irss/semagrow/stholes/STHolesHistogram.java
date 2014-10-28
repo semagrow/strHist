@@ -88,9 +88,9 @@ public class STHolesHistogram<R extends Rectangle<R>>
         for (STHolesBucket<R> enclosingB : enclosingBuckets) {
             long bucketEstimation = enclosingB.getEstimate(rec);
             est += bucketEstimation;
-            logger.debug("Enclosing  " + enclosingB.toString());
-            logger.debug("Estimated triples: [" + bucketEstimation + "]");
-            logger.debug("Current estimation sum: [" + est + "]");
+            logger.info("Enclosing  " + enclosingB.toString());
+            logger.info("Estimated triples: [" + bucketEstimation + "]");
+            logger.info("Current estimation sum: [" + est + "]");
         }
 
         return est;
@@ -186,8 +186,8 @@ public class STHolesHistogram<R extends Rectangle<R>>
         }
 
         // check if histogram must be compacted after refinement
-        logger.debug("Histogram refined with query: " + queryRecord.getQuery());
-        logger.debug("Compacting histogram.");
+        logger.info("Histogram refined with query: " + queryRecord.getQuery());
+        logger.info("Compacting histogram.");
         compact();
     }
 
@@ -443,9 +443,9 @@ public class STHolesHistogram<R extends Rectangle<R>>
              STHolesBucket<R> bn = bestMerge.getBn();
 
             STHolesBucket.merge(b1, b2, bn, this);
-            logger.debug("Bert merge info: " + bestMerge.toString());
-            logger.debug("Number of PC merges: " + pcMergesNum);
-            logger.debug("Number of SS merges: " + ssMergesNum);
+            logger.info("Bert merge info: " + bestMerge.toString());
+            logger.info("Number of PC merges: " + pcMergesNum);
+            logger.info("Number of SS merges: " + ssMergesNum);
             bucketsNum -= 1;
         }
     }
