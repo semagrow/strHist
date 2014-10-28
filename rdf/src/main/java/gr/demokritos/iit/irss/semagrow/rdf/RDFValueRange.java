@@ -104,7 +104,7 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     }
 
     public boolean hasSameType(RDFValueRange rdfValueRange) {
-        if (literalRange.isInfinite() && rdfValueRange.isInfinite())
+        if (this.isInfinite() && rdfValueRange.isInfinite())
             return true;
         else
             return literalRange.hasSameType(rdfValueRange.literalRange);
@@ -113,4 +113,14 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     public RDFLiteralRange getLiteralRange() { return literalRange; }
 
     public RDFURIRange getUriRange() { return uriRange; }
+
+    @Override
+    public String toString()  {
+        if (uriRange != null && !uriRange.getPrefixList().isEmpty())
+            return uriRange.toString();
+        else if (literalRange != null)
+            return literalRange.toString();
+
+        return "{}";
+    }
 }

@@ -60,12 +60,21 @@ public class Stat {
 
     public String toString() {
 
-        String res;
-        res =   "statistics:\n"
-                + "\ttriples : \n\t\t" + frequency +
-                "\n\tdistinctSubjects : \n\t\t" + distinctCount.get(0) +
-                "\n\tdistinctPredicates : \n\t\t" + distinctCount.get(1) +
-                "\n\tdistinctObjects : \n\t\t" + distinctCount.get(2) + "\n";
+        String res = "";
+
+        res += "(";
+        res += frequency.toString() + ",";
+        res += "{";
+        boolean comma = false;
+        for (Long d : distinctCount) {
+            if (comma)
+                res += ",";
+
+            res += d.toString();
+            comma = true;
+        }
+        res +="}";
+        res += ")";
 
         return res;
 

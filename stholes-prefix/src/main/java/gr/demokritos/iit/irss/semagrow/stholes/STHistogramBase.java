@@ -31,9 +31,10 @@ public abstract class STHistogramBase<R extends Rectangle<R>, S> implements STHi
         //logger.debug("Number of buckets before refine: " + bucketsNum);
         int i = 1;
         while (workload.hasNext()) {
-            logger.info("Refining query no"+i);
+            QueryRecord<R,S> record = workload.next();
+            logger.info("Refining query"+ i + " with rectangle " + record.getRectangle().toString());
             i++;
-            refine(workload.next());
+            refine(record);
         }
 
         //logger.debug("Number of buckets after refine: " + bucketsNum);

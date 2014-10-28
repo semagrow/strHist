@@ -88,9 +88,9 @@ public class STHolesHistogram<R extends Rectangle<R>>
         for (STHolesBucket<R> enclosingB : enclosingBuckets) {
             long bucketEstimation = enclosingB.getEstimate(rec);
             est += bucketEstimation;
-            logger.info("Enclosing  " + enclosingB.toString());
-            logger.info("Estimated triples: [" + bucketEstimation + "]");
-            logger.info("Current estimation sum: [" + est + "]");
+            logger.debug("Enclosing  " + enclosingB.toString());
+            logger.debug("Estimated triples: [" + bucketEstimation + "]");
+            logger.debug("Current estimation sum: [" + est + "]");
         }
 
         return est;
@@ -184,17 +184,16 @@ public class STHolesHistogram<R extends Rectangle<R>>
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
                 //System.out.println("<<<>>> Hole: " + hole);
                 if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole)) {
+                    logger.info("Drilling hole " + hole.getBox().toString() + " with statistics " + hole.getStatistics().toString());
                     drillHole(bucket, hole);
-                    logger.info("Hole is drilled");
                 } else {
-                    logger.info("Skipping Drill hole");
+                    logger.info("Skip drilling hole for bucket " + bucket.getBox().toString());
                 }
             }
         }
 
         // check if histogram must be compacted after refinement
-        logger.info("Histogram refined with query: " + queryRecord.getQuery());
-        logger.info("Compacting histogram.");
+        logger.debug("Histogram refined with query: " + queryRecord.getRectangle());
         compact();
     }
 
@@ -439,6 +438,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
      */
     private void compact() {
 
+        logger.debug("Compacting histogram.");
         // while too many buckets compute merge penalty for each parent-child
         // and sibling pair, find the one with the minimum penalty and
         // call merge(b1,b2,bn)
@@ -450,9 +450,9 @@ public class STHolesHistogram<R extends Rectangle<R>>
              STHolesBucket<R> bn = bestMerge.getBn();
 
             STHolesBucket.merge(b1, b2, bn, this);
-            logger.info("Bert merge info: " + bestMerge.toString());
-            logger.info("Number of PC merges: " + pcMergesNum);
-            logger.info("Number of SS merges: " + ssMergesNum);
+            logger.debug("Best merge info: " + bestMerge.toString());
+            logger.debug("Number of PC merges: " + pcMergesNum);
+            logger.debug("Number of SS merges: " + ssMergesNum);
             bucketsNum -= 1;
         }
     }
