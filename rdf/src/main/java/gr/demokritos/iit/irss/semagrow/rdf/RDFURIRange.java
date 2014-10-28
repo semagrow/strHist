@@ -60,4 +60,7 @@ public class RDFURIRange implements RangeLength<URI>, Rangeable<RDFURIRange> {
         return range.getPrefixList();
     }
 
+    @Override
+    public String toString() { return range.toString(); }
+
 }

@@ -111,11 +111,11 @@ public class Workflow {
             //repo.shutDown();
 
 //            // Load feedback
-//            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "/" + date + "_log.ser");
-//            Collection<QueryRecord> queryRecords = adaptLogs(logs, date);
+            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "/" + date + "_log.ser");
+            Collection<QueryRecord> queryRecords = adaptLogs(logs, date);
 //
 //            // Refine histogram according to the feedback.
-//            STHolesHistogram histogram = refineHistogram(queryRecords, date);
+            STHolesHistogram histogram = refineHistogram(queryRecords, date);
 
 //            // Execute test queries on triple store and refined histogram.
 //            execTestQueries(repo, histogram, date);

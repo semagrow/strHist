@@ -1,9 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
-import com.sun.xml.internal.fastinfoset.tools.FI_SAX_Or_XML_SAX_SAXEvent;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
-import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -106,7 +104,7 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     }
 
     public boolean hasSameType(RDFValueRange rdfValueRange) {
-        if (literalRange.isInfinite() && rdfValueRange.isInfinite())
+        if (this.isInfinite() && rdfValueRange.isInfinite())
             return true;
         else
             return literalRange.hasSameType(rdfValueRange.literalRange);
@@ -115,4 +113,14 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     public RDFLiteralRange getLiteralRange() { return literalRange; }
 
     public RDFURIRange getUriRange() { return uriRange; }
+
+    @Override
+    public String toString()  {
+        if (uriRange != null && !uriRange.getPrefixList().isEmpty())
+            return uriRange.toString();
+        else if (literalRange != null)
+            return literalRange.toString();
+
+        return "{}";
+    }
 }
