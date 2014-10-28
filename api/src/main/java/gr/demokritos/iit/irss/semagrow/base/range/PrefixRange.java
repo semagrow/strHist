@@ -284,9 +284,11 @@ public class PrefixRange
     //Tested
     public String toString() {
 
-        String res;
+        String res="";
 
-        res = "{";
+        if (prefixList.size() > 1)
+            res += "{";
+
         boolean comma = false;
 
         for (String p : prefixList) {
@@ -297,8 +299,9 @@ public class PrefixRange
 
             comma = true;
         }
+        if (prefixList.size() > 1)
+            res += "}";
 
-        res += "}";
         return res;
     }
 

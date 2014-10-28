@@ -60,14 +60,19 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             throw new IllegalArgumentException("Only single-pattern queries are supported");
 
         pattern = patterns.iterator().next();
-
+        bindings = queryLogRecord.getBindings();
         //if (queryLogRecord.get)
 
     }
 
     @Override
     public String getQuery() {
-        return null;
+
+        URI resultFile = queryLogRecord.getResults();
+        if (resultFile != null)
+            return resultFile.stringValue() + " " + getRectangle().toString();
+        else
+            return "<nofile>" + " " + getRectangle().toString();
     }
 
     @Override

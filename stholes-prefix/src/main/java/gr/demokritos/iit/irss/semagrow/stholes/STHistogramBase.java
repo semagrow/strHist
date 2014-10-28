@@ -32,7 +32,7 @@ public abstract class STHistogramBase<R extends Rectangle<R>, S> implements STHi
         int i = 1;
         while (workload.hasNext()) {
             QueryRecord<R,S> record = workload.next();
-            logger.info("Refining query"+ i + " with rectangle " + record.getRectangle().toString());
+            logger.info("Refining query"+ record.getQuery());
             i++;
             refine(record);
         }

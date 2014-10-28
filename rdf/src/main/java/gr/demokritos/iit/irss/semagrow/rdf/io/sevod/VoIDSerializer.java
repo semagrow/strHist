@@ -228,7 +228,7 @@ public class VoIDSerializer {
         for (Map.Entry<URI, RangeLength<?>> entry : rangeMap.entrySet()) {
             URI key = entry.getKey();
 
-            if (key.equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.LONG)) {
+            if (key.equals(XMLSchema.INTEGER) || key.equals(XMLSchema.INT) || entry.getKey().equals(XMLSchema.LONG)) {
 
                 URI rangeURI = createURI(histogramNamespace, RANGE + "_" + rangeCounter++);
                 IntervalRange ir = ((IntervalRange)entry.getValue());

@@ -100,7 +100,7 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
 
     public RDFValueRange tightRange(RDFValueRange rdfValueRange) {
         return new RDFValueRange(uriRange.tightRange(rdfValueRange.uriRange),
-                literalRange.tightRange(literalRange));
+                literalRange.tightRange(rdfValueRange.literalRange));
     }
 
     public boolean hasSameType(RDFValueRange rdfValueRange) {

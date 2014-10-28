@@ -126,6 +126,11 @@ public class STHolesHistogram<R extends Rectangle<R>>
     public void refine(QueryRecord<R,Stat> queryRecord) {
 
 
+        if (queryRecord.getQuery().contains("1066071442383356038.tsv")) {
+            int i = 0;
+            i++;
+        }
+
         List<R> rects = new ArrayList<R>();
 
         if (queryRecord.getRectangle().isInfinite()) {
@@ -187,7 +192,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
                     logger.info("Drilling hole " + hole.getBox().toString() + " with statistics " + hole.getStatistics().toString());
                     drillHole(bucket, hole);
                 } else {
-                    logger.info("Skip drilling hole for bucket " + bucket.getBox().toString());
+                    logger.info("Skip drilling for " + bucket.getBox().toString());
                 }
             }
         }
@@ -438,7 +443,9 @@ public class STHolesHistogram<R extends Rectangle<R>>
      */
     private void compact() {
 
-        logger.debug("Compacting histogram.");
+        if (bucketsNum > maxBucketsNum)
+            logger.debug("Compacting histogram.");
+
         // while too many buckets compute merge penalty for each parent-child
         // and sibling pair, find the one with the minimum penalty and
         // call merge(b1,b2,bn)

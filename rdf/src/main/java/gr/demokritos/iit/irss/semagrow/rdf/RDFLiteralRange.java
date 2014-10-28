@@ -394,7 +394,7 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
     //TODO: Fix me! na kanw add map entry
     public RDFLiteralRange tightRange(RDFLiteralRange literalRange) {
 
-        if (infinite)
+        if (isInfinite() || literalRange.isInfinite())
             return new RDFLiteralRange();
 
 
