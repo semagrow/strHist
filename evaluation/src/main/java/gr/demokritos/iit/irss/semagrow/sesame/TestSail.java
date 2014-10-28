@@ -1,11 +1,16 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
+import gr.demokritos.iit.irss.semagrow.file.FileManager;
+import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
 import gr.demokritos.iit.irss.semagrow.qfr.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
+import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -26,19 +31,17 @@ import java.util.concurrent.Executors;
  */
 public class TestSail extends SailBase {
 
-
     private Repository actualRepo;
-
     private RDFSTHolesHistogram histogram;
-
     private ExecutorService executorService;
-
+    private ResultMaterializationManager manager;
     private int year;
 
     public TestSail(Repository actual, int year) {
         this.year = year;
         actualRepo = actual;
         executorService = Executors.newFixedThreadPool(10);
+        manager = getMateralizationManager();
     }
 
     public RepositoryConnection getRepositoryConnection() throws RepositoryException {
@@ -50,6 +53,21 @@ public class TestSail extends SailBase {
             histogram = new RDFSTHolesHistogram();
 
         return histogram;
+    }
+
+    private ResultMaterializationManager getMateralizationManager() {
+        if (manager == null) {
+            File baseDir = new File("/var/tmp/" + year + "/");
+            if (!baseDir.exists())
+                baseDir.mkdir();
+
+            TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
+
+            TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
+            TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
+            manager = new FileManager(baseDir, writerFactory, getExecutorService());
+        }
+        return manager;
     }
 
     QueryLogHandler handler;

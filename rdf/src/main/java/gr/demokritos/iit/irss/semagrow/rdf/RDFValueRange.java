@@ -1,9 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
-import com.sun.xml.internal.fastinfoset.tools.FI_SAX_Or_XML_SAX_SAXEvent;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
-import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;

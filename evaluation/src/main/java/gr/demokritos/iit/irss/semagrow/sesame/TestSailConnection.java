@@ -31,11 +31,8 @@ public class TestSailConnection extends SailConnectionBase {
 
     private TestSail sail;
     private RepositoryConnection conn;
-
     private QueryLogHandler handler;
-    static private ResultMaterializationManager manager;
     private ExecutorService executorService;
-    private int year;
 
     public TestSailConnection(TestSail sailBase, int year) throws RepositoryException {
         super(sailBase);
@@ -43,27 +40,9 @@ public class TestSailConnection extends SailConnectionBase {
         conn = sail.getRepositoryConnection();
         handler = sail.getQueryLogHandler();
         executorService = sail.getExecutorService();
-        manager = getMateralizationManager();
-        this.year = year;
     }
 
     public QueryLogHandler getQueryLogHandler() { return handler; }
-
-    private ResultMaterializationManager getMateralizationManager(){
-
-        if (manager == null) {
-            File baseDir = new File("/var/tmp/" + Workflow.YEAR + "/");
-            if (!baseDir.exists())
-                baseDir.mkdir();
-
-            TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
-
-            TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
-            TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
-            manager = new FileManager(baseDir, writerFactory, getExecutorService());
-        }
-        return manager;
-    }
 
     private ExecutorService getExecutorService() {
         return executorService;
@@ -93,7 +72,7 @@ public class TestSailConnection extends SailConnectionBase {
         opt.optimize(tupleExpr, dataset, bindings);
 
         try {
-            EvaluationStrategyImpl evalStrategy = new EvaluationStrategyImpl(conn, handler, manager);
+            EvaluationStrategyImpl evalStrategy = new EvaluationStrategyImpl(conn, handler, sail.);
             return evalStrategy.evaluate(tupleExpr, bindings);
         }catch(QueryEvaluationException e) {
             throw new SailException(e);

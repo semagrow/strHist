@@ -64,7 +64,7 @@ public class Workflow {
     private static int term = 0, startDate, endDate;
     public static Path path;
 
-    public static int YEAR;
+
 
 
 
@@ -104,21 +104,22 @@ public class Workflow {
         executors = Executors.newCachedThreadPool();
 
         for (int date=startDate; date<=endDate; date++) {
-            YEAR = date;
+
             // Query triple stores and write feedback.
             Repository repo = getFedRepository(getRepository(date), date);
-            //queryTripleStores(repo, date);
-//            repo.shutDown();
+            queryTripleStores(repo, date);
+            repo.shutDown();
 
 //            // Load feedback
-            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "/" + date + "_log.ser");
-            Collection<QueryRecord> queryRecords = adaptLogs(logs, date);
-
-            // Refine histogram according to the feedback.
-            STHolesHistogram histogram = refineHistogram(queryRecords, date);
-
-//            // Execute test queries on triple store and refined histogram.
-            execTestQueries(repo, histogram, date);
+//            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "/" + date + "_log.ser");
+//            Collection<QueryRecord> queryRecords = adaptLogs(logs, date);
+//
+//            // Refine histogram according to the feedback.
+//            STHolesHistogram histogram = refineHistogram(queryRecords, date);
+//
+////            // Execute test queries on triple store and refined histogram.
+//            execTestQueries(repo, histogram, date);
+//            repo.shutDown();
         }
         executors.shutdown();
     }
