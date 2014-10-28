@@ -1,7 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
-import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
@@ -13,15 +12,11 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.QueryRoot;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.QueryOptimizer;
-import org.openrdf.query.resultio.TupleQueryResultFormat;
-import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
-import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.SailConnectionBase;
 
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -31,18 +26,27 @@ public class TestSailConnection extends SailConnectionBase {
 
     private TestSail sail;
     private RepositoryConnection conn;
+
     private QueryLogHandler handler;
+
     private ExecutorService executorService;
 
-    public TestSailConnection(TestSail sailBase, int year) throws RepositoryException {
+    private ResultMaterializationManager manager;
+
+    public TestSailConnection(TestSail sailBase) throws RepositoryException {
         super(sailBase);
         sail = sailBase;
         conn = sail.getRepositoryConnection();
         handler = sail.getQueryLogHandler();
         executorService = sail.getExecutorService();
+        manager = sail.getMateralizationManager();
     }
 
     public QueryLogHandler getQueryLogHandler() { return handler; }
+
+    private ResultMaterializationManager getMateralizationManager(){
+        return manager;
+    }
 
     private ExecutorService getExecutorService() {
         return executorService;
@@ -72,7 +76,7 @@ public class TestSailConnection extends SailConnectionBase {
         opt.optimize(tupleExpr, dataset, bindings);
 
         try {
-            EvaluationStrategyImpl evalStrategy = new EvaluationStrategyImpl(conn, handler, sail.);
+            EvaluationStrategyImpl evalStrategy = new EvaluationStrategyImpl(conn, handler, manager);
             return evalStrategy.evaluate(tupleExpr, bindings);
         }catch(QueryEvaluationException e) {
             throw new SailException(e);

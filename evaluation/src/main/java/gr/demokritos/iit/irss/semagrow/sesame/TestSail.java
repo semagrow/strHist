@@ -31,17 +31,21 @@ import java.util.concurrent.Executors;
  */
 public class TestSail extends SailBase {
 
+
     private Repository actualRepo;
+
     private RDFSTHolesHistogram histogram;
+
     private ExecutorService executorService;
+
     private ResultMaterializationManager manager;
+
     private int year;
 
     public TestSail(Repository actual, int year) {
         this.year = year;
         actualRepo = actual;
         executorService = Executors.newFixedThreadPool(10);
-        manager = getMateralizationManager();
     }
 
     public RepositoryConnection getRepositoryConnection() throws RepositoryException {
@@ -53,21 +57,6 @@ public class TestSail extends SailBase {
             histogram = new RDFSTHolesHistogram();
 
         return histogram;
-    }
-
-    private ResultMaterializationManager getMateralizationManager() {
-        if (manager == null) {
-            File baseDir = new File("/var/tmp/" + year + "/");
-            if (!baseDir.exists())
-                baseDir.mkdir();
-
-            TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
-
-            TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
-            TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
-            manager = new FileManager(baseDir, writerFactory, getExecutorService());
-        }
-        return manager;
     }
 
     QueryLogHandler handler;
@@ -96,6 +85,23 @@ public class TestSail extends SailBase {
         return handler;
     }
 
+
+    public ResultMaterializationManager getMateralizationManager(){
+
+        if (manager == null) {
+            File baseDir = new File("/var/tmp/" + this.year + "/");
+            if (!baseDir.exists())
+                baseDir.mkdir();
+
+            TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
+
+            TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
+            TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
+            manager = new FileManager(baseDir, writerFactory, getExecutorService());
+        }
+        return manager;
+    }
+
     @Override
     protected void shutDownInternal() throws SailException {
 
@@ -113,7 +119,7 @@ public class TestSail extends SailBase {
     @Override
     protected SailConnection getConnectionInternal() throws SailException {
         try {
-            return new TestSailConnection(this, year);
+            return new TestSailConnection(this);
         } catch (RepositoryException e) {
             throw new SailException(e);
         }
