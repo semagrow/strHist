@@ -5,7 +5,6 @@ import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
-import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
@@ -169,7 +168,7 @@ public class JSONDeserializer {
         long low = (Long) jsonObject.get("low");
         long high = (Long) jsonObject.get("high");
 
-        ranges.put(XMLSchema.INTEGER, new IntervalRange((int) low, (int) high));
+        ranges.put(XMLSchema.INT, new IntervalRange((int) low, (int) high));
     }
 
 
@@ -187,7 +186,7 @@ public class JSONDeserializer {
             e.printStackTrace();
         }
 
-        ranges.put(XMLSchema.INTEGER, new CalendarRange(dateBegin, dateEnd));
+        ranges.put(XMLSchema.DATETIME, new CalendarRange(dateBegin, dateEnd));
     }// getObjectCalendarRange
 
 
@@ -247,9 +246,15 @@ public class JSONDeserializer {
 
     public static void main(String[] args) {
         STHolesHistogram<RDFRectangle> histogram =
-                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON.txt").
+                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980.txt").
                         getHistogram();
 
-        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSONN.txt");
+        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980_new.txt");
+
+        histogram =
+                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980_new.txt").
+                        getHistogram();
+
+        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980_new_2.txt");
     }
 }

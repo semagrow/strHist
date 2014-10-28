@@ -125,7 +125,7 @@ public class VoIDeserializer {
 
         IntervalRange integerInterval = getIntInterval(res);
         if (integerInterval != null)
-            objectRanges.put(XMLSchema.INTEGER, integerInterval);
+            objectRanges.put(XMLSchema.INT, integerInterval);
 
         CalendarRange calendarRange = getCalendarRange(res);
         if (calendarRange != null)

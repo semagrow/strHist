@@ -110,14 +110,26 @@ public class JSONSerializer {
         for (Map.Entry<URI,RangeLength<?>> entry : literalRange.getRanges().entrySet()) {
             object = new JSONObject();
 
-            if (entry.getKey().equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.LONG)) {
+            if (entry.getKey().equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.INT) || entry.getKey().equals(XMLSchema.LONG)) {
                 object.put("intervalRange", getJSONIntervalRange((IntervalRange)entry.getValue()));
 
             } else if (entry.getKey().equals(XMLSchema.DATETIME)) {
                 object.put("calendarRange", getJSONCalendarRange((CalendarRange)entry.getValue()));
 
             } else if (entry.getKey().equals(XMLSchema.STRING)) {
-                object.put("prefixRange", getJSONPrefixRange((PrefixRange)entry.getValue()));
+                PrefixRange pr = null;
+                Object obj = entry.getValue();
+
+                if (obj instanceof RDFURIRange) {
+                    RDFURIRange uriRange = (RDFURIRange)obj;
+                    pr = new PrefixRange(uriRange.getPrefixList());
+                } else if (obj instanceof PrefixRange) {
+                    pr = (PrefixRange)obj;
+                }
+
+                RDFURIRange uriRange = (RDFURIRange)entry.getValue();
+
+                object.put("prefixRange", getJSONPrefixRange(pr));
             }
 
             array.add(object);

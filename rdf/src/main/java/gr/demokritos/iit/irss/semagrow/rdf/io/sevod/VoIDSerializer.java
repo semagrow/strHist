@@ -5,6 +5,7 @@ import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.POWDERS;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.SEVOD;
@@ -180,7 +181,7 @@ public class VoIDSerializer {
             for (Map.Entry<URI, RangeLength<?>> entry : bucket.getBox().getObjectRange().getLiteralRange().getRanges().entrySet()) {
                 URI key = entry.getKey();
 
-                if (key.equals(XMLSchema.INTEGER) || entry.getKey().equals(XMLSchema.LONG)) {
+                if (key.equals(XMLSchema.INTEGER) || key.equals(XMLSchema.INT) || entry.getKey().equals(XMLSchema.LONG)) {
 
                     objectStr += ((IntervalRange)entry.getValue()).toString();
                 } else if (key.equals(XMLSchema.DATETIME)) {
@@ -189,7 +190,16 @@ public class VoIDSerializer {
                     objectStr += " [" + cr.getBegin() + "-" + cr.getEnd() + "] ";
                 } else if (key.equals(XMLSchema.STRING)) {
 
-                    PrefixRange pr = (PrefixRange)entry.getValue();
+                    PrefixRange pr = null;
+                    Object obj = entry.getValue();
+
+                    if (obj instanceof RDFURIRange) {
+                        RDFURIRange rdfuriRange = (RDFURIRange)obj;
+                        pr = new PrefixRange(rdfuriRange.getPrefixList());
+                    } else if (obj instanceof PrefixRange) {
+                        pr = (PrefixRange)obj;
+                    }
+
                     // TODO: Change, in histogram we consider each PrefixRange as always a URL
                     for (String s : pr.getPrefixList())
                         objectStr += " <" + s + "> ";
@@ -233,8 +243,16 @@ public class VoIDSerializer {
                 model.add(rangeURI, SEVOD.FROM, createLiteral(cr.getBegin()));
                 model.add(rangeURI, SEVOD.TO, createLiteral(cr.getEnd()));
             } else if (key.equals(XMLSchema.STRING)) {
+                PrefixRange pr = null;
+                Object obj = entry.getValue();
 
-                PrefixRange pr = (PrefixRange)entry.getValue();
+                if (obj instanceof RDFURIRange) {
+                    RDFURIRange rdfuriRange = (RDFURIRange)obj;
+                    pr = new PrefixRange(rdfuriRange.getPrefixList());
+                } else if (obj instanceof PrefixRange) {
+                    pr = (PrefixRange)obj;
+                }
+
                 for (String s : pr.getPrefixList())
                     model.add(bucketResource, SEVOD.STRINGOBJECTREGEXPATTERN, createLiteral(s));
             }
@@ -318,10 +336,18 @@ public class VoIDSerializer {
 
     public static void main(String[] args) {
         STHolesHistogram<RDFRectangle> histogram =
-                new JSONDeserializer("/home/nickozoulis/histJSON_1982.txt").
+                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980.txt").
                         getHistogram();
 
-        new VoIDSerializer("application/x-turtle", "/home/nickozoulis/exp_hist_void/").serialize(histogram);
+        new VoIDSerializer("application/x-turtle", "/home/nickozoulis/git/sthist/rdf/src/main/resources/histVOID_1980.ttl").serialize(histogram);
+
+        histogram =
+                new VoIDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histVOID_1980.ttl").
+                        getHistogram();
+
+        new VoIDSerializer("application/x-turtle", "/home/nickozoulis/git/sthist/rdf/src/main/resources/new_histVOID_1980.ttl").serialize(histogram);
+
+
     }
 
 }
