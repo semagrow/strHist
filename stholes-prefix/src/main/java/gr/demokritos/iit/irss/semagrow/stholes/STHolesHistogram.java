@@ -141,6 +141,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
 
                 setRoot(new STHolesBucket<R>(rect, new Stat(), null, null));
                 bucketsNum += 1;
+                logger.info("Root bucket is created");
 
             } else {
 
@@ -169,6 +170,8 @@ public class STHolesHistogram<R extends Rectangle<R>>
                     root.setStatistics(rootStatsN);
 
                 }
+
+                logger.info("Root bucket is expanded");
             }
 
 
@@ -180,8 +183,12 @@ public class STHolesHistogram<R extends Rectangle<R>>
                 //System.out.println("--------------------------------------------------");
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
                 //System.out.println("<<<>>> Hole: " + hole);
-                if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole))
+                if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole)) {
                     drillHole(bucket, hole);
+                    logger.info("Hole is drilled");
+                } else {
+                    logger.info("Skipping Drill hole");
+                }
             }
         }
 
@@ -489,6 +496,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
                 bn = candidateMergedBucket.getKey();
             }
 
+            /*
             // Candidate sibling-sibling merges
             for (int j = i + 1; j < bChildren.size(); j++) {
 
@@ -508,7 +516,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
                     }
                 }
 
-            }
+            }*/
         }
 
         // local best merge

@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
+import com.sun.xml.internal.fastinfoset.tools.FI_SAX_Or_XML_SAX_SAXEvent;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
@@ -55,7 +56,8 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     }
 
     public boolean isEmpty() {
-        return uriRange.isEmpty() && literalRange.isEmpty();
+        //FIXME: wrong definition uriRange.isEmpty() && literalRange.isEmpty();
+        return uriRange.isEmpty() || literalRange.isEmpty();
     }
 
     public boolean isInfinite() { return uriRange.isInfinite() && literalRange.isInfinite(); }
