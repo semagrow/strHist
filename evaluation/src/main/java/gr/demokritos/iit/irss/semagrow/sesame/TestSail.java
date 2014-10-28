@@ -1,11 +1,16 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
+import gr.demokritos.iit.irss.semagrow.file.FileManager;
+import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
 import gr.demokritos.iit.irss.semagrow.qfr.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
+import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -32,6 +37,8 @@ public class TestSail extends SailBase {
     private RDFSTHolesHistogram histogram;
 
     private ExecutorService executorService;
+
+    private ResultMaterializationManager manager;
 
     private int year;
 
@@ -78,6 +85,23 @@ public class TestSail extends SailBase {
         return handler;
     }
 
+
+    public ResultMaterializationManager getMateralizationManager(){
+
+        if (manager == null) {
+            File baseDir = new File("/var/tmp/" + this.year + "/");
+            if (!baseDir.exists())
+                baseDir.mkdir();
+
+            TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
+
+            TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
+            TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
+            manager = new FileManager(baseDir, writerFactory, getExecutorService());
+        }
+        return manager;
+    }
+
     @Override
     protected void shutDownInternal() throws SailException {
 
@@ -95,7 +119,7 @@ public class TestSail extends SailBase {
     @Override
     protected SailConnection getConnectionInternal() throws SailException {
         try {
-            return new TestSailConnection(this, year);
+            return new TestSailConnection(this);
         } catch (RepositoryException e) {
             throw new SailException(e);
         }

@@ -33,35 +33,23 @@ public class TestSailConnection extends SailConnectionBase {
     private RepositoryConnection conn;
 
     private QueryLogHandler handler;
-    static private ResultMaterializationManager manager;
-    private ExecutorService executorService;
-    private int year;
 
-    public TestSailConnection(TestSail sailBase, int year) throws RepositoryException {
+    private ExecutorService executorService;
+
+    private ResultMaterializationManager manager;
+
+    public TestSailConnection(TestSail sailBase) throws RepositoryException {
         super(sailBase);
         sail = sailBase;
         conn = sail.getRepositoryConnection();
         handler = sail.getQueryLogHandler();
         executorService = sail.getExecutorService();
-        manager = getMateralizationManager();
-        this.year = year;
+        manager = sail.getMateralizationManager();
     }
 
     public QueryLogHandler getQueryLogHandler() { return handler; }
 
     private ResultMaterializationManager getMateralizationManager(){
-
-        if (manager == null) {
-            File baseDir = new File("/var/tmp/" + Workflow.YEAR + "/");
-            if (!baseDir.exists())
-                baseDir.mkdir();
-
-            TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
-
-            TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
-            TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
-            manager = new FileManager(baseDir, writerFactory, getExecutorService());
-        }
         return manager;
     }
 
