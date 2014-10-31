@@ -51,8 +51,8 @@ public class Workflow {
         Variables for local run
      */
 //    private static List<String> agroTerms = loadAgroTerms("/home/nickozoulis/agrovoc_terms.txt");
-//    public static String logFolder = "/home/nickozoulis/semagrow/serial/";
-//    private static String tripleStorePath = "/home/nickozoulis/Downloads/";
+//    public static String HISTPATH = "/home/nickozoulis/semagrow/serial/";
+//    private static String TSPATH = "/home/nickozoulis/Downloads/";
 //    private static int term = 0;
 //    private static int startDate = 1980, endDate = 1980;
 
@@ -63,15 +63,9 @@ public class Workflow {
     static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
     private static ExecutorService executors;
 
-
     private static List<String> agroTerms;
-    private static String logFolder, tripleStorePath;
-    private static int term = 0, startDate, endDate;
-    public static Path path;
-
-
-
-
+    public static String HISTPATH, TSPATH;
+    private static int startDate, endDate;
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path, t = TripleStore, a = AgroknowTerms
@@ -93,8 +87,8 @@ public class Workflow {
                 System.exit(1);
             }
 
-            logFolder = options.valueOf("l").toString();
-            tripleStorePath = options.valueOf("t").toString();
+            HISTPATH = options.valueOf("l").toString();
+            TSPATH = options.valueOf("t").toString();
             agroTerms = loadAgroTerms(options.valueOf("a").toString());
 
             runMultiAnnualExperiment();
@@ -111,9 +105,9 @@ public class Workflow {
         for (int date=startDate; date<=endDate; date++) {
 
             // Query triple stores and write feedback.
-            //Repository repo = getFedRepository(getRepository(date), date);
-            //queryTripleStores(repo, date);
-            //repo.shutDown();
+            Repository repo = getFedRepository(getRepository(date), date);
+            queryTripleStores(repo, date);
+
 
             // Load feedback
             Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "/" + date + "_log.ser");
@@ -123,8 +117,8 @@ public class Workflow {
             STHolesHistogram histogram = refineHistogram(queryRecords, date);
 
             // Execute test queries on triple store and refined histogram.
-            //execTestQueries(repo, histogram, date);
-            //repo.shutDown();
+            execTestQueries(repo, histogram, date);
+            repo.shutDown();
         }
         executors.shutdown();
     }
@@ -183,7 +177,7 @@ public class Workflow {
     }
 
     private static STHolesHistogram refineHistogram(Collection<QueryRecord> listQueryRecords, int date) {
-        STHolesHistogram histogram = loadPreviousHistogram(logFolder, date);
+        STHolesHistogram histogram = loadPreviousHistogram(HISTPATH, date);
 
         if (listQueryRecords.size() > 0) {
             logger.debug("Refining histogram " + date);
@@ -192,7 +186,7 @@ public class Workflow {
         }
         else logger.debug("No query records. No histogram refinement.");
 
-        serializeHistogram(histogram, logFolder, date);
+        serializeHistogram(histogram, HISTPATH, date);
 
         return histogram;
     }
@@ -202,9 +196,9 @@ public class Workflow {
                                         int date) throws RepositoryException, IOException {
         RepositoryConnection conn;
         logger.debug("Executing test queries of: " + date);
-        Path path = Paths.get(logFolder, "results.csv");
+        Path path = Paths.get(HISTPATH, "results.csv");
         BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
-        bw.write("Date, Q, QYear, Act, Est");
+        bw.write("Date, Q, QYear, Act, Est, AbsErr%");
         bw.newLine();
 
         Random r = new Random();
@@ -228,10 +222,13 @@ public class Workflow {
         Literal lit = ValueFactoryImpl.getInstance().createLiteral(year);
         String testQ1str = String.format(testQ1, lit.toString());
 
+        long actual = execTripleStore(conn, testQ1str);
+        long estim = execHistogram(conn, histogram, testQ1str);
+        long error = (Math.abs(actual - estim) * 100) / (Math.max(actual, estim));
+
         try {
             bw.write(numPass + ", Q1, " + year + ", " +
-                    execTripleStore(conn, testQ1str) + ", " +
-                    execHistogram(conn, histogram, testQ1str));
+                    actual + ", " + estim + ", " + error + "%");
             bw.newLine();
         } catch (IOException e) {
             e.printStackTrace();
@@ -275,7 +272,6 @@ public class Workflow {
 
     private static Repository getFedRepository(Repository actual, int date) throws RepositoryException {
         TestSail sail = new TestSail(actual, date);
-//        histogram = sail.getHistogram();
         Repository repo = new SailRepository(sail);
         repo.initialize();
         return repo;
@@ -295,7 +291,7 @@ public class Workflow {
     private static Repository getRepository(int year) throws RepositoryException, IOException {
         Properties properties = new Properties();
 
-        File journal = new File(tripleStorePath + "bigdata_agris_data_" + year + ".jnl");
+        File journal = new File(TSPATH + "bigdata_agris_data_" + year + ".jnl");
 
         properties.setProperty(
                 BigdataSail.Options.FILE,
@@ -311,19 +307,21 @@ public class Workflow {
     }
 
     private static void serializeHistogram(STHolesHistogram histogram, String path, int date) {
-        logger.debug("Serializing histogram to JSON in : " + logFolder + "histJSON_" + date + ".txt");
-        new JSONSerializer(histogram, logFolder + "histJSON_" + date + ".txt");
-        logger.debug("Serializing histogram to VOID in : " + logFolder + "histVOID_" + date + ".txt");
-        new VoIDSerializer("application/x-turtle", logFolder + "histVOID_" + date + ".ttl").serialize(histogram);
+        logger.debug("Serializing histogram to JSON in : " + HISTPATH + "histJSON_" + date + ".txt");
+        new JSONSerializer(histogram, HISTPATH + "histJSON_" + date + ".txt");
+        logger.debug("Serializing histogram to VOID in : " + HISTPATH + "histVOID_" + date + ".txt");
+        new VoIDSerializer("application/x-turtle", HISTPATH + "histVOID_" + date + ".ttl").serialize(histogram);
     }
 
     private static STHolesHistogram loadPreviousHistogram(String logFolder, int date) {
-        if (date == startDate)
+        File jsonHist = new File(logFolder + "histJSON_" + (date - 1) + ".txt");
+
+        if (!jsonHist.exists())
             logger.debug("Creating a new histogram.");
         else
             logger.debug("Deserializing histogram: " + (date - 1));
 
-        return (date == startDate)
+        return (!jsonHist.exists())
                 ? new STHolesHistogram<RDFRectangle>()
                 : new JSONDeserializer(logFolder + "histJSON_" + (date - 1) + ".txt").getHistogram();
     }
