@@ -126,7 +126,11 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             if (oVal instanceof Literal) {
                 Literal oLit = (Literal)oVal;
                 RDFLiteralRange lRange = new RDFLiteralRange(oLit.getDatatype(), computeObjectRange(oLit));
-                oRange = new RDFValueRange(null, lRange);
+                oRange = new RDFValueRange(lRange);
+            } else if (oVal instanceof URI) {
+                URI oURI = (URI)oVal;
+                RDFURIRange uriRange = new RDFURIRange(Collections.singletonList(oURI.stringValue()));
+                oRange = new RDFValueRange(uriRange);
             }
         } else  {
             // oVal is a variable but can have filters
@@ -159,6 +163,10 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
                 Literal l = (Literal)o;
                 RDFLiteralRange lRange = new RDFLiteralRange(l.getDatatype(), computeObjectRange(l));
                 oRange = new RDFValueRange(lRange);
+            } else if (o instanceof URI) {
+                URI u = (URI)o;
+                RDFURIRange uriRange = new RDFURIRange(Collections.singletonList(u.stringValue()));
+                oRange = new RDFValueRange(uriRange);
             }
         }
 
@@ -166,14 +174,13 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
     }
 
     private RangeLength<?> computeObjectRange(Literal lit) {
-        if (lit.getDatatype().equals(XMLSchema.INT)) {
+        if (lit.getDatatype().equals(XMLSchema.INT) || lit.getDatatype().equals(XMLSchema.INTEGER)) {
             int val = lit.intValue();
             return new IntervalRange(val,val);
-        } else if (lit.getDatatype().equals(XMLSchema.DATETIME)) {
+        } else if (lit.getDatatype().equals(XMLSchema.DATETIME) || lit.getDatatype().equals(XMLSchema.DATE)) {
             Date val = lit.calendarValue().toGregorianCalendar().getTime();
             return new CalendarRange(val,val);
-        }
-        else {
+        } else {
             //return new PrefixRange(lit.stringValue());
             //FIXME
             return null;
