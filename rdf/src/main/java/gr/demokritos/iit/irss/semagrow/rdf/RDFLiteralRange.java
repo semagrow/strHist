@@ -93,7 +93,7 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
 
             for (URI type : ranges.keySet()) {
 
-                res = ranges.get(type).isUnit();
+                res = res && ranges.get(type).isUnit();
             }
         }
 
@@ -497,7 +497,7 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
     /**
      * expands an RDFLiteralRange containing ONLY
      * one subrange, so that is includes {v}
-     * @param v
+     * @param l
      */
 
     public void expand(Literal l) {
