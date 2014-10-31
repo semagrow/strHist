@@ -64,15 +64,9 @@ public class Workflow {
     private static ExecutorService executors;
 
     private static List<String> agroTerms;
-<<<<<<< HEAD
-    private static String logFolder, tripleStorePath;
-    private static int term = 0, startDate, endDate;
-    public static Path path;
 
-=======
     public static String HISTPATH, TSPATH;
     private static int startDate, endDate;
->>>>>>> 075cb7d591a2240b09f283f582e7c091207c0507
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path, t = TripleStore, a = AgroknowTerms
