@@ -1,7 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.api.qfr;
 
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
-import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 
 import java.util.Iterator;
 
