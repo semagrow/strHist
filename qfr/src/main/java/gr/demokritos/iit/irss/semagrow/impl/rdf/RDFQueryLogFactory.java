@@ -1,5 +1,8 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.impl.rdf;
 
+import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogFactory;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.RDFWriterFactory;
 

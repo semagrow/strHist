@@ -1,4 +1,8 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.impl.serial;
+
+import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogFactory;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
 
 import java.io.OutputStream;
 

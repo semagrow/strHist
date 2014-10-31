@@ -1,5 +1,7 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.impl.rdf;
 
+import gr.demokritos.iit.irss.semagrow.api.*;
+import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordImpl;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.QFR;
 import org.openrdf.model.*;
 import org.openrdf.model.vocabulary.RDF;

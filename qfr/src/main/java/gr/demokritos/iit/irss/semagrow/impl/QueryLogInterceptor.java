@@ -1,7 +1,13 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.impl;
 
+import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import gr.demokritos.iit.irss.semagrow.impl.MeasuringIteration;
+import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordImpl;
 import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
+import gr.demokritos.iit.irss.semagrow.impl.QueryResultObservingIteration;
 import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.DelayedIteration;
 import info.aduna.iteration.Iteration;

@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.api;
 
 import java.io.IOException;
 import java.io.InputStream;

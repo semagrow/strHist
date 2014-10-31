@@ -1,5 +1,8 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.impl.rdf;
 
+import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.QFR;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;

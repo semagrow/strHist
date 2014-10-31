@@ -1,4 +1,8 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.impl;
+
+import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
 
 import java.util.Collection;
 import java.util.LinkedList;

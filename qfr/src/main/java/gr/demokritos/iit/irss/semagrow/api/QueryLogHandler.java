@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.api;
 
 /**
  * Created by angel on 10/20/14.

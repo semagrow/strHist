@@ -1,6 +1,6 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.impl;
 
-import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
 import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.algebra.TupleExpr;

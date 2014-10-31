@@ -2,9 +2,9 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.qfr.SerialQueryLogFactory;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
+import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;

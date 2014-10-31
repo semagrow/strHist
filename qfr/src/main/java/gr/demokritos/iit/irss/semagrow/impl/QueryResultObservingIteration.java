@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.qfr;
+package gr.demokritos.iit.irss.semagrow.impl;
 
 
 import info.aduna.iteration.Iteration;

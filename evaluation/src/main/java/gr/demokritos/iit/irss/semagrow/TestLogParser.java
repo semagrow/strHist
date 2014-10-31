@@ -1,6 +1,13 @@
 package gr.demokritos.iit.irss.semagrow;
 
-import gr.demokritos.iit.irss.semagrow.qfr.*;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogParser;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
+import gr.demokritos.iit.irss.semagrow.impl.rdf.RDFQueryLogParser;
+import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogFactory;
+import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

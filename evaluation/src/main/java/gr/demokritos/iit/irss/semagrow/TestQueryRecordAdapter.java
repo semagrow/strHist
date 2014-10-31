@@ -1,9 +1,13 @@
 package gr.demokritos.iit.irss.semagrow;
 
+import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
+import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
+import gr.demokritos.iit.irss.semagrow.impl.rdf.RDFQueryLogParser;
 import gr.demokritos.iit.irss.semagrow.qfr.*;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
