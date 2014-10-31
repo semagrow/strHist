@@ -1,10 +1,7 @@
-package gr.demokritos.iit.irss.semagrow.tools;
+package gr.demokritos.iit.irss.semagrow.numericalqfr;
 
-import gr.demokritos.iit.irss.semagrow.NumQuery;
-import gr.demokritos.iit.irss.semagrow.NumQueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import org.openrdf.model.URI;
@@ -12,7 +9,6 @@ import org.openrdf.model.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Created by efi on 18/10/2014.

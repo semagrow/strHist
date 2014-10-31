@@ -1,15 +1,11 @@
-package gr.demokritos.iit.irss.semagrow.tools;
+package gr.demokritos.iit.irss.semagrow.numericalqfr;
 
-import gr.demokritos.iit.irss.semagrow.CustomCollection;
-import gr.demokritos.iit.irss.semagrow.NumQuery;
-import gr.demokritos.iit.irss.semagrow.NumQueryRecord;
-import gr.demokritos.iit.irss.semagrow.NumQueryResult;
+import gr.demokritos.iit.irss.semagrow.tools.CustomCollection;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
-import gr.demokritos.iit.irss.semagrow.tools.NumericalMapper;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 

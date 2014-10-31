@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow;
+package gr.demokritos.iit.irss.semagrow.numericalqfr;
 
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 
