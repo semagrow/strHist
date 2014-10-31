@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow;
+package gr.demokritos.iit.irss.semagrow.tools;
 
 import java.io.*;
 import java.util.ArrayList;

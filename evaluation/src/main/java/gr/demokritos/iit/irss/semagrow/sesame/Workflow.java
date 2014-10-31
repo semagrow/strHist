@@ -106,7 +106,7 @@ public class Workflow {
         for (int date=startDate; date<=endDate; date++) {
 
             // Query triple stores and write feedback.
-            Repository repo = getFedRepository(getRepository(date), date);
+            //Repository repo = getFedRepository(getRepository(date), date);
             //queryTripleStores(repo, date);
             //repo.shutDown();
 
@@ -118,8 +118,8 @@ public class Workflow {
             STHolesHistogram histogram = refineHistogram(queryRecords, date);
 
             // Execute test queries on triple store and refined histogram.
-            execTestQueries(repo, histogram, date);
-            repo.shutDown();
+            //execTestQueries(repo, histogram, date);
+            //repo.shutDown();
         }
         executors.shutdown();
     }
