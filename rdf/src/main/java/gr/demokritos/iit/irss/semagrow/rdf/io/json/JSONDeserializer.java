@@ -5,10 +5,7 @@ import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
-import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
+import gr.demokritos.iit.irss.semagrow.rdf.*;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.json.simple.JSONArray;
@@ -32,16 +29,16 @@ import java.util.*;
  */
 public class JSONDeserializer {
 
-    private STHolesHistogram<RDFRectangle> histogram;
+    private RDFSTHolesHistogram histogram;
 
 
     public JSONDeserializer(String path) {
-        histogram = new STHolesHistogram<RDFRectangle>();
+        histogram = new RDFSTHolesHistogram();
         histogram.setRoot(readJSON(path));
     }
 
 
-    public STHolesHistogram<RDFRectangle> getHistogram() {
+    public RDFSTHolesHistogram getHistogram() {
         return this.histogram;
     }
 

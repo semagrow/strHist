@@ -7,4 +7,8 @@ import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
  */
 public class RDFSTHolesHistogram extends STHolesHistogram<RDFRectangle> {
 
+    public RDFSTHolesHistogram() {
+        super();
+    }
+
 }
