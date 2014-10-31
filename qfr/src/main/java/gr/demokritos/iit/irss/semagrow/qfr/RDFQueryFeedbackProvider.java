@@ -10,6 +10,7 @@ import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.ConvertingIteration;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -37,26 +38,30 @@ public class RDFQueryFeedbackProvider implements QueryFeedbackProvider<RDFRectan
         return materializationManager;
     }
 
-    public InputStream getInputStream() { return null; }
+    public InputStream getInputStream() throws IOException { return null; }
 
     @Override
     public Iterator<QueryRecord<RDFRectangle, Stat>> getQueryRecordIterator()
     {
-        InputStream in = getInputStream();
+        try {
+            InputStream in = getInputStream();
 
-        BackgroundParserIteration queryLogIter = new BackgroundParserIteration(parser, in);
+            BackgroundParserIteration queryLogIter = new BackgroundParserIteration(parser, in);
 
-        CloseableIteration<QueryRecord<RDFRectangle, Stat>, Exception> queryRecordIter =
-            new ConvertingIteration<QueryLogRecord, QueryRecord<RDFRectangle, Stat>, Exception>(queryLogIter)
-            {
-                @Override
-                protected QueryRecord<RDFRectangle, Stat> convert(QueryLogRecord queryLogRecord) throws Exception {
-                    return new QueryRecordAdapter(queryLogRecord,getMaterializationManager());
-                }
-            };
+            CloseableIteration<QueryRecord<RDFRectangle, Stat>, Exception> queryRecordIter =
+                    new ConvertingIteration<QueryLogRecord, QueryRecord<RDFRectangle, Stat>, Exception>(queryLogIter) {
+                        @Override
+                        protected QueryRecord<RDFRectangle, Stat> convert(QueryLogRecord queryLogRecord) throws Exception {
+                            return new QueryRecordAdapter(queryLogRecord, getMaterializationManager());
+                        }
+                    };
 
-        execute(queryLogIter);
-        return new IterationIterator<QueryRecord<RDFRectangle, Stat>>(queryRecordIter);
+            execute(queryLogIter);
+            return new IterationIterator<QueryRecord<RDFRectangle, Stat>>(queryRecordIter);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void execute(Runnable runnable) {

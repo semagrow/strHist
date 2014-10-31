@@ -6,6 +6,7 @@ import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogParser;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
@@ -147,6 +148,15 @@ public class Workflow {
                 }
 
             }
+    }
+
+    private static Iterator<QueryRecord<RDFRectangle,Stat>>
+        parseQFR(String path, int year) throws IOException, QueryLogException
+    {
+
+        QueryLogParser parser = new SerialQueryLogParser();
+        RDFQueryFeedbackProvider qfrProvider = new FileRDFQueryFeedbackProvider(new File(path), parser, getMateralizationManager(year), executors);
+        return qfrProvider.getQueryRecordIterator();
     }
 
     private static Collection<QueryLogRecord> parseFeedbackLog(String path) {

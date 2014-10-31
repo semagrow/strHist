@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow;
+package gr.demokritos.iit.irss.semagrow.generator;
 
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryFeedbackProvider;

@@ -100,7 +100,6 @@ public class TestSail extends SailBase {
         return handler;
     }
 
-
     public ResultMaterializationManager getMateralizationManager(){
 
         if (manager == null) {
