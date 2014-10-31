@@ -6,6 +6,10 @@ import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,11 +43,11 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 	 */
 	public RDFRectangle getRectangle() {
 		
-		PrefixRange subjectRange = getSubjectRange(logQuery.getQueryStatements().get(0));
+		RDFURIRange subjectRange = getSubjectRange(logQuery.getQueryStatements().get(0));
 
-		ExplicitSetRange<String> predicateRange = getPredicateRange(logQuery.getQueryStatements().get(1));
+		ExplicitSetRange<URI> predicateRange = getPredicateRange(logQuery.getQueryStatements().get(1));
 
-		RDFLiteralRange objectRange = getObjectRange(logQuery.getQueryStatements().get(2));
+		RDFValueRange objectRange = getObjectRange(logQuery.getQueryStatements().get(2));
 				
 		return new RDFRectangle(subjectRange, predicateRange, objectRange);
 	}// getRectangle
@@ -52,7 +56,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 	/**
 	 * TODO: Unchecked
 	 */
-	private RDFLiteralRange getObjectRange(Binding binding) {
+	private RDFValueRange getObjectRange(Binding binding) {
 		RDFLiteralRange objectRange = null;
 		
 		// Check what's inside the object's value.
@@ -144,7 +148,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 			objectRange = new RDFLiteralRange(binding.getValue());
 		}	
 		
-		return objectRange;
+		return new RDFValueRange(objectRange);
 	}// getObjectRange
 	
 	
@@ -162,41 +166,33 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 		return null;
 	}
 
-
-	public static void main(String[] args) {
-	
-		
-	}
-
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private ExplicitSetRange<String> getPredicateRange(Binding binding) {
-		HashSet<String> set = new HashSet<String>();
+	private ExplicitSetRange<URI> getPredicateRange(Binding binding) {
+		HashSet<URI> set = new HashSet<URI>();
 
 		// Check if binding is a const variable or not.
 		if (binding.getValue().equals("")) {// Is variable
 			// Check if any Filter for predicate exists.
 			QueryFilter qf = null;
 			if ((qf = hasFilter(binding.getName())) != null) {
-				Set<String> explicitSet = new HashSet<String>();
-				explicitSet.add(qf.getRegex());
-							
-				return new ExplicitSetRange(explicitSet);
+				Set<URI> explicitSet = new HashSet<URI>();
+				explicitSet.add(ValueFactoryImpl.getInstance().createURI(qf.getRegex()));
+
+				return new ExplicitSetRange<URI>(explicitSet);
 							
 			} else // Call the empty constructor, it handles this case. 					
-				return new ExplicitSetRange();
+				return new ExplicitSetRange<URI>();
 			
 		} else {// Is const
 				// Add the whole value as predicate
 				// TODO: Think if this is really ok.
-			set.add(binding.getValue());
+			set.add(ValueFactoryImpl.getInstance().createURI(binding.getValue()));
 		}
 
-		return new ExplicitSetRange<String>(set);
+		return new ExplicitSetRange<URI>(set);
 	}// getPredicateRange
 
 
-	private PrefixRange getSubjectRange(Binding binding) {
+	private RDFURIRange getSubjectRange(Binding binding) {
 		ArrayList<String> prefix = new ArrayList<String>();
 
 		// Check if binding is a const variable or not.
@@ -207,10 +203,10 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 				ArrayList<String> prefixList = new ArrayList<String>();
 				prefixList.add(qf.getRegex());
 				
-				return new PrefixRange(prefixList);
+				return new RDFURIRange(prefixList);
 				
 			} else // Call the empty constructor, it handles this case. 					
-				return new PrefixRange();
+				return new RDFURIRange();
 			
 		} else {// Is const
 				// Add the whole value as prefix
@@ -218,7 +214,7 @@ public class RDFQueryRecord implements QueryRecord<RDFRectangle,Stat>, Serializa
 			prefix.add(binding.getValue());
 		}
 
-		return new PrefixRange(prefix);
+		return new RDFURIRange(prefix);
 	}// getSubjectRange
 	
 	

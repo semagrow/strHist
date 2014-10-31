@@ -9,7 +9,6 @@ import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.XMLSchema;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -24,7 +23,7 @@ import java.util.Map;
 /**
  * Created by angel on 7/15/14.
  */
-public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteralRange> {
+public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiteralRange> {
 
     static final Logger logger = LoggerFactory.getLogger(RDFLiteralRange.class);
 
@@ -84,7 +83,6 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
         ranges.put(type, subRange);
     }
 
-
     public boolean isUnit() {
 
         if (infinite) return false;
@@ -134,6 +132,9 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
 
         if (infinite) return literalRange;
 
+        if (literalRange.isInfinite())
+            return this;
+
         RDFLiteralRange res = null;
 
         if (literalRange.ranges.size() != 1) {
@@ -157,7 +158,7 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
             RangeLength<?> range = entry.getValue();
             if (entry.getKey().equals(literalValueType)) {
 
-                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                if (literalValueType.equals(XMLSchema.INTEGER) || literalValueType.equals(XMLSchema.INT)) {
                     res = new RDFLiteralRange(literalValueType,
                             ((IntervalRange) range).intersection(
                                     (IntervalRange) literalrange));
@@ -182,6 +183,8 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
         }
 
 
+        if (res == null)
+            return res;
 
         return res;
     }
@@ -191,7 +194,8 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
 	public RDFLiteralRange minus(RDFLiteralRange literalRange) {
 
 
-        if (infinite) return literalRange;
+        if (infinite)
+            return literalRange;
 
         RDFLiteralRange res = null;
 
@@ -217,7 +221,7 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
             RangeLength<?> range = entry.getValue();
             if (entry.getKey().equals(literalValueType)) {
 
-                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                if (literalValueType.equals(XMLSchema.INTEGER) || literalValueType.equals(XMLSchema.INT)) {
                     res = new RDFLiteralRange(literalValueType,
                             ((IntervalRange) range).minus(
                                     (IntervalRange) literalrange));
@@ -242,43 +246,40 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
         }
 
 
+        if (res == null)
+            return res;
 
         return res;
 	}
 
 
 
-	public boolean includes(Value value) {
+	public boolean includes(Literal literal) {
 
-        if (infinite) return true;
+        if (isInfinite())
+            return true;
 
         for (Map.Entry<URI, RangeLength<?>> entry : ranges.entrySet()) {
 
             URI valueType = entry.getKey();
             RangeLength<?> range = entry.getValue();
 
-            if (value instanceof Literal) {
-                Literal literal = (Literal) value;
 
-                if (literal.getDatatype().equals(valueType)) {
-                    if (valueType.equals(XMLSchema.INTEGER) || valueType.equals(XMLSchema.INT)) {
-                        return ((IntervalRange) range).includes(literal.intValue());
+            if (literal.getDatatype().equals(valueType)) {
+                if (valueType.equals(XMLSchema.INTEGER) || valueType.equals(XMLSchema.INT)) {
+                    return ((IntervalRange) range).includes(literal.intValue());
 
-                    } else if (valueType.equals(XMLSchema.LONG)) {
-                        return ((IntervalRange) range).includes(literal.intValue());
+                } else if (valueType.equals(XMLSchema.LONG)) {
+                    return ((IntervalRange) range).includes(literal.intValue());
 
-                    } else if (valueType.equals(XMLSchema.STRING)) {
-                        return ((PrefixRange) range).includes(literal.stringValue());
+                } else if (valueType.equals(XMLSchema.STRING)) {
+                    return ((PrefixRange) range).includes(literal.stringValue());
 
-                    } else if (valueType.equals(XMLSchema.DATETIME)) {
-                        return ((CalendarRange) range).
-                                includes(literal.calendarValue().
-                                        toGregorianCalendar().getTime());
-                    }
+                } else if (valueType.equals(XMLSchema.DATETIME)) {
+                    return ((CalendarRange) range).
+                            includes(literal.calendarValue().
+                                    toGregorianCalendar().getTime());
                 }
-            } else if (value instanceof URI) {
-                if (range instanceof PrefixRange)
-                    return ((PrefixRange) range).includes(((URI) value).stringValue());
             }
         }
     		
@@ -393,7 +394,8 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
     //TODO: Fix me! na kanw add map entry
     public RDFLiteralRange tightRange(RDFLiteralRange literalRange) {
 
-        if (infinite) return new RDFLiteralRange();
+        if (isInfinite() || literalRange.isInfinite())
+            return new RDFLiteralRange();
 
 
 
@@ -428,7 +430,7 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
             RangeLength<?> range = entry.getValue();
             if (entry.getKey().equals(literalValueType)) {
 
-                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                if (literalValueType.equals(XMLSchema.INTEGER) || literalValueType.equals(XMLSchema.INT)) {
 
                     IntervalRange ires = ((IntervalRange) range).tightRange(
                             (IntervalRange) literalrange);
@@ -491,10 +493,6 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
         return null;
     }
 
-    @Deprecated
-    public void expand(String v) {
-        throw new NotImplementedException();
-    }
 
     /**
      * expands an RDFLiteralRange containing ONLY
@@ -502,57 +500,36 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
      * @param v
      */
 
-    public void expand(Value v) {
+    public void expand(Literal l) {
 
-        if (v instanceof Literal)
-        {
-            Literal l = (Literal)v;
-            URI type = l.getDatatype();
+        URI type = l.getDatatype();
 
-            if (ranges.containsKey(type)) {
-                if (type.equals(XMLSchema.INTEGER) || type.equals(XMLSchema.INT)) {
-                    Range<Integer> r =  (Range<Integer>) ranges.get(l.getDatatype());
-                    r.expand(l.intValue());
-                } else if (type.equals(XMLSchema.DATETIME)) {
-                    Range<Date> r =  (Range<Date>) ranges.get(l.getDatatype());
-                    r.expand(l.calendarValue().toGregorianCalendar().getTime());
-                } else {
-                    throw new NotImplementedException();
-                }
+        if (ranges.containsKey(type)) {
+            if (type.equals(XMLSchema.INTEGER) || type.equals(XMLSchema.INT)) {
+                Range<Integer> r =  (Range<Integer>) ranges.get(l.getDatatype());
+                r.expand(l.intValue());
+            } else if (type.equals(XMLSchema.DATETIME)) {
+                Range<Date> r =  (Range<Date>) ranges.get(l.getDatatype());
+                r.expand(l.calendarValue().toGregorianCalendar().getTime());
             } else {
-                // FIXME: add a new range for that type.
-                if (type.equals(XMLSchema.INTEGER) || type.equals(XMLSchema.INT)) {
-                    IntervalRange r = new IntervalRange(l.intValue(), l.intValue());
-                    ranges.put(type, r);
-                } else if (type.equals(XMLSchema.DATETIME)) {
-                    CalendarRange r = new CalendarRange(l.calendarValue().toGregorianCalendar().getTime(),
-                                                        l.calendarValue().toGregorianCalendar().getTime());
-                    ranges.put(type, r);
-                } else {
-                    throw new NotImplementedException();
-                }
+                throw new NotImplementedException();
+            }
+        } else {
+            // FIXME: add a new range for that type.
+            if (type.equals(XMLSchema.INTEGER) || type.equals(XMLSchema.INT)) {
+                IntervalRange r = new IntervalRange(l.intValue(), l.intValue());
+                ranges.put(type, r);
+            } else if (type.equals(XMLSchema.DATETIME)) {
+                CalendarRange r = new CalendarRange(l.calendarValue().toGregorianCalendar().getTime(),
+                                                    l.calendarValue().toGregorianCalendar().getTime());
+                ranges.put(type, r);
+            } else {
+                throw new NotImplementedException();
             }
         }
+
     }
 
-    /*
-    public URI getValueType() {
-        return valueType;
-    }
-
-    public void setValueType(URI valueType) {
-        this.valueType = valueType;
-    }
-
-    public Range<?> getRange() {
-        return range;
-    }
-
-    public void setRange(RangeLength<?> range) {
-        this.range = range;
-    }
-
-    */
     public Map<URI, RangeLength<?>> getRanges() {
 
         return ranges;
@@ -562,6 +539,7 @@ public class RDFLiteralRange implements RangeLength<Value>, Rangeable<RDFLiteral
 
         ranges.put(type, rangeN);
     }
+
     public long getLength() {
 
         if (infinite) return Integer.MAX_VALUE;

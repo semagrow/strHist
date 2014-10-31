@@ -9,6 +9,12 @@ public class SerialQueryLogFactory implements QueryLogFactory {
 
     @Override
     public QueryLogHandler getQueryRecordLogger(OutputStream out) {
-        return new SerialQueryLogHandler(out);
+        QueryLogHandler factory = new SerialQueryLogHandler(out);
+        try {
+            factory.startQueryLog();
+        } catch (QueryLogException e) {
+            e.printStackTrace();
+        }
+        return factory;
     }
 }

@@ -8,6 +8,8 @@ import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.SEVOD;
 import gr.demokritos.iit.irss.semagrow.rdf.io.vocab.VOID;
@@ -68,11 +70,23 @@ public class VoIDeserializer {
 
     private RDFRectangle getRectangle(Resource res) {
         return new RDFRectangle(
-                getPrefixRange(res, VOID.URIREGEXPATTERN),
+                getURIRange(res, VOID.URIREGEXPATTERN),
                 getExplicitSetRange(res, VOID.PROPERTY),
-                getRDFLiteralRange(res));
+                getRDFValueRange(res));
     }
 
+
+    private RDFURIRange getURIRange(Resource res, URI predicate) {
+
+        ArrayList<String> arrList = new ArrayList<String>();
+
+        Set<Value> set = model.filter(res, predicate, null).objects();
+
+        for (Value v : set)
+            arrList.add(v.stringValue());
+
+        return new RDFURIRange(arrList);
+    }
 
     private PrefixRange getPrefixRange(Resource res, URI predicate) {
 
@@ -86,32 +100,39 @@ public class VoIDeserializer {
         return new PrefixRange(arrList);
     }
 
+    private ExplicitSetRange<URI> getExplicitSetRange(Resource res, URI predicate) {
 
-    private ExplicitSetRange<String> getExplicitSetRange(Resource res, URI predicate) {
-
-        Set<String> hashSet = new HashSet<String>();
+        Set<URI> hashSet = new HashSet<URI>();
 
         Set<Value> set = model.filter(res, predicate, null).objects();
 
-        for (Value v : set)
-            hashSet.add(v.toString());
+        for (Value v : set) {
+            if (v instanceof URI)
+                hashSet.add((URI)v);
+        }
 
-        return new ExplicitSetRange<String>(hashSet);
+        return new ExplicitSetRange<URI>(hashSet);
     }
 
+    private RDFValueRange getRDFValueRange(Resource res) {
+        //RDFURIRange r = get
+        RDFLiteralRange lr = getRDFLiteralRange(res);
+        return new RDFValueRange(lr);
+    }
 
     private RDFLiteralRange getRDFLiteralRange(Resource res) {
         Map <URI, RangeLength<?>> objectRanges = new HashMap<URI, RangeLength<?>>();
 
         IntervalRange integerInterval = getIntInterval(res);
         if (integerInterval != null)
-            objectRanges.put(XMLSchema.INTEGER, integerInterval);
+            objectRanges.put(XMLSchema.INT, integerInterval);
 
         CalendarRange calendarRange = getCalendarRange(res);
         if (calendarRange != null)
             objectRanges.put(XMLSchema.DATETIME, calendarRange);
 
         PrefixRange prefixRange = getPrefixRange(res, SEVOD.STRINGOBJECTREGEXPATTERN);
+
         if (!prefixRange.isEmpty())
             objectRanges.put(XMLSchema.STRING, prefixRange);
 

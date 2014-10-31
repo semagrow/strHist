@@ -1,12 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
-import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.qfr.RDFQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.*;
@@ -16,23 +12,12 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.QueryRoot;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.QueryOptimizer;
-import org.openrdf.query.resultio.TupleQueryResultFormat;
-import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
-import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFWriterFactory;
-import org.openrdf.rio.RDFWriterRegistry;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.SailConnectionBase;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by angel on 10/11/14.
@@ -43,45 +28,24 @@ public class TestSailConnection extends SailConnectionBase {
     private RepositoryConnection conn;
 
     private QueryLogHandler handler;
-    private ResultMaterializationManager manager;
+
     private ExecutorService executorService;
+
+    private ResultMaterializationManager manager;
 
     public TestSailConnection(TestSail sailBase) throws RepositoryException {
         super(sailBase);
         sail = sailBase;
         conn = sail.getRepositoryConnection();
-        handler = getQueryLogHandler();
+        handler = sail.getQueryLogHandler();
         executorService = sail.getExecutorService();
-        manager = getMateralizationManager();
+        manager = sail.getMateralizationManager();
     }
 
-    private QueryLogHandler getQueryLogHandler() {
-
-        QueryLogHandler handler;
-
-        File qfrLog  = new File("/var/tmp/qfr.log");
-        RDFFormat rdfFF = RDFFormat.NTRIPLES;
-
-        RDFWriterRegistry writerRegistry = RDFWriterRegistry.getInstance();
-        RDFWriterFactory rdfWriterFactory = writerRegistry.get(rdfFF);
-        QueryLogFactory factory = new RDFQueryLogFactory(rdfWriterFactory);
-        try {
-            OutputStream out = new FileOutputStream(qfrLog, true);
-            handler = factory.getQueryRecordLogger(out);
-            return handler;
-        } catch (FileNotFoundException e) {
-
-        }
-        return null;
-    }
+    public QueryLogHandler getQueryLogHandler() { return handler; }
 
     private ResultMaterializationManager getMateralizationManager(){
-        File baseDir = new File("/var/tmp/");
-        TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
-
-        TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
-        TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
-        return new FileManager(baseDir, writerFactory, getExecutorService());
+        return manager;
     }
 
     private ExecutorService getExecutorService() {
@@ -92,9 +56,7 @@ public class TestSailConnection extends SailConnectionBase {
     protected void closeInternal() throws SailException {
         try {
             conn.close();
-            if (handler != null)
-                handler.endQueryLog();
-        } catch (RepositoryException | QueryLogException e) {
+        } catch (RepositoryException e) {
             throw new SailException(e);
         }
     }

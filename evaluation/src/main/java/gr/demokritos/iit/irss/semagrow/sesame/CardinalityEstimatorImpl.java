@@ -8,6 +8,8 @@ import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -96,26 +98,30 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
         Value pVal = pattern.getPredicateVar().getValue();
         Value oVal = pattern.getObjectVar().getValue();
 
-        PrefixRange subjectRange = new PrefixRange();
+        RDFURIRange subjectRange = new RDFURIRange();
+
         if (sVal == null) {
             if (bindings.hasBinding(pattern.getSubjectVar().getName()))
                 subjectRange.getPrefixList().add(bindings.getValue(pattern.getSubjectVar().getName()).stringValue());
         } else
             subjectRange.getPrefixList().add(sVal.stringValue());
 
-        ExplicitSetRange<String> predicateRange = new ExplicitSetRange<String>();
+        ExplicitSetRange<URI> predicateRange = new ExplicitSetRange<URI>();
         if (pVal == null) {
             if (bindings.hasBinding(pattern.getPredicateVar().getName()))
-                predicateRange.getItems().add(bindings.getValue(pattern.getPredicateVar().getName()).stringValue());
+                predicateRange.getItems().add((URI)bindings.getValue(pattern.getPredicateVar().getName()));
         } else
-            predicateRange.getItems().add(pVal.stringValue());
+            predicateRange.getItems().add((URI)pVal);
 
-        RDFLiteralRange objectRange = new RDFLiteralRange();
+        RDFLiteralRange literalRange = new RDFLiteralRange();
         if (oVal == null) {
             if (bindings.hasBinding(pattern.getObjectVar().getName()))
-                fillObjectRange(objectRange, bindings.getValue(pattern.getObjectVar().getName()));
+                fillObjectRange(literalRange, bindings.getValue(pattern.getObjectVar().getName()));
         } else
-            fillObjectRange(objectRange, oVal);
+            fillObjectRange(literalRange, oVal);
+
+
+        RDFValueRange objectRange = new RDFValueRange(literalRange);
 
         return new RDFRectangle(subjectRange, predicateRange, objectRange);
     }

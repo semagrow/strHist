@@ -2,11 +2,13 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
+import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.file.FileManager;
+import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
+import gr.demokritos.iit.irss.semagrow.qfr.*;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
-import gr.demokritos.iit.irss.semagrow.rdf.io.log.LogParser;
-import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.io.sevod.VoIDSerializer;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import info.aduna.iteration.Iteration;
@@ -19,6 +21,9 @@ import org.openrdf.query.*;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedTupleQuery;
 import org.openrdf.query.parser.QueryParserUtil;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
+import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -29,10 +34,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by angel on 10/11/14.
@@ -42,23 +46,27 @@ public class Workflow {
         Variables for local run
      */
 //    private static List<String> agroTerms = loadAgroTerms("/home/nickozoulis/agrovoc_terms.txt");
-//    public static String logFolder = "/home/nickozoulis/strhist_exp_logs/";
+//    public static String logFolder = "/home/nickozoulis/semagrow/serial/";
 //    private static String tripleStorePath = "/home/nickozoulis/Downloads/";
 //    private static int term = 0;
 //    private static int startDate = 1980, endDate = 1980;
-//    public static Path path =  Paths.get(logFolder, "semagrow_logs.log");
 
 
     static final Logger logger = LoggerFactory.getLogger(Workflow.class);
-
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
     private static String testQ1 = prefixes + "select * {?x semagrow:year %s . }";
+    static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
+    private static ExecutorService executors;
+
 
     private static List<String> agroTerms;
     private static String logFolder, tripleStorePath;
     private static int term = 0, startDate, endDate;
     public static Path path;
-    static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
+
+
+
+
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path, t = TripleStore, a = AgroknowTerms
@@ -69,7 +77,7 @@ public class Workflow {
     static public void main(String[] args) throws RepositoryException, IOException {
         OptionParser parser = new OptionParser("s:e:l:t:a:");
         OptionSet options = parser.parse(args);
-        
+
         if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l")
                 && options.hasArgument("t") && options.hasArgument("a")) {
 
@@ -93,23 +101,27 @@ public class Workflow {
     }
 
     private static void runMultiAnnualExperiment() throws RepositoryException, IOException {
+        executors = Executors.newCachedThreadPool();
+
         for (int date=startDate; date<=endDate; date++) {
 
-            path = Paths.get(logFolder, "semagrow_log_" + date + ".log");
+            // Query triple stores and write feedback.
+            //Repository repo = getFedRepository(getRepository(date), date);
+            //queryTripleStores(repo, date);
+            //repo.shutDown();
 
-            // Query triple stores and get feedback.
-            Repository repo = getFedRepository(getRepository(date));
-//            queryTripleStores(repo, date);
-
-            // Parse feedback logs.
-            List<RDFQueryRecord> listQueryRecords = new LogParser(path.toString()).parse();
+            // Load feedback
+            Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "/" + date + "_log.ser");
+            Collection<QueryRecord> queryRecords = adaptLogs(logs, date);
 
             // Refine histogram according to the feedback.
-            STHolesHistogram histogram = refineHistogram(listQueryRecords, date);
+            STHolesHistogram histogram = refineHistogram(queryRecords, date);
 
             // Execute test queries on triple store and refined histogram.
-            execTestQueries(repo, histogram, date);
+            //execTestQueries(repo, histogram, date);
+            //repo.shutDown();
         }
+        executors.shutdown();
     }
 
     private static void queryTripleStores(Repository repo, int date) throws RepositoryException, IOException {
@@ -137,7 +149,35 @@ public class Workflow {
             }
     }
 
-    private static STHolesHistogram refineHistogram(List<RDFQueryRecord> listQueryRecords, int date) {
+    private static Collection<QueryLogRecord> parseFeedbackLog(String path) {
+        Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
+        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+        QueryLogParser parser = new SerialQueryLogParser();
+        parser.setQueryRecordHandler(handler);
+
+        logger.info("Parsing file : " + path);
+        try {
+            parser.parseQueryLog(new FileInputStream(path));
+        } catch (FileNotFoundException e) {e.printStackTrace();
+        } catch (QueryLogException e) {e.printStackTrace();
+        } catch (IOException e) {e.printStackTrace();}
+        logger.info("Number of parsed query logs: " + logs.size());
+
+        return logs;
+    }
+
+    private static Collection<QueryRecord> adaptLogs(Collection<QueryLogRecord> logs, int year) {
+        Collection<QueryRecord> queryRecords = new LinkedList<QueryRecord>();
+        Iterator iter = logs.iterator();
+
+        while (iter.hasNext()) {
+            queryRecords.add(new QueryRecordAdapter((QueryLogRecord)iter.next(), getMateralizationManager(year)));
+        }
+
+        return queryRecords;
+    }
+
+    private static STHolesHistogram refineHistogram(Collection<QueryRecord> listQueryRecords, int date) {
         STHolesHistogram histogram = loadPreviousHistogram(logFolder, date);
 
         if (listQueryRecords.size() > 0) {
@@ -228,8 +268,8 @@ public class Workflow {
         return 0;
     }
 
-    private static Repository getFedRepository(Repository actual) throws RepositoryException {
-        TestSail sail = new TestSail(actual);
+    private static Repository getFedRepository(Repository actual, int date) throws RepositoryException {
+        TestSail sail = new TestSail(actual, date);
 //        histogram = sail.getHistogram();
         Repository repo = new SailRepository(sail);
         repo.initialize();
@@ -303,6 +343,15 @@ public class Workflow {
         }
 
         return list;
+    }
+
+    private static ResultMaterializationManager getMateralizationManager(int year) {
+        File baseDir = new File("/var/tmp/" + year + "/");
+        TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
+
+        TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
+        TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
+        return new FileManager(baseDir, writerFactory, executors);
     }
 
 }

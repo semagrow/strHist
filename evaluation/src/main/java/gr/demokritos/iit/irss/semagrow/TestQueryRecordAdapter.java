@@ -82,7 +82,7 @@ public class TestQueryRecordAdapter {
     }
 
     private static ResultMaterializationManager getMateralizationManager(){
-        File baseDir = new File("/home/nickozoulis/semagrow/test_2/");
+        File baseDir = new File("/var/tmp/");
         TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
 
         TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();

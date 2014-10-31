@@ -106,16 +106,25 @@ public class ExplicitSetRange<T>
 
     //Tested
     public String toString() {
-        String res;
+        String res = "";
 
-        res = "uris: { ";
+        if (items.size() > 1)
+            res += "{";
+
+        boolean comma = false;
 
         for (T p : items) {
 
-            res = res + p + " ";
+            if (comma)
+                res +=",";
+
+            res += p;
+
+            comma = true;
         }
 
-        res += "}";
+        if (items.size() > 1)
+            res += "}";
 
         return res;
     }

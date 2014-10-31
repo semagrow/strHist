@@ -148,6 +148,11 @@ public class PrefixRange
         ArrayList<String> prefixN = new ArrayList<String>();
         int cnt = 0;
 
+        if (prefixList.isEmpty() && isInfinite()) {
+            prefixList.add(v);
+            infinite = false;
+        }
+
         // find longest common prefix with
         // each string in prefix range
         for (String p : prefixList) {
@@ -279,16 +284,24 @@ public class PrefixRange
     //Tested
     public String toString() {
 
-        String res;
+        String res="";
 
-        res = "uriprefixes: { ";
+        if (prefixList.size() > 1)
+            res += "{";
+
+        boolean comma = false;
 
         for (String p : prefixList) {
 
-            res = res + p + " ";
-        }
+            if (comma)
+                res += ",";
+            res = "\"" + p + "\"";
 
-        res += "}";
+            comma = true;
+        }
+        if (prefixList.size() > 1)
+            res += "}";
+
         return res;
     }
 

@@ -126,52 +126,57 @@ public class STHolesHistogram<R extends Rectangle<R>>
     public void refine(QueryRecord<R,Stat> queryRecord) {
 
 
+        if (queryRecord.getQuery().contains("1066071442383356038.tsv")) {
+            int i = 0;
+            i++;
+        }
+
         List<R> rects = new ArrayList<R>();
+
         if (queryRecord.getRectangle().isInfinite()) {
-            rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
+            //rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
+            rects.addAll(queryRecord.getResultSet().getRectangles());
         } else {
             rects.add(queryRecord.getRectangle());
         }
 
         for (R rect : rects) {
-            // check if root is null
-            if (root == null) {
 
-                root = new STHolesBucket<R>(rect, new Stat(), null, null);
+            if (this.getRoot() == null) {
+
+                setRoot(new STHolesBucket<R>(rect, new Stat(), null, null));
                 bucketsNum += 1;
+                logger.info("Root bucket is created");
+
             } else {
 
                 // expand root
                 if (!root.getBox().contains(rect)) {
 
                     // expand root box so that it includes q
+
                     R boxN = root.getBox().computeTightBox(rect);
+
                     //     System.out.println("Rectangle: " + queryRecord.getRectangle());
                     //     System.out.println("Box: " + root.getBox());
 
                     Stat statsN = countMatchingTuples(rect, queryRecord);
-                    // freqN = freq(root) + freq(q)
-                    // dN(i) = max(d(i,root), d(i,q))
-                    long freqN = statsN.getFrequency() +
-                            root.getStatistics().getFrequency();
-                    List<Long> distinctN = new ArrayList<Long>();
-                    for (int i = 0; i < statsN.getDistinctCount().size(); i++) {
+                    Stat rootStatsN = computeRootStats(root.getStatistics(), statsN);
 
-                        distinctN.add(Math.max(statsN.getDistinctCount().get(i),
-                                root.getStatistics().getDistinctCount().get(i)));
-                    }
                     //Collection<STHolesBucket<R>> childrenN =
-                      //      new ArrayList<STHolesBucket<R>>();
+                    //      new ArrayList<STHolesBucket<R>>();
                     //STHolesBucket<R> rootN =
-                      //      new STHolesBucket<R>(boxN, new Stat(freqN, distinctN), childrenN, null);
+                    //      new STHolesBucket<R>(boxN, new Stat(freqN, distinctN), childrenN, null);
                     //bucketsNum += 1;
                     //rootN.addChild(root);
-                   // root = rootN;
-                    statsN = new Stat(freqN, distinctN);
+                    // root = rootN;
+
                     root.setBox(boxN);
-                    root.setStatistics(statsN);
+                    root.setStatistics(rootStatsN);
 
                 }
+
+                logger.info("Root bucket is expanded");
             }
 
 
@@ -183,15 +188,36 @@ public class STHolesHistogram<R extends Rectangle<R>>
                 //System.out.println("--------------------------------------------------");
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
                 //System.out.println("<<<>>> Hole: " + hole);
-                if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole))
+                if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole)) {
+                    logger.info("Drilling hole " + hole.getBox().toString() + " with statistics " + hole.getStatistics().toString());
                     drillHole(bucket, hole);
+                } else {
+                    logger.info("Skip drilling for " + bucket.getBox().toString());
+                }
             }
         }
 
         // check if histogram must be compacted after refinement
-        logger.debug("Histogram refined with query: " + queryRecord.getQuery());
-        logger.debug("Compacting histogram.");
+        logger.debug("Histogram refined with query: " + queryRecord.getRectangle());
         compact();
+    }
+
+
+    private Stat computeRootStats(Stat oldStats, Stat deltaStats) {
+        // freqN = freq(root) + freq(q)
+        // dN(i) = max(d(i,root), d(i,q))
+
+        long freqN = deltaStats.getFrequency() + oldStats.getFrequency();
+
+        List<Long> distinctN = new ArrayList<Long>();
+
+        for (int i = 0; i < deltaStats.getDistinctCount().size(); i++) {
+
+            distinctN.add(Math.max(deltaStats.getDistinctCount().get(i),
+                    oldStats.getDistinctCount().get(i)));
+        }
+
+        return new Stat(freqN, distinctN);
     }
 
     //Tested
@@ -261,14 +287,16 @@ public class STHolesHistogram<R extends Rectangle<R>>
     private void  updateParticipants(List<STHolesBucket<R>> participants,
                                     STHolesBucket<R> bucket, R c) {
 
-        participants.clear();
+        List<STHolesBucket<R>> participantsNew = new LinkedList<STHolesBucket<R>>();
 
         for (STHolesBucket<R> bi : bucket.getChildren()) {
             if ((c.intersects(bi.getBox())) && (!c.contains(bi.getBox()))) {
 
-                participants.add(bi);
+                participantsNew.add(bi);
             }
         }
+
+        participants.retainAll(participantsNew);
     }
 
     /**
@@ -415,6 +443,9 @@ public class STHolesHistogram<R extends Rectangle<R>>
      */
     private void compact() {
 
+        if (bucketsNum > maxBucketsNum)
+            logger.debug("Compacting histogram.");
+
         // while too many buckets compute merge penalty for each parent-child
         // and sibling pair, find the one with the minimum penalty and
         // call merge(b1,b2,bn)
@@ -426,7 +457,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
              STHolesBucket<R> bn = bestMerge.getBn();
 
             STHolesBucket.merge(b1, b2, bn, this);
-            logger.debug("Bert merge info: " + bestMerge.toString());
+            logger.debug("Best merge info: " + bestMerge.toString());
             logger.debug("Number of PC merges: " + pcMergesNum);
             logger.debug("Number of SS merges: " + ssMergesNum);
             bucketsNum -= 1;
@@ -472,6 +503,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
                 bn = candidateMergedBucket.getKey();
             }
 
+            /*
             // Candidate sibling-sibling merges
             for (int j = i + 1; j < bChildren.size(); j++) {
 
@@ -491,7 +523,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
                     }
                 }
 
-            }
+            }*/
         }
 
         // local best merge

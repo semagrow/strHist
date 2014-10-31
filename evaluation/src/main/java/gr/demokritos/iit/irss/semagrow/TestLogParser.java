@@ -1,8 +1,6 @@
 package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.qfr.*;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,21 +20,34 @@ public class TestLogParser {
 
     public static void main(String[] args) throws IOException, QueryLogException, ClassNotFoundException {
 
-        OptionParser parser = new OptionParser("i:o:");
-        OptionSet options = parser.parse(args);
+//        OptionParser parser = new OptionParser("i:o:");
+//        OptionSet options = parser.parse(args);
+//
+//        if (options.hasArgument("i") && options.hasArgument("o")) {
+//            input = options.valueOf("i").toString();
+//            output = options.valueOf("o").toString();
+//        } else {
+//            logger.error("Invalid arguments");
+//            System.exit(1);
+//        }
 
-        if (options.hasArgument("i") && options.hasArgument("o")) {
-            input = options.valueOf("i").toString();
-            output = options.valueOf("o").toString();
-        } else {
-            logger.error("Invalid arguments");
-            System.exit(1);
-        }
+        input = "/var/tmp/qfr.log";
+        output = "/home/nickozoulis/semagrow/serial/qfr_log.ser";
 
-        writeRDFQueryLogSerial();
-
-        parseRDFQueryLogSerial();
+//        writeRDFQueryLogSerial();
+//
+//        parseRDFQueryLogSerial();
     }
+
+    private static void writeSerialQueryLog() throws IOException, QueryLogException {
+        Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
+        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+
+
+
+    }
+
+
 
     private static void writeRDFQueryLogSerial() throws IOException, QueryLogException {
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();

@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.qfr;
 
 import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
 import org.openrdf.model.URI;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.algebra.TupleExpr;
 
 import java.util.*;
@@ -29,17 +30,21 @@ public class QueryLogRecordImpl implements QueryLogRecord {
 
     private URI results;
 
-    public QueryLogRecordImpl(UUID session, URI endpoint, TupleExpr query) {
+    private BindingSet bindings;
+
+    public QueryLogRecordImpl(UUID session, URI endpoint, TupleExpr query, BindingSet bindings) {
         this.session = session;
         this.endpoint = endpoint;
         this.query = query;
+        this.bindings = bindings;
         this.bindingNames = new LinkedList<String>();
     }
 
-    public QueryLogRecordImpl(UUID session, URI endpoint, TupleExpr query, Collection<String> bindingNames) {
+    public QueryLogRecordImpl(UUID session, URI endpoint, TupleExpr query, BindingSet bindings, Collection<String> bindingNames) {
         this.session = session;
         this.endpoint = endpoint;
         this.query = query;
+        this.bindings = bindings;
         this.bindingNames = new LinkedList<String>(bindingNames);
     }
 
@@ -48,6 +53,9 @@ public class QueryLogRecordImpl implements QueryLogRecord {
 
     @Override
     public TupleExpr getQuery() { return query; }
+
+    @Override
+    public BindingSet getBindings() { return bindings; }
 
     @Override
     public UUID getSession() { return session; }

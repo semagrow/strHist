@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow;
+package gr.demokritos.iit.irss.semagrow.numericalqfr;
 
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
@@ -36,6 +36,10 @@ public class NumQueryResult implements QueryResult<NumRectangle, Long>, Serializ
         return cardinality;
     }// getCardinality
 
+
+    public List<NumRectangle> getRectangles() {
+        return getRectangles(null);
+    }
 
     @Override
     public List<NumRectangle> getRectangles(NumRectangle rect) {

@@ -4,6 +4,7 @@ import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
+import org.openrdf.model.URI;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,16 +14,16 @@ import java.util.HashSet;
  */
 public class RDFRectangle implements Rectangle<RDFRectangle> {
 
-    private PrefixRange subjectRange;
+    private RDFURIRange subjectRange;
 
-	private ExplicitSetRange<String> predicateRange;
+	private ExplicitSetRange<URI> predicateRange;
 
 	// private Range<Object> objectRange;
-	private RDFLiteralRange objectRange;
+	private RDFValueRange objectRange;
 
 
-	public RDFRectangle(PrefixRange subjectRange,
-			ExplicitSetRange<String> predicateRange, RDFLiteralRange objectRange) {
+	public RDFRectangle(RDFURIRange subjectRange,
+			ExplicitSetRange<URI> predicateRange, RDFValueRange objectRange) {
 		this.subjectRange = subjectRange;
 		this.predicateRange = predicateRange;
 		this.objectRange = objectRange;
@@ -92,9 +93,9 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
     // Shrink rectangle so that it does not intersect with rec
     public void shrink(RDFRectangle rec) {
 
-        PrefixRange subjectRangeN = subjectRange.minus(rec.subjectRange);
-        ExplicitSetRange<String> predicateRangeN = predicateRange.minus(rec.predicateRange);
-        RDFLiteralRange objectRangeN = objectRange.minus(rec.objectRange);
+        RDFURIRange subjectRangeN = subjectRange.minus(rec.subjectRange);
+        ExplicitSetRange<URI> predicateRangeN = predicateRange.minus(rec.predicateRange);
+        RDFValueRange objectRangeN = objectRange.minus(rec.objectRange);
 
         ArrayList<Double> lengths = new ArrayList<Double>();
         long subjectLength = subjectRange.getLength();
@@ -140,22 +141,22 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 
     public RDFRectangle computeTightBox(RDFRectangle rec) {
 
-        PrefixRange subjectRangeN = subjectRange.tightRange(rec.subjectRange);
-        ExplicitSetRange<String> predicateRangeN = predicateRange.tightRange(rec.predicateRange);
-        RDFLiteralRange objectRangeN = objectRange.tightRange(rec.objectRange);
+        RDFURIRange subjectRangeN = subjectRange.tightRange(rec.subjectRange);
+        ExplicitSetRange<URI> predicateRangeN = predicateRange.tightRange(rec.predicateRange);
+        RDFValueRange objectRangeN = objectRange.tightRange(rec.objectRange);
         
         return new RDFRectangle(subjectRangeN, predicateRangeN, objectRangeN);
     }
 
-    public void setObjectRange(RDFLiteralRange objectRange) {
+    public void setObjectRange(RDFValueRange objectRange) {
         this.objectRange = objectRange;
     }
 
-    public void setPredicateRange(ExplicitSetRange<String> predicateRange) {
+    public void setPredicateRange(ExplicitSetRange<URI> predicateRange) {
         this.predicateRange = predicateRange;
     }
 
-    public void setSubjectRange(PrefixRange subjectRange) {
+    public void setSubjectRange(RDFURIRange subjectRange) {
         this.subjectRange = subjectRange;
     }
 
@@ -168,7 +169,7 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 
     public boolean isMergeable(RDFRectangle rec) {
 
-        return objectRange.hasSameType((RDFLiteralRange) rec.getRange(2));
+        return objectRange.hasSameType(rec.objectRange);
     }
 
     public boolean isEmpty() {
@@ -201,52 +202,27 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 
     public String toString() {
 
-        String res = "rectangle:\n" +
-                "\tsubject:\n" + "\t\t" + subjectRange.toString() + "\n" +
-                "\tpredicate:\n" + "\t\t" + predicateRange.toString() + "\n" +
-                "\tobject:\n" + "\t\t" + objectRange.toString() + "\n";
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("(");
+        buffer.append(subjectRange.toString());
+        buffer.append(",");
+        buffer.append(predicateRange.toString());
+        buffer.append(",");
+        buffer.append(objectRange.toString());
+        buffer.append(")");
 
-        return res;
+        return buffer.toString();
     }
 
-    public static void main(String args[] ) {
-        ArrayList<String> myRangePrefixList = new ArrayList<String>();
-        myRangePrefixList.add("http://a/");
-        PrefixRange subjectRange = new PrefixRange(myRangePrefixList);
-
-        HashSet<String> s1 = new HashSet<String>();
-        s1.add("a");
-        s1.add("b");
-        s1.add("c");
-        ExplicitSetRange<String> predicateRange = new ExplicitSetRange<String>(s1);
-
-        int low = 0;
-        int high = 10;
-        RDFLiteralRange objectRange = new RDFLiteralRange(low, high);
-        //RDFLiteralRange objectRange2  = new RDFLiteralRange();
-
-        RDFRectangle rect = new RDFRectangle(subjectRange, predicateRange, objectRange);
-
-        RDFLiteralRange objectRange2 = new RDFLiteralRange(low + 1, high);
-        RDFRectangle rect2 = new RDFRectangle(subjectRange, predicateRange, objectRange2);
-        System.out.println(rect + " and " + rect2 + " are mergeable: " + rect.isMergeable(rect2));
-
-        RDFLiteralRange objectRange3 = new RDFLiteralRange("http://a");
-        RDFRectangle rect3 = new RDFRectangle(subjectRange, predicateRange, objectRange3);
-        System.out.println(rect + " and " + rect3 + " are mergeable: " + rect.isMergeable(rect3));
-
-        System.out.println(rect.isInfinite());
-    }
-
-    public RDFLiteralRange getObjectRange() {
+    public RDFValueRange getObjectRange() {
         return objectRange;
     }
 
-    public ExplicitSetRange<String> getPredicateRange() {
+    public ExplicitSetRange<URI> getPredicateRange() {
         return predicateRange;
     }
 
-    public PrefixRange getSubjectRange() {
+    public RDFURIRange getSubjectRange() {
         return subjectRange;
     }
 }

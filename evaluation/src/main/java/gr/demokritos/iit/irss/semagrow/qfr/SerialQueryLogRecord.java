@@ -1,15 +1,13 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
-import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
 import org.openrdf.model.URI;
-import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.parser.ParsedTupleQuery;
 import org.openrdf.query.parser.QueryParserUtil;
 import org.openrdf.queryrender.sparql.SPARQLQueryRenderer;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +18,8 @@ import java.util.UUID;
  */
 public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
 
-    private static final long serialVersionUID = 3274204530379085447L;
+    private static final long serialVersionUID = -5389996019343297997L;
+
     private transient QueryLogRecord queryLogRecord;
 
     public SerialQueryLogRecord(){}
@@ -37,32 +36,36 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
         out.writeObject(queryLogRecord.getStartTime());
         out.writeObject(queryLogRecord.getEndTime());
         out.writeObject(queryLogRecord.getDuration());
+        out.writeObject(queryLogRecord.getResults());
+        out.writeObject(queryLogRecord.getBindings());
 
         ParsedTupleQuery q = new ParsedTupleQuery(queryLogRecord.getQuery());
         out.writeObject(new SPARQLQueryRenderer().render(q)); // String
-
-        // TODO: out.writeObject(queryLogRecord.getResult());
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException, MalformedQueryException {
+    private void readObject(java.io.ObjectInputStream in) throws Exception {
         UUID uuid = (UUID)in.readObject();
         URI endpoint = (URI)in.readObject();
-        List<String> bindingNames = (List<String>)in.readObject();
+        List<String> bindingNames = (List<String>) in.readObject();
         long cardinality = (long)in.readObject();
         Date startTime = (Date)in.readObject();
         Date endTime = (Date)in.readObject();
         long duration = (long)in.readObject();
+        URI results = (URI)in.readObject();
+        BindingSet bindings = (BindingSet)in.readObject();
 
         ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL,
                                                             (String)in.readObject(),
                                                             "http://example.org/");
         TupleExpr query = q.getTupleExpr();
 
-        this.queryLogRecord = new QueryLogRecordImpl(uuid, endpoint, query , bindingNames);
+        this.queryLogRecord = new QueryLogRecordImpl(uuid, endpoint, query, bindings, bindingNames);
         this.queryLogRecord.setCardinality(cardinality);
         this.queryLogRecord.setDuration(startTime.getTime(), endTime.getTime());
-        //TODO: this.queryLogRecord.setResults();
+        this.queryLogRecord.setResults(results);
     }
+
+
 
     public QueryLogRecord getQueryLogRecord() {
         return queryLogRecord;
@@ -72,6 +75,9 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
     public URI getEndpoint() {
         return getQueryLogRecord().getEndpoint();
     }
+
+    @Override
+    public BindingSet getBindings() { return getQueryLogRecord().getBindings(); }
 
     @Override
     public TupleExpr getQuery() {

@@ -5,9 +5,10 @@ import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
-import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.json.simple.JSONArray;
@@ -15,6 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.XMLSchema;
 
 import java.io.FileNotFoundException;
@@ -120,9 +122,9 @@ public class JSONDeserializer {
 
     private RDFRectangle getBox(Object boxObj) {
         JSONObject jsonObject;
-        PrefixRange subjectRange;
-        ExplicitSetRange<String> predicateRange;
-        RDFLiteralRange objectRange;
+        RDFURIRange subjectRange;
+        ExplicitSetRange<URI> predicateRange;
+        RDFValueRange objectRange;
 
         jsonObject = (JSONObject)boxObj;
 
@@ -134,7 +136,7 @@ public class JSONDeserializer {
     }
 
 
-    private RDFLiteralRange getObject(Object objectObj) {
+    private RDFValueRange getObject(Object objectObj) {
         Map<URI,RangeLength<?>> ranges = new HashMap<URI, RangeLength<?>>();
         RDFLiteralRange literalRange = null;
         JSONObject jsonObject = (JSONObject)objectObj, temp;
@@ -156,7 +158,7 @@ public class JSONDeserializer {
 
         }// while
 
-        return new RDFLiteralRange(ranges);
+        return new RDFValueRange(new RDFLiteralRange(ranges));
     }
 
 
@@ -166,7 +168,7 @@ public class JSONDeserializer {
         long low = (Long) jsonObject.get("low");
         long high = (Long) jsonObject.get("high");
 
-        ranges.put(XMLSchema.INTEGER, new IntervalRange((int) low, (int) high));
+        ranges.put(XMLSchema.INT, new IntervalRange((int) low, (int) high));
     }
 
 
@@ -184,11 +186,11 @@ public class JSONDeserializer {
             e.printStackTrace();
         }
 
-        ranges.put(XMLSchema.INTEGER, new CalendarRange(dateBegin, dateEnd));
+        ranges.put(XMLSchema.DATETIME, new CalendarRange(dateBegin, dateEnd));
     }// getObjectCalendarRange
 
 
-    private PrefixRange getSubject(Object subjectObj) {
+    private RDFURIRange getSubject(Object subjectObj) {
         ArrayList<String> prefixList = new ArrayList<String>();
         JSONObject jsonObject = (JSONObject)subjectObj, temp = null;
         JSONArray array = (JSONArray)jsonObject.get("array");
@@ -201,12 +203,12 @@ public class JSONDeserializer {
                 prefixList.add((String)temp.get("value"));
         }
 
-        return new PrefixRange(prefixList);
+        return new RDFURIRange(prefixList);
     }
 
 
-    private ExplicitSetRange getPredicate(Object predicateObj) {
-        Set<String> predicateSet = new HashSet<String>();
+    private ExplicitSetRange<URI> getPredicate(Object predicateObj) {
+        Set<URI> predicateSet = new HashSet<URI>();
         JSONObject jsonObject = (JSONObject)predicateObj, temp = null;
         JSONArray array = (JSONArray)jsonObject.get("array");
         Iterator<JSONObject> iterator = array.iterator();
@@ -214,11 +216,13 @@ public class JSONDeserializer {
         while (iterator.hasNext()) {
             temp = iterator.next();
 
-            if (((String)temp.get("type")).equals("uri"))
-                predicateSet.add((String)temp.get("value"));
+            if (((String)temp.get("type")).equals("uri")) {
+                URI p = ValueFactoryImpl.getInstance().createURI((String) temp.get("value"));
+                predicateSet.add(p);
+            }
         }
 
-        return new ExplicitSetRange(predicateSet);
+        return new ExplicitSetRange<URI>(predicateSet);
     }
 
 
@@ -242,9 +246,15 @@ public class JSONDeserializer {
 
     public static void main(String[] args) {
         STHolesHistogram<RDFRectangle> histogram =
-                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON.txt").
+                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980.txt").
                         getHistogram();
 
-        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSONN.txt");
+        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980_new.txt");
+
+        histogram =
+                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980_new.txt").
+                        getHistogram();
+
+        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980_new_2.txt");
     }
 }

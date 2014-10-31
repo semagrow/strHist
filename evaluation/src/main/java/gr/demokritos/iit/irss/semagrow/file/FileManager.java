@@ -60,7 +60,7 @@ public class FileManager implements ResultMaterializationManager {
             URI storeId = convertURI(file.toURI());
             OutputStream out = new FileOutputStream(file);
             TupleQueryResultWriter writer = writerFactory.getWriter(out);
-            return new StoreHandler(storeId, writer);
+            return new StoreHandler(storeId, writer, out);
         } catch (IOException e) {
             throw new QueryEvaluationException(e);
         }
@@ -90,10 +90,12 @@ public class FileManager implements ResultMaterializationManager {
     {
         private URI id;
         private boolean started = false;
+        private OutputStream out;
 
-        public StoreHandler(URI id, QueryResultHandler handler) {
+        public StoreHandler(URI id, QueryResultHandler handler, OutputStream out) {
             super(handler);
             this.id = id;
+            this.out = out;
         }
 
         public URI getId() { return id; }
@@ -112,11 +114,24 @@ public class FileManager implements ResultMaterializationManager {
             started = true;
         }
 
+        @Override
+        public void endQueryResult() throws TupleQueryResultHandlerException {
+            if (started) {
+                super.endQueryResult();
+            }
+
+            try {
+                out.close();
+            }catch(IOException e) {
+                throw new TupleQueryResultHandlerException(e);
+            }
+        }
+
         public void destroy() throws IOException {
 
             try {
-                if (started)
-                    super.endQueryResult();
+
+                endQueryResult();
 
                 File f = null;
                 f = new File(convertbackURI(id));
