@@ -70,9 +70,6 @@ public class Workflow {
     public static Path path;
 
 
-
-
-
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path, t = TripleStore, a = AgroknowTerms
      * @param args
@@ -120,7 +117,7 @@ public class Workflow {
             Collection<QueryRecord> queryRecords = adaptLogs(logs, date);
 
             // Refine histogram according to the feedback.
-            STHolesHistogram histogram = refineHistogram(queryRecords, date);
+            STHolesHistogram histogram = refineHistogram(queryRecords.iterator(), date);
 
             // Execute test queries on triple store and refined histogram.
             //execTestQueries(repo, histogram, date);
@@ -182,15 +179,12 @@ public class Workflow {
         return queryRecords;
     }
 
-    private static STHolesHistogram refineHistogram(Collection<QueryRecord> listQueryRecords, int date) {
+    private static STHolesHistogram refineHistogram(Iterator<QueryRecord> listQueryRecords, int date) {
         STHolesHistogram histogram = loadPreviousHistogram(logFolder, date);
 
-        if (listQueryRecords.size() > 0) {
-            logger.debug("Refining histogram " + date);
-            histogram.refine(listQueryRecords.iterator());
-            logger.debug("Refinement is over.");
-        }
-        else logger.debug("No query records. No histogram refinement.");
+        logger.debug("Refining histogram " + date);
+        histogram.refine(listQueryRecords);
+        logger.debug("Refinement is over.");
 
         serializeHistogram(histogram, logFolder, date);
 
