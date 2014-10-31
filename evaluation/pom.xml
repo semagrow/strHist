@@ -26,6 +26,11 @@
     </dependency>
       <dependency>
           <groupId>gr.demokritos.iit.irss.semagrow</groupId>
+          <artifactId>sthist-qfr</artifactId>
+          <version>1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+          <groupId>gr.demokritos.iit.irss.semagrow</groupId>
           <artifactId>sthist-rdf</artifactId>
           <version>1.0-SNAPSHOT</version>
       </dependency>

@@ -47,7 +47,9 @@ public class FileManager implements ResultMaterializationManager {
             BackgroundTupleResult result = new BackgroundTupleResult(parser, in);
             execute(result);
             return result;
-        } catch (URISyntaxException | FileNotFoundException e) {
+        } catch (URISyntaxException e) {
+            throw new QueryEvaluationException(e);
+        } catch (FileNotFoundException e) {
             throw new QueryEvaluationException(e);
         }
     }

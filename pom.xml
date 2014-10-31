@@ -20,6 +20,8 @@
     <module>stholes</module>
     <module>stholes-prefix</module>
     <module>rdf</module>
+    <module>tools</module>
+    <module>qfr</module>
   </modules>
 
 	<repositories>

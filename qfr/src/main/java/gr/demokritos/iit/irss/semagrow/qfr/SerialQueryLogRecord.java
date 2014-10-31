@@ -47,10 +47,10 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
         UUID uuid = (UUID)in.readObject();
         URI endpoint = (URI)in.readObject();
         List<String> bindingNames = (List<String>) in.readObject();
-        long cardinality = (long)in.readObject();
+        Long cardinality = (Long)in.readObject();
         Date startTime = (Date)in.readObject();
         Date endTime = (Date)in.readObject();
-        long duration = (long)in.readObject();
+        Long duration = (Long)in.readObject();
         URI results = (URI)in.readObject();
         BindingSet bindings = (BindingSet)in.readObject();
 
