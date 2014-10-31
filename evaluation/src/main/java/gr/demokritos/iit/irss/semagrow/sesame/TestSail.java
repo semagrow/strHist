@@ -6,6 +6,7 @@ import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
+import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
@@ -18,6 +19,8 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.SailBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +34,7 @@ import java.util.concurrent.Executors;
  */
 public class TestSail extends SailBase {
 
-
+    static final Logger logger = LoggerFactory.getLogger(TestSail.class);
     private Repository actualRepo;
 
     private RDFSTHolesHistogram histogram;
@@ -44,8 +47,23 @@ public class TestSail extends SailBase {
 
     public TestSail(Repository actual, int year) {
         this.year = year;
+        this.histogram = instantiateHistogram();
         actualRepo = actual;
         executorService = Executors.newFixedThreadPool(10);
+    }
+
+    private RDFSTHolesHistogram instantiateHistogram() {
+        File jsonHist = new File(Workflow.HISTPATH + "histJSON_" + (year - 1) + ".txt");
+
+        logger.debug("HISTPATH: " + jsonHist.getPath());
+        if (!jsonHist.exists())
+            logger.debug("Creating a new histogram.");
+        else
+            logger.debug("Deserializing histogram: " + (year - 1));
+
+        return (!jsonHist.exists())
+                ? new RDFSTHolesHistogram()
+                : new JSONDeserializer(jsonHist.getPath()).getHistogram();
     }
 
     public RepositoryConnection getRepositoryConnection() throws RepositoryException {
@@ -53,10 +71,7 @@ public class TestSail extends SailBase {
     }
 
     public RDFSTHolesHistogram getHistogram() {
-        if (histogram == null)
-            histogram = new RDFSTHolesHistogram();
-
-        return histogram;
+        return this.histogram;
     }
 
     QueryLogHandler handler;
