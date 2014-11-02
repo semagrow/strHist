@@ -117,7 +117,8 @@ public class VoIDeserializer {
     private RDFValueRange getRDFValueRange(Resource res) {
         //RDFURIRange r = get
         RDFLiteralRange lr = getRDFLiteralRange(res);
-        return new RDFValueRange(lr);
+        RDFURIRange u = getRDFURIRange(res);
+        return new RDFValueRange(u, lr);
     }
 
     private RDFLiteralRange getRDFLiteralRange(Resource res) {
@@ -139,6 +140,19 @@ public class VoIDeserializer {
         return new RDFLiteralRange(objectRanges);
     }
 
+    private RDFURIRange getRDFURIRange(Resource res) {
+        RDFURIRange u = new RDFURIRange();
+        Model m = model.filter(res, SEVOD.OBJECTREGEXPATTERN, null);
+        List<String> prefixList = new LinkedList<String>();
+        for (Statement s : m) {
+            String prefix = s.getObject().stringValue();
+            prefixList.add(prefix);
+        }
+        if (!prefixList.isEmpty())
+            u = new RDFURIRange(prefixList);
+
+        return u;
+    }
 
     private CalendarRange getCalendarRange(Resource res) {
 

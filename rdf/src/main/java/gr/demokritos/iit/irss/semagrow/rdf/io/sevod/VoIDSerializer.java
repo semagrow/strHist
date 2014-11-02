@@ -213,6 +213,11 @@ public class VoIDSerializer {
 
         addRangesToModel(bucketResource, bucket.getBox().getObjectRange().getLiteralRange().getRanges());
 
+        for (String prefix : bucket.getBox().getObjectRange().getUriRange().getPrefixList()) {
+            model.add(bucketResource, SEVOD.OBJECTREGEXPATTERN, vf.createLiteral(prefix));
+        }
+
+
         // Declare each child as subset and serialize recursively each bucket.
         int count = 0;
         for (STHolesBucket<RDFRectangle> b : bucket.getChildren()) {
