@@ -134,6 +134,31 @@ public class JSONDeserializer {
 
 
     private RDFValueRange getObject(Object objectObj) {
+        JSONObject jsonObject = (JSONObject)objectObj;
+
+        return new RDFValueRange(
+                getRDFURIRange(jsonObject.get("rdfURIRange")),
+                getRDFLiteralRange(jsonObject.get("rdfLiteralRange")));
+    }
+
+
+    private RDFURIRange getRDFURIRange(Object objectObj) {
+        JSONObject jsonObject = (JSONObject)objectObj, temp;
+        JSONArray array = (JSONArray)jsonObject.get("array");
+        Iterator<JSONObject> iterator = array.iterator();
+        ArrayList<String> list = new ArrayList<String>();
+
+        while (iterator.hasNext()) {
+            temp = iterator.next();
+
+            list.add((String)temp.get("rdfUri"));
+        }
+
+        return new RDFURIRange(list);
+    }
+
+
+    private RDFLiteralRange getRDFLiteralRange(Object objectObj) {
         Map<URI,RangeLength<?>> ranges = new HashMap<URI, RangeLength<?>>();
         RDFLiteralRange literalRange = null;
         JSONObject jsonObject = (JSONObject)objectObj, temp;
@@ -152,10 +177,9 @@ public class JSONDeserializer {
             } else if (temp.get("calendarRange") != null) {
                 getObjectCalendarRange(temp.get("calendarRange"), ranges);
             }
-
         }// while
 
-        return new RDFValueRange(new RDFLiteralRange(ranges));
+        return new RDFLiteralRange(ranges);
     }
 
 
@@ -243,15 +267,10 @@ public class JSONDeserializer {
 
     public static void main(String[] args) {
         STHolesHistogram<RDFRectangle> histogram =
-                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980.txt").
+                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/hhhistJSON.txt").
                         getHistogram();
 
-        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980_new.txt");
+        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/hhhistJSON_new.txt");
 
-        histogram =
-                new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980_new.txt").
-                        getHistogram();
-
-        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980_new_2.txt");
-    }
+        }
 }

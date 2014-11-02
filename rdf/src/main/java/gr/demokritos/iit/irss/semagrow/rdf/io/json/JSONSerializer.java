@@ -102,10 +102,17 @@ public class JSONSerializer {
 
 
     private JSONObject getJSONObject(RDFValueRange objectRange) {
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("rdfURIRange", getJSONRDFURIRange(objectRange.getUriRange()));
+        jsonObject.put("rdfLiteralRange", getJSONRDFLiteralRange(objectRange.getLiteralRange()));
+
+        return jsonObject;
+    }
+
+    private JSONObject getJSONRDFLiteralRange(RDFLiteralRange literalRange) {
         JSONObject object;
         JSONArray array = new JSONArray();
-
-        RDFLiteralRange literalRange = objectRange.getLiteralRange();
 
         for (Map.Entry<URI,RangeLength<?>> entry : literalRange.getRanges().entrySet()) {
             object = new JSONObject();
@@ -127,13 +134,28 @@ public class JSONSerializer {
                     pr = (PrefixRange)obj;
                 }
 
-                RDFURIRange uriRange = (RDFURIRange)entry.getValue();
-
                 object.put("prefixRange", getJSONPrefixRange(pr));
             }
 
             array.add(object);
         }// for
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("array", array);
+
+        return jsonObject;
+    }
+
+    private JSONObject getJSONRDFURIRange(RDFURIRange uriRange) {
+        JSONObject object;
+        JSONArray array = new JSONArray();
+
+        for (String s : uriRange.getPrefixList()) {
+            object = new JSONObject();
+            object.put("rdfUri", s);
+
+            array.add(object);
+        }
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("array", array);
@@ -229,7 +251,7 @@ public class JSONSerializer {
                 new VoIDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histVoID.ttl").
                         getHistogram();
 
-        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON.txt");
+        new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/hhhistJSON.txt");
     }
 
 }
