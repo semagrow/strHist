@@ -54,8 +54,8 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     }
 
     public boolean isEmpty() {
-        //FIXME: wrong definition uriRange.isEmpty() && literalRange.isEmpty();
-        return uriRange.isEmpty() || literalRange.isEmpty();
+        //FIXME: check in case of errors uriRange.isEmpty() || literalRange.isEmpty();
+        return uriRange.isEmpty() && literalRange.isEmpty();
     }
 
     public boolean isInfinite() { return uriRange.isInfinite() && literalRange.isInfinite(); }
