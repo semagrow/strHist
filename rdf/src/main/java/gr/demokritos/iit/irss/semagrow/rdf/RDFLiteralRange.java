@@ -11,9 +11,9 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.XMLSchema;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,11 +51,11 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
 
     public RDFLiteralRange(int low, int high)
     {
-        this(XMLSchema.INTEGER, new IntervalRange(low, high));
+        this(XMLSchema.INT, new IntervalRange(low, high));
     }
 
     public RDFLiteralRange(long low, long high) {
-        this(XMLSchema.INTEGER, new IntervalRange((int) low, (int) high));
+        this(XMLSchema.INT, new IntervalRange((int) low, (int) high));
     }
 
     public RDFLiteralRange(String range) {
@@ -369,7 +369,7 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
             RangeLength<?> range = entry.getValue();
             if (entry.getKey().equals(literalValueType)) {
 
-                if (literalValueType.equals(XMLSchema.INTEGER)) {
+                if (literalValueType.equals(XMLSchema.INTEGER) || literalValueType.equals(XMLSchema.INT)) {
                     return  ((IntervalRange) range).intersects(
                             (IntervalRange) literalrange);
                 } else if (literalValueType.equals(XMLSchema.LONG)) {
