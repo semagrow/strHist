@@ -127,7 +127,7 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
     		return res;
     }
 
-
+    //FIXME: Error occured when intesecting an RDFValueRange with an other and one of the two has Infinite.
 	public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
 
         if (infinite) return literalRange;
