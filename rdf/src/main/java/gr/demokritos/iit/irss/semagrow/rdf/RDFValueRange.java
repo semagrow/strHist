@@ -99,8 +99,33 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     }
 
     public RDFValueRange tightRange(RDFValueRange rdfValueRange) {
-        return new RDFValueRange(uriRange.tightRange(rdfValueRange.uriRange),
-                literalRange.tightRange(rdfValueRange.literalRange));
+
+        if (this.isInfinite())
+            return rdfValueRange;
+
+        if (rdfValueRange.isInfinite())
+            return this;
+
+
+        RDFURIRange u;
+
+        if (uriRange.isInfinite())
+            u = rdfValueRange.uriRange;
+        else if (rdfValueRange.uriRange.isInfinite())
+            u = uriRange;
+        else
+            u = uriRange.tightRange(rdfValueRange.uriRange);
+
+        RDFLiteralRange l;
+
+        if (literalRange.isInfinite())
+            l = rdfValueRange.literalRange;
+        else if (rdfValueRange.literalRange.isInfinite())
+            l = literalRange;
+        else
+            l = literalRange.tightRange(rdfValueRange.literalRange);
+
+        return new RDFValueRange(u, l);
     }
 
     public boolean hasSameType(RDFValueRange rdfValueRange) {
