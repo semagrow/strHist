@@ -3,7 +3,6 @@ package gr.demokritos.iit.irss.semagrow.stholes;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.base.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +13,7 @@ import java.util.Iterator;
  */
 public abstract class STHistogramBase<R extends Rectangle<R>, S> implements STHistogram<R,S> {
 
-    static final Logger logger = LoggerFactory.getLogger(STHolesHistogram.class);
+    static final Logger logger = LoggerFactory.getLogger(STHistogramBase.class);
 
     public STHistogramBase() { }
 

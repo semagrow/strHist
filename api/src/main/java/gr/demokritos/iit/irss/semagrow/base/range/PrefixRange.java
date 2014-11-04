@@ -97,6 +97,12 @@ public class PrefixRange
 
         if (infinite) return new PrefixRange();
 
+        // If any of the 2 lists is empty, just return a new Range containing the other one.
+        if (this.getPrefixList().isEmpty())
+            return new PrefixRange(prefixRange.getPrefixList());
+        else if (prefixRange.getPrefixList().isEmpty())
+            return new PrefixRange(this.getPrefixList());
+
         ArrayList<String> prefixListN = new ArrayList<String>();
 
         for (String myP : prefixList) {
