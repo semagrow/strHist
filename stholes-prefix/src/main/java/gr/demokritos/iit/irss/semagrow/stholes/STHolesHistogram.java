@@ -125,7 +125,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
      */
     public void refine(QueryRecord<R,Stat> queryRecord) {
         List<R> rects = new ArrayList<R>();
-        
+
         if (queryRecord.getRectangle().isInfinite()) {
             //rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
             rects.addAll(queryRecord.getResultSet().getRectangles());
@@ -162,10 +162,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
 
             for (STHolesBucket<R> bucket : candidates) {
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
-                //FIXME: This is a dirty fix.
-                if (hole.getStatistics().getFrequency() == 0)
-                    continue;
-
+                
                 if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole)) {
                     logger.info("Drilling hole " + hole.getBox().toString() + " with statistics " + hole.getStatistics().toString());
                     drillHole(bucket, hole);
