@@ -124,15 +124,8 @@ public class STHolesHistogram<R extends Rectangle<R>>
      * @param queryRecord query feedback
      */
     public void refine(QueryRecord<R,Stat> queryRecord) {
-
-
-        if (queryRecord.getQuery().contains("1066071442383356038.tsv")) {
-            int i = 0;
-            i++;
-        }
-
         List<R> rects = new ArrayList<R>();
-
+        
         if (queryRecord.getRectangle().isInfinite()) {
             //rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
             rects.addAll(queryRecord.getResultSet().getRectangles());
@@ -149,45 +142,30 @@ public class STHolesHistogram<R extends Rectangle<R>>
                 logger.info("Root bucket is created");
 
             } else {
-
                 // expand root
                 if (!root.getBox().contains(rect)) {
-
                     // expand root box so that it includes q
-
                     R boxN = root.getBox().computeTightBox(rect);
-
-                    //     System.out.println("Rectangle: " + queryRecord.getRectangle());
-                    //     System.out.println("Box: " + root.getBox());
 
                     Stat statsN = countMatchingTuples(rect, queryRecord);
                     Stat rootStatsN = computeRootStats(root.getStatistics(), statsN);
 
-                    //Collection<STHolesBucket<R>> childrenN =
-                    //      new ArrayList<STHolesBucket<R>>();
-                    //STHolesBucket<R> rootN =
-                    //      new STHolesBucket<R>(boxN, new Stat(freqN, distinctN), childrenN, null);
-                    //bucketsNum += 1;
-                    //rootN.addChild(root);
-                    // root = rootN;
-
                     root.setBox(boxN);
                     root.setStatistics(rootStatsN);
-
                 }
 
                 logger.info("Root bucket is expanded");
             }
 
-
             // get all c
             Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(rect);
 
             for (STHolesBucket<R> bucket : candidates) {
-                //System.out.println("<<<>>> Candidate: " + bucket);
-                //System.out.println("--------------------------------------------------");
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
-                //System.out.println("<<<>>> Hole: " + hole);
+                //FIXME: This is a dirty fix.
+                if (hole.getStatistics().getFrequency() == 0)
+                    continue;
+
                 if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole)) {
                     logger.info("Drilling hole " + hole.getBox().toString() + " with statistics " + hole.getStatistics().toString());
                     drillHole(bucket, hole);
@@ -202,11 +180,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
         compact();
     }
 
-
     private Stat computeRootStats(Stat oldStats, Stat deltaStats) {
-        // freqN = freq(root) + freq(q)
-        // dN(i) = max(d(i,root), d(i,q))
-
         long freqN = deltaStats.getFrequency() + oldStats.getFrequency();
 
         List<Long> distinctN = new ArrayList<Long>();
