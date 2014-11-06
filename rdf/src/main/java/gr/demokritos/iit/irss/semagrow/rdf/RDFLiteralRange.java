@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by angel on 7/15/14.
@@ -140,6 +137,10 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         if (literalRange.ranges.size() != 1) {
             logger.debug("Argument should be a " +
                     "range of single type");
+
+            if (literalRange.ranges.size() == 0)
+                return new RDFLiteralRange(Collections.<URI, RangeLength<?>>emptyMap());
+
             return null;
         }
 
@@ -301,6 +302,10 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         if (literalRange.ranges.size() != 1) {
             logger.debug("Argument should be a " +
                     "range of single type");
+
+            if (this.getRanges().size() == 0 && literalRange.ranges.size() == 0)
+                return true;
+
             return false;
         }
 
@@ -351,6 +356,10 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         if (literalRange.ranges.size() != 1) {
             logger.debug("Argument should be a " +
                     "range of single type");
+
+            if (this.getRanges().size() == 0 && literalRange.ranges.size() == 0)
+                return true;
+
             return false;
         }
 
@@ -402,6 +411,10 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         if (literalRange.ranges.size() != 1) {
             logger.debug("Argument should be a " +
                     "range of single type");
+
+            if (literalRange.ranges.size() == 0)
+                return new RDFLiteralRange(this.getRanges());
+
             return null;
         }
 
