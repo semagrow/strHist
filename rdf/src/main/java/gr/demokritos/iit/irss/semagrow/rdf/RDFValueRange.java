@@ -6,6 +6,8 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 
+import java.util.Collections;
+
 /**
  * Created by angel on 10/25/14.
  */
@@ -32,7 +34,7 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     }
 
     public RDFValueRange(RDFLiteralRange literalRange) {
-        this(new RDFURIRange(), literalRange);
+        this(new RDFURIRange(Collections.<String>emptyList()), literalRange);
         assert literalRange != null;
     }
 
