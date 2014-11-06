@@ -2,6 +2,8 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
+import gr.demokritos.iit.irss.semagrow.api.range.Range;
+import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.base.range.CalendarRange;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
@@ -139,23 +141,29 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
             URI uri = (URI) oVal;
             PrefixRange pr = new PrefixRange();
             pr.getPrefixList().add(uri.stringValue());
-            return new RDFValueRange(new RDFURIRange(pr.getPrefixList()));
+            return new RDFValueRange(new RDFURIRange(pr.getPrefixList()),
+                                     new RDFLiteralRange(Collections.<URI, RangeLength<?>>emptyMap()));
         } else if (oVal instanceof Literal) {
             Literal l = (Literal) oVal;
+            Range literalRange = null;
 
             if (l.getDatatype().equals(XMLSchema.INT))
-                return new RDFValueRange(new RDFLiteralRange(XMLSchema.INT, new IntervalRange(l.intValue(), l.intValue())));
+                literalRange = new RDFLiteralRange(XMLSchema.INT, new IntervalRange(l.intValue(), l.intValue()));
             else if (l.getDatatype().equals(XMLSchema.LONG))
-                return new RDFValueRange(new RDFLiteralRange(XMLSchema.LONG, new IntervalRange((int) l.longValue(), (int) l.longValue())));
+                literalRange = new RDFLiteralRange(XMLSchema.LONG, new IntervalRange((int) l.longValue(), (int) l.longValue()));
             else if (l.getDatatype().equals(XMLSchema.STRING)) {
                 PrefixRange pr = new PrefixRange();
                 pr.getPrefixList().add(l.stringValue());
-                return new RDFValueRange(new RDFLiteralRange(XMLSchema.STRING, pr));
+                literalRange = new RDFLiteralRange(XMLSchema.STRING, pr);
             } else if (l.getDatatype().equals(XMLSchema.DATETIME)) {
                 Calendar cal = l.calendarValue().toGregorianCalendar();
                 CalendarRange cr = new CalendarRange(cal.getTime(), cal.getTime());
-                return new RDFValueRange(new RDFLiteralRange(XMLSchema.DATETIME, cr));
+                literalRange = new RDFLiteralRange(XMLSchema.DATETIME, cr);
             }
+
+            if (literalRange != null)
+                return new RDFValueRange(new RDFURIRange(Collections.<String>emptyList()),
+                                        (RDFLiteralRange)literalRange);
         }
 
         return new RDFValueRange();

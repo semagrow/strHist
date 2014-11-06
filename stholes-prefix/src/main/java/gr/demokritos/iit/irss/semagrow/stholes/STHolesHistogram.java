@@ -54,11 +54,11 @@ public class STHolesHistogram<R extends Rectangle<R>>
         if (root != null) {
 
             // if rec is larger than our root
-            if (rec.contains(root.getBox())){
+            if (rec.isEnclosing(root.getBox())){
 
                 return root.getEstimate(rec);
             }
-            else if (!root.getBox().contains(rec)) {
+            else if (!root.getBox().isEnclosing(rec)) {
 
                 return 0;
             }
@@ -88,9 +88,9 @@ public class STHolesHistogram<R extends Rectangle<R>>
         for (STHolesBucket<R> enclosingB : enclosingBuckets) {
             long bucketEstimation = enclosingB.getEstimate(rec);
             est += bucketEstimation;
-            logger.debug("Enclosing  " + enclosingB.toString());
-            logger.debug("Estimated triples: [" + bucketEstimation + "]");
-            logger.debug("Current estimation sum: [" + est + "]");
+            logger.info("Enclosing  " + enclosingB.toString());
+            logger.info("Estimated triples: [" + bucketEstimation + "]");
+            logger.info("Current estimation sum: [" + est + "]");
         }
 
         return est;
@@ -152,9 +152,9 @@ public class STHolesHistogram<R extends Rectangle<R>>
 
                     root.setBox(boxN);
                     root.setStatistics(rootStatsN);
-                }
 
-                logger.info("Root bucket is expanded");
+                    logger.info("Root bucket is expanded");
+                }
             }
 
             // get all c
@@ -162,7 +162,7 @@ public class STHolesHistogram<R extends Rectangle<R>>
 
             for (STHolesBucket<R> bucket : candidates) {
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
-                
+
                 if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole)) {
                     logger.info("Drilling hole " + hole.getBox().toString() + " with statistics " + hole.getStatistics().toString());
                     drillHole(bucket, hole);
@@ -474,8 +474,8 @@ public class STHolesHistogram<R extends Rectangle<R>>
                 bn = candidateMergedBucket.getKey();
             }
 
-            /*
-            // Candidate sibling-sibling merges
+
+            /*// Candidate sibling-sibling merges
             for (int j = i + 1; j < bChildren.size(); j++) {
 
                 bj = bChildren.get(j);

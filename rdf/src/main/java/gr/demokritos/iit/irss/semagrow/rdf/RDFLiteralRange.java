@@ -289,9 +289,6 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
     @SuppressWarnings("unchecked")
 	public boolean contains(RDFLiteralRange literalRange) {
 
-        //for estimation
-        //
-        //
         if (isInfinite())
             return true;
 
@@ -299,12 +296,10 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
             return false;
 
         if (literalRange.ranges.size() != 1) {
-            logger.debug("Argument should be a " +
-                    "range of single type");
-
             if (this.getRanges().size() == 0 && literalRange.ranges.size() == 0)
                 return true;
 
+            logger.debug("Argument should be a range of single type");
             return false;
         }
 
@@ -342,11 +337,9 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
             }
         }
 
-
         return false;
     }
 
-    
     @SuppressWarnings("unchecked")
 	public boolean intersects(RDFLiteralRange literalRange) {
 
