@@ -105,7 +105,11 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
                 list.add(bindings.getValue(pattern.getSubjectVar().getName()).stringValue());
         } else
             list.add(sVal.stringValue());
-        subjectRange = new RDFURIRange(list);
+
+        if (!list.isEmpty())
+            subjectRange = new RDFURIRange(list);
+        else
+            subjectRange = new RDFURIRange();
 
         ExplicitSetRange<URI> predicateRange;
         Set<URI> set = new HashSet<URI>();
@@ -113,8 +117,12 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
             if (bindings.hasBinding(pattern.getPredicateVar().getName()))
                 set.add((URI)bindings.getValue(pattern.getPredicateVar().getName()));
         } else
-            set.add((URI)pVal);
-        predicateRange = new ExplicitSetRange<URI>(set);
+            set.add((URI) pVal);
+
+        if (!set.isEmpty())
+            predicateRange = new ExplicitSetRange<URI>(set);
+        else
+            predicateRange = new ExplicitSetRange<>();
 
         RDFValueRange objectRange = null;
         if (oVal == null) {
