@@ -17,7 +17,7 @@ import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.algebra.*;
 
-import java.util.Calendar;
+import java.util.*;
 
 /**
  * Created by angel on 10/11/14.
@@ -98,20 +98,25 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
         Value pVal = pattern.getPredicateVar().getValue();
         Value oVal = pattern.getObjectVar().getValue();
 
-        RDFURIRange subjectRange = new RDFURIRange();
-
+        RDFURIRange subjectRange;
+        List<String> list = new ArrayList<String>();
         if (sVal == null) {
             if (bindings.hasBinding(pattern.getSubjectVar().getName()))
-                subjectRange.getPrefixList().add(bindings.getValue(pattern.getSubjectVar().getName()).stringValue());
+                list.add(bindings.getValue(pattern.getSubjectVar().getName()).stringValue());
         } else
-            subjectRange.getPrefixList().add(sVal.stringValue());
+            list.add(sVal.stringValue());
 
-        ExplicitSetRange<URI> predicateRange = new ExplicitSetRange<URI>();
+        subjectRange = new RDFURIRange(list);
+
+        ExplicitSetRange<URI> predicateRange;
+        Set<URI> set = new HashSet<URI>();
         if (pVal == null) {
             if (bindings.hasBinding(pattern.getPredicateVar().getName()))
-                predicateRange.getItems().add((URI)bindings.getValue(pattern.getPredicateVar().getName()));
+                set.add((URI)bindings.getValue(pattern.getPredicateVar().getName()));
         } else
-            predicateRange.getItems().add((URI)pVal);
+            set.add((URI)pVal);
+
+        predicateRange = new ExplicitSetRange<URI>(set);
 
         RDFValueRange objectRange = null;
         if (oVal == null) {
