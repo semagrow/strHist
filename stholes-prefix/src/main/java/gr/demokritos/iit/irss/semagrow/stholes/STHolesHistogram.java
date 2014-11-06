@@ -85,14 +85,15 @@ public class STHolesHistogram<R extends Rectangle<R>>
 
         getEnclosingBuckets(rec, b, enclosingBuckets);
 
+        logger.info("Query Rectangle: " + rec.toString());
+        logger.info("Number of enclosed buckets: " + enclosingBuckets.size());
+
         for (STHolesBucket<R> enclosingB : enclosingBuckets) {
             long bucketEstimation = enclosingB.getEstimate(rec);
             est += bucketEstimation;
-            logger.info("Enclosing  " + enclosingB.toString());
-            logger.info("Estimated triples: [" + bucketEstimation + "]");
-            logger.info("Current estimation sum: [" + est + "]");
         }
 
+        logger.info("Estimated triples: " + est);
         return est;
     }
 
