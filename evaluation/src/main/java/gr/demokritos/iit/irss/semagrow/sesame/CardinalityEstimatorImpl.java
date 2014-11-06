@@ -120,7 +120,6 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
         } else
             objectRange = fillObjectRange(oVal);
 
-
         return new RDFRectangle(subjectRange, predicateRange, objectRange);
     }
 
