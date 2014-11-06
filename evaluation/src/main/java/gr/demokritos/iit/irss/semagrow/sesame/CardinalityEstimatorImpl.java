@@ -125,33 +125,30 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
     }
 
     private RDFValueRange fillObjectRange(Value oVal) {
-        RDFLiteralRange literalRange = null;
-        RDFURIRange uriRange = null;
-
         if (oVal instanceof URI) {
             URI uri = (URI) oVal;
             PrefixRange pr = new PrefixRange();
             pr.getPrefixList().add(uri.stringValue());
-            uriRange = new RDFURIRange(pr.getPrefixList());
+            return new RDFValueRange(new RDFURIRange(pr.getPrefixList()));
         } else if (oVal instanceof Literal) {
             Literal l = (Literal) oVal;
 
             if (l.getDatatype().equals(XMLSchema.INT))
-                literalRange = new RDFLiteralRange(XMLSchema.INT, new IntervalRange(l.intValue(), l.intValue()));
+                return new RDFValueRange(new RDFLiteralRange(XMLSchema.INT, new IntervalRange(l.intValue(), l.intValue())));
             else if (l.getDatatype().equals(XMLSchema.LONG))
-                literalRange = new RDFLiteralRange(XMLSchema.LONG, new IntervalRange((int) l.longValue(), (int) l.longValue()));
+                return new RDFValueRange(new RDFLiteralRange(XMLSchema.LONG, new IntervalRange((int) l.longValue(), (int) l.longValue())));
             else if (l.getDatatype().equals(XMLSchema.STRING)) {
                 PrefixRange pr = new PrefixRange();
                 pr.getPrefixList().add(l.stringValue());
-                literalRange = new RDFLiteralRange(XMLSchema.STRING, pr);
+                return new RDFValueRange(new RDFLiteralRange(XMLSchema.STRING, pr));
             } else if (l.getDatatype().equals(XMLSchema.DATETIME)) {
                 Calendar cal = l.calendarValue().toGregorianCalendar();
                 CalendarRange cr = new CalendarRange(cal.getTime(), cal.getTime());
-                literalRange = new RDFLiteralRange(XMLSchema.DATETIME, cr);
+                return new RDFValueRange(new RDFLiteralRange(XMLSchema.DATETIME, cr));
             }
         }
 
-        return new RDFValueRange(uriRange, literalRange);
+        return new RDFValueRange();
     }
 
 }
