@@ -29,7 +29,7 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
     }
 
     public RDFValueRange(RDFURIRange uriRange) {
-        this(uriRange, new RDFLiteralRange());
+        this(uriRange, new RDFLiteralRange(Collections.<URI, RangeLength<?>>emptyMap()));
         assert uriRange != null;
     }
 
