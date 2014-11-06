@@ -124,7 +124,6 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
     		return res;
     }
 
-    //FIXME: Error occured when intesecting an RDFValueRange with an other and one of the two has Infinite.
 	public RDFLiteralRange intersection(RDFLiteralRange literalRange) {
 
         if (infinite) return literalRange;
@@ -357,6 +356,7 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
             logger.debug("Argument should be a " +
                     "range of single type");
 
+            // FIXME: Is this conceptually right?
             if (this.getRanges().size() == 0 && literalRange.ranges.size() == 0)
                 return true;
 
@@ -400,7 +400,6 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         return false;
     }
 
-    //TODO: Fix me! na kanw add map entry
     public RDFLiteralRange tightRange(RDFLiteralRange literalRange) {
 
         if (isInfinite() || literalRange.isInfinite())
