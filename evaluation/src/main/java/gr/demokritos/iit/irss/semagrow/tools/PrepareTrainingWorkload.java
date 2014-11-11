@@ -2,10 +2,26 @@ package gr.demokritos.iit.irss.semagrow.tools;
 
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
+import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
+import gr.demokritos.iit.irss.semagrow.file.FileManager;
+import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
+import gr.demokritos.iit.irss.semagrow.impl.QueryLogInterceptor;
+import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.sesame.TestSail;
+import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.*;
+import org.openrdf.query.algebra.TupleExpr;
+import org.openrdf.query.parser.ParsedTupleQuery;
+import org.openrdf.query.parser.QueryParserUtil;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
+import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -14,77 +30,85 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by nickozoulis on 10/11/2014.
  */
 public class PrepareTrainingWorkload {
+    /*
+        Variables for local run
+     */
+//    private static int year = 1980;
+//    private static String inputPath = "/home/nickozoulis/";
 
     static final Logger logger = LoggerFactory.getLogger(PrepareTrainingWorkload.class);
+    private static URI endpoint = ValueFactoryImpl.getInstance().createURI("http://histogramnamespace/example");
     private static final String DISTINCTPath = "/var/tmp/distinct/";
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
-    private static String query = prefixes + "select * where {?sub dc:subject <%s> filter regex(str(?sub), \"^%s\")}";
-
-//    private static String inputPath, output, agroTermsPath;
-//    private static int year;
+    private static String query = prefixes + "select * where {?sub dc:subject ?obj . filter regex(str(?sub), \"^%s\")}";
+    private static QueryLogInterceptor interceptor;
+    private static ExecutorService executors;
     private static Random rand = new Random();
 
-    private static int year = 1980;
-    private static String inputPath = "/home/nickozoulis/",
-            output = "/home/nickozoulis/semagrow/exp_No6/",
-            agroTermsPath = "/home/nickozoulis/semagrow/agrovoc_terms.txt";
+    private static String inputPath;
+    private static int year;
 
 
     public static void main(String[] args) throws IOException, RepositoryException {
-        prepareTrainingWorkload();
-//        OptionParser parser = new OptionParser("y:i:o:a:");
-//        OptionSet options = parser.parse(args);
-//
-//        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("o") && options.hasArgument("a")) {
-//            year = Integer.parseInt(options.valueOf("y").toString());
-//            inputPath = options.valueOf("i").toString();
-//            output = options.valueOf("o").toString();
-//            agroTermsPath = options.valueOf("a").toString();
-//
-//            prepareTrainingWorkload();
-//        } else {
-//            logger.error("Invalid arguments");
-//            System.exit(1);
-//        }
+        OptionParser parser = new OptionParser("y:i:");
+        OptionSet options = parser.parse(args);
+
+        if (options.hasArgument("y") && options.hasArgument("i")) {
+            year = Integer.parseInt(options.valueOf("y").toString());
+            inputPath = options.valueOf("i").toString();
+
+            prepareTrainingWorkload();
+        } else {
+            logger.error("Invalid arguments");
+            System.exit(1);
+        }
     }
 
     private static void prepareTrainingWorkload() throws IOException, RepositoryException {
-        queryStore(getFedRepository(getRepository(year), year));
+        executors = Executors.newCachedThreadPool();
+
+        interceptor = new QueryLogInterceptor(initHandler(), initMateralizationManager());
+        queryStore(getRepository(year));
+
+        executors.shutdown();
     }
 
     private static void queryStore(Repository repo) throws IOException {
         int subjectsNum = countLineNumber(DISTINCTPath);
         String trimmedSubject;
-        List<String> agroTerms = loadAgroTerms(agroTermsPath);
 
         logger.info("Starting quering triple store: " + year);
         RepositoryConnection conn;
-        int term = 0;
 
-        // Loop through some agroTerms
-        for (int j=0; j<200; j++) {
-            logger.info("Agrovoc Term: " + agroTerms.get(term));
+        // Create a 50-query batch
+        for (int j=0; j<50; j++) {
+            logger.info("Query No: " + j);
             try {
                 conn = repo.getConnection();
 
                 trimmedSubject = trimSubject(loadDistinctSubject(randInt(0, subjectsNum)));
-                String q = String.format(query, agroTerms.get(term++), trimmedSubject);
-                TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, q);
+                String q = String.format(query, trimmedSubject);
+                TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, q);
                 logger.info("Query: " + q);
 
-                TupleQueryResult result = query.evaluate();
-                consumeIteration(result);
-                conn.close();
+                // Get TupleExpr
+                ParsedTupleQuery psq = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL,q, "http://example.org/");
+                TupleExpr tupleExpr = psq.getTupleExpr();
 
+                CloseableIteration<BindingSet, QueryEvaluationException> result =
+                        interceptor.afterExecution(endpoint, tupleExpr, tupleQuery.getBindings(), tupleQuery.evaluate());
+                consumeIteration(result);
+
+                conn.close();
             } catch (MalformedQueryException | RepositoryException | QueryEvaluationException mqe) {
                 mqe.printStackTrace();
             }
@@ -206,26 +230,39 @@ public class PrepareTrainingWorkload {
         return lines;
     }
 
-    private static List<String> loadAgroTerms(String path) {
-        List<String> list = new ArrayList<String>();
+    private static QueryLogHandler initHandler() {
+        QueryLogHandler handler = null;
+        SerialQueryLogFactory factory = new SerialQueryLogFactory();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
-            String text = "";
+            File dir = new File("/var/tmp/" + year + "/");
+            if (!dir.exists())
+                dir.mkdir();
 
-            while ((text = br.readLine()) != null) {
-                String[] split = text.split(",");
-                list.add(split[1].trim());
-            }
+            File qfrLog = new File("/var/tmp/" + year + "/" + year + "_log.ser");
+            OutputStream out = new FileOutputStream(qfrLog, true);
+            handler = factory.getQueryRecordLogger(out);
+        } catch (IOException e) {e.printStackTrace();}
 
-            br.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        return handler;
+    }
+
+    private static ResultMaterializationManager initMateralizationManager(){
+        ResultMaterializationManager manager = null;
+
+        if (manager == null) {
+            File baseDir = new File("/var/tmp/" + year + "/");
+            if (!baseDir.exists())
+                baseDir.mkdir();
+
+            TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
+
+            TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
+            TupleQueryResultWriterFactory writerFactory = registry.get(resultFF);
+            manager = new FileManager(baseDir, writerFactory, executors);
         }
 
-        return list;
+        return manager;
     }
 
 }
