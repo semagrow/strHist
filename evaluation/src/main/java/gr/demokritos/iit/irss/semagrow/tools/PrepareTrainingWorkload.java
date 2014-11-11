@@ -55,16 +55,17 @@ public class PrepareTrainingWorkload {
     private static Random rand = new Random();
 
     private static String inputPath;
-    private static int year;
+    private static int year, numOfQueries;
 
 
     public static void main(String[] args) throws IOException, RepositoryException {
-        OptionParser parser = new OptionParser("y:i:");
+        OptionParser parser = new OptionParser("y:i:b:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("y") && options.hasArgument("i")) {
+        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("b")) {
             year = Integer.parseInt(options.valueOf("y").toString());
             inputPath = options.valueOf("i").toString();
+            numOfQueries = Integer.parseInt(options.valueOf("b").toString());
 
             prepareTrainingWorkload();
         } else {
@@ -89,8 +90,7 @@ public class PrepareTrainingWorkload {
         logger.info("Starting quering triple store: " + year);
         RepositoryConnection conn;
 
-        // Create a 50-query batch
-        for (int j=0; j<50; j++) {
+        for (int j=0; j<numOfQueries; j++) {
             logger.info("Query No: " + j);
             try {
                 conn = repo.getConnection();
