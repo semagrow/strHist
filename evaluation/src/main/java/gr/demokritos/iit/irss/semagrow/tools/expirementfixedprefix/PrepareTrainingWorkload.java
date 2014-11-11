@@ -69,7 +69,7 @@ public class PrepareTrainingWorkload {
     }
 
     private static void queryStore(Repository repo) throws IOException, RepositoryException {
-        int subjectsNum = Utils.countLineNumber(DISTINCTPath, year);
+        int subjectsNum = Utils.countLineNumber(DISTINCTPath + "subjects_" + year + ".txt");
         String trimmedSubject;
 
         logger.info("Starting quering triple store: " + year);

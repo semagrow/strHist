@@ -135,21 +135,17 @@ public class Utils {
         return rand.nextInt((max - min) + 1) + min;
     }
 
-    public static int countLineNumber(String path, int year) {
+    public static int countLineNumber(String path) {
         int lines = 0;
-        try {
 
-            File file = new File(path + "subjects_" + year + ".txt");
+        try {
+            File file = new File(path);
             LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file));
             lineNumberReader.skip(Long.MAX_VALUE);
             lines = lineNumberReader.getLineNumber();
             lineNumberReader.close();
 
-        } catch (FileNotFoundException e) {
-            logger.debug("FileNotFoundException Occurred" +  e.getMessage());
-        } catch (IOException e) {
-            logger.debug("IOException Occurred" + e.getMessage());
-        }
+        } catch (IOException e) {e.printStackTrace();}
 
         return lines;
     }
