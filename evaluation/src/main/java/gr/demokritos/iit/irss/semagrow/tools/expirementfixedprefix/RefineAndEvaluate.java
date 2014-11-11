@@ -5,6 +5,8 @@ import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.tools.Utils;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -30,33 +32,32 @@ public class RefineAndEvaluate {
     /*
         Variables for local run
      */
-    private static int year = 1980;
-    private static String inputPath = "/home/nickozoulis/", outputPath = "/home/nickozoulis/semagrow/exp_No6/";
+//    private static int year = 1980;
+//    private static String inputPath = "/home/nickozoulis/", outputPath = "/home/nickozoulis/semagrow/exp_No6/";
 
     static final Logger logger = LoggerFactory.getLogger(RefineAndEvaluate.class);
     static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
     private static ExecutorService executors;
 
-//    private static String inputPath, outputPath;
-//    private static int year;
+    private static String inputPath, outputPath;
+    private static int year;
 
 
     public static void main(String[] args) throws IOException, RepositoryException {
-        executeExperiment();
-//        OptionParser parser = new OptionParser("y:i:o:");
-//        OptionSet options = parser.parse(args);
-//
-//        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("o")) {
-//            year = Integer.parseInt(options.valueOf("y").toString());
-//            inputPath = options.valueOf("i").toString();
-//            outputPath = options.valueOf("o").toString();
-//
-//            executeExperiment();
-//        } else {
-//            logger.error("Invalid arguments");
-//            System.exit(1);
-//        }
+        OptionParser parser = new OptionParser("y:i:o:");
+        OptionSet options = parser.parse(args);
+
+        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("o")) {
+            year = Integer.parseInt(options.valueOf("y").toString());
+            inputPath = options.valueOf("i").toString();
+            outputPath = options.valueOf("o").toString();
+
+            executeExperiment();
+        } else {
+            logger.error("Invalid arguments");
+            System.exit(1);
+        }
     }
 
     private static void executeExperiment() throws IOException, RepositoryException {
@@ -84,8 +85,8 @@ public class RefineAndEvaluate {
             // For every 10 queryRecords
             for (int i=0; i<queryRecords.size(); i+=10) {
                 // Get a subList
-                Collection<QueryRecord> subQRList = ((List) queryRecords).subList(i, i + 10);
-                Collection<QueryLogRecord> subLogList = ((List) logs).subList(i, i + 10);
+                Collection<QueryRecord> subQRList = ((List)queryRecords).subList(i, i + 10);
+                Collection<QueryLogRecord> subLogList = ((List)logs).subList(i, i + 10);
 
                 // Refine histogram according to the feedback subList
                 RDFSTHolesHistogram histogram = refineHistogram(subQRList.iterator(), year);
