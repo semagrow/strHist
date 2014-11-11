@@ -126,7 +126,7 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
         else
             predicateRange = new ExplicitSetRange<>();
 
-        RDFValueRange objectRange = null;
+        RDFValueRange objectRange = new RDFValueRange();
         if (oVal == null) {
             if (bindings.hasBinding(pattern.getObjectVar().getName()))
                 objectRange = fillObjectRange(bindings.getValue(pattern.getObjectVar().getName()));
