@@ -39,6 +39,7 @@ public class RefineAndEvaluate {
     static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
     private static ExecutorService executors;
+    private static List<String> pointSubjects;
 
     private static String inputPath, outputPath;
     private static int year;
@@ -73,12 +74,16 @@ public class RefineAndEvaluate {
         Collection<QueryLogRecord> logs = Utils.parseFeedbackLog("/var/tmp/" + year + "/" + year + "_log.ser");
         Collection<QueryRecord> queryRecords = Utils.adaptLogs(logs, year, executors);
 
+        // Instantiate fixed point query subjects.
+        pointSubjects = loadFixedPrefixes();
+
         logger.info("Starting refining histogram: " + year);
         RepositoryConnection conn;
 
         try {
             conn = repo.getConnection();
-            Path path = Paths.get(outputPath + year, "results.csv");
+
+            Path path = Paths.get(outputPath, "results_" + year + ".csv");
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
             bw.write("Year, Prefix, Act, Est, AbsErr%\n");
 
@@ -86,13 +91,13 @@ public class RefineAndEvaluate {
             for (int i=0; i<queryRecords.size(); i+=10) {
                 // Get a subList
                 Collection<QueryRecord> subQRList = ((List)queryRecords).subList(i, i + 10);
-                Collection<QueryLogRecord> subLogList = ((List)logs).subList(i, i + 10);
 
                 // Refine histogram according to the feedback subList
-                RDFSTHolesHistogram histogram = refineHistogram(subQRList.iterator(), year);
+                RDFSTHolesHistogram histogram = refineHistogram(subQRList.iterator(), year, i);
 
                 // Evaluate a point query on histogram and triple store.
-                evaluateWithTestQuery(conn, histogram, bw, subLogList);
+                evaluateWithTestQuery(conn, histogram, bw, pointSubjects, i);
+                bw.flush();
             }
 
             bw.close();
@@ -107,16 +112,17 @@ public class RefineAndEvaluate {
     private static void evaluateWithTestQuery(RepositoryConnection conn,
                                               RDFSTHolesHistogram histogram,
                                               BufferedWriter bw,
-                                              Collection<QueryLogRecord> subList) {
+                                              List<String> pointSubjects,
+                                              int iteration) {
 
         logger.info("Executing test query of year: " + year);
 
         String testQuery;
 
         // Fire point queries
-        for (int i=0; i<10; i++) {
-            testQuery = prefixes + " select * where {%s dc:subject ?o}";
-            testQuery = String.format(testQuery, getRandomSubjectFromTSV(subList));
+        for (int i=iteration; i<iteration + 10; i++) {
+            testQuery = prefixes + " select * where {<http://agris.fao.org/aos/records/%s> dc:subject ?o}";
+            testQuery = String.format(testQuery, pointSubjects.get(i));
             evaluateTestQuery(conn, histogram, testQuery, bw);
         }
     }
@@ -138,61 +144,21 @@ public class RefineAndEvaluate {
         }
     }
 
-    private static RDFSTHolesHistogram refineHistogram(Iterator<QueryRecord> listQueryRecords, int year) {
-        File folder = new File(outputPath + year);
-        if (!folder.exists())
-            folder.mkdir();
+    private static RDFSTHolesHistogram refineHistogram(Iterator<QueryRecord> listQueryRecords, int year, int iteration) {
+        RDFSTHolesHistogram histogram;
 
-        RDFSTHolesHistogram histogram = Utils.loadPreviousHistogram(folder.getPath(), year);
+        if (iteration == 0)
+            histogram = Utils.loadPreviousHistogram(outputPath, year);
+        else
+            histogram = Utils.loadCurrentHistogram(outputPath, year);
 
         logger.info("Refining histogram " + year);
         ((STHolesHistogram)histogram).refine(listQueryRecords);
         logger.info("Refinement is over.");
 
-        Utils.serializeHistogram(histogram, folder.getPath() + "/", year);
+        Utils.serializeHistogram(histogram, outputPath, year);
 
         return histogram;
-    }
-
-    /**
-     * Chooses randomly a tsv-file from the subList and then randomly a subject from that tsv.
-     * @return String subject
-     */
-    private static String getRandomSubjectFromTSV(Collection<QueryLogRecord> subList) {
-        String path = "/var/tmp/" + year + "/", subject = "";
-        List<String> tsvFiles = new ArrayList<String>();
-
-        for (QueryLogRecord qlr : subList) {
-            String[] splits = qlr.getResults().stringValue().split("/");
-            tsvFiles.add(splits[splits.length - 1]);
-        }
-
-        int tsv = Utils.randInt(0, tsvFiles.size() - 1);
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(path + tsvFiles.get(tsv)));
-
-            int lines = Utils.countLineNumber(path + tsvFiles.get(tsv));
-            int pos = Utils.randInt(1, lines);
-            int counter = 0;
-
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                if (++counter == pos) {
-
-                    String[] splits = line.split("\t");
-                    subject = splits[0];
-
-                    break;
-                }
-            }
-
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return subject;
     }
 
     private static String getPrefix(String testQuery) {
@@ -208,6 +174,21 @@ public class RefineAndEvaluate {
         }
 
         return "";
+    }
+
+    private static List<String> loadFixedPrefixes() throws IOException {
+        List<String> pointQueries = new ArrayList<String>();
+
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        InputStream stream = loader.getResourceAsStream("fixed_prefixes");
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+
+        String line = "";
+        while ((line = br.readLine()) != null)
+            pointQueries.add(line.trim());
+
+        return pointQueries;
     }
 
 }
