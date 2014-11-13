@@ -134,12 +134,11 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         RDFLiteralRange res = null;
 
         if (literalRange.ranges.size() != 1) {
-            logger.debug("Argument should be a " +
-                    "range of single type");
 
             if (literalRange.ranges.size() == 0)
                 return new RDFLiteralRange(Collections.<URI, RangeLength<?>>emptyMap());
 
+            logger.debug("Argument should be a range of single type");
             return null;
         }
 
@@ -346,12 +345,12 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         if (infinite) return true;
 
         if (literalRange.ranges.size() != 1) {
-            logger.debug("Argument should be a " +
-                    "range of single type");
 
             // FIXME: Is this conceptually right?
             if (this.getRanges().size() == 0 && literalRange.ranges.size() == 0)
                 return true;
+
+            logger.debug("Argument should be a range of single type");
 
             return false;
         }
@@ -401,12 +400,11 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
 
 
         if (literalRange.ranges.size() != 1) {
-            logger.debug("Argument should be a " +
-                    "range of single type");
 
             if (literalRange.ranges.size() == 0)
                 return new RDFLiteralRange(this.getRanges());
 
+            logger.debug("Argument should be a range of single type");
             return null;
         }
 
