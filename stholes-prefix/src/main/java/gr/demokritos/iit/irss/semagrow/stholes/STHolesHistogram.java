@@ -361,10 +361,8 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         return qr.getCardinality(rectangle);
     }
 
-
-    //Tested (default case)
     /**
-     * Create a hole (i.e. a child STHolesBucket) inside an existing bucket
+     * Create a hole (i.e. a child STHolesBucket) inside an existing bucket.
      * @param parentBucket parent bucket
      * @param candidateHole candidate hole
      */
@@ -378,10 +376,11 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
             Collection<STHolesBucket<R>> toBeRemoved = new ArrayList<STHolesBucket<R>>();
 
             for (STHolesBucket<R> bc : parentBucket.getChildren()) {
-                if (candidateHole.getBox().contains(bc.getBox())){
-                    // If this child's box is equal to the candidate hole's box,
-                    // refresh the candidate's statistics and replace this child.
+                if (candidateHole.getBox().contains(bc.getBox())) {
+                    // If this candidates's box is equals to the child's box.
                     if (candidateHole.getBox().equals(bc.getBox())) {
+
+                        // Refresh the candidate's statistics and replace this child.
                         candidateHole.getStatistics().setFrequency(candidateHole.getStatistics().getFrequency() +
                                                                    bc.getStatistics().getFrequency());
 
@@ -398,8 +397,27 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
 
                     candidateHole.addChild(bc);
                     toBeRemoved.add(bc);
+                } else if (bc.getBox().contains(candidateHole.getBox())) {
+                    // If this child's box is equals to the candidate hole's box.
+                    if (bc.getBox().equals(candidateHole.getBox())) {
+                        // Just refresh the child's statistics and continue loop.
+                        bc.getStatistics().setFrequency(candidateHole.getStatistics().getFrequency() +
+                                                        bc.getStatistics().getFrequency());
+
+                        List<Long> distinct = new ArrayList<Long>();
+                        for (int i=0; i<candidateHole.getStatistics().getDistinctCount().size(); i++) {
+                            distinct.add(Math.max(candidateHole.getStatistics().getDistinctCount().get(i),
+                                    bc.getStatistics().getDistinctCount().get(i)));
+                        }
+                        bc.getStatistics().setDistinctCount(distinct);
+
+                        continue;
+                    }
+
+                    // Hangs the candidate bucket below the child.
+                    bc.addChild(candidateHole);
                 }
-            }
+            }// for
 
             for (STHolesBucket<R> bc : toBeRemoved)
                 parentBucket.removeChild(bc);
@@ -407,8 +425,8 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
             parentBucket.addChild(candidateHole);
 
             bucketsNum++;
-        }
-    }
+        }// else
+    }// drillHole
 
     /**
      * merges superfluous buckets
