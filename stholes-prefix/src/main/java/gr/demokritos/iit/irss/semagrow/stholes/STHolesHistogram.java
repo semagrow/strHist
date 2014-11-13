@@ -156,7 +156,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
             }
 
             // get all c
-            Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(rect);
+            Iterable<STHolesBucket<R>> candidates = getCandidates(rect);//getCandidateBuckets(rect);
 
             for (STHolesBucket<R> bucket : candidates) {
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
@@ -306,47 +306,37 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         return c;
     }
 
-    //Tested
     /**
-     * get STHolesBuckets that have nonempty intersection with a queryrecord
+     * Get STHolesBuckets with the most specific nonempty intersection with a QueryRecord.
      * @param queryBox query feedback
      * @return buckets that intersect with queryRecord
      */
-    private Iterable<STHolesBucket<R>> getCandidateBuckets(R queryBox) {
+    private Iterable<STHolesBucket<R>> getCandidates(R queryBox) {
+        return getCandidates(root, queryBox);
+    }
 
-
-
+    private Collection<STHolesBucket<R>> getCandidates(STHolesBucket<R> bucket, R queryBox) {
         Collection<STHolesBucket<R>> candidates = new LinkedList<STHolesBucket<R>>();
 
-        // check if there are bucket with boxes that intersect with the rectangle of the query
-
-
-        candidates = getCandidateBucketsAux(root, candidates, queryBox);
-
-        return candidates;
-    }
-
-    //Tested
-    private Collection<STHolesBucket<R>> getCandidateBucketsAux(
-            STHolesBucket<R> b, Collection<STHolesBucket<R>> candidates,
-            R queryBox)
-    {
-
-        R c = b.getBox();
-
-
-        if (c.intersects(queryBox)) {
-
-            candidates.add(b);
+        for (STHolesBucket<R> bucketChild : bucket.getChildren()) {
+            candidates.addAll(getCandidates(bucketChild, queryBox));
         }
 
+        if (bucket.getBox().intersects(queryBox)) {
+            boolean moreSpecific = true;
 
-        for (STHolesBucket<R> bc : b.getChildren())
-            getCandidateBucketsAux(bc,candidates,queryBox);
+            for (STHolesBucket<R> candidate :candidates) {
+                // Add a candidate only if there isn't any more specific candidate.
+                if (candidate.getBox().isEnclosing(queryBox))
+                    moreSpecific = false;
+            }
+
+            if (moreSpecific)
+                candidates.add(bucket);
+        }
 
         return candidates;
     }
-
 
     /**
      * Count the tuples of the query result set that match the criteria of the given bucket.
