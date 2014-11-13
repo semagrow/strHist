@@ -1,3 +1,4 @@
+
 package gr.demokritos.iit.irss.semagrow.sesame;
 
 import com.bigdata.rdf.sail.BigdataSail;
@@ -10,7 +11,7 @@ import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogParser;
-import gr.demokritos.iit.irss.semagrow.qfr.*;
+import gr.demokritos.iit.irss.semagrow.qfr.QueryRecordAdapter;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
@@ -18,8 +19,6 @@ import gr.demokritos.iit.irss.semagrow.rdf.io.sevod.VoIDSerializer;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import org.openrdf.model.Literal;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.*;
@@ -50,11 +49,10 @@ public class Workflow {
      /*
         Variables for local run
      */
-//    private static List<String> agroTerms = loadAgroTerms("/home/nickozoulis/agrovoc_terms.txt");
-//    public static String HISTPATH = "/home/nickozoulis/semagrow/serial/";
-//    private static String TSPATH = "/home/nickozoulis/Downloads/";
-//    private static int term = 0;
-//    private static int startDate = 1980, endDate = 1980;
+    private static List<String> agroTerms = loadAgroTerms("/home/nickozoulis/semagrow/agrovoc_terms.txt");
+    public static String HISTPATH = "/home/nickozoulis/semagrow/serial/";
+    private static String TSPATH = "/home/nickozoulis/";
+    private static int startDate = 1980, endDate = 1980;
 
 
     static final Logger logger = LoggerFactory.getLogger(Workflow.class);
@@ -63,10 +61,9 @@ public class Workflow {
     static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
     private static ExecutorService executors;
 
-    private static List<String> agroTerms;
-
-    public static String HISTPATH, TSPATH;
-    private static int startDate, endDate;
+//    private static List<String> agroTerms;
+//    public static String HISTPATH, TSPATH;
+//    private static int startDate, endDate;
 
     /**
      * s = Starting date, e = Ending Date, l = LogOutput path, t = TripleStore, a = AgroknowTerms
@@ -75,29 +72,30 @@ public class Workflow {
      * @throws IOException
      */
     static public void main(String[] args) throws RepositoryException, IOException {
-        OptionParser parser = new OptionParser("s:e:l:t:a:");
-        OptionSet options = parser.parse(args);
-
-        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l")
-                && options.hasArgument("t") && options.hasArgument("a")) {
-
-            startDate = Integer.parseInt(options.valueOf("s").toString());
-            endDate = Integer.parseInt(options.valueOf("e").toString());
-            if (startDate > endDate) {
-                logger.error("Invalid arguments");
-                System.exit(1);
-            }
-
-            HISTPATH = options.valueOf("l").toString();
-            TSPATH = options.valueOf("t").toString();
-            agroTerms = loadAgroTerms(options.valueOf("a").toString());
-
-            runMultiAnnualExperiment();
-        }
-        else {
-            logger.error("Invalid arguments");
-            System.exit(1);
-        }
+        runMultiAnnualExperiment();
+//        OptionParser parser = new OptionParser("s:e:l:t:a:");
+//        OptionSet options = parser.parse(args);
+//
+//        if (options.hasArgument("s") && options.hasArgument("e") && options.hasArgument("l")
+//                && options.hasArgument("t") && options.hasArgument("a")) {
+//
+//            startDate = Integer.parseInt(options.valueOf("s").toString());
+//            endDate = Integer.parseInt(options.valueOf("e").toString());
+//            if (startDate > endDate) {
+//                logger.error("Invalid arguments");
+//                System.exit(1);
+//            }
+//
+//            HISTPATH = options.valueOf("l").toString();
+//            TSPATH = options.valueOf("t").toString();
+//            agroTerms = loadAgroTerms(options.valueOf("a").toString());
+//
+//            runMultiAnnualExperiment();
+//        }
+//        else {
+//            logger.error("Invalid arguments");
+//            System.exit(1);
+//        }
     }
 
     private static void runMultiAnnualExperiment() throws RepositoryException, IOException {
@@ -107,8 +105,7 @@ public class Workflow {
 
             // Query triple stores and write feedback.
             Repository repo = getFedRepository(getRepository(date), date);
-            queryTripleStores(repo, date);
-
+//            queryTripleStores(repo, date);
 
             // Load feedback
             Collection<QueryLogRecord> logs = parseFeedbackLog("/var/tmp/" + date + "/" + date + "_log.ser");

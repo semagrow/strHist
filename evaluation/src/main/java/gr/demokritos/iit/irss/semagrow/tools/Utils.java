@@ -90,11 +90,17 @@ public class Utils {
         if (!jsonHist.exists())
             logger.info("Creating a new histogram.");
         else
-            logger.info("Deserializing histogram: " + (date - 1));
+            logger.info("Deserializing previous histogram: " + (date - 1));
 
         return (!jsonHist.exists())
                 ? new RDFSTHolesHistogram()
                 : new JSONDeserializer(logFolder + "histJSON_" + (date - 1) + ".txt").getHistogram();
+    }
+
+    public static RDFSTHolesHistogram loadCurrentHistogram(String logFolder, int date) {
+        logger.info("Deserializing current histogram: " + date);
+
+        return new JSONDeserializer(logFolder + "histJSON_" + date + ".txt").getHistogram();
     }
 
     public static List<String> loadAgroTerms(String path) {

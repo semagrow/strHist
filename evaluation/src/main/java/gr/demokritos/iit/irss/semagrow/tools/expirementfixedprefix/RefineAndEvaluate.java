@@ -46,6 +46,7 @@ public class RefineAndEvaluate {
 
 
     public static void main(String[] args) throws IOException, RepositoryException {
+        
         OptionParser parser = new OptionParser("y:i:o:");
         OptionSet options = parser.parse(args);
 
@@ -87,16 +88,17 @@ public class RefineAndEvaluate {
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
             bw.write("Year, Prefix, Act, Est, AbsErr%\n");
 
-            // For every 10 queryRecords
-            for (int i=0; i<queryRecords.size(); i+=10) {
+            int step = 50;
+            // For every 50 queryRecords
+            for (int i=0; i<queryRecords.size(); i+=step) {
                 // Get a subList
-                Collection<QueryRecord> subQRList = ((List)queryRecords).subList(i, i + 10);
+                Collection<QueryRecord> subQRList = ((List)queryRecords).subList(i, i + step);
 
                 // Refine histogram according to the feedback subList
                 RDFSTHolesHistogram histogram = refineHistogram(subQRList.iterator(), year, i);
 
                 // Evaluate a point query on histogram and triple store.
-                evaluateWithTestQuery(conn, histogram, bw, pointSubjects, i);
+                evaluateWithTestQuery(conn, histogram, bw, pointSubjects);
                 bw.flush();
             }
 
@@ -112,15 +114,14 @@ public class RefineAndEvaluate {
     private static void evaluateWithTestQuery(RepositoryConnection conn,
                                               RDFSTHolesHistogram histogram,
                                               BufferedWriter bw,
-                                              List<String> pointSubjects,
-                                              int iteration) {
+                                              List<String> pointSubjects) {
 
         logger.info("Executing test query of year: " + year);
 
         String testQuery;
 
         // Fire point queries
-        for (int i=iteration; i<iteration + 10; i++) {
+        for (int i=0; i<20; i++) {
             testQuery = prefixes + " select * where {<http://agris.fao.org/aos/records/%s> dc:subject ?o}";
             testQuery = String.format(testQuery, pointSubjects.get(i));
             evaluateTestQuery(conn, histogram, testQuery, bw);
