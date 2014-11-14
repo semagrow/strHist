@@ -86,6 +86,8 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         logger.info("Number of enclosed buckets: " + enclosingBuckets.size());
 
         for (STHolesBucket<R> enclosingB : enclosingBuckets) {
+            logger.info("Enclosed Bucket Rectangle: " + enclosingB.getBox().toString());
+            logger.info("Enclosed Bucket Statistics: " + enclosingB.getStatistics().toString());
             long bucketEstimation = enclosingB.getEstimate(rec);
             est += bucketEstimation;
         }
@@ -156,7 +158,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
             }
 
             // get all c
-            Iterable<STHolesBucket<R>> candidates = getCandidates(rect);//getCandidateBuckets(rect);
+            Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(rect);//getCandidateBuckets(rect);
 
             for (STHolesBucket<R> bucket : candidates) {
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
@@ -308,28 +310,26 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
 
     /**
      * Get STHolesBuckets with the most specific nonempty intersection with a QueryRecord.
-     * @param queryBox query feedback
+     * @param queryBox query feedback rectangle
      * @return buckets that intersect with queryRecord
      */
-    private Iterable<STHolesBucket<R>> getCandidates(R queryBox) {
-        return getCandidates(root, queryBox);
+    private Iterable<STHolesBucket<R>> getCandidateBuckets(R queryBox) {
+        return getCandidateBuckets(root, queryBox);
     }
 
-    private Collection<STHolesBucket<R>> getCandidates(STHolesBucket<R> bucket, R queryBox) {
+    private Collection<STHolesBucket<R>> getCandidateBuckets(STHolesBucket<R> bucket, R queryBox) {
         Collection<STHolesBucket<R>> candidates = new LinkedList<STHolesBucket<R>>();
 
-        for (STHolesBucket<R> bucketChild : bucket.getChildren()) {
-            candidates.addAll(getCandidates(bucketChild, queryBox));
-        }
+        for (STHolesBucket<R> bucketChild : bucket.getChildren())
+            candidates.addAll(getCandidateBuckets(bucketChild, queryBox));
 
         if (bucket.getBox().intersects(queryBox)) {
             boolean moreSpecific = true;
 
-            for (STHolesBucket<R> candidate :candidates) {
-                // Add a candidate only if there isn't any more specific candidate.
+            // Add a candidate only if there isn't already any more specific candidate.
+            for (STHolesBucket<R> candidate : candidates)
                 if (candidate.getBox().isEnclosing(queryBox))
                     moreSpecific = false;
-            }
 
             if (moreSpecific)
                 candidates.add(bucket);

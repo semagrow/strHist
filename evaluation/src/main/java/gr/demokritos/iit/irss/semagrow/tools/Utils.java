@@ -232,12 +232,12 @@ public class Utils {
         return subject;
     }
 
-    public static String trimSubject(String subject) {
+    public static String trimSubject(String subject, int trimPos) {
         String[] splits = subject.split("/");
         String lastSlashPrefix = splits[splits.length - 1];
 
         // Get random cut on the prefix. 3 is given to avoid memory heap overflow
-        int randomCut = randInt(2, lastSlashPrefix.length() - 3);
+//        int randomCut = randInt(2, lastSlashPrefix.length() - 3);
 
         String trimmedSubject = "";
         // Reform the trimmed subject. Intentionally exclude the last one.
@@ -246,7 +246,7 @@ public class Utils {
         }
 
         // Append the random cut.
-        trimmedSubject += lastSlashPrefix.substring(0, randomCut);
+        trimmedSubject += lastSlashPrefix.substring(0, trimPos);
 
         return trimmedSubject;
     }
