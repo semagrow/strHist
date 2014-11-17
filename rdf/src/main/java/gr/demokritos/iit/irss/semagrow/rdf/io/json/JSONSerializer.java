@@ -55,7 +55,9 @@ public class JSONSerializer {
 
 
     private JSONObject serialize(STHolesHistogram<RDFRectangle> histogram) {
-        return serialize(histogram.getRoot());
+        JSONObject jsonRoot = serialize(histogram.getRoot());
+        jsonRoot.put("numOfBuckets", histogram.getBucketsNum());
+        return jsonRoot;
     }
 
 

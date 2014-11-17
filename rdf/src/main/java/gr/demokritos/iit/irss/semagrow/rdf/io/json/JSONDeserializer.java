@@ -58,6 +58,8 @@ public class JSONDeserializer {
 
             rootBucket = getBucket(bucket);
 
+            histogram.setBucketNum((Long)jsonObject.get("numOfBuckets"));
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
