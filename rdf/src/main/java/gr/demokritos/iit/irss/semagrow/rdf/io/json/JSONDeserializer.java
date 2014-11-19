@@ -156,7 +156,7 @@ public class JSONDeserializer {
             list.add((String)temp.get("rdfUri"));
         }
 
-        return new RDFURIRange(list);
+        return (list.isEmpty()) ? new RDFURIRange() : new RDFURIRange(list);
     }
 
 
@@ -181,7 +181,7 @@ public class JSONDeserializer {
             }
         }// while
 
-        return new RDFLiteralRange(ranges);
+        return (ranges.isEmpty()) ? new RDFLiteralRange() : new RDFLiteralRange(ranges);
     }
 
 
@@ -226,7 +226,7 @@ public class JSONDeserializer {
                 prefixList.add((String)temp.get("value"));
         }
 
-        return new RDFURIRange(prefixList);
+        return (prefixList.isEmpty()) ? new RDFURIRange() : new RDFURIRange(prefixList);
     }
 
 
@@ -245,7 +245,7 @@ public class JSONDeserializer {
             }
         }
 
-        return new ExplicitSetRange<URI>(predicateSet);
+        return (predicateSet.isEmpty()) ? new ExplicitSetRange<URI>() : new ExplicitSetRange<URI>(predicateSet);
     }
 
 
