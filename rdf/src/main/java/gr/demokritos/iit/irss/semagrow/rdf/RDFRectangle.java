@@ -3,11 +3,9 @@ package gr.demokritos.iit.irss.semagrow.rdf;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
-import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
 import org.openrdf.model.URI;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * Created by angel on 7/15/14.
@@ -180,6 +178,10 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
         // ASSUMPTION: Infinite is considered to be enclosed in every rectangle.
 
         boolean b = true;
+
+        // FIXME: Infinite root workaround
+        if (r.subjectRange.isInfinite() && r.predicateRange.isInfinite() && r.objectRange.isInfinite())
+            return false;
 
         if (r.subjectRange.isInfinite())
             b = b && true;
