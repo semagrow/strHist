@@ -7,22 +7,29 @@ import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogParser;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
+import gr.demokritos.iit.irss.semagrow.base.Stat;
+import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogParser;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryRecordAdapter;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONSerializer;
 import gr.demokritos.iit.irss.semagrow.rdf.io.sevod.VoIDSerializer;
 import gr.demokritos.iit.irss.semagrow.sesame.ActualCardinalityEstimator;
 import gr.demokritos.iit.irss.semagrow.sesame.CardinalityEstimatorImpl;
 import gr.demokritos.iit.irss.semagrow.sesame.TestSail;
+import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
+import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -93,8 +100,25 @@ public class Utils {
             logger.info("Deserializing previous histogram: " + (date - 1));
 
         return (!jsonHist.exists())
-                ? new RDFSTHolesHistogram()
+                ? new RDFSTHolesHistogram(getFixedRoot())
                 : new JSONDeserializer(logFolder + "histJSON_" + (date - 1) + ".txt").getHistogram();
+    }
+
+    /**
+     * Fixed root for bigdata_agris_data_2001.jnl
+     * @return
+     */
+    private static STHolesBucket getFixedRoot() {
+        RDFRectangle box = new RDFRectangle(new RDFURIRange(), new ExplicitSetRange<URI>(), new RDFValueRange());
+
+        List<Long> list = new ArrayList<>();
+        list.add((long)2188632);
+        list.add((long)1);
+        list.add((long)19625);
+
+        Stat stats = new Stat((long)14230094 , list);
+
+        return new STHolesBucket(box, stats);
     }
 
     public static RDFSTHolesHistogram loadCurrentHistogram(String logFolder, int date) {
