@@ -10,15 +10,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-
 /**
  * Created by angel on 7/11/14.
+ * @author efi
+ * @author nickozoulis
  */
 public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,Stat> implements STHistogram<R,Stat> {
-
     static final Logger logger = LoggerFactory.getLogger(STHolesHistogram.class);
     private STHolesBucket<R> root;
-    public long maxBucketsNum;
+    public long maxBucketsNum = 100;
     public Double epsilon = 0.0;
     private long bucketsNum = 0;
 
@@ -30,9 +30,13 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
 
     public STHolesHistogram() {
         //todo: choose a constant
-        maxBucketsNum = 1000;
         root = null;
         bucketsNum += bucketsNum;
+    }
+
+    public STHolesHistogram(STHolesBucket root) {
+        this.root = root;
+        bucketsNum++;
     }
 
     public STHolesHistogram(Iterator<QueryRecord<R,Stat>> workload) {
@@ -215,7 +219,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @return shrinked bucket
      */
     private STHolesBucket<R> shrink(STHolesBucket<R> bucket, R rect, QueryRecord<R,Stat> queryRecord) {
-
         // Find candidate hole
         R c = bucket.getBox().intersection(rect);
 
@@ -227,11 +230,9 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         //for (STHolesBucket<R> participant : participants) {
 
         while (!participants.isEmpty()) {
-
             c.shrink(participants.get(0).getBox());
             updateParticipants(participants, bucket, c);
         }
-
 
         //TODO: create a new rectangle / this is not the way to do it!
         //todo: is this still a todo?
@@ -255,9 +256,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @param bucket parent bucket
      * @param c candidate hole
      */
-    private void  updateParticipants(List<STHolesBucket<R>> participants,
-                                    STHolesBucket<R> bucket, R c) {
-
+    private void  updateParticipants(List<STHolesBucket<R>> participants, STHolesBucket<R> bucket, R c) {
         List<STHolesBucket<R>> participantsNew = new LinkedList<STHolesBucket<R>>();
 
         for (STHolesBucket<R> bi : bucket.getChildren()) {
@@ -279,8 +278,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @return box after merge
      */
     private R getSiblingSiblingBox(STHolesBucket<R> b1, STHolesBucket<R> b2) {
-
-
         // Get parent
         STHolesBucket<R> bp = b1.getParent(); //todo: check if they are siblings
         // Find tightly enclosing box
@@ -303,7 +300,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
                 break;
             }
         }
-
 
         return c;
     }
@@ -345,7 +341,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @return statistics
      */
     private Stat countMatchingTuples(R rectangle, QueryRecord<R,Stat> queryRecord) {
-
         QueryResult<R,Stat> qr = queryRecord.getResultSet();
 
         return qr.getCardinality(rectangle);
@@ -422,9 +417,8 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * merges superfluous buckets
      */
     private void compact() {
-
         if (bucketsNum > maxBucketsNum)
-            logger.debug("Compacting histogram.");
+            logger.info("Compacting histogram.");
 
         // while too many buckets compute merge penalty for each parent-child
         // and sibling pair, find the one with the minimum penalty and
@@ -437,9 +431,9 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
              STHolesBucket<R> bn = bestMerge.getBn();
 
             STHolesBucket.merge(b1, b2, bn, this);
-            logger.debug("Best merge info: " + bestMerge.toString());
-            logger.debug("Number of PC merges: " + pcMergesNum);
-            logger.debug("Number of SS merges: " + ssMergesNum);
+            logger.info("Best merge info: " + bestMerge.toString());
+            logger.info("Number of PC merges: " + pcMergesNum);
+            logger.info("Number of SS merges: " + ssMergesNum);
             bucketsNum -= 1;
         }
     }
@@ -452,7 +446,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @return best merge
      */
     private MergeInfo<R> findBestMerge(STHolesBucket<R> b) {
-
         MergeInfo<R> bestMerge;
         MergeInfo<R> candidateMerge;
         double minimumPenalty = Integer.MAX_VALUE;
@@ -542,9 +535,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @param bc child bucket
      * @return pair of merge penalty and resulting box
      */
-    private Map.Entry<STHolesBucket<R>, Double>
-    getPCMergePenalty(int type, STHolesBucket<R> bp, STHolesBucket<R> bc)
-    {
+    private Map.Entry<STHolesBucket<R>, Double> getPCMergePenalty(int type, STHolesBucket<R> bp, STHolesBucket<R> bc) {
         double penalty;
         double dd, dd2, bn_size, bc_size;
         int dim;
@@ -596,8 +587,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @param b2 sibling 2
      * @return pair of merge penalty and resulting box
      */
-    private Map.Entry<STHolesBucket<R>, Double>
-    getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
+    private Map.Entry<STHolesBucket<R>, Double> getSSMergePenalty(STHolesBucket<R> b1, STHolesBucket<R> b2) {
     	return getSSMergePenalty( PENALTY_TYPE, b1, b2 );
     }
     
@@ -663,13 +653,10 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         I.addAll(b1.getChildren());
         I.addAll(b2.getChildren());
 
-
-
         for (STHolesBucket<R> bi : I) {
 
             newChildren.add(bi);
         }
-
 
         // Create bn
         Stat newStatistics = new Stat(newFrequency, newDistinct);
@@ -723,10 +710,9 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
 		this.root = root;
 	}
 
-    public long getBucketsNum() {
+    public long getBucketsNum() { return bucketsNum; }
 
-        return bucketsNum;
-    }
+    public void setBucketNum(long bucketsNum) { this.bucketsNum = bucketsNum; }
 
     public void setMaxBucketsNum(long maxBucketsNum) {
         this.maxBucketsNum = maxBucketsNum;
@@ -747,6 +733,5 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
     public void setPcMergesNum(long pcMergesNum) {
         this.pcMergesNum = pcMergesNum;
     }
-
 
 }
