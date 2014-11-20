@@ -13,26 +13,20 @@ import java.util.Collection;
 public class STHolesBucket<R extends Rectangle> {
 
     private R box;
-
     private Collection<STHolesBucket<R>> children;
-
     private Stat statistics;
-
     private STHolesBucket<R> parent;
 
     public STHolesBucket() {
         this.children = new ArrayList<STHolesBucket<R>>();
     }
 
-    //Tested
     public STHolesBucket(R box, Stat statistics) {
         this.box = box;
         this.statistics = statistics;
-
         this.children = new ArrayList<STHolesBucket<R>>();
     }
 
-    //Tested
     public STHolesBucket(R box, Stat statistics,
                          Collection<STHolesBucket<R>> children,
                          STHolesBucket<R> parent) {
@@ -40,7 +34,6 @@ public class STHolesBucket<R extends Rectangle> {
         this.statistics = statistics;
 
         if (children == null) {
-
             this.children = new ArrayList<STHolesBucket<R>>();
         } else {
             this.children = children;
@@ -48,7 +41,6 @@ public class STHolesBucket<R extends Rectangle> {
         setParent(parent);
     }
 
-    //Tested
     public R getBox() {
         return box;
     }
@@ -57,7 +49,6 @@ public class STHolesBucket<R extends Rectangle> {
         return statistics;
     }
 
-    //Tested
     public Collection<STHolesBucket<R>> getChildren() {
         return children;
     }
@@ -66,28 +57,21 @@ public class STHolesBucket<R extends Rectangle> {
         return parent;
     }
 
-    //Tested
     public void addChild(STHolesBucket<R> bucket) {
-
-
         children.add(bucket);
         bucket.parent = this;
     }
 
     public void removeChild(STHolesBucket<R> bucket) {
-
         if (!children.isEmpty()) {
-
             children.remove(bucket);
         }
     }
 
-    public static <R extends Rectangle<R>> 
-        void merge(STHolesBucket<R> bucket1,
-                   STHolesBucket<R> bucket2,
-                   STHolesBucket<R> mergeBucket,
-                   STHolesHistogram<R> h)
-    {
+    public static <R extends Rectangle<R>> void merge(STHolesBucket<R> bucket1,
+                                                      STHolesBucket<R> bucket2,
+                                                      STHolesBucket<R> mergeBucket,
+                                                      STHolesHistogram<R> h) {
         if (bucket2.getParent() == bucket1) { //or equals
             parentChildMerge(bucket1, bucket2, mergeBucket, h);
         }
@@ -96,14 +80,13 @@ public class STHolesBucket<R extends Rectangle> {
         }
     }
 
-    public static <R extends Rectangle<R>> void
-        parentChildMerge(STHolesBucket<R> bp, STHolesBucket<R> bc, STHolesBucket<R> bn,
-                         STHolesHistogram<R> h) {
+    public static <R extends Rectangle<R>> void parentChildMerge(STHolesBucket<R> bp,
+                                                                 STHolesBucket<R> bc,
+                                                                 STHolesBucket<R> bn,
+                                                                 STHolesHistogram<R> h) {
 
         //Merge buckets b1, b2 into bn
         STHolesBucket<R> bpp = bp.getParent();
-
-
 
         //Children of both buckets bc and bp
         //become children of the new bucket
@@ -111,9 +94,7 @@ public class STHolesBucket<R extends Rectangle> {
             bn.addChild(bi);
 
         for (STHolesBucket<R> bchild : bp.children) {
-
             if (!bchild.equals(bc)) {
-
                 bn.addChild(bchild);
             }
         }
@@ -121,23 +102,18 @@ public class STHolesBucket<R extends Rectangle> {
         if (bpp == null) {
             //bp is root
             h.setRoot(bn);
-
         } else {
-
             bpp.removeChild(bp);
             bpp.addChild(bn);
         }
 
-
         h.setPcMergesNum(h.getPcMergesNum() + 1);
     }
 
-    public static <R extends Rectangle<R>> 
-        void siblingSiblingMerge(STHolesBucket<R> b1,
-                                 STHolesBucket<R> b2,
-                                 STHolesBucket<R> bn,
-                                 STHolesHistogram<R> h)
-    {
+    public static <R extends Rectangle<R>> void siblingSiblingMerge(STHolesBucket<R> b1,
+                                                                    STHolesBucket<R> b2,
+                                                                    STHolesBucket<R> bn,
+                                                                    STHolesHistogram<R> h) {
         //todo: throw exception if they are not siblings
         STHolesBucket<R> newParent = b1.getParent();
 
@@ -161,7 +137,6 @@ public class STHolesBucket<R extends Rectangle> {
 
 
     public void setParent(STHolesBucket<R> parent) {
-
         this.parent = parent;
     }
 
@@ -169,13 +144,11 @@ public class STHolesBucket<R extends Rectangle> {
         this.box = box;
     }
 
-    //Tested
-    public long getEstimate( R rec )
-    {
+    public long getEstimate(R rec) {
         long dvc = 1;
         
         // If no argument, return myself's estimate
-        if( rec == null ) { rec = this.box; }
+        if (rec == null) { rec = this.box; }
 
         for (int i=0; i< rec.getDimensionality(); i++) {
             if ((rec.getRange(i)).isUnit()) {
@@ -183,12 +156,10 @@ public class STHolesBucket<R extends Rectangle> {
             }
         }
         
-        float estimate =
-        	((float)this.statistics.getFrequency().longValue()) / ((float)dvc);
+        float estimate = ((float)this.statistics.getFrequency().longValue()) / ((float)dvc);
         return Math.round( estimate );
     }
 
-    //Tested
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -213,48 +184,11 @@ public class STHolesBucket<R extends Rectangle> {
         return result;
     }
 
-    //Tested
     public String toString() {
-
         String res = "bucket: \n" + box + statistics;
-
         int childrenNum = children.size();
         res += "childrenNum: \n\t" + childrenNum + "\n";
         return res;
     }
 
-    /*
-    public static void main(String args[] ) {
-
-        ArrayList<String> myRangePrefixList = new ArrayList<String>();
-        myRangePrefixList.add("http://a/");
-        PrefixRange subjectRange = new PrefixRange(myRangePrefixList);
-
-        HashSet<String> s1 = new HashSet<String>();
-        s1.add("a");
-        s1.add("b");
-        s1.add("c");
-        ExplicitSetRange<String> predicateRange = new ExplicitSetRange<String>(s1);
-
-        int low = 0;
-        int high = 10;
-        RDFLiteralRange objectRange = new RDFLiteralRange(low, high);
-
-        RDFRectangle rect = new RDFRectangle(subjectRange, predicateRange, objectRange);
-
-        long frequency = 42;
-        List<Long> distinct = new ArrayList<Long>();
-        distinct.add((long)10);
-        distinct.add((long)20);
-        distinct.add((long)30);
-        Stat statistics = new Stat(frequency, distinct);
-
-        STHolesBucket<RDFRectangle> b1 = new STHolesBucket<RDFRectangle>(rect,statistics,null,null);
-        rect.setObjectRange(new RDFLiteralRange(2,8));
-        STHolesBucket<RDFRectangle> b2 = new STHolesBucket<RDFRectangle>(rect,statistics,null,b1);
-        STHolesBucket<RDFRectangle> b3 = new STHolesBucket<RDFRectangle>(rect,statistics,null,b1);
-        System.out.println(b1);
-        System.out.println("b2 equals b3: " + (b2.equals(b3)));
-    }
-    */
 }

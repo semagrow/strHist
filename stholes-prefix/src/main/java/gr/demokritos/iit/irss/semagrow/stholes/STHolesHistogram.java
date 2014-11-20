@@ -44,7 +44,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         refine(workload);
     }
 
-    //Tested
     /**
      * estimates the number of tuples
      * that match rectangle {rec}
@@ -53,14 +52,11 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      */
     public long estimate(R rec) {
         if (root != null) {
-
             // if rec is larger than our root
-            if (rec.isEnclosing(root.getBox())){
-
+            if (rec.isEnclosing(root.getBox())) {
                 return root.getEstimate(rec);
             }
             else if (!root.getBox().isEnclosing(rec)) {
-
                 return 0;
             }
 
@@ -70,7 +66,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
             return 0;
     }
 
-    //Tested
     /**
      * estimates the number of tuples contained in {rec}
      * by finding the enclosing bucket(s)
@@ -79,7 +74,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @return estimated number of tuples
      */
     private long estimateAux(R rec, STHolesBucket<R> b) {
-
         long est = 0;
 
         List<STHolesBucket<R>> enclosingBuckets = new ArrayList<STHolesBucket<R>>();
@@ -101,18 +95,12 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
     }
 
     private void getEnclosingBuckets(R rec, STHolesBucket<R> b, List<STHolesBucket<R>> enclosingBuckets) {
-
         boolean isEnclosingBucket = false;
 
-
         if ((b.getBox()).isEnclosing(rec)) { //unnecessary
-
             isEnclosingBucket = true;
-
             for (STHolesBucket<R> bc : b.getChildren()) {
-
                 if ((bc.getBox()).isEnclosing(rec)) {
-
                     isEnclosingBucket = false;
                     getEnclosingBuckets(rec, bc, enclosingBuckets);
                 }
@@ -138,13 +126,10 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         }
 
         for (R rect : rects) {
-
             if (this.getRoot() == null) {
-
                 setRoot(new STHolesBucket<R>(rect, new Stat(), null, null));
                 bucketsNum += 1;
                 logger.info("Root bucket is created");
-
             } else {
                 // expand root
                 if (!root.getBox().contains(rect)) {
@@ -187,17 +172,13 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         List<Long> distinctN = new ArrayList<Long>();
 
         for (int i = 0; i < deltaStats.getDistinctCount().size(); i++) {
-
-            distinctN.add(Math.max(deltaStats.getDistinctCount().get(i),
-                    oldStats.getDistinctCount().get(i)));
+            distinctN.add(Math.max(deltaStats.getDistinctCount().get(i), oldStats.getDistinctCount().get(i)));
         }
 
         return new Stat(freqN, distinctN);
     }
 
-    //Tested
     private boolean isInaccurateEstimation(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
-
 //        int epsilon = 0; //todo: adjust parameter
         Stat actualStatistics = hole.getStatistics();
         Double actualDensity = actualStatistics.getDensity();
@@ -205,12 +186,9 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         Stat curStatistics = bucket.getStatistics();
         Double curDensity = curStatistics.getDensity();
 
-      //  System.out.println(">>Bucket is: " + bucket + " and hole is: " + hole +
-        //"actual density is: " + actualDensity + " curDensity is: " + curDensity);
         return (Math.abs(actualDensity - curDensity) > epsilon);
     }
 
-    //Tested
     /**
      * creates a new bucket that has a rectangle that does not intersect with the children of {bucket}
      * and includes the number of tuples that matches the queryRecord
@@ -227,7 +205,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         List<STHolesBucket<R>> participants = new LinkedList<STHolesBucket<R>>();
 
         updateParticipants(participants, bucket, c);
-        //for (STHolesBucket<R> participant : participants) {
 
         while (!participants.isEmpty()) {
             c.shrink(participants.get(0).getBox());
@@ -236,18 +213,13 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
 
         //TODO: create a new rectangle / this is not the way to do it!
         //todo: is this still a todo?
-        //R r = bucket.getBox();
-
 
         // Collect candidate hole statistics
         Stat stats = countMatchingTuples(c, queryRecord);
 
-        // Create candidate hole bucket
-
         return new STHolesBucket<R>(c, stats, null, null);
     }
 
-    //Tested
     /**
      * finds {bucket}'s children that partially intersect
      * with candidate hole c and stores them
@@ -261,7 +233,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
 
         for (STHolesBucket<R> bi : bucket.getChildren()) {
             if ((c.intersects(bi.getBox())) && (!c.contains(bi.getBox()))) {
-
                 participantsNew.add(bi);
             }
         }
@@ -283,20 +254,15 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         // Find tightly enclosing box
         R c = b1.getBox().computeTightBox(b2.getBox());
 
-
         // Expand tightly enclosing box
         List<STHolesBucket<R>> participants = new LinkedList<STHolesBucket<R>>();
 
         updateParticipants(participants, bp, c);
 
         for (STHolesBucket<R> participant : participants) {
-
             c = c.computeTightBox(participant.getBox());
-
             updateParticipants(participants, bp, c);
-
             if (participants.isEmpty()) {
-
                 break;
             }
         }
@@ -342,7 +308,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      */
     private Stat countMatchingTuples(R rectangle, QueryRecord<R,Stat> queryRecord) {
         QueryResult<R,Stat> qr = queryRecord.getResultSet();
-
         return qr.getCardinality(rectangle);
     }
 
@@ -477,6 +442,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
             }
 
 
+            // SS merges are commented out because of time complexity.
             /*// Candidate sibling-sibling merges
             for (int j = i + 1; j < bChildren.size(); j++) {
 
@@ -503,11 +469,9 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         bestMerge = new MergeInfo<R>(b1, b2, bn, minimumPenalty);
 
         for (STHolesBucket<R> bc : b.getChildren()) {
-
             candidateMerge = findBestMerge(bc);
 
             if (candidateMerge.getPenalty() <= minimumPenalty) {
-
                 bestMerge = candidateMerge;
             }
         }
@@ -522,8 +486,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @param bc child bucket
      * @return pair of merge penalty and resulting box
      */
-    private Map.Entry<STHolesBucket<R>, Double>
-    getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
+    private Map.Entry<STHolesBucket<R>, Double> getPCMergePenalty(STHolesBucket<R> bp, STHolesBucket<R> bc) {
         return getPCMergePenalty( PENALTY_TYPE, bp, bc );
     }
 
