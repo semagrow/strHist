@@ -34,7 +34,6 @@ public class RefineTrainingWorkload {
     private static int year;
 
     public static void main(String[] args) throws IOException, RepositoryException {
-//        executeExperiment();
         OptionParser parser = new OptionParser("y:i:o:");
         OptionSet options = parser.parse(args);
 

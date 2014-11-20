@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -33,20 +30,19 @@ public class RefineAndEvaluate {
         Variables for local run
      */
 //    private static int year = 1980;
-//    private static String inputPath = "/home/nickozoulis/", outputPath = "/home/nickozoulis/semagrow/exp_No6/";
+//    private static String inputPath = "/home/nickozoulis/", outputPath = "/home/nickozoulis/semagrow/exp_No3/";
 
     static final Logger logger = LoggerFactory.getLogger(RefineAndEvaluate.class);
     static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
+    private static final String DISTINCTPath = "/var/tmp/distinct/";
     private static ExecutorService executors;
     private static List<String> pointSubjects;
 
     private static String inputPath, outputPath;
     private static int year;
 
-
     public static void main(String[] args) throws IOException, RepositoryException {
-        
         OptionParser parser = new OptionParser("y:i:o:");
         OptionSet options = parser.parse(args);
 
@@ -75,9 +71,6 @@ public class RefineAndEvaluate {
         Collection<QueryLogRecord> logs = Utils.parseFeedbackLog("/var/tmp/" + year + "/" + year + "_log.ser");
         Collection<QueryRecord> queryRecords = Utils.adaptLogs(logs, year, executors);
 
-        // Instantiate fixed point query subjects.
-        pointSubjects = loadFixedPrefixes();
-
         logger.info("Starting refining histogram: " + year);
         RepositoryConnection conn;
 
@@ -86,22 +79,15 @@ public class RefineAndEvaluate {
 
             Path path = Paths.get(outputPath, "results_" + year + ".csv");
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
-            bw.write("Year, Prefix, Act, Est, AbsErr%\n");
+            bw.write("Year, Prefix, Act, Est, AbsErr%\n\n");
 
-            int step = 50;
-            // For every 50 queryRecords
-            for (int i=0; i<queryRecords.size(); i+=step) {
-                // Get a subList
-                Collection<QueryRecord> subQRList = ((List)queryRecords).subList(i, i + step);
+            // Refine histogram according to the feedback subList
+            RDFSTHolesHistogram histogram = refineHistogram(queryRecords.iterator(), year, 0);
 
-                // Refine histogram according to the feedback subList
-                RDFSTHolesHistogram histogram = refineHistogram(subQRList.iterator(), year, i);
+            // Evaluate a point query on histogram and triple store.
+            evaluateWithSampleTestQueries(conn, histogram, bw, 0.01);
 
-                // Evaluate a point query on histogram and triple store.
-                evaluateWithTestQuery(conn, histogram, bw, pointSubjects);
-                bw.flush();
-            }
-
+            bw.flush();
             bw.close();
             conn.close();
         } catch (RepositoryException e) {
@@ -109,6 +95,54 @@ public class RefineAndEvaluate {
         }
 
         repo.shutDown();
+    }
+
+    private static void evaluateWithSampleTestQueries(RepositoryConnection conn,
+                                                      RDFSTHolesHistogram histogram,
+                                                      BufferedWriter bw,
+                                                      double percentage) {
+
+        logger.info("Executing test queries of year: " + year);
+
+        String testQuery;
+        Set samplingRows = Utils.getSamplingRows(DISTINCTPath + "subjects_" + year + ".txt", percentage);
+        Iterator iter = samplingRows.iterator();
+
+        while (iter.hasNext()) {
+            try {
+                Integer i = (Integer) iter.next();
+                String subject = Utils.loadDistinctSubject(i, year, DISTINCTPath);
+
+                testQuery = prefixes + " select * where {<%s> dc:subject ?o}";
+                testQuery = String.format(testQuery, subject);
+
+                evaluateTestQuery(conn, histogram, testQuery, bw);
+            } catch (IOException e) {e.printStackTrace();}
+        }
+
+        try {bw.write("\n");} catch (IOException e) {e.printStackTrace();}
+    }
+
+    private static void evaluateWithAllTestQueries(RepositoryConnection conn,
+                                                   RDFSTHolesHistogram histogram,
+                                                   BufferedWriter bw,
+                                                   List<String> pointSubjects) {
+
+        logger.info("Executing test queries of year: " + year);
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(DISTINCTPath + "subjects_" + year + ".txt"));
+            String line = "", testQuery = "";
+
+            while ((line = br.readLine()) != null) {
+                testQuery = prefixes + " select * where {<%s> dc:subject ?o}";
+                testQuery = String.format(testQuery, line.trim());
+                evaluateTestQuery(conn, histogram, testQuery, bw);
+            }
+
+            br.close();
+        } catch (FileNotFoundException e) {e.printStackTrace();
+        } catch (IOException e) {e.printStackTrace();}
+
     }
 
     private static void evaluateWithTestQuery(RepositoryConnection conn,
@@ -126,15 +160,20 @@ public class RefineAndEvaluate {
             testQuery = String.format(testQuery, pointSubjects.get(i));
             evaluateTestQuery(conn, histogram, testQuery, bw);
         }
+
+        try {bw.write("\n");} catch (IOException e) {e.printStackTrace();}
     }
 
     private static void evaluateTestQuery(RepositoryConnection conn, RDFSTHolesHistogram histogram,
                                         String testQuery, BufferedWriter bw) {
-
         long actual = Utils.evaluateOnTripleStore(conn, testQuery);
         long estimate = Utils.evaluateOnHistogram(conn, histogram, testQuery);
-        if (actual == 0 && estimate == 0) return; // Should never happen
-        long error = (Math.abs(actual - estimate) * 100) / (Math.max(actual, estimate));
+        long error;
+
+        if (actual == 0 && estimate == 0)
+            error = 0;
+        else
+            error = (Math.abs(actual - estimate) * 100) / (Math.max(actual, estimate));
 
         String prefix = getPrefix(testQuery);
         try {

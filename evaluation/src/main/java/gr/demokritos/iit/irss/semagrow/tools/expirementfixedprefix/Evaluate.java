@@ -40,7 +40,6 @@ public class Evaluate {
 
 
     public static void main(String[] args) throws IOException, RepositoryException {
-//        executeExperiment();
         OptionParser parser = new OptionParser("y:i:o:");
         OptionSet options = parser.parse(args);
 

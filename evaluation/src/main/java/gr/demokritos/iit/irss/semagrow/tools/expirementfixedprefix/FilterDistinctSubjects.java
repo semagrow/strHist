@@ -27,8 +27,8 @@ public class FilterDistinctSubjects {
     /*
         Variables for local run.
      */
-//    private static String inputPath = "/home/nickozoulis/", output = "/home/nickozoulis/semagrow/distinct.txt";
-//    private static int startYear = 1980, endYear = 1980;
+//    private static String inputPath = "/home/nickozoulis/Desktop/res_prefix/", output = "/var/tmp/distinct/";
+//    private static int year = 1977;
 
     static final Logger logger = LoggerFactory.getLogger(FilterDistinctSubjects.class);
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";

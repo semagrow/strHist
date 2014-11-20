@@ -28,8 +28,8 @@ public class PrepareTrainingWorkload {
     /*
         Variables for local run
      */
-//    private static int year = 1980, numOfQueries = 20;
-//    private static String inputPath = "/home/nickozoulis/";
+//    private static int year = 1977, numOfQueries = 200;
+//    private static String inputPath = "/home/nickozoulis/Desktop/res_prefix/";
 
     static final Logger logger = LoggerFactory.getLogger(PrepareTrainingWorkload.class);
     private static URI endpoint = ValueFactoryImpl.getInstance().createURI("http://histogramnamespace/example");
@@ -75,12 +75,16 @@ public class PrepareTrainingWorkload {
         logger.info("Starting quering triple store: " + year);
         RepositoryConnection conn = null;
 
+        int trimPos = 5;
+
         for (int j=0; j<numOfQueries; j++) {
             logger.info("Query No: " + j);
             try {
                 conn = repo.getConnection();
 
-                trimmedSubject = Utils.trimSubject(Utils.loadDistinctSubject(Utils.randInt(0, subjectsNum), year, DISTINCTPath));
+                if (j % 25 == 0) trimPos++;
+
+                trimmedSubject = Utils.trimSubject(Utils.loadDistinctSubject(Utils.randInt(0, subjectsNum), year, DISTINCTPath), trimPos);
                 String q = String.format(query, trimmedSubject);
                 TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, q);
                 logger.info("Query: " + q);
