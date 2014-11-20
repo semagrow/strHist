@@ -231,7 +231,7 @@ public class Utils {
         return repo;
     }
 
-    public static String loadDistinctSubject(int num, int year, String path) throws IOException{
+    public static String loadDistinctSubject(int num, int year, String path) throws IOException {
         String subject = "";
 
         BufferedReader br = null;
@@ -318,6 +318,17 @@ public class Utils {
         }
 
         return 0;
+    }
+
+    public static Set getSamplingRows(String filePath, double percentage) {
+        Set set = new HashSet<Integer>();
+
+        int lines = countLineNumber(filePath);
+
+        while (set.size() < lines * percentage)
+            set.add(randInt(0, lines));
+
+        return set;
     }
 
 }
