@@ -64,7 +64,7 @@ public class Evaluate {
     private static void refineAndEvaluate(Repository repo) throws IOException, RepositoryException {
         // Load Evaluations
         logger.info("Loading evaluation: " + year);
-        loadEvaluations();
+        loadPointQueryEvaluations();
 
         logger.info("Starting evaluation: " + year);
         RepositoryConnection conn;
@@ -164,12 +164,12 @@ public class Evaluate {
         return "";
     }
 
-    private static Hashtable loadEvaluations() {
+    private static Hashtable loadPointQueryEvaluations() {
         hashTable = new Hashtable<>();
 
         String line = "";
         try {
-            BufferedReader br = new BufferedReader(new FileReader(DISTINCTPath + "evals_" + year + ".csv"));
+            BufferedReader br = new BufferedReader(new FileReader(DISTINCTPath + "evals_" + 2014 + ".csv"));
 
             while ((line = br.readLine()) != null) {
                 String[] splits = line.split(",");

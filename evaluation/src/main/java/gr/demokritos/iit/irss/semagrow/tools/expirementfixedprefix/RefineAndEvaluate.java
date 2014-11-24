@@ -216,19 +216,4 @@ public class RefineAndEvaluate {
         return "";
     }
 
-    private static List<String> loadFixedPrefixes() throws IOException {
-        List<String> pointQueries = new ArrayList<String>();
-
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream stream = loader.getResourceAsStream("fixed_prefixes");
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-
-        String line = "";
-        while ((line = br.readLine()) != null)
-            pointQueries.add(line.trim());
-
-        return pointQueries;
-    }
-
 }

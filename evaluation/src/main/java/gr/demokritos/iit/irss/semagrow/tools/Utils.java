@@ -57,7 +57,7 @@ import java.util.concurrent.ExecutorService;
 public class Utils {
 
     static final Logger logger = LoggerFactory.getLogger(Utils.class);
-    private static Random rand = new Random();
+    private static Random rand = new Random(1);
 
     public static Collection<QueryLogRecord> parseFeedbackLog(String path) {
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
