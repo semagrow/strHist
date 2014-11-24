@@ -1,7 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.tools.expirementfixedprefix;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
-import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.tools.Utils;
 import joptsimple.OptionParser;
@@ -15,9 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.Collection;
+import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,6 +31,7 @@ public class Evaluate {
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
     private static final String DISTINCTPath = "/var/tmp/distinct/";
     private static ExecutorService executors;
+    private static Hashtable<String, Long> hashTable;
 
     private static String inputPath, outputPath;
     private static int year;
@@ -64,9 +62,9 @@ public class Evaluate {
     }
 
     private static void refineAndEvaluate(Repository repo) throws IOException, RepositoryException {
-        // Load Feedback
-        Collection<QueryLogRecord> logs = Utils.parseFeedbackLog("/var/tmp/" + year + "/" + year + "_log.ser");
-        Collection<QueryRecord> queryRecords = Utils.adaptLogs(logs, year, executors);
+        // Load Evaluations
+        logger.info("Loading evaluation: " + year);
+        loadEvaluations();
 
         logger.info("Starting evaluation: " + year);
         RepositoryConnection conn;
@@ -130,50 +128,11 @@ public class Evaluate {
         try {bw.write("\n");} catch (IOException e) {e.printStackTrace();}
     }
 
-    private static void evaluateWithAllTestQueries(RepositoryConnection conn,
-                                                   RDFSTHolesHistogram histogram,
-                                                   BufferedWriter bw,
-                                                   List<String> pointSubjects) {
-
-        logger.info("Executing test queries of year: " + year);
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(DISTINCTPath + "subjects_" + year + ".txt"));
-            String line = "", testQuery = "";
-
-            while ((line = br.readLine()) != null) {
-                testQuery = prefixes + " select * where {<%s> dc:subject ?o}";
-                testQuery = String.format(testQuery, line.trim());
-                evaluateTestQuery(conn, histogram, testQuery, bw);
-            }
-
-            br.close();
-        } catch (FileNotFoundException e) {e.printStackTrace();
-        } catch (IOException e) {e.printStackTrace();}
-
-    }
-
-    private static void evaluateWithTestQuery(RepositoryConnection conn,
-                                              RDFSTHolesHistogram histogram,
-                                              BufferedWriter bw,
-                                              List<String> pointSubjects) {
-
-        logger.info("Executing test query of year: " + year);
-
-        String testQuery;
-
-        // Fire point queries
-        for (int i=0; i<20; i++) {
-            testQuery = prefixes + " select * where {<http://agris.fao.org/aos/records/%s> dc:subject ?o}";
-            testQuery = String.format(testQuery, pointSubjects.get(i));
-            evaluateTestQuery(conn, histogram, testQuery, bw);
-        }
-
-        try {bw.write("\n");} catch (IOException e) {e.printStackTrace();}
-    }
-
     private static void evaluateTestQuery(RepositoryConnection conn, RDFSTHolesHistogram histogram,
                                           String testQuery, BufferedWriter bw) {
-        long actual = Utils.evaluateOnTripleStore(conn, testQuery);
+        String prefix = getPrefix(testQuery);
+
+        long actual = hashTable.get(prefix);
         long estimate = Utils.evaluateOnHistogram(conn, histogram, testQuery);
         long error;
 
@@ -182,7 +141,6 @@ public class Evaluate {
         else
             error = (Math.abs(actual - estimate) * 100) / (Math.max(actual, estimate));
 
-        String prefix = getPrefix(testQuery);
         try {
             bw.write(year + ", " + prefix + ", " + actual + ", " + estimate + ", " + error + "%");
             bw.newLine();
@@ -204,6 +162,28 @@ public class Evaluate {
         }
 
         return "";
+    }
+
+    private static Hashtable loadEvaluations() {
+        hashTable = new Hashtable<>();
+
+        String line = "";
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(DISTINCTPath + "evals_" + year + ".csv"));
+
+            while ((line = br.readLine()) != null) {
+                String[] splits = line.split(",");
+
+                try {
+                    hashTable.put(splits[0].trim(), Long.parseLong(splits[1].trim()));
+                } catch (NumberFormatException e) {}
+            }
+
+            br.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {e.printStackTrace();}
+        return hashTable;
     }
 
 }

@@ -72,7 +72,7 @@ public class PrepareTrainingWorkload {
         int subjectsNum = Utils.countLineNumber(DISTINCTPath + "subjects_" + year + ".txt");
         String trimmedSubject;
 
-        logger.info("Starting quering triple store: " + year);
+        logger.info("Starting querying triple store: " + year);
         RepositoryConnection conn = null;
 
         int trimPos = 5;

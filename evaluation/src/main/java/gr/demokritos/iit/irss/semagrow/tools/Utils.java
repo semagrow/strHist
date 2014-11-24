@@ -100,7 +100,7 @@ public class Utils {
             logger.info("Deserializing previous histogram: " + (date - 1));
 
         return (!jsonHist.exists())
-                ? new RDFSTHolesHistogram(getFixedRoot())
+                ? new RDFSTHolesHistogram(getFixedRoot())//todo:extract stats from 2014.jnl
                 : new JSONDeserializer(logFolder + "histJSON_" + (date - 1) + ".txt").getHistogram();
     }
 

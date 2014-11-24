@@ -14,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.OpenOption;
-import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -27,7 +25,6 @@ import java.util.concurrent.Executors;
 public class RefineTrainingWorkload {
 
     static final Logger logger = LoggerFactory.getLogger(RefineTrainingWorkload.class);
-    static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
      private static ExecutorService executors;
 
     private static String inputPath, outputPath;

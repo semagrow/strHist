@@ -21,21 +21,21 @@ public class ExtractRepoStats {
     static final Logger logger = LoggerFactory.getLogger(ExtractRepoStats.class);
     private static ExecutorService executors;
     private static int year;
-    private static String inputPath, outputPath;
+    private static String inputPath;
     private static final String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
     private final static String queryTriples = prefixes + "select * where {?sub dc:subject ?obj}";
     private final static String queryDistinctSubjects = prefixes + "select distinct ?sub where {?sub dc:subject ?obj}";
     private final static String queryDistinctPredicates = prefixes + "";
     private final static String queryDistinctObjects = prefixes + "select distinct ?obj where {?sub dc:subject ?obj}";
 
+
     public static void main(String[] args) throws IOException, RepositoryException {
         OptionParser parser = new OptionParser("y:i:o:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("o")) {
+        if (options.hasArgument("y") && options.hasArgument("i")) {
             year = Integer.parseInt(options.valueOf("y").toString());
             inputPath = options.valueOf("i").toString();
-            outputPath = options.valueOf("o").toString();
 
             execute();
         } else {
@@ -56,10 +56,14 @@ public class ExtractRepoStats {
         try {
             conn = repo.getConnection();
 
-            TupleQuery query = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryDistinctSubjects);
-            TupleQueryResult res = query.evaluate();
+            TupleQuery query;
+            TupleQueryResult res;
+            long c;
 
-            long c = 0;
+            query = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryDistinctSubjects);
+            res = query.evaluate();
+
+            c = 0;
             logger.info("Counting distinct subjects..");
             while (res.hasNext()) {
                 c++;
@@ -80,7 +84,7 @@ public class ExtractRepoStats {
             query = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryTriples);
             res = query.evaluate();
             c = 0;
-            logger.info("Counting triples..");
+            logger.info("Counting triples for year: " + year);
             while (res.hasNext()) {
                 c++;
                 res.next();
