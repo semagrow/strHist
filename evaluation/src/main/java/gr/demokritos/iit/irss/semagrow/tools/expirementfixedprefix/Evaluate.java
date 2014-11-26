@@ -56,14 +56,14 @@ public class Evaluate {
     private static void executeExperiment() throws IOException, RepositoryException {
         executors = Executors.newCachedThreadPool();
 
-        refineAndEvaluate(Utils.getRepository(year, inputPath));
+        evaluate(Utils.getRepository(year, inputPath));
 
         executors.shutdown();
     }
 
-    private static void refineAndEvaluate(Repository repo) throws IOException, RepositoryException {
+    private static void evaluate(Repository repo) throws IOException, RepositoryException {
         // Load Evaluations
-        logger.info("Loading evaluation: " + year);
+        logger.info("Loading point query evaluations: " + year);
         loadPointQueryEvaluations();
 
         logger.info("Starting evaluation: " + year);
@@ -76,7 +76,7 @@ public class Evaluate {
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
             bw.write("Year, Prefix, Act, Est, AbsErr%\n\n");
 
-            RDFSTHolesHistogram histogram = loadHistogram(year, 0);
+            RDFSTHolesHistogram histogram = loadHistogram(year, 1);
 
             // Evaluate a point query on histogram and triple store.
             evaluateWithSampleTestQueries(conn, histogram, bw, 0.01);
@@ -175,7 +175,8 @@ public class Evaluate {
                 String[] splits = line.split(",");
 
                 try {
-                    hashTable.put(splits[0].trim(), Long.parseLong(splits[1].trim()));
+                    if (splits.length == 2)
+                        hashTable.put(splits[0].trim(), Long.parseLong(splits[1].trim()));
                 } catch (NumberFormatException e) {}
             }
 

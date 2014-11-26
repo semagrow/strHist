@@ -100,23 +100,23 @@ public class Utils {
             logger.info("Deserializing previous histogram: " + (date - 1));
 
         return (!jsonHist.exists())
-                ? new RDFSTHolesHistogram(getFixedRoot())//todo:extract stats from 2014.jnl
+                ? new RDFSTHolesHistogram(getFixedRoot())
                 : new JSONDeserializer(logFolder + "histJSON_" + (date - 1) + ".txt").getHistogram();
     }
 
     /**
-     * Fixed root for bigdata_agris_data_2001.jnl
+     * Fixed root for bigdata_agris_data_2004.jnl
      * @return
      */
     private static STHolesBucket getFixedRoot() {
         RDFRectangle box = new RDFRectangle(new RDFURIRange(), new ExplicitSetRange<URI>(), new RDFValueRange());
 
         List<Long> list = new ArrayList<>();
-        list.add((long)2188632);
+        list.add((long)2318520);
         list.add((long)1);
-        list.add((long)19625);
+        list.add((long)19709);
 
-        Stat stats = new Stat((long)14230094 , list);
+        Stat stats = new Stat((long)15371754 , list);
 
         return new STHolesBucket(box, stats);
     }
