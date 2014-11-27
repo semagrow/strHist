@@ -30,10 +30,7 @@ import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
 import org.openrdf.model.URI;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.*;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedTupleQuery;
 import org.openrdf.query.parser.QueryParserUtil;
@@ -58,6 +55,7 @@ public class Utils {
 
     static final Logger logger = LoggerFactory.getLogger(Utils.class);
     private static Random rand = new Random(1);
+    private static final String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
 
     public static Collection<QueryLogRecord> parseFeedbackLog(String path) {
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
@@ -329,6 +327,39 @@ public class Utils {
             set.add(randInt(0, lines));
 
         return set;
+    }
+
+    public static long countRepoTriples(RepositoryConnection conn) {
+        return countQueryRepo(conn, prefixes + "select * where {?sub dc:subject ?obj}");
+    }
+
+    public static long countDistinctRepoSubjects(RepositoryConnection conn) {
+        return countQueryRepo(conn, prefixes + "select distinct ?sub where {?sub dc:subject ?obj}");
+    }
+
+    public static long countDistinctRepoObjects(RepositoryConnection conn) {
+        return countQueryRepo(conn, prefixes + "select distinct ?obj where {?sub dc:subject ?obj}");
+    }
+
+    private static long countQueryRepo(RepositoryConnection conn, String queryStr) {
+        TupleQuery query;
+        TupleQueryResult res;
+        long c = 0;
+
+        try {
+            query = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryStr);
+            res = query.evaluate();
+            while (res.hasNext()) {
+                c++;
+                res.next();
+            }
+        } catch (NumberFormatException e) {e.printStackTrace();
+        } catch (RepositoryException e) {e.printStackTrace();
+        } catch (MalformedQueryException e) {e.printStackTrace();
+        } catch (QueryEvaluationException e) {e.printStackTrace();
+        } catch (Exception e) {e.printStackTrace();}
+
+        return c;
     }
 
 }
