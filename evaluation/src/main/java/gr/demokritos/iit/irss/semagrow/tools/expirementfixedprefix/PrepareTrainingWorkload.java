@@ -17,7 +17,12 @@ import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -63,7 +68,7 @@ public class PrepareTrainingWorkload {
         executors = Executors.newCachedThreadPool();
 
         interceptor = new QueryLogInterceptor(Utils.getHandler(year), Utils.getMateralizationManager(year, executors));
-        queryStore(Utils.getRepository(year, inputPath));
+        queryStor(Utils.getRepository(year, inputPath));
 
         executors.shutdown();
     }
@@ -104,6 +109,64 @@ public class PrepareTrainingWorkload {
         }
 
         repo.shutDown();
+    }
+
+    private static void queryStor(Repository repo) throws IOException, RepositoryException {
+        List<String> subjects = loadRandomSubjects();
+
+        logger.info("Starting querying triple store: " + year);
+        RepositoryConnection conn;
+
+        int trimPos = 2;
+        String trimmedSubject;
+
+        for (int j=0; j<subjects.size(); j++) {
+            logger.info("Query No: " + j);
+            try {
+                conn = repo.getConnection();
+
+                if (j % 25 == 0) trimPos+=2;
+
+                trimmedSubject = Utils.trimSubject(subjects.get(j), trimPos);
+                String q = String.format(query, trimmedSubject);
+                TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, q);
+                logger.info("Query: " + q);
+
+                // Get TupleExpr
+                ParsedTupleQuery psq = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, q, "http://example.org/");
+                TupleExpr tupleExpr = psq.getTupleExpr();
+
+                CloseableIteration<BindingSet, QueryEvaluationException> result =
+                        interceptor.afterExecution(endpoint, tupleExpr, tupleQuery.getBindings(), tupleQuery.evaluate());
+                Utils.consumeIteration(result);
+
+                conn.close();
+            } catch (MalformedQueryException | RepositoryException | QueryEvaluationException mqe) {
+                mqe.printStackTrace();
+            }
+        }
+
+        repo.shutDown();
+    }
+
+    private static List<String> loadRandomSubjects() {
+        List<String> list = new ArrayList<>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("/var/tmp/train_subjects/" + year + ".txt"));
+            String line = "";
+
+            while ((line = br.readLine()) != null)
+                list.add(line.trim());
+
+            br.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
 }

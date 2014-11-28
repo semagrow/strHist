@@ -362,4 +362,35 @@ public class Utils {
         return c;
     }
 
+    public static List<String> selectSubjectsByRows(RepositoryConnection conn, List<Long> rows) {
+        Collections.sort(rows);
+        List<String> listSubjects = new ArrayList<>();
+
+        String queryStr = prefixes + "select ?sub where {?sub dc:subject ?obj}";
+        TupleQuery query;
+        TupleQueryResult res;
+        long c = 0;
+
+        try {
+            query = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryStr);
+            res = query.evaluate();
+            BindingSet bs;
+            while (res.hasNext()) {
+                bs = res.next();
+
+                if (!rows.isEmpty() && c++ == rows.get(0)) {
+                    if (bs.hasBinding("sub"))
+                        listSubjects.add(bs.getValue("sub").stringValue());
+                    rows.remove(0);
+                }
+            }
+        } catch (NumberFormatException e) {e.printStackTrace();
+        } catch (RepositoryException e) {e.printStackTrace();
+        } catch (MalformedQueryException e) {e.printStackTrace();
+        } catch (QueryEvaluationException e) {e.printStackTrace();
+        } catch (Exception e) {e.printStackTrace();}
+
+        return listSubjects;
+    }
+
 }

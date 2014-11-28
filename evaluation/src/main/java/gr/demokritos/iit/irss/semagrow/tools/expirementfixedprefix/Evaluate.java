@@ -16,8 +16,6 @@ import java.nio.file.*;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +28,6 @@ public class Evaluate {
     static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
     private static final String DISTINCTPath = "/var/tmp/distinct/";
-    private static ExecutorService executors;
     private static Hashtable<String, Long> hashTable;
 
     private static String inputPath, outputPath;
@@ -54,11 +51,7 @@ public class Evaluate {
     }
 
     private static void executeExperiment() throws IOException, RepositoryException {
-        executors = Executors.newCachedThreadPool();
-
         evaluate(Utils.getRepository(year, inputPath));
-
-        executors.shutdown();
     }
 
     private static void evaluate(Repository repo) throws IOException, RepositoryException {
@@ -184,6 +177,7 @@ public class Evaluate {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {e.printStackTrace();}
+
         return hashTable;
     }
 

@@ -8,9 +8,7 @@ import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +37,50 @@ public class ExtractRepoStats {
 
     private static void execute() throws IOException, RepositoryException {
 //        queryStore(Utils.getRepository(year, inputPath));
-        findNumbersByDistribution(Utils.getRepository(year, inputPath));
+//        findNumbersByDistribution(Utils.getRepository(year, inputPath));
+        extractTrainingWorkloadSubjects(Utils.getRepository(year, inputPath));
+    }
+
+    private static void extractTrainingWorkloadSubjects(Repository repo) throws RepositoryException {
+        logger.info("Loading Random Numbers.." + year);
+        List<Long> listNums = loadRandomNumbers();
+        List<String> listSubjects = new ArrayList<>();
+
+        RepositoryConnection conn;
+
+        try {
+            conn = repo.getConnection();
+
+            logger.info("Selecting Subjects By Row.."  + year);
+            listSubjects.addAll(Utils.selectSubjectsByRows(conn, listNums));
+        } catch (Exception e) {e.printStackTrace();}
+
+        repo.shutDown();
+
+        logger.info("Writing subjects to file.." + year);
+        writeSubjectsToFile(year, listSubjects);
+    }
+
+    private static List<Long> loadRandomNumbers() {
+        List<Long> list = new ArrayList<>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("/var/tmp/train_numb3rs/" + year + ".txt"));
+            String line = "";
+
+            while ((line = br.readLine()) != null)
+                list.add(Long.parseLong(line.trim()));
+
+            br.close();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
     private static void findNumbersByDistribution(Repository repo) throws IOException, RepositoryException {
@@ -97,6 +138,21 @@ public class ExtractRepoStats {
 
             for (Long l : list)
                 bw.write(l + "\n");
+
+            bw.flush();
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void writeSubjectsToFile(int year, List<String> list) {
+        logger.info("Writing Subjects to file");
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter("/var/tmp/train_subjects/" + year + ".txt"));
+
+            for (String s : list)
+                bw.write(s + "\n");
 
             bw.flush();
             bw.close();
