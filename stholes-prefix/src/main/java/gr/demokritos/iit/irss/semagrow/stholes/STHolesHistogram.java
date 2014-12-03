@@ -152,6 +152,14 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
                 // Calculate intersection and shrink it
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord);
 
+                // If bucket is equals to hole, just update the stats.
+                if (bucket.getBox().equals(hole.getBox())) {
+                    bucket.setStatistics(new Stat(hole.getStatistics()));
+                    logger.info("Bucket Update: " + bucket.getBox().toString());
+                    logger.info("Updated Stats: " + bucket.getStatistics().toString());
+                    continue;
+                }
+
                 if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole)) {
                     logger.info("Drilling");
                     logger.info("Bucket: " + bucket.getBox().toString() + " with stats " + bucket.getStatistics().toString());
@@ -338,22 +346,6 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
             bucket.addChild(hole);
             bucketsNum++;
         }
-    }
-
-    /**
-     *
-     * @param bucket
-     * @param hole
-     */
-    private Stat mergeStats(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
-        long frequency = bucket.getStatistics().getFrequency() + hole.getStatistics().getFrequency();
-
-        List<Long> distinct = new ArrayList<Long>();
-        for (int i=0; i<hole.getStatistics().getDistinctCount().size(); i++) {
-            distinct.add(Math.max(hole.getStatistics().getDistinctCount().get(i),
-                                  bucket.getStatistics().getDistinctCount().get(i)));
-        }
-        return new Stat(frequency, distinct);
     }
 
     /**
