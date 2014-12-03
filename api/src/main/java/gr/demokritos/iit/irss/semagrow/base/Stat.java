@@ -19,6 +19,11 @@ public class Stat {
         this.frequency = frequency;
     }
 
+    public Stat(Stat original) {
+        this.frequency = original.getFrequency();
+        this.distinctCount = original.getDistinctCount();
+    }
+
     /**
      * Default Constructor
      */

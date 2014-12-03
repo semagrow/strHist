@@ -18,7 +18,7 @@ import java.util.*;
 public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,Stat> implements STHistogram<R,Stat> {
     static final Logger logger = LoggerFactory.getLogger(STHolesHistogram.class);
     private STHolesBucket<R> root;
-    public long maxBucketsNum = 100;
+    public long maxBucketsNum = 1000;
     public Double epsilon = 0.0;
     private long bucketsNum = 0;
 
@@ -146,24 +146,28 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
                 }
             }
 
-            // get all c
-            Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(rect);//getCandidateBuckets(rect);
+            Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(rect);
 
             for (STHolesBucket<R> bucket : candidates) {
-                STHolesBucket<R> hole = shrink(bucket, rect, queryRecord); //calculate intersection and shrink it
+                // Calculate intersection and shrink it
+                STHolesBucket<R> hole = shrink(bucket, rect, queryRecord);
 
                 if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole)) {
-                    logger.info("Drilling hole " + hole.getBox().toString() + " with statistics " + hole.getStatistics().toString());
+                    logger.info("Drilling");
+                    logger.info("Bucket: " + bucket.getBox().toString() + " with stats " + bucket.getStatistics().toString());
+                    logger.info("Hole " + hole.getBox().toString() + " with stats " + hole.getStatistics().toString());
                     drillHole(bucket, hole);
                 } else {
-                    logger.info("Skip drilling for " + bucket.getBox().toString());
+                    logger.info("Skip drilling");
+                    logger.info("Bucket: " + bucket.getBox().toString() + " with stats " + bucket.getStatistics().toString());
+                    logger.info("Skipped Hole " + hole.getBox().toString() + " with stats " + hole.getStatistics().toString());
                 }
             }
         }
+        logger.debug("Histogram refined with query: " + queryRecord.getRectangle());
 
         // check if histogram must be compacted after refinement
-        logger.debug("Histogram refined with query: " + queryRecord.getRectangle());
-        compact();
+//        compact();
     }
 
     private Stat computeRootStats(Stat oldStats, Stat deltaStats) {
@@ -312,71 +316,67 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
     }
 
     /**
-     * Create a hole (i.e. a child STHolesBucket) inside an existing bucket.
-     * @param parentBucket parent bucket
-     * @param candidateHole candidate hole
+     * Create a hole inside an existing bucket.
+     * @param bucket parent bucket
+     * @param hole candidate hole
      */
-    private void drillHole(STHolesBucket<R> parentBucket, STHolesBucket<R> candidateHole) {
-        if (parentBucket.getBox().equals(candidateHole.getBox())) {
-            Stat parentStats = new Stat(candidateHole.getStatistics().getFrequency(),
-                                        candidateHole.getStatistics().getDistinctCount());
-            parentBucket.setStatistics(parentStats);
-        }
-        else {
-            Collection<STHolesBucket<R>> toBeRemoved = new ArrayList<STHolesBucket<R>>();
-
-            for (STHolesBucket<R> bc : parentBucket.getChildren()) {
-                if (candidateHole.getBox().contains(bc.getBox())) {
-                    // If this candidates's box is equals to the child's box.
-                    if (candidateHole.getBox().equals(bc.getBox())) {
-
-                        // Refresh the candidate's statistics and replace this child.
-                        candidateHole.getStatistics().setFrequency(candidateHole.getStatistics().getFrequency() +
-                                                                   bc.getStatistics().getFrequency());
-
-                        List<Long> distinct = new ArrayList<Long>();
-                        for (int i=0; i<bc.getStatistics().getDistinctCount().size(); i++) {
-                            distinct.add(Math.max(candidateHole.getStatistics().getDistinctCount().get(i),
-                                                  bc.getStatistics().getDistinctCount().get(i)));
-                        }
-                        candidateHole.getStatistics().setDistinctCount(distinct);
-
-                        toBeRemoved.add(bc);
-                        continue;
-                    }
-
-                    candidateHole.addChild(bc);
-                    toBeRemoved.add(bc);
-                } else if (bc.getBox().contains(candidateHole.getBox())) {
-                    // If this child's box is equals to the candidate hole's box.
-                    if (bc.getBox().equals(candidateHole.getBox())) {
-                        // Just refresh the child's statistics and continue loop.
-                        bc.getStatistics().setFrequency(candidateHole.getStatistics().getFrequency() +
-                                                        bc.getStatistics().getFrequency());
-
-                        List<Long> distinct = new ArrayList<Long>();
-                        for (int i=0; i<candidateHole.getStatistics().getDistinctCount().size(); i++) {
-                            distinct.add(Math.max(candidateHole.getStatistics().getDistinctCount().get(i),
-                                    bc.getStatistics().getDistinctCount().get(i)));
-                        }
-                        bc.getStatistics().setDistinctCount(distinct);
-
-                        continue;
-                    }
-
-                    // Hangs the candidate bucket below the child.
-                    bc.addChild(candidateHole);
+    private void drillHole(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
+        // If parentBucket is equals to candidateHole,
+        // just refresh parents Stats with hole's more recent ones.
+        if (bucket.getBox().equals(hole.getBox())) {
+            bucket.setStatistics(new Stat(hole.getStatistics()));
+        } else {
+            STHolesBucket toAdd = null, toRemove = null;
+            // Check if any child is equals to the candidateHole or
+            // any child contains the candidateHole
+            // candidateHole contains any child or
+            for (STHolesBucket<R> bucketChild : bucket.getChildren()) {
+                if (bucketChild.getBox().equals(hole.getBox())) {
+                    // Refresh child's stats with hole's more recent ones.
+                    bucketChild.setStatistics(new Stat(hole.getStatistics()));
+                    return;
+                } else if (bucketChild.getBox().contains(hole.getBox())) {
+                    // Merge bucket and hole stats and drill a hole inside bucket.
+                    bucketChild.setStatistics(mergeStats(bucketChild, hole));
+                    bucketChild.addChild(hole);
+                    bucketsNum++;
+                    return;
+                } else if (hole.getBox().contains(bucketChild.getBox())) {
+                    // Merge bucket and hole stats and simulate
+                    // a parent(hole)-child(existing bucket) merge.
+                    hole.setStatistics(mergeStats(bucketChild, hole));
+                    toAdd = hole;
+                    toRemove = bucketChild;
+                    break;
                 }
-            }// for
+            }
 
-            for (STHolesBucket<R> bc : toBeRemoved)
-                parentBucket.removeChild(bc);
+            if (toAdd != null && toRemove != null) {
+                bucket.addChild(toAdd);
+                bucket.removeChild(toRemove);
+                return;
+            }
 
-            parentBucket.addChild(candidateHole);
-
+            bucket.addChild(hole);
             bucketsNum++;
-        }// else
-    }// drillHole
+        }
+    }
+
+    /**
+     *
+     * @param bucket
+     * @param hole
+     */
+    private Stat mergeStats(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
+        long frequency = bucket.getStatistics().getFrequency() + hole.getStatistics().getFrequency();
+
+        List<Long> distinct = new ArrayList<Long>();
+        for (int i=0; i<hole.getStatistics().getDistinctCount().size(); i++) {
+            distinct.add(Math.max(hole.getStatistics().getDistinctCount().get(i),
+                                  bucket.getStatistics().getDistinctCount().get(i)));
+        }
+        return new Stat(frequency, distinct);
+    }
 
     /**
      * merges superfluous buckets
