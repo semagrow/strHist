@@ -323,39 +323,17 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
     private void drillHole(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
         // If parentBucket is equals to candidateHole,
         // just refresh parents Stats with hole's more recent ones.
-        if (bucket.getBox().equals(hole.getBox())) {
+        if (bucket.getBox().equals(hole.getBox())) { // Should never happen because of isInaccurateEstimation
             bucket.setStatistics(new Stat(hole.getStatistics()));
         } else {
-            STHolesBucket toAdd = null, toRemove = null;
-            // Check if any child is equals to the candidateHole or
-            // any child contains the candidateHole
-            // candidateHole contains any child or
-            for (STHolesBucket<R> bucketChild : bucket.getChildren()) {
-                if (bucketChild.getBox().equals(hole.getBox())) {
-                    // Refresh child's stats with hole's more recent ones.
-                    bucketChild.setStatistics(new Stat(hole.getStatistics()));
-                    return;
-                } else if (bucketChild.getBox().contains(hole.getBox())) {
-                    // Merge bucket and hole stats and drill a hole inside bucket.
-                    bucketChild.setStatistics(mergeStats(bucketChild, hole));
-                    bucketChild.addChild(hole);
-                    bucketsNum++;
-                    return;
-                } else if (hole.getBox().contains(bucketChild.getBox())) {
-                    // Merge bucket and hole stats and simulate
-                    // a parent(hole)-child(existing bucket) merge.
-                    hole.setStatistics(mergeStats(bucketChild, hole));
-                    toAdd = hole;
-                    toRemove = bucketChild;
-                    break;
-                }
-            }
+            List<STHolesBucket> toRemove = new ArrayList<>();
 
-            if (toAdd != null && toRemove != null) {
-                bucket.addChild(toAdd);
-                bucket.removeChild(toRemove);
-                return;
-            }
+            for (STHolesBucket<R> bucketChild : bucket.getChildren())
+                if (hole.getBox().contains(bucketChild.getBox()))
+                    toRemove.add(bucketChild);
+
+            for (STHolesBucket r : toRemove)
+                bucket.removeChild(r);
 
             bucket.addChild(hole);
             bucketsNum++;
