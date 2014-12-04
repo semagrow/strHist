@@ -118,12 +118,10 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
     public void refine(QueryRecord<R,Stat> queryRecord) {
         List<R> rects = new ArrayList<R>();
 
-        if (queryRecord.getRectangle().isInfinite()) {
-            //rects.addAll( queryRecord.getResultSet().getRectangles(queryRecord.getRectangle()));
+        if (queryRecord.getRectangle().isInfinite())
             rects.addAll(queryRecord.getResultSet().getRectangles());
-        } else {
+        else
             rects.add(queryRecord.getRectangle());
-        }
 
         for (R rect : rects) {
             if (this.getRoot() == null) {
@@ -131,9 +129,8 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
                 bucketsNum += 1;
                 logger.info("Root bucket is created");
             } else {
-                // expand root
                 if (!root.getBox().contains(rect)) {
-                    // expand root box so that it includes q
+                    // Expand root box so that it includes q
                     R boxN = root.getBox().computeTightBox(rect);
 
                     Stat statsN = countMatchingTuples(rect, queryRecord);
@@ -151,6 +148,9 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
             for (STHolesBucket<R> bucket : candidates) {
                 // Calculate intersection and shrink it
                 STHolesBucket<R> hole = shrink(bucket, rect, queryRecord);
+
+                if (hole.getBox().toString().contains("GB199"))
+                    System.out.println();
 
                 // If bucket is equals to hole, just update the stats.
                 if (bucket.getBox().equals(hole.getBox())) {
@@ -174,8 +174,8 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         }
         logger.debug("Histogram refined with query: " + queryRecord.getRectangle());
 
-        // check if histogram must be compacted after refinement
-//        compact();
+        // Check if histogram must be compacted after refinement
+        compact();
     }
 
     private Stat computeRootStats(Stat oldStats, Stat deltaStats) {
@@ -329,23 +329,17 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
      * @param hole candidate hole
      */
     private void drillHole(STHolesBucket<R> bucket, STHolesBucket<R> hole) {
-        // If parentBucket is equals to candidateHole,
-        // just refresh parents Stats with hole's more recent ones.
-        if (bucket.getBox().equals(hole.getBox())) { // Should never happen because of isInaccurateEstimation
-            bucket.setStatistics(new Stat(hole.getStatistics()));
-        } else {
-            List<STHolesBucket> toRemove = new ArrayList<>();
+        List<STHolesBucket> toRemove = new ArrayList<>();
 
-            for (STHolesBucket<R> bucketChild : bucket.getChildren())
-                if (hole.getBox().contains(bucketChild.getBox()))
-                    toRemove.add(bucketChild);
+        for (STHolesBucket<R> bucketChild : bucket.getChildren())
+            if (hole.getBox().contains(bucketChild.getBox()))
+                toRemove.add(bucketChild);
 
-            for (STHolesBucket r : toRemove)
-                bucket.removeChild(r);
+        for (STHolesBucket r : toRemove)
+            bucket.removeChild(r);
 
-            bucket.addChild(hole);
-            bucketsNum++;
-        }
+        bucket.addChild(hole);
+        bucketsNum++;
     }
 
     /**

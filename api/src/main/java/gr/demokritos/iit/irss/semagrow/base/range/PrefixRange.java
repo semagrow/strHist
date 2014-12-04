@@ -312,7 +312,6 @@ public class PrefixRange
     }
 
     public long getLength() {
-
         if (infinite) return Integer.MAX_VALUE;
         return prefixList.size();
     }
@@ -322,9 +321,11 @@ public class PrefixRange
 
         if (o instanceof PrefixRange) {
             PrefixRange range = (PrefixRange)o;
+            //FIXME: Maybe list's equals is not what we need. Consider changing prefixList to Set
             boolean p = this.prefixList.equals(range.prefixList);
             return this.infinite == range.infinite && p;
         }
+
         return false;
     }
 }
