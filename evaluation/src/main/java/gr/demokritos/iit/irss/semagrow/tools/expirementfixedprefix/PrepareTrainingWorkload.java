@@ -68,50 +68,12 @@ public class PrepareTrainingWorkload {
         executors = Executors.newCachedThreadPool();
 
         interceptor = new QueryLogInterceptor(Utils.getHandler(year), Utils.getMateralizationManager(year, executors));
-        queryStor(Utils.getRepository(year, inputPath));
+        queryStore(Utils.getRepository(year, inputPath));
 
         executors.shutdown();
     }
 
     private static void queryStore(Repository repo) throws IOException, RepositoryException {
-        int subjectsNum = Utils.countLineNumber(DISTINCTPath + "subjects_" + year + ".txt");
-        String trimmedSubject;
-
-        logger.info("Starting querying triple store: " + year);
-        RepositoryConnection conn = null;
-
-        int trimPos = 5;
-
-        for (int j=0; j<numOfQueries; j++) {
-            logger.info("Query No: " + j);
-            try {
-                conn = repo.getConnection();
-
-                if (j % 25 == 0) trimPos++;
-
-                trimmedSubject = Utils.trimSubject(Utils.loadDistinctSubject(Utils.randInt(0, subjectsNum), year, DISTINCTPath), trimPos);
-                String q = String.format(query, trimmedSubject);
-                TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, q);
-                logger.info("Query: " + q);
-
-                // Get TupleExpr
-                ParsedTupleQuery psq = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, q, "http://example.org/");
-                TupleExpr tupleExpr = psq.getTupleExpr();
-
-                CloseableIteration<BindingSet, QueryEvaluationException> result =
-                        interceptor.afterExecution(endpoint, tupleExpr, tupleQuery.getBindings(), tupleQuery.evaluate());
-                Utils.consumeIteration(result);
-
-                conn.close();
-            } catch (MalformedQueryException | RepositoryException | QueryEvaluationException mqe) {
-                mqe.printStackTrace();
-            }
-        }
-
-        repo.shutDown();
-    }
-
-    private static void queryStor(Repository repo) throws IOException, RepositoryException {
         List<String> subjects = loadRandomSubjects();
 
         logger.info("Starting querying triple store: " + year);
@@ -125,7 +87,7 @@ public class PrepareTrainingWorkload {
             try {
                 conn = repo.getConnection();
 
-                if (j % 25 == 0) trimPos+=2;
+                if (j % 25 == 0) trimPos++;
 
                 trimmedSubject = Utils.trimSubject(subjects.get(j), trimPos);
                 String q = String.format(query, trimmedSubject);

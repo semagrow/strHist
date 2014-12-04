@@ -36,9 +36,9 @@ public class ExtractRepoStats {
     }
 
     private static void execute() throws IOException, RepositoryException {
-//        queryStore(Utils.getRepository(year, inputPath));
+        queryStore(Utils.getRepository(year, inputPath));
 //        findNumbersByDistribution(Utils.getRepository(year, inputPath));
-        extractTrainingWorkloadSubjects(Utils.getRepository(year, inputPath));
+//        extractTrainingWorkloadSubjects(Utils.getRepository(year, inputPath));
     }
 
     private static void extractTrainingWorkloadSubjects(Repository repo) throws RepositoryException {

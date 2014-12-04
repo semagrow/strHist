@@ -103,18 +103,18 @@ public class Utils {
     }
 
     /**
-     * Fixed root for bigdata_agris_data_2004.jnl
+     * Fixed root for bigdata_agris_data_2009.jnl
      * @return
      */
     private static STHolesBucket getFixedRoot() {
         RDFRectangle box = new RDFRectangle(new RDFURIRange(), new ExplicitSetRange<URI>(), new RDFValueRange());
 
         List<Long> list = new ArrayList<>();
-        list.add((long)2318520);
+        list.add((long)2576877);//2004: 2318520
         list.add((long)1);
-        list.add((long)19709);
+        list.add((long)20692);//2004: 19709
 
-        Stat stats = new Stat((long)15371754 , list);
+        Stat stats = new Stat((long) 17447544, list);// 2004: 15371754
 
         return new STHolesBucket(box, stats);
     }

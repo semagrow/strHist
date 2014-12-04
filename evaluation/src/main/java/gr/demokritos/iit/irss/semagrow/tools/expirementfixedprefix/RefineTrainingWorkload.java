@@ -7,13 +7,9 @@ import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.tools.Utils;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -25,55 +21,41 @@ import java.util.concurrent.Executors;
 public class RefineTrainingWorkload {
 
     static final Logger logger = LoggerFactory.getLogger(RefineTrainingWorkload.class);
-     private static ExecutorService executors;
+    private static ExecutorService executors;
 
-    private static String inputPath, outputPath;
+    private static String outputPath;
     private static int year;
 
-    public static void main(String[] args) throws IOException, RepositoryException {
-        OptionParser parser = new OptionParser("y:i:o:");
+    public static void main(String[] args) {
+        OptionParser parser = new OptionParser("y:o:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("o")) {
+        if (options.hasArgument("y") && options.hasArgument("o")) {
             year = Integer.parseInt(options.valueOf("y").toString());
-            inputPath = options.valueOf("i").toString();
             outputPath = options.valueOf("o").toString();
 
-            executeExperiment();
+            execute();
         } else {
             logger.error("Invalid arguments");
             System.exit(1);
         }
     }
 
-    private static void executeExperiment() throws IOException, RepositoryException {
+    private static void execute() {
         executors = Executors.newCachedThreadPool();
-
-        refineAndEvaluate(Utils.getRepository(year, inputPath));
-
+        refine();
         executors.shutdown();
     }
 
-    private static void refineAndEvaluate(Repository repo) throws IOException, RepositoryException {
+    private static void refine() {
         // Load Feedback
         Collection<QueryLogRecord> logs = Utils.parseFeedbackLog("/var/tmp/" + year + "/" + year + "_log.ser");
         Collection<QueryRecord> queryRecords = Utils.adaptLogs(logs, year, executors);
 
         logger.info("Starting refining histogram: " + year);
-        RepositoryConnection conn;
 
-        try {
-            conn = repo.getConnection();
-
-            // Refine histogram according to the feedback
-            RDFSTHolesHistogram histogram = refineHistogram(queryRecords.iterator(), year, 0);
-
-            conn.close();
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        }
-
-        repo.shutDown();
+        // Refine histogram according to the feedback
+        refineHistogram(queryRecords.iterator(), year, 0);
     }
 
     private static RDFSTHolesHistogram refineHistogram(Iterator<QueryRecord> listQueryRecords, int year, int iteration) {
