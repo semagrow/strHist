@@ -162,11 +162,11 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
             if (o instanceof Literal) {
                 Literal l = (Literal)o;
                 RDFLiteralRange lRange = new RDFLiteralRange(l.getDatatype(), computeObjectRange(l));
-                oRange = new RDFValueRange(lRange);
+                oRange.setLiteralRange(lRange);
             } else if (o instanceof URI) {
                 URI u = (URI)o;
                 RDFURIRange uriRange = new RDFURIRange(Collections.singletonList(u.stringValue()));
-                oRange = new RDFValueRange(uriRange);
+                oRange.setUriRange(uriRange);
             }
         }
 
