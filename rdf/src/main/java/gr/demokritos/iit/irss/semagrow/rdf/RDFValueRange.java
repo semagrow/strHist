@@ -139,7 +139,11 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
 
     public RDFLiteralRange getLiteralRange() { return literalRange; }
 
+    public void setLiteralRange(RDFLiteralRange rdfLiteralRange) { literalRange = rdfLiteralRange; }
+
     public RDFURIRange getUriRange() { return uriRange; }
+
+    public void setUriRange(RDFURIRange rdfuriRange) { uriRange = rdfuriRange; }
 
     @Override
     public String toString()  {
@@ -149,5 +153,18 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
             return literalRange.toString();
 
         return "{}";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        if (obj instanceof RDFValueRange) {
+            RDFValueRange rdfValueRange = (RDFValueRange)obj;
+            return this.uriRange.equals(rdfValueRange.getUriRange()) &&
+                   this.literalRange.equals(rdfValueRange.getLiteralRange());
+        }
+
+        return false;
     }
 }

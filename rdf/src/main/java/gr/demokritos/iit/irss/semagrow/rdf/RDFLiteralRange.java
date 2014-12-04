@@ -595,6 +595,19 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
         return false;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        if (obj instanceof RDFLiteralRange) {
+            RDFLiteralRange rdfLiteralRange = (RDFLiteralRange)obj;
+            return this.infinite == rdfLiteralRange.infinite &&
+                   this.ranges.equals(rdfLiteralRange.getRanges());
+        }
+
+        return false;
+    }
+
     public static void main(String args[] ) {
         
         RDFLiteralRange rootRange = new RDFLiteralRange(0,10);

@@ -49,10 +49,14 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 	
 	@Override
 	public boolean equals(Object obj) {
+        if (this == obj) return true;
+
 		if (obj instanceof RDFRectangle) {
 			RDFRectangle rec = (RDFRectangle)obj;
-			return this.contains(rec) && rec.contains(this);
-			
+            return this.getSubjectRange().equals(rec.getSubjectRange()) &&
+                   this.getPredicateRange().equals(rec.getPredicateRange()) &&
+                   this.getObjectRange().equals(rec.getObjectRange());
+//			return this.contains(rec) && rec.contains(this);
 		}
 		
 		return false;
