@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.tools.expirementfixedprefix;
+package gr.demokritos.iit.irss.semagrow.tools;
 
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;

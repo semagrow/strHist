@@ -1,7 +1,9 @@
-package gr.demokritos.iit.irss.semagrow.numericalqfr;
+package gr.demokritos.iit.irss.semagrow.tools.deprecated;
 
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;
+import gr.demokritos.iit.irss.semagrow.numericalqfr.NumQuery;
+import gr.demokritos.iit.irss.semagrow.numericalqfr.NumQueryRecord;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.BindingSet;
 import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import org.openrdf.model.URI;

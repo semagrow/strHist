@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow;
+package gr.demokritos.iit.irss.semagrow.tools.deprecated;
 
 import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;

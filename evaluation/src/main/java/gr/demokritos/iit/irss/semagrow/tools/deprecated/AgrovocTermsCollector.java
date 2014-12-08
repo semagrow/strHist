@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.tools;
+package gr.demokritos.iit.irss.semagrow.tools.deprecated;
 
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;

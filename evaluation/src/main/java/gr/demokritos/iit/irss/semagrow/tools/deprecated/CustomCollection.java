@@ -1,4 +1,4 @@
-package gr.demokritos.iit.irss.semagrow.tools;
+package gr.demokritos.iit.irss.semagrow.tools.deprecated;
 
 import java.io.*;
 import java.util.ArrayList;

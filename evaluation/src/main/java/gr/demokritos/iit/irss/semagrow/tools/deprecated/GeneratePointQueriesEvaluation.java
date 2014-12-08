@@ -1,5 +1,6 @@
-package gr.demokritos.iit.irss.semagrow.tools;
+package gr.demokritos.iit.irss.semagrow.tools.deprecated;
 
+import gr.demokritos.iit.irss.semagrow.tools.Utils;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.openrdf.repository.Repository;
