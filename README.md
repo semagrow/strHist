@@ -35,7 +35,7 @@ The experiment procedures are divided in 3 main executables for preparing the wo
 
 `Evaluate.java`: Parses the histogram and executes point queries both in histogram and repository, so as to get the estimated and actual cardinality of each point query.
 
-In our setup the above executables are being repeatedly run for each triple store using unix scripts. We process the final results using unix scripts in order to extract statistics as the absolute average error, the percentage of non root evaluation and the only-root evaluation (the final results are being printed as *Year, Prefix, Act, Est, AbsErr%*.
+In our setup the above executables are being repeatedly run for each triple store using unix scripts. We process the final results using unix scripts in order to extract statistics as the absolute average error, the percentage of non root evaluation and the only-root evaluation (the final results are being printed as *Year, Prefix, Act, Est, AbsErr%*).
 
 Running a demo
 -----------
