@@ -135,7 +135,7 @@
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>Workflow</mainClass>
+                        <mainClass>RefineTrainingWorkload</mainClass>
                     </manifest>
                 </archive>
             </configuration>
