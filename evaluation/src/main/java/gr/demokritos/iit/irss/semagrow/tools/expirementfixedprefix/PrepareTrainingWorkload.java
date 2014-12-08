@@ -30,23 +30,18 @@ import java.util.concurrent.Executors;
  * Created by nickozoulis on 10/11/2014.
  */
 public class PrepareTrainingWorkload {
-    /*
-        Variables for local run
-     */
-//    private static int year = 1977, numOfQueries = 200;
-//    private static String inputPath = "/home/nickozoulis/Desktop/res_prefix/";
 
     static final Logger logger = LoggerFactory.getLogger(PrepareTrainingWorkload.class);
     private static URI endpoint = ValueFactoryImpl.getInstance().createURI("http://histogramnamespace/example");
-    private static final String DISTINCTPath = "/var/tmp/distinct/";
     private static String prefixes = "prefix dc: <http://purl.org/dc/terms/> prefix semagrow: <http://www.semagrow.eu/rdf/> ";
-    private static String query = prefixes + "select * where {?sub dc:subject ?obj . filter regex(str(?sub), \"^%s\")}";
     private static QueryLogInterceptor interceptor;
     private static ExecutorService executors;
 
+    // Setup Parameters
     private static String inputPath;
     private static int year, numOfQueries;
-
+    // Sparql query to be evaluated
+    private static String query = prefixes + "select * where {?sub dc:subject ?obj . filter regex(str(?sub), \"^%s\")}";
 
     public static void main(String[] args) throws IOException, RepositoryException {
         OptionParser parser = new OptionParser("y:i:b:");
@@ -87,6 +82,9 @@ public class PrepareTrainingWorkload {
             try {
                 conn = repo.getConnection();
 
+                // This line controls the rate of how fast the querying prefixes should expand.
+                // For example if batch is 100 queries, then with {j mod 25} we would end up with 4 different
+                // prefix depths.
                 if (j % 25 == 0) trimPos++;
 
                 trimmedSubject = Utils.trimSubject(subjects.get(j), trimPos);
@@ -98,6 +96,7 @@ public class PrepareTrainingWorkload {
                 ParsedTupleQuery psq = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, q, "http://example.org/");
                 TupleExpr tupleExpr = psq.getTupleExpr();
 
+                // Intercepts the query results.
                 CloseableIteration<BindingSet, QueryEvaluationException> result =
                         interceptor.afterExecution(endpoint, tupleExpr, tupleQuery.getBindings(), tupleQuery.evaluate());
                 Utils.consumeIteration(result);
@@ -111,6 +110,10 @@ public class PrepareTrainingWorkload {
         repo.shutDown();
     }
 
+    /**
+     * Loads distinct repo subjects, from which the training workload will be created.
+     * @return
+     */
     private static List<String> loadRandomSubjects() {
         List<String> list = new ArrayList<>();
 

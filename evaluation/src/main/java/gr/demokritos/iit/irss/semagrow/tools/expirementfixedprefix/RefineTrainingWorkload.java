@@ -23,6 +23,7 @@ public class RefineTrainingWorkload {
     static final Logger logger = LoggerFactory.getLogger(RefineTrainingWorkload.class);
     private static ExecutorService executors;
 
+    // Setup Parameters
     private static String outputPath;
     private static int year;
 

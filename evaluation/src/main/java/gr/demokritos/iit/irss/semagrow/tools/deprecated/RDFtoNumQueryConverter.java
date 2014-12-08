@@ -4,7 +4,6 @@ import gr.demokritos.iit.irss.semagrow.numericalqfr.NumQuery;
 import gr.demokritos.iit.irss.semagrow.numericalqfr.NumQueryRecord;
 import gr.demokritos.iit.irss.semagrow.numericalqfr.NumQueryResult;
 import gr.demokritos.iit.irss.semagrow.numericalqfr.NumericalMapper;
-import gr.demokritos.iit.irss.semagrow.tools.CustomCollection;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.NumRectangle;
 import gr.demokritos.iit.irss.semagrow.base.range.IntervalRange;

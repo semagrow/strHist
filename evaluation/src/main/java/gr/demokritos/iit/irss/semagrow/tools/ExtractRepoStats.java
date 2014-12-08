@@ -28,6 +28,7 @@ public class ExtractRepoStats {
         if (options.hasArgument("y") && options.hasArgument("i")) {
             year = Integer.parseInt(options.valueOf("y").toString());
             inputPath = options.valueOf("i").toString();
+            
             execute();
         } else {
             logger.error("Invalid arguments");
@@ -36,7 +37,7 @@ public class ExtractRepoStats {
     }
 
     private static void execute() throws IOException, RepositoryException {
-        queryStore(Utils.getRepository(year, inputPath));
+//        queryStore(Utils.getRepository(year, inputPath));
 //        findNumbersByDistribution(Utils.getRepository(year, inputPath));
 //        extractTrainingWorkloadSubjects(Utils.getRepository(year, inputPath));
     }
