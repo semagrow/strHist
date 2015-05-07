@@ -1,4 +1,3 @@
-
 ### CODE OVERVIEW
 
 The STRHist codebase is organized around the following interface packages:
