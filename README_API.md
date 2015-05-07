@@ -65,7 +65,8 @@ Paths for Implementation
 ***Implementations***
 
 * QueryRecordAdapter: implements <QueryRecord>. Based on the metadata file, it takes the query results – patterns from the suitable result-File (with the use of <FileManager>). Take in mind that only single-pattern queries are supported. Then, it computes the RDFRectangle by using this pattern. The computation of the RDFRectangle denotes the computation of its 3 ranges – one for subject that can only contain prefixes (URI), the other for predicate that can be either prefixes or literals and the last one for objects which can take many different forms.
-   → QueryResultImpl: implements <QueryResult>. Based on the resultset it contains the <RDFRectangle> with some statistics.
+   
+→ QueryResultImpl: implements <QueryResult>. Based on the resultset it contains the <RDFRectangle> with some statistics.
 * QueryLogRecordImpl: implements <QueryLogRecord> in order to keep metadata.
 * SerialQueryLogRecord: implements <QueryLogRecord> it is used for serialization of a <QueryLogRecord> (for read and write from/to the supplied input/output stream).
 * RDFQueryLogHandler: implements <QueryLogHandler>. Handles/writes a <QueryLogRecord> object in RDF format – as triples to the supplied output stream of log file.
@@ -75,8 +76,9 @@ Paths for Implementation
 * RDFQueryLogFactory: implements <QueryLogFactory>. Returns a <RDFQueryLogHandler> for writing, based on RDFWriter.
 * SerialQueryLogFactory: implements <QueryLogFactory>. Returns a <SerialQueryLogHandler> that will write to the provided output stream.
 * FileManager: implements <ResultMaterializationManager> for handling results from files. 
- - getResults(): get the results from a specified input stream. The parsing uses a queue to load a small part at a time (consumer-producer).
- - saveResults(): returns a <StoreHandler> with a supplied output stream of the result file.
-  → StoreHandler: implements <MaterializationHandle>. It handles/commits the results through endQueryResults() function.
+	- getResults(): get the results from a specified input stream. The parsing uses a queue to load a small part at a time (consumer-producer).
+ 	- saveResults(): returns a <StoreHandler> with a supplied output stream of the result file.
+  
+→ StoreHandler: implements <MaterializationHandle>. It handles/commits the results through endQueryResults() function.
 
 
