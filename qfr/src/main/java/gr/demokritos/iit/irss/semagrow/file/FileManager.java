@@ -21,7 +21,7 @@ public class FileManager implements ResultMaterializationManager {
 
     private TupleQueryResultWriterFactory writerFactory;
 
-    private String filePrefix = "qfr";
+    private String filePrefix = "result";
 
     private File baseDir;
 
@@ -45,6 +45,7 @@ public class FileManager implements ResultMaterializationManager {
             TupleQueryResultParser parser = factory.getParser();
             InputStream in = new FileInputStream(f);
             BackgroundTupleResult result = new BackgroundTupleResult(parser, in);
+
             execute(result);
             return result;
         } catch (URISyntaxException e) {
