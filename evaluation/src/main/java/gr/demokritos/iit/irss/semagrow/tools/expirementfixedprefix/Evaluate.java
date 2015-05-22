@@ -32,15 +32,13 @@ public class Evaluate {
     // Setup Parameters
     private static final String DISTINCTPath = "/var/tmp/distinct/";
     private static String inputPath, outputPath;
-    private static int year;
 
 
     public static void main(String[] args) throws IOException, RepositoryException {
-        OptionParser parser = new OptionParser("y:i:o:");
+        OptionParser parser = new OptionParser("i:o:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("o")) {
-            year = Integer.parseInt(options.valueOf("y").toString());
+        if (options.hasArgument("i") && options.hasArgument("o")) {
             inputPath = options.valueOf("i").toString();
             outputPath = options.valueOf("o").toString();
 
@@ -52,25 +50,25 @@ public class Evaluate {
     }
 
     private static void executeExperiment() throws IOException, RepositoryException {
-        evaluate(Utils.getRepository(year, inputPath));
+        evaluate(Utils.getRepository(inputPath));
     }
 
     private static void evaluate(Repository repo) throws IOException, RepositoryException {
         // Load Evaluations
-        logger.info("Loading point query evaluations: " + year);
+        logger.info("Loading point query evaluations: ");
         loadPointQueryEvaluations();
 
-        logger.info("Starting evaluation: " + year);
+        logger.info("Starting evaluation: ");
         RepositoryConnection conn;
 
         try {
             conn = repo.getConnection();
 
-            Path path = Paths.get(outputPath, "results_" + year + ".csv");
+            Path path = Paths.get(outputPath, "results_.csv");
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
             bw.write("Year, Prefix, Act, Est, AbsErr%\n\n");
 
-            RDFSTHolesHistogram histogram = loadHistogram(year, 1);
+            RDFSTHolesHistogram histogram = loadHistogram(1);
 
             // Evaluate a point query on histogram and triple store.
             evaluateWithSampleTestQueries(conn, histogram, bw, 0.01);
@@ -85,13 +83,13 @@ public class Evaluate {
         repo.shutDown();
     }
 
-    private static RDFSTHolesHistogram loadHistogram(int year, int iteration) {
+    private static RDFSTHolesHistogram loadHistogram(int iteration) {
         RDFSTHolesHistogram histogram;
 
         if (iteration == 0)
-            histogram = Utils.loadPreviousHistogram(outputPath, year);
+            histogram = Utils.loadPreviousHistogram(outputPath);
         else
-            histogram = Utils.loadCurrentHistogram(outputPath, year);
+            histogram = Utils.loadCurrentHistogram(outputPath);
 
         return histogram;
     }
@@ -101,16 +99,16 @@ public class Evaluate {
                                                       BufferedWriter bw,
                                                       double percentage) {
 
-        logger.info("Executing test queries of year: " + year);
+        logger.info("Executing test queries of year: ");
 
         String testQuery;
-        Set samplingRows = Utils.getSamplingRows(DISTINCTPath + "subjects_" + year + ".txt", percentage);
+        Set samplingRows = Utils.getSamplingRows(DISTINCTPath + "subjects_.txt", percentage);
         Iterator iter = samplingRows.iterator();
 
         while (iter.hasNext()) {
             try {
                 Integer i = (Integer) iter.next();
-                String subject = Utils.loadDistinctSubject(i, year, DISTINCTPath);
+                String subject = Utils.loadDistinctSubject(i, DISTINCTPath);
 
                 testQuery = prefixes + " select * where {<%s> dc:subject ?o}";
                 testQuery = String.format(testQuery, subject);
@@ -136,7 +134,7 @@ public class Evaluate {
             error = (Math.abs(actual - estimate) * 100) / (Math.max(actual, estimate));
 
         try {
-            bw.write(year + ", " + prefix + ", " + actual + ", " + estimate + ", " + error + "%");
+            bw.write( prefix + ", " + actual + ", " + estimate + ", " + error + "%");
             bw.newLine();
         } catch (IOException e) {
             e.printStackTrace();

@@ -32,15 +32,13 @@ public class GeneratePointQueriesEvaluation {
     private static ExecutorService executors;
 
     private static String inputPath, outputPath;
-    private static int year;
 
 
     public static void main(String[] args) throws IOException, RepositoryException {
         OptionParser parser = new OptionParser("y:i:o:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("o")) {
-            year = Integer.parseInt(options.valueOf("y").toString());
+        if (options.hasArgument("i") && options.hasArgument("o")) {
             inputPath = options.valueOf("i").toString();
             outputPath = options.valueOf("o").toString();
 
@@ -54,24 +52,24 @@ public class GeneratePointQueriesEvaluation {
     private static void execute() throws IOException, RepositoryException {
         executors = Executors.newCachedThreadPool();
 
-        evaluate(Utils.getRepository(year, inputPath));
+        evaluate(Utils.getRepository(inputPath));
 
         executors.shutdown();
     }
 
     private static void evaluate(Repository repo) throws IOException, RepositoryException {
-        logger.info("Starting point query evaluation: " + year);
+        logger.info("Starting point query evaluation: " );
         RepositoryConnection conn;
 
         try {
             conn = repo.getConnection();
 
-            Path path = Paths.get(outputPath, "evals_" + year + ".csv");
+            Path path = Paths.get(outputPath, "evals_.csv");
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
             bw.write("Prefix, Eval\n\n");
 
             String line = "", testQuery = "";
-            BufferedReader br = new BufferedReader(new FileReader(DISTINCTPath + "subjects_" + year + ".txt"));
+            BufferedReader br = new BufferedReader(new FileReader(DISTINCTPath + "subjects_.txt"));
 
             while ((line = br.readLine()) != null) {
                 testQuery = prefixes + " select * where {<%s> dc:subject ?o}";

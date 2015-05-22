@@ -25,14 +25,12 @@ public class RefineTrainingWorkload {
 
     // Setup Parameters
     private static String outputPath;
-    private static int year;
 
     public static void main(String[] args) {
-        OptionParser parser = new OptionParser("y:o:");
+        OptionParser parser = new OptionParser("o:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("y") && options.hasArgument("o")) {
-            year = Integer.parseInt(options.valueOf("y").toString());
+        if (options.hasArgument("o")) {
             outputPath = options.valueOf("o").toString();
 
             execute();
@@ -50,28 +48,28 @@ public class RefineTrainingWorkload {
 
     private static void refine() {
         // Load Feedback
-        Collection<QueryLogRecord> logs = Utils.parseFeedbackLog("/var/tmp/" + year + "/" + year + "_log.ser");
-        Collection<QueryRecord> queryRecords = Utils.adaptLogs(logs, year, executors);
+        Collection<QueryLogRecord> logs = Utils.parseFeedbackLog("/var/tmp/_log.ser");
+        Collection<QueryRecord> queryRecords = Utils.adaptLogs(logs, executors);
 
-        logger.info("Starting refining histogram: " + year);
+        logger.info("Starting refining histogram: ");
 
         // Refine histogram according to the feedback
-        refineHistogram(queryRecords.iterator(), year, 0);
+        refineHistogram(queryRecords.iterator(), 0);
     }
 
-    private static RDFSTHolesHistogram refineHistogram(Iterator<QueryRecord> listQueryRecords, int year, int iteration) {
+    private static RDFSTHolesHistogram refineHistogram(Iterator<QueryRecord> listQueryRecords, int iteration) {
         RDFSTHolesHistogram histogram;
 
         if (iteration == 0)
-            histogram = Utils.loadPreviousHistogram(outputPath, year);
+            histogram = Utils.loadPreviousHistogram(outputPath);
         else
-            histogram = Utils.loadCurrentHistogram(outputPath, year);
+            histogram = Utils.loadCurrentHistogram(outputPath);
 
-        logger.info("Refining histogram " + year);
+        logger.info("Refining histogram ");
         ((STHolesHistogram)histogram).refine(listQueryRecords);
         logger.info("Refinement is over.");
 
-        Utils.serializeHistogram(histogram, outputPath, year);
+        Utils.serializeHistogram(histogram, outputPath);
 
         return histogram;
     }

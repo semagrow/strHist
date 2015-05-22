@@ -18,15 +18,13 @@ import java.util.List;
 public class ExtractRepoStats {
 
     static final Logger logger = LoggerFactory.getLogger(ExtractRepoStats.class);
-    private static int year;
     private static String inputPath;
 
     public static void main(String[] args) throws IOException, RepositoryException {
-        OptionParser parser = new OptionParser("y:i:o:");
+        OptionParser parser = new OptionParser("i:o:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("y") && options.hasArgument("i")) {
-            year = Integer.parseInt(options.valueOf("y").toString());
+        if (options.hasArgument("i")) {
             inputPath = options.valueOf("i").toString();
             
             execute();
@@ -43,7 +41,7 @@ public class ExtractRepoStats {
     }
 
     private static void extractTrainingWorkloadSubjects(Repository repo) throws RepositoryException {
-        logger.info("Loading Random Numbers.." + year);
+        logger.info("Loading Random Numbers.." );
         List<Long> listNums = loadRandomNumbers();
         List<String> listSubjects = new ArrayList<>();
 
@@ -52,21 +50,21 @@ public class ExtractRepoStats {
         try {
             conn = repo.getConnection();
 
-            logger.info("Selecting Subjects By Row.."  + year);
+            logger.info("Selecting Subjects By Row.." );
             listSubjects.addAll(Utils.selectSubjectsByRows(conn, listNums));
         } catch (Exception e) {e.printStackTrace();}
 
         repo.shutDown();
 
-        logger.info("Writing subjects to file.." + year);
-        writeSubjectsToFile(year, listSubjects);
+        logger.info("Writing subjects to file.." );
+        writeSubjectsToFile(listSubjects);
     }
 
     private static List<Long> loadRandomNumbers() {
         List<Long> list = new ArrayList<>();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader("/var/tmp/train_numb3rs/" + year + ".txt"));
+            BufferedReader br = new BufferedReader(new FileReader("/var/tmp/train_numb3rs/train.txt"));
             String line = "";
 
             while ((line = br.readLine()) != null)
@@ -89,7 +87,7 @@ public class ExtractRepoStats {
 
         try {
             conn = repo.getConnection();
-            writeNumsToFile(year, getRandomNumbers(Utils.countRepoTriples(conn), 100));
+            writeNumsToFile(getRandomNumbers(Utils.countRepoTriples(conn), 100));
         } catch (NumberFormatException e) {e.printStackTrace();
         } catch (Exception e) {e.printStackTrace();}
 
@@ -111,7 +109,7 @@ public class ExtractRepoStats {
             c = Utils.countDistinctRepoObjects(conn);
             logger.info("Distinct objects:" + c);
 
-            logger.info("Counting triples for year: " + year);
+            logger.info("Counting triples for year: ");
             c = Utils.countRepoTriples(conn);
             logger.info("Total Triples:" + c);
 
@@ -132,10 +130,10 @@ public class ExtractRepoStats {
         return list;
     }
 
-    private static void writeNumsToFile(int year, List<Long> list) {
+    private static void writeNumsToFile(List<Long> list) {
         logger.info("Writing Nums to file");
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("/var/tmp/train_numb3rs/" + year + ".txt"));
+            BufferedWriter bw = new BufferedWriter(new FileWriter("/var/tmp/train_numb3rs/train.txt"));
 
             for (Long l : list)
                 bw.write(l + "\n");
@@ -147,10 +145,10 @@ public class ExtractRepoStats {
         }
     }
 
-    private static void writeSubjectsToFile(int year, List<String> list) {
+    private static void writeSubjectsToFile(List<String> list) {
         logger.info("Writing Subjects to file");
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("/var/tmp/train_subjects/" + year + ".txt"));
+            BufferedWriter bw = new BufferedWriter(new FileWriter("/var/tmp/train_subjects/train.txt"));
 
             for (String s : list)
                 bw.write(s + "\n");

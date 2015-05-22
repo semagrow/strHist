@@ -35,14 +35,12 @@ public class FilterDistinctSubjects {
     private static String query = prefixes + "select distinct ?s where {?s dc:subject ?o . }";
 
     private static String inputPath, output;
-    private static int year;
 
     public static void main(String[] args) {
-        OptionParser parser = new OptionParser("y:i:o:");
+        OptionParser parser = new OptionParser("i:o:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("o")) {
-            year = Integer.parseInt(options.valueOf("y").toString());
+        if (options.hasArgument("i") && options.hasArgument("o")) {
             inputPath = options.valueOf("i").toString();
             output = options.valueOf("o").toString();
 
@@ -54,11 +52,11 @@ public class FilterDistinctSubjects {
     }
 
     private static void executeFiltering() {
-        queryStore(initStoreConnection(year));
+        queryStore(initStoreConnection());
     }
 
     private static void queryStore(Repository repo) {
-        logger.info("Repetition for year: " + year);
+        logger.info("Repetition for year: ");
         try {
             RepositoryConnection conn = repo.getConnection();
             logger.info("Repo initialized: " + repo.getDataDir());
@@ -81,7 +79,7 @@ public class FilterDistinctSubjects {
 
     private static void writeToFile(Iteration<BindingSet,QueryEvaluationException> iter) {
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(output + "subjects_" + year + ".txt"));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(output + "subjects_.txt"));
             while (iter.hasNext()) {
                 BindingSet bs = iter.next();
 
@@ -95,10 +93,10 @@ public class FilterDistinctSubjects {
         }
     }
 
-    private static Repository initStoreConnection(int year) {
+    private static Repository initStoreConnection() {
         Properties properties = new Properties();
 
-        File journal = new File(inputPath + "bigdata_agris_data_" + year + ".jnl");
+        File journal = new File(inputPath + "bigdata_agris_data_.jnl");
 
         properties.setProperty(
                 BigdataSail.Options.FILE,

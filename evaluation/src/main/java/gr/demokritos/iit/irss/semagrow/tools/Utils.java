@@ -72,34 +72,34 @@ public class Utils {
         return logs;
     }
 
-    public static Collection<QueryRecord> adaptLogs(Collection<QueryLogRecord> logs, int year, ExecutorService executors) {
+    public static Collection<QueryRecord> adaptLogs(Collection<QueryLogRecord> logs, ExecutorService executors) {
         Collection<QueryRecord> queryRecords = new LinkedList<QueryRecord>();
         Iterator iter = logs.iterator();
 
         while (iter.hasNext())
-            queryRecords.add(new QueryRecordAdapter((QueryLogRecord)iter.next(), getMateralizationManager(year, executors)));
+            queryRecords.add(new QueryRecordAdapter((QueryLogRecord)iter.next(), getMateralizationManager(executors)));
 
         return queryRecords;
     }
 
-    public static void serializeHistogram(STHolesHistogram histogram, String path, int date) {
-        logger.info("Serializing histogram to JSON in : " + path + "histJSON_" + date + ".txt");
-        new JSONSerializer(histogram, path + "histJSON_" + date + ".txt");
-        logger.info("Serializing histogram to VOID in : " + path + "histVOID_" + date + ".txt");
-        new VoIDSerializer("application/x-turtle", path + "histVOID_" + date + ".ttl").serialize(histogram);
+    public static void serializeHistogram(STHolesHistogram histogram, String path) {
+        logger.info("Serializing histogram to JSON histJSON.txt");
+        new JSONSerializer(histogram, path + "histJSON.txt");
+        logger.info("Serializing histogram to VOID in : " + path + "histVOID.txt");
+        new VoIDSerializer("application/x-turtle", path + "histVOID.ttl").serialize(histogram);
     }
 
-    public static RDFSTHolesHistogram loadPreviousHistogram(String logFolder, int date) {
-        File jsonHist = new File(logFolder + "histJSON_" + (date - 1) + ".txt");
+    public static RDFSTHolesHistogram loadPreviousHistogram(String logFolder) {
+        File jsonHist = new File(logFolder + "histJSON.txt");
 
         if (!jsonHist.exists())
             logger.info("Creating a new histogram.");
         else
-            logger.info("Deserializing previous histogram: " + (date - 1));
+            logger.info("Deserializing previous histogram: ");
 
         return (!jsonHist.exists())
                 ? new RDFSTHolesHistogram(getFixedRoot())
-                : new JSONDeserializer(logFolder + "histJSON_" + (date - 1) + ".txt").getHistogram();
+                : new JSONDeserializer(logFolder + "histJSON.txt").getHistogram();
     }
 
     /**
@@ -119,10 +119,10 @@ public class Utils {
         return new STHolesBucket(box, stats);
     }
 
-    public static RDFSTHolesHistogram loadCurrentHistogram(String logFolder, int date) {
-        logger.info("Deserializing current histogram: " + date);
+    public static RDFSTHolesHistogram loadCurrentHistogram(String logFolder) {
+        logger.info("Deserializing current histogram: ");
 
-        return new JSONDeserializer(logFolder + "histJSON_" + date + ".txt").getHistogram();
+        return new JSONDeserializer(logFolder + "histJSON.txt").getHistogram();
     }
 
     public static List<String> loadAgroTerms(String path) {
@@ -178,8 +178,8 @@ public class Utils {
         return lines;
     }
 
-    public static ResultMaterializationManager getMateralizationManager(int year, ExecutorService executors) {
-        File baseDir = new File("/var/tmp/" + year + "/");
+    public static ResultMaterializationManager getMateralizationManager(ExecutorService executors) {
+        File baseDir = new File("/var/tmp/");
         TupleQueryResultFormat resultFF = TupleQueryResultFormat.TSV;
 
         TupleQueryResultWriterRegistry registry = TupleQueryResultWriterRegistry.getInstance();
@@ -187,16 +187,16 @@ public class Utils {
         return new FileManager(baseDir, writerFactory, executors);
     }
 
-    public static QueryLogHandler getHandler(int year) {
+    public static QueryLogHandler getHandler() {
         QueryLogHandler handler = null;
         SerialQueryLogFactory factory = new SerialQueryLogFactory();
 
         try {
-            File dir = new File("/var/tmp/" + year + "/");
+            File dir = new File("/var/tmp/");
             if (!dir.exists())
                 dir.mkdir();
 
-            File qfrLog = new File("/var/tmp/" + year + "/" + year + "_log.ser");
+            File qfrLog = new File("/var/tmp/_log.ser");
             OutputStream out = new FileOutputStream(qfrLog, true);
             handler = factory.getQueryRecordLogger(out);
         } catch (IOException e) {e.printStackTrace();}
@@ -204,10 +204,10 @@ public class Utils {
         return handler;
     }
 
-    public static Repository getRepository(int year, String inputPath) throws RepositoryException, IOException {
+    public static Repository getRepository(String inputPath) throws RepositoryException, IOException {
         Properties properties = new Properties();
 
-        File journal = new File(inputPath + "bigdata_agris_data_" + year + ".jnl");
+        File journal = new File(inputPath + "bigdata_agris_data_.jnl");
 
         properties.setProperty(
                 BigdataSail.Options.FILE,
@@ -229,12 +229,12 @@ public class Utils {
         return repo;
     }
 
-    public static String loadDistinctSubject(int num, int year, String path) throws IOException {
+    public static String loadDistinctSubject(int num, String path) throws IOException {
         String subject = "";
 
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(path + "subjects_" + year + ".txt"));
+            br = new BufferedReader(new FileReader(path + "subjects_.txt"));
             String line = "";
             int counter = 0;
 

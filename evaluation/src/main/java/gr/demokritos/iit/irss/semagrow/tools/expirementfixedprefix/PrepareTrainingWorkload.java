@@ -39,16 +39,15 @@ public class PrepareTrainingWorkload {
 
     // Setup Parameters
     private static String inputPath;
-    private static int year, numOfQueries;
+    private static int numOfQueries;
     // Sparql query to be evaluated
     private static String query = prefixes + "select * where {?sub dc:subject ?obj . filter regex(str(?sub), \"^%s\")}";
 
     public static void main(String[] args) throws IOException, RepositoryException {
-        OptionParser parser = new OptionParser("y:i:b:");
+        OptionParser parser = new OptionParser("i:b:");
         OptionSet options = parser.parse(args);
 
-        if (options.hasArgument("y") && options.hasArgument("i") && options.hasArgument("b")) {
-            year = Integer.parseInt(options.valueOf("y").toString());
+        if (options.hasArgument("i") && options.hasArgument("b")) {
             inputPath = options.valueOf("i").toString();
             numOfQueries = Integer.parseInt(options.valueOf("b").toString());
 
@@ -62,8 +61,8 @@ public class PrepareTrainingWorkload {
     private static void executeExperiment() throws IOException, RepositoryException {
         executors = Executors.newCachedThreadPool();
 
-        interceptor = new QueryLogInterceptor(Utils.getHandler(year), Utils.getMateralizationManager(year, executors));
-        queryStore(Utils.getRepository(year, inputPath));
+        interceptor = new QueryLogInterceptor(Utils.getHandler(), Utils.getMateralizationManager(executors));
+        queryStore(Utils.getRepository(inputPath));
 
         executors.shutdown();
     }
@@ -71,7 +70,7 @@ public class PrepareTrainingWorkload {
     private static void queryStore(Repository repo) throws IOException, RepositoryException {
         List<String> subjects = loadRandomSubjects();
 
-        logger.info("Starting querying triple store: " + year);
+        logger.info("Starting querying triple store: ");
         RepositoryConnection conn;
 
         int trimPos = 2;
@@ -118,7 +117,7 @@ public class PrepareTrainingWorkload {
         List<String> list = new ArrayList<>();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader("/var/tmp/train_subjects/" + year + ".txt"));
+            BufferedReader br = new BufferedReader(new FileReader("/var/tmp/train_subjects/file.txt"));
             String line = "";
 
             while ((line = br.readLine()) != null)
