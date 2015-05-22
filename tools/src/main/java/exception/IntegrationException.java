@@ -32,10 +32,6 @@ public class IntegrationException extends Exception {
             // problem in handling lastQfr file
             System.err.println("Error in handling lastQfr file");
             System.exit(5);
-        } else if (e instanceof IntegrationException) {
-            // problem in creating lastQfrFile
-            System.err.println("Error in creating lastQfr file");
-            System.exit(6);
         }
     }
 

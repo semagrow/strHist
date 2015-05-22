@@ -232,7 +232,7 @@ public class VoIDeserializer {
         return model;
     }
 
-
+/*
     public static void main(String[] args) {
         STHolesHistogram<RDFRectangle> histogram =
                 new VoIDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histVoID.ttl").
@@ -240,5 +240,6 @@ public class VoIDeserializer {
 
         new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON.txt");
     }
+    */
 
 }

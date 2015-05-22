@@ -1,6 +1,7 @@
 package histogram;
 
 import config.LogConfigImpl;
+import exception.IntegrationException;
 import exception.LogException;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
 import qfr.QueryLogReader;

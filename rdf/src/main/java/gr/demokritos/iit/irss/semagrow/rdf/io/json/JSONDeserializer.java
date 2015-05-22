@@ -32,7 +32,7 @@ public class JSONDeserializer {
     private RDFSTHolesHistogram histogram;
 
 
-    public JSONDeserializer(String path) {
+    public JSONDeserializer(String path) throws ParseException {
         histogram = new RDFSTHolesHistogram();
         histogram.setRoot(readJSON(path));
     }
@@ -43,7 +43,7 @@ public class JSONDeserializer {
     }
 
 
-    private STHolesBucket<RDFRectangle> readJSON(String path) {
+    private STHolesBucket<RDFRectangle> readJSON(String path) throws ParseException {
         JSONParser parser = new JSONParser();
         Object obj;
         JSONObject jsonObject;
@@ -63,8 +63,6 @@ public class JSONDeserializer {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
             e.printStackTrace();
         }
 
@@ -266,7 +264,7 @@ public class JSONDeserializer {
         return new Stat(frequency, distinctCount);
     }
 
-
+/*
     public static void main(String[] args) {
         STHolesHistogram<RDFRectangle> histogram =
                 new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/hhhistJSON.txt").
@@ -275,4 +273,5 @@ public class JSONDeserializer {
         new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/hhhistJSON_new.txt");
 
         }
+        */
 }

@@ -27,12 +27,8 @@ public class QfrLastWriter {
         try {
             out = new FileWriter(logFile);
         } catch (IOException e) {
-            try {
-                createFile();
-            } catch (IntegrationException e1) {
-                new IntegrationException(e1);
-            }
-
+            createFile();
+           
         }
     }
 
@@ -60,7 +56,7 @@ public class QfrLastWriter {
         }
     }
 
-    private void createFile() throws IntegrationException {
+    private void createFile() {
         File file = new File(logFile);
 
         if(! file.exists()) {
@@ -72,9 +68,9 @@ public class QfrLastWriter {
             } catch (IOException e) {
                 new IntegrationException(e);
             }
-        } else
+        }
 
-            throw new IntegrationException("Error in opening file");
+        new IntegrationException("Error in opening lastqfr file");
 
 
     }

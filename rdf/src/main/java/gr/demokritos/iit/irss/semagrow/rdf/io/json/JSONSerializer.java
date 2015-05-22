@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class JSONSerializer {
 
-    public JSONSerializer(STHolesHistogram<RDFRectangle> histogram, String outputPath) {
+    public JSONSerializer(STHolesHistogram<RDFRectangle> histogram, String outputPath) throws IOException {
         writeJSON(histogram, outputPath);
     }
 
@@ -38,19 +38,17 @@ public class JSONSerializer {
     /**
      * Writes the histogram into a file in jSON format.
      */
-    private void writeJSON(STHolesHistogram<RDFRectangle> histogram, String outputPath) {
+    private void writeJSON(STHolesHistogram<RDFRectangle> histogram, String outputPath) throws IOException {
         FileWriter fw;
 
-        try {
+
             fw = new FileWriter(outputPath);
 
             // Write root bucket and its children via recursive calls.
             fw.write(JsonWriter.formatJson(serialize(histogram).toJSONString()));
 
             fw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
 
@@ -247,7 +245,7 @@ public class JSONSerializer {
         return jSONObj;
     }
 
-
+/*
     public static void main(String[] args) {
         STHolesHistogram<RDFRectangle> histogram =
                 new VoIDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histVoID.ttl").
@@ -255,5 +253,6 @@ public class JSONSerializer {
 
         new JSONSerializer(histogram, "/home/nickozoulis/git/sthist/rdf/src/main/resources/hhhistJSON.txt");
     }
+    */
 
 }

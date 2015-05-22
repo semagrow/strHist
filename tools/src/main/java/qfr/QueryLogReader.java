@@ -63,6 +63,8 @@ public class QueryLogReader {
             throw new QueryLogException(e);
         }
         logger.info("Parsed "+logFile.getName());
+        System.out.println("Parsed "+logFile.getName());
+
         LogWriterImpl.getInstance().write("Parsed "+logFile.getName());
     }
 
@@ -71,6 +73,8 @@ public class QueryLogReader {
         Collection<QueryRecord> qr = utils.adaptLogs(this.logCollection);
 
         logger.info("Successful adapt of logs");
+        System.out.println("Successful adapt of logs");
+
         return qr;
     }
 

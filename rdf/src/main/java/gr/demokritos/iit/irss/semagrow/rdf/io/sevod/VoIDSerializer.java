@@ -88,7 +88,7 @@ public class VoIDSerializer {
     }
 
 
-    public void serialize(STHolesHistogram<RDFRectangle> histogram) {
+    public void serialize(STHolesHistogram<RDFRectangle> histogram) throws RDFHandlerException {
 
         // Eleon load fix: Add a root node with name 'datasetTop'
         Resource bucketResource = SEVOD.ROOT;
@@ -109,7 +109,7 @@ public class VoIDSerializer {
     }
 
 
-    private void writeToFile(String outputPath) {
+    private void writeToFile(String outputPath) throws RDFHandlerException {
 
         FileOutputStream out = null;
         try {
@@ -118,11 +118,9 @@ public class VoIDSerializer {
             e.printStackTrace();
         }
 
-        try {
-            Rio.write(model, out, format);
-        } catch (RDFHandlerException e) {
-            e.printStackTrace();
-        }
+
+        Rio.write(model, out, format);
+
     }
 
 
@@ -338,7 +336,7 @@ public class VoIDSerializer {
         return ValueFactoryImpl.getInstance().createLiteral(d);
     }
 
-
+/*
     public static void main(String[] args) {
         STHolesHistogram<RDFRectangle> histogram =
                 new JSONDeserializer("/home/nickozoulis/git/sthist/rdf/src/main/resources/histJSON_1980.txt").
@@ -354,6 +352,7 @@ public class VoIDSerializer {
 
 
     }
+    */
 
 }
 
