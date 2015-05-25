@@ -1,7 +1,7 @@
-package exception;
+package gr.demokritos.iit.irss.semagrow.exception;
 
 import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import log.LogWriterImpl;
+import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
 
 import java.io.IOException;
 

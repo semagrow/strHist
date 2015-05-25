@@ -1,4 +1,4 @@
-package exception;
+package gr.demokritos.iit.irss.semagrow.exception;
 
 import java.io.IOException;
 

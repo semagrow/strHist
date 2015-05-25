@@ -1,13 +1,12 @@
-package histogram;
+package gr.demokritos.iit.irss.semagrow.histogram;
 
-import config.LogConfigImpl;
-import exception.IntegrationException;
-import exception.LogException;
+import gr.demokritos.iit.irss.semagrow.config.LogConfigImpl;
+import gr.demokritos.iit.irss.semagrow.exception.LogException;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import qfr.QueryLogReader;
+import gr.demokritos.iit.irss.semagrow.qfr.QueryLogReader;
 import gr.demokritos.iit.irss.semagrow.stholes.STHistogramBase;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
-import log.LogWriterImpl;
+import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
 
 import java.io.File;
 import java.io.IOException;

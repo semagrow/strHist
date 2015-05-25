@@ -1,4 +1,4 @@
-package qfr;
+package gr.demokritos.iit.irss.semagrow.qfr;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -9,8 +9,14 @@ import java.io.IOException;
  * Created by kzam on 5/21/15.
  */
 public class QfrLastParser {
-    private static final String logFile = "/var/tmp/log/lastQfr.txt";
+
+    private static String logFile;
+    private static final String suffix = "lastQfr.txt";
     private static BufferedReader reader = null;
+
+    public QfrLastParser(String baseDir) {
+        this.logFile = baseDir + suffix;
+    }
 
     public long getTimestamp() throws IOException {
 

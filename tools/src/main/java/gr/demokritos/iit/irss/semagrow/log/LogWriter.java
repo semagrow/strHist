@@ -1,4 +1,4 @@
-package log;
+package gr.demokritos.iit.irss.semagrow.log;
 
 /**
  * Created by kzam on 5/21/15.

@@ -1,12 +1,12 @@
-package qfr;
+package gr.demokritos.iit.irss.semagrow.qfr;
 
 import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
 import gr.demokritos.iit.irss.semagrow.impl.rdf.RDFQueryLogParser;
-import histogram.HistogramUtils;
-import log.LogWriterImpl;
+import gr.demokritos.iit.irss.semagrow.histogram.HistogramUtils;
+import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
 import org.openrdf.model.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +95,7 @@ public class QueryLogReader {
 
         this.executor.shutdown();
 
-        QfrLastWriter.getInstance().write(this.logFile.lastModified());
+        writeTimestamp();
     }
 
     private void deleteResults()
@@ -114,5 +114,11 @@ public class QueryLogReader {
 
             LogWriterImpl.getInstance().write(uri.toString()+" deleted");
         }
+    }
+
+    private void writeTimestamp() {
+        QfrLastWriter lastqfr = new QfrLastWriter(logFile.getParent());
+
+        lastqfr.write(this.logFile.lastModified());
     }
 }

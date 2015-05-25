@@ -1,6 +1,6 @@
-package log;
+package gr.demokritos.iit.irss.semagrow.log;
 
-import exception.LogException;
+import gr.demokritos.iit.irss.semagrow.exception.LogException;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,14 +13,11 @@ import java.util.Date;
  */
 public class LogWriterImpl implements LogWriter{
 
-    private static final String logFile = "/var/tmp/log/fileLog.txt";
+    private static final String logFile = "/var/tmp/strhistLog.txt";
     private static FileWriter out = null;
 
     private static final LogWriterImpl instance = new LogWriterImpl();
 
-    private LogWriterImpl() {
-
-    }
 
     public static LogWriterImpl getInstance() {
         return instance;

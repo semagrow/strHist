@@ -1,6 +1,6 @@
-package histogram;
+package gr.demokritos.iit.irss.semagrow.histogram;
 
-import exception.HistogramException;
+import gr.demokritos.iit.irss.semagrow.exception.HistogramException;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
@@ -53,15 +53,11 @@ public class HistogramUtils {
         Iterator iter = logs.iterator();
 
         while (iter.hasNext()) {
-            try {
-                QueryLogRecord record = (QueryLogRecord) iter.next();
+            QueryLogRecord record = (QueryLogRecord) iter.next();
 
+            if(isSinglePattern(record))
+               queryRecords.add(new QueryRecordAdapter(record, getMateralizationManager()));
 
-                if(isSinglePattern(record))
-                    queryRecords.add(new QueryRecordAdapter(record, getMateralizationManager()));
-            } catch (Exception e) {
-                //throw new QueryLogException(e);
-            }
         }
         return queryRecords;
     }

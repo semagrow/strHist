@@ -1,6 +1,6 @@
-package qfr;
+package gr.demokritos.iit.irss.semagrow.qfr;
 
-import log.LogWriterImpl;
+import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
 import org.openrdf.model.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

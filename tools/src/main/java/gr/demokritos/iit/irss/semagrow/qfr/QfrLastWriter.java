@@ -1,6 +1,6 @@
-package qfr;
+package gr.demokritos.iit.irss.semagrow.qfr;
 
-import exception.IntegrationException;
+import gr.demokritos.iit.irss.semagrow.exception.IntegrationException;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -11,13 +11,12 @@ import java.io.IOException;
  */
 public class QfrLastWriter {
 
-    private static final String logFile = "/var/tmp/log/lastQfr.txt";
+    private static String logFile;
+    private static final String suffix = "/lastQfr.txt";
     private static FileWriter out = null;
 
-    private static final QfrLastWriter instance = new QfrLastWriter();
-
-    public static QfrLastWriter getInstance() {
-        return instance;
+    public QfrLastWriter(String logDir) {
+        this.logFile = logDir + suffix;
     }
 
     public QfrLastWriter() {

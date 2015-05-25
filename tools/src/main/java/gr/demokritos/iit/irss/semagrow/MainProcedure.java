@@ -1,12 +1,16 @@
-import config.LogConfigImpl;
-import exception.IntegrationException;
+package gr.demokritos.iit.irss.semagrow;
+
+import gr.demokritos.iit.irss.semagrow.config.LogConfigImpl;
+import gr.demokritos.iit.irss.semagrow.exception.IntegrationException;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import qfr.QueryLogRemover;
-import histogram.LoadHistogram;
-import log.LogWriterImpl;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import gr.demokritos.iit.irss.semagrow.qfr.QueryLogRemover;
+import gr.demokritos.iit.irss.semagrow.histogram.LoadHistogram;
+import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import qfr.QueryLogManager;
+import gr.demokritos.iit.irss.semagrow.qfr.QueryLogManager;
 
 import java.io.File;
 
@@ -20,8 +24,6 @@ public class MainProcedure {
 
     static final Logger logger = LoggerFactory.getLogger(MainProcedure.class);
 
-    //private final static String baseDir = "/var/tmp/log/";
-    //private final static String histDir = "/var/tmp/";
     private static LogConfigImpl config;
 
     public MainProcedure(LogConfigImpl config) {
@@ -77,8 +79,6 @@ public class MainProcedure {
             }
         }
 
-        //  if(config.isDelete())
-        //   deleteLogs(qfrFiles);
 
         writer.close();
     }
@@ -102,15 +102,29 @@ public class MainProcedure {
 
     public static void main(String [] args)
     {
-        LogConfigImpl config = new LogConfigImpl();
-        config.setHistDir("/var/tmp/");
-        config.setLogDir("/var/tmp/log/");
-        config.setQfrPrefix("qfr");
-        config.setDelete(false);
+        OptionParser parser = new OptionParser("h:l:p:d:");
+        OptionSet options = parser.parse(args);
 
-        MainProcedure procedure = new MainProcedure(config);
+        if (options.hasArgument("h") && options.hasArgument("l") && options.hasArgument("p")) {
 
-        procedure.refine();
+            LogConfigImpl config = new LogConfigImpl();
+            config.setHistDir(options.valueOf("h").toString());
+            config.setLogDir(options.valueOf("l").toString());
+            config.setQfrPrefix(options.valueOf("p").toString());
 
+            if(options.hasArgument("d"))
+                config.setDelete(true);
+            else
+                config.setDelete(false);
+
+
+            MainProcedure procedure = new MainProcedure(config);
+
+            procedure.refine();
+
+        } else {
+            System.err.println("Invalid arguments");
+            System.exit(1);
+        }
     }
 }

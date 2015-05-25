@@ -7,6 +7,7 @@ import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
+import org.json.simple.parser.ParseException;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
@@ -61,9 +62,14 @@ public class TestSail extends SailBase {
         else
             logger.debug("Deserializing histogram: " + (year - 1));
 
-        return (!jsonHist.exists())
-                ? new RDFSTHolesHistogram()
-                : new JSONDeserializer(jsonHist.getPath()).getHistogram();
+        try {
+            return (!jsonHist.exists())
+                    ? new RDFSTHolesHistogram()
+                    : new JSONDeserializer(jsonHist.getPath()).getHistogram();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public RepositoryConnection getRepositoryConnection() throws RepositoryException {

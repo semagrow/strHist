@@ -9,6 +9,7 @@ import gr.demokritos.iit.irss.semagrow.rdf.io.log.RDFQueryRecord;
 import gr.demokritos.iit.irss.semagrow.stholesOrig.STHolesOrigHistogram;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,8 +76,12 @@ public class TestHistogram {
         }
 
         if (options.has("h") && options.hasArgument("h"))
-             h = (RDFSTHolesHistogram)new JSONDeserializer(options.valueOf("h").toString()).
-                     getHistogram();
+            try {
+                h = (RDFSTHolesHistogram)new JSONDeserializer(options.valueOf("h").toString()).
+                        getHistogram();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
         if (options.has("o") && options.hasArgument("o"))
             outputDir = options.valueOf("o").toString();
@@ -301,7 +306,11 @@ public class TestHistogram {
     }
 
     private static void outputHistogram(RDFSTHolesHistogram h, String filename) {
-        new JSONSerializer(h, filename);
+        try {
+            new JSONSerializer(h, filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void outputHistogramNum(STHolesOrigHistogram<NumRectangle> h, String filename) {

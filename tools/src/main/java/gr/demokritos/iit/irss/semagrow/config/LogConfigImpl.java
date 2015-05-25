@@ -1,4 +1,4 @@
-package config;
+package gr.demokritos.iit.irss.semagrow.config;
 
 /**
  * Created by kzam on 5/21/15.

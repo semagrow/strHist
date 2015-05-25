@@ -1,6 +1,6 @@
-package qfr;
+package gr.demokritos.iit.irss.semagrow.qfr;
 
-import exception.IntegrationException;
+import gr.demokritos.iit.irss.semagrow.exception.IntegrationException;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
@@ -84,7 +84,7 @@ public class QueryLogManager {
     }
 
     private void getUncheckedFiles() throws IntegrationException {
-        QfrLastParser parser = new QfrLastParser();
+        QfrLastParser parser = new QfrLastParser(baseDir);
         File[] temp = foundFiles;
 
         try {

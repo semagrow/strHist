@@ -29,6 +29,7 @@ import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import info.aduna.iteration.Iteration;
 import info.aduna.iteration.Iterations;
+import org.json.simple.parser.ParseException;
 import org.openrdf.model.URI;
 import org.openrdf.query.*;
 import org.openrdf.query.impl.EmptyBindingSet;
@@ -41,6 +42,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFHandlerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,9 +86,17 @@ public class Utils {
 
     public static void serializeHistogram(STHolesHistogram histogram, String path) {
         logger.info("Serializing histogram to JSON histJSON.txt");
-        new JSONSerializer(histogram, path + "histJSON.txt");
+        try {
+            new JSONSerializer(histogram, path + "histJSON.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         logger.info("Serializing histogram to VOID in : " + path + "histVOID.txt");
-        new VoIDSerializer("application/x-turtle", path + "histVOID.ttl").serialize(histogram);
+        try {
+            new VoIDSerializer("application/x-turtle", path + "histVOID.ttl").serialize(histogram);
+        } catch (RDFHandlerException e) {
+            e.printStackTrace();
+        }
     }
 
     public static RDFSTHolesHistogram loadPreviousHistogram(String logFolder) {
@@ -97,9 +107,14 @@ public class Utils {
         else
             logger.info("Deserializing previous histogram: ");
 
-        return (!jsonHist.exists())
-                ? new RDFSTHolesHistogram(getFixedRoot())
-                : new JSONDeserializer(logFolder + "histJSON.txt").getHistogram();
+        try {
+            return (!jsonHist.exists())
+                    ? new RDFSTHolesHistogram(getFixedRoot())
+                    : new JSONDeserializer(logFolder + "histJSON.txt").getHistogram();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -122,7 +137,12 @@ public class Utils {
     public static RDFSTHolesHistogram loadCurrentHistogram(String logFolder) {
         logger.info("Deserializing current histogram: ");
 
-        return new JSONDeserializer(logFolder + "histJSON.txt").getHistogram();
+        try {
+            return new JSONDeserializer(logFolder + "histJSON.txt").getHistogram();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static List<String> loadAgroTerms(String path) {

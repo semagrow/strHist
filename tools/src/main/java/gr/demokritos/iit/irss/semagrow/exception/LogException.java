@@ -1,4 +1,4 @@
-package exception;
+package gr.demokritos.iit.irss.semagrow.exception;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ public class LogException extends Exception {
             System.err.println("Error in log file");
             e.printStackTrace();
 
-            System.exit(5);
+            System.exit(7);
         }
     }
 }
