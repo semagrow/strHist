@@ -78,9 +78,9 @@ Paths for Implementation
 * RDFQueryLogFactory: implements <QueryLogFactory>. Returns a <RDFQueryLogHandler> for writing, based on RDFWriter.
 * SerialQueryLogFactory: implements <QueryLogFactory>. Returns a <SerialQueryLogHandler> that will write to the provided output stream.
 * FileManager: implements <ResultMaterializationManager> for handling results from files.
-___→  getResults(): get the results from a specified input stream. The parsing uses a queue to load a small part at a time (consumer-producer).
-<br />
-___→  saveResults(): returns a <StoreHandler> with a supplied output stream of the result file.
+→  getResults(): get the results from a specified input stream. The parsing uses a queue to load a small part at a time (consumer-producer).
+
+→  saveResults(): returns a <StoreHandler> with a supplied output stream of the result file.
   
 * FileManager.StoreHandler: implements <MaterializationHandle>. It handles/commits the results through endQueryResults() function.
 
@@ -140,11 +140,11 @@ Extensions of <Exception>
 * HistogramException: used for exceptions that are thrown during the handle of a histogram - backup and its (de-)serialization. The exit code of this kind of exception is *6*.
 * LogException: this exception is thrown when handling the extra log file. The exit code is *7*.
 * IntegrationException: this exception is thrown at any other error during the procedure. Specifically,
-___→ Exit code *2* denotes casting errors.
-<br >
-___→ Exit code *3* denotes an ArrayIndexOutOfBoundsException.
-<br >
-___→ Exit code *4* denotes a problem during the parsing of a query log file.
-<br >
-___→ Exit code *5* denotes a problem in handling the file that contains the timestamp of the last parsed query log file.
+→ Exit code *2* denotes casting errors.
+
+→ Exit code *3* denotes an ArrayIndexOutOfBoundsException.
+
+→ Exit code *4* denotes a problem during the parsing of a query log file.
+
+→ Exit code *5* denotes a problem in handling the file that contains the timestamp of the last parsed query log file.
 
