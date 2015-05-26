@@ -2,6 +2,7 @@ package gr.demokritos.iit.irss.semagrow.exception;
 
 import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 
@@ -23,6 +24,10 @@ public class IntegrationException extends Exception {
         } else if(e instanceof ArrayIndexOutOfBoundsException) {
             // problem with objects in strhist
             System.err.println("Error with Object-Range");
+            System.exit(3);
+        } else if(e instanceof NotImplementedException) {
+            // problem with nom implemented methods
+            System.err.println("Error with non-implemented parts");
             System.exit(3);
         } else if(e instanceof QueryLogException) {
             // problem in parsing a log file

@@ -3,14 +3,15 @@ package gr.demokritos.iit.irss.semagrow;
 import gr.demokritos.iit.irss.semagrow.config.LogConfigImpl;
 import gr.demokritos.iit.irss.semagrow.exception.IntegrationException;
 import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogRemover;
 import gr.demokritos.iit.irss.semagrow.histogram.LoadHistogram;
 import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogManager;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 
@@ -21,8 +22,6 @@ public class MainProcedure {
 
     private QueryLogManager manager;
     private static LoadHistogram histogram;
-
-    static final Logger logger = LoggerFactory.getLogger(MainProcedure.class);
 
     private static LogConfigImpl config;
 
@@ -42,7 +41,6 @@ public class MainProcedure {
 
         if(qfrFiles.length == 0) {
             writer.write("No files for refinement");
-            logger.info("No files for refinement");
 
             System.out.println("No files for refinement");
         }
@@ -56,20 +54,42 @@ public class MainProcedure {
 
             } catch(ArrayIndexOutOfBoundsException e) {
 
-                if(i == qfrFiles.length-1)
+                if(i == qfrFiles.length-1) {
+                    if(config.isDelete()) {
+                        deleteLog(qfrFiles[i]);
+                    }
                     new IntegrationException(e);
+                }
                 else
                     continue;
             } catch (java.lang.ClassCastException e) {
 
-                if(i == qfrFiles.length-1)
+                if(i == qfrFiles.length-1) {
+                    if(config.isDelete()) {
+                        deleteLog(qfrFiles[i]);
+                    }
+                new IntegrationException(e);
+            }
+            else
+                    continue;
+            } catch (NotImplementedException e) {
+                if(i == qfrFiles.length-1) {
+                    if(config.isDelete()) {
+                        deleteLog(qfrFiles[i]);
+                    }
                     new IntegrationException(e);
+                }
                 else
                     continue;
-            } catch (QueryLogException e) {
+            }
+            catch (QueryLogException e) {
 
-                if(i == qfrFiles.length-1)
+                if(i == qfrFiles.length-1) {
+                    if(config.isDelete()) {
+                        deleteLog(qfrFiles[i]);
+                    }
                     new IntegrationException(e);
+                }
                 else
                     continue;
             } finally {
@@ -102,7 +122,7 @@ public class MainProcedure {
 
     public static void main(String [] args)
     {
-        OptionParser parser = new OptionParser("h:l:p:d:");
+        OptionParser parser = new OptionParser("h:l:p:d::");
         OptionSet options = parser.parse(args);
 
         if (options.hasArgument("h") && options.hasArgument("l") && options.hasArgument("p")) {
@@ -112,7 +132,7 @@ public class MainProcedure {
             config.setLogDir(options.valueOf("l").toString());
             config.setQfrPrefix(options.valueOf("p").toString());
 
-            if(options.hasArgument("d"))
+            if(options.has("d"))
                 config.setDelete(true);
             else
                 config.setDelete(false);
