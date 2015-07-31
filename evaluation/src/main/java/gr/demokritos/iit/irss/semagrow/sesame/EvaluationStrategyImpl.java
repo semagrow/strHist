@@ -2,8 +2,7 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.impl.QueryLogInterceptor;
+import eu.semagrow.querylog.api.QueryLogHandler;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.ValueFactoryImpl;

@@ -1,7 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.histogram;
 
 import gr.demokritos.iit.irss.semagrow.exception.HistogramException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import eu.semagrow.querylog.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
@@ -117,7 +117,7 @@ public class HistogramUtils {
         try {
             rdfstHolesHistogram =  new JSONDeserializer(logFolder + "histJSON.txt").getHistogram();
         } catch (ParseException e1) {
-            new HistogramException("Problemn in deserializing JSON back up file");
+            new HistogramException("Problem in deserializing JSON back up file");
         }
         return rdfstHolesHistogram;
     }

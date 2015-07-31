@@ -1,13 +1,10 @@
-package gr.demokritos.iit.irss.semagrow.impl;
+package gr.demokritos.iit.irss.semagrow.sesame;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
-import gr.demokritos.iit.irss.semagrow.impl.MeasuringIteration;
-import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordImpl;
+import eu.semagrow.querylog.api.QueryLogException;
+import eu.semagrow.querylog.api.QueryLogHandler;
+import eu.semagrow.querylog.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.file.MaterializationHandle;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
-import gr.demokritos.iit.irss.semagrow.impl.QueryResultObservingIteration;
 import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.DelayedIteration;
 import info.aduna.iteration.Iteration;
@@ -17,6 +14,7 @@ import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.impl.EmptyBindingSet;
+import eu.semagrow.querylog.impl.QueryLogRecordImpl;
 
 import java.io.IOException;
 import java.util.*;

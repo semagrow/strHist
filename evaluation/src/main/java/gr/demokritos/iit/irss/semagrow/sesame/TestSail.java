@@ -1,9 +1,9 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
+import eu.semagrow.querylog.api.QueryLogWriter;
 import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
+import eu.semagrow.querylog.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.io.json.JSONDeserializer;
@@ -80,9 +80,9 @@ public class TestSail extends SailBase {
         return this.histogram;
     }
 
-    QueryLogHandler handler;
+    QueryLogWriter handler;
 
-    public QueryLogHandler getQueryLogHandler() {
+    public QueryLogWriter getQueryLogHandler() {
 
         RDFFormat rdfFF = RDFFormat.NTRIPLES;
 

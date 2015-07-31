@@ -1,7 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
 import eu.semagrow.stack.modules.sails.semagrow.helpers.FilterCollector;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import eu.semagrow.querylog.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;

@@ -2,10 +2,9 @@ package gr.demokritos.iit.irss.semagrow;
 
 import gr.demokritos.iit.irss.semagrow.config.LogConfigImpl;
 import gr.demokritos.iit.irss.semagrow.exception.IntegrationException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import eu.semagrow.querylog.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogRemover;
 import gr.demokritos.iit.irss.semagrow.histogram.LoadHistogram;
-import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.slf4j.Logger;
@@ -14,6 +13,7 @@ import gr.demokritos.iit.irss.semagrow.qfr.QueryLogManager;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by kzam on 5/21/15.
@@ -23,7 +23,9 @@ public class MainProcedure {
     private QueryLogManager manager;
     private static LoadHistogram histogram;
 
-    private static LogConfigImpl config;
+    private LogConfigImpl config;
+
+    private static Logger logger = LoggerFactory.getLogger(MainProcedure.class);
 
     public MainProcedure(LogConfigImpl config) {
         this.config = config;
@@ -33,16 +35,13 @@ public class MainProcedure {
         histogram = new LoadHistogram(this.config);
     }
 
-    public void refine() {
-        LogWriterImpl writer = LogWriterImpl.getInstance();
-        writer.start();
+    public void refine() throws IntegrationException {
 
         File[] qfrFiles = manager.getQfrFiles();
 
         if(qfrFiles.length == 0) {
-            writer.write("No files for refinement");
 
-            System.out.println("No files for refinement");
+            logger.info("No files for refinement");
         }
 
         for(int i=0; i<qfrFiles.length; i++) {
@@ -58,29 +57,24 @@ public class MainProcedure {
                     if(config.isDelete()) {
                         deleteLog(qfrFiles[i]);
                     }
-                    new IntegrationException(e);
+                    throw new IntegrationException(e);
                 }
-                else
-                    continue;
             } catch (java.lang.ClassCastException e) {
 
                 if(i == qfrFiles.length-1) {
                     if(config.isDelete()) {
                         deleteLog(qfrFiles[i]);
                     }
-                new IntegrationException(e);
-            }
-            else
-                    continue;
+                    throw new IntegrationException(e);
+                }
             } catch (NotImplementedException e) {
                 if(i == qfrFiles.length-1) {
                     if(config.isDelete()) {
                         deleteLog(qfrFiles[i]);
                     }
-                    new IntegrationException(e);
+                    throw new IntegrationException(e);
                 }
-                else
-                    continue;
+
             }
             catch (QueryLogException e) {
 
@@ -88,10 +82,9 @@ public class MainProcedure {
                     if(config.isDelete()) {
                         deleteLog(qfrFiles[i]);
                     }
-                    new IntegrationException(e);
+                    throw new IntegrationException(e);
                 }
-                else
-                    continue;
+
             } finally {
                 if(config.isDelete()) {
                     deleteLog(qfrFiles[i]);
@@ -99,8 +92,6 @@ public class MainProcedure {
             }
         }
 
-
-        writer.close();
     }
 
     private void deleteLog(File qfr) {
@@ -140,11 +131,65 @@ public class MainProcedure {
 
             MainProcedure procedure = new MainProcedure(config);
 
-            procedure.refine();
+            try {
+                procedure.refine();
+            } catch (IntegrationException e) {
+                logger.error("Integration exception", getErrorMsg(e), e);
+                System.exit(getErrorCode(e));
+            }
 
         } else {
-            System.err.println("Invalid arguments");
+            logger.error("Invalid arguments");
             System.exit(1);
         }
     }
+
+    public static int getErrorCode(Exception e) {
+
+        if(e instanceof java.lang.ClassCastException) {
+            // problem with bnodes in strhist
+            System.err.println("Error with BNodes: cannot be cast to URI");
+            return 2;
+        } else if(e instanceof ArrayIndexOutOfBoundsException) {
+            // problem with objects in strhist
+            System.err.println("Error with Object-Range");
+            return 3;
+        } else if(e instanceof NotImplementedException) {
+            // problem with nom implemented methods
+            System.err.println("Error with non-implemented parts");
+            return 3;
+        } else if(e instanceof QueryLogException) {
+            // problem in parsing a log file
+            System.err.println("Error in parsing a log file");
+            return 4;
+        } else if (e instanceof IOException) {
+            // problem in handling lastQfr file
+            System.err.println("Error in handling lastQfr file");
+            return 5;
+        } else {
+            return 1;
+        }
+    }
+
+    public static String getErrorMsg(Exception e) {
+        if(e instanceof java.lang.ClassCastException) {
+            // problem with bnodes in strhist
+            return "Error with BNodes: cannot be cast to URI";
+        } else if(e instanceof ArrayIndexOutOfBoundsException) {
+            // problem with objects in strhist
+            return "Error with Object-Range";
+        } else if(e instanceof NotImplementedException) {
+            // problem with nom implemented methods
+            return "Error with non-implemented parts";
+        } else if(e instanceof QueryLogException) {
+            // problem in parsing a log file
+            return "Error in parsing a log file";
+        } else if (e instanceof IOException) {
+            // problem in handling lastQfr file
+            return "Error in handling lastQfr file";
+        } else {
+            return "General Integration Exception";
+        }
+    }
 }
+

@@ -1,12 +1,12 @@
 package gr.demokritos.iit.irss.semagrow.histogram;
 
 import gr.demokritos.iit.irss.semagrow.config.LogConfigImpl;
-import gr.demokritos.iit.irss.semagrow.exception.LogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
+import eu.semagrow.querylog.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogReader;
 import gr.demokritos.iit.irss.semagrow.stholes.STHistogramBase;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
-import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,9 @@ import java.io.IOException;
 public class LoadHistogram {
     //private static String histDir;
     private STHolesHistogram histogram;
-    private static LogConfigImpl config;
+    private LogConfigImpl config;
+
+    private static Logger logger = LoggerFactory.getLogger(LoadHistogram.class);
 
     public LoadHistogram(LogConfigImpl config) {
         this.config = config;
@@ -37,10 +39,8 @@ public class LoadHistogram {
             ((STHistogramBase) this.histogram).refine(reader.adaption(config.getLogDir()).iterator());
 
             HistogramUtils.serializeHistogram(histogram, config.getHistDir());
-
         } catch (IOException e) {
-            new LogException(e);
-
+            logger.warn("IO exception", e);
         } finally {
             reader.shutdown(config.isDelete());
         }
@@ -48,7 +48,7 @@ public class LoadHistogram {
 
     private void loadHistogram() {
         this.histogram = HistogramUtils.loadPreviousHistogram(config.getHistDir());
-        LogWriterImpl.getInstance().write("Previous histogram loaded");
+        logger.info("Previous histogram loaded");
     }
 
 }

@@ -1,13 +1,13 @@
 package gr.demokritos.iit.irss.semagrow.tools.deprecated;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import eu.semagrow.querylog.api.QueryLogException;
+import eu.semagrow.querylog.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
-import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
-import gr.demokritos.iit.irss.semagrow.impl.rdf.RDFQueryLogParser;
+import eu.semagrow.querylog.QueryLogCollector;
+import eu.semagrow.querylog.impl.rdf.RDFQueryLogParser;
 import gr.demokritos.iit.irss.semagrow.qfr.*;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
@@ -37,7 +37,7 @@ public class TestQueryRecordAdapter {
     public static void main(String[] args) throws IOException, QueryLogException {
 
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
-        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+        QueryLogCollector handler = new QueryLogCollector(logs);
 
         RDFQueryLogParser parser = new RDFQueryLogParser(handler);
 
@@ -45,7 +45,11 @@ public class TestQueryRecordAdapter {
 
         logger.info("Parsing file : " + f.getName());
 
-        parser.parseQueryLog(new FileInputStream(f));
+        try {
+            parser.parseQueryLog(new FileInputStream(f));
+        } catch (eu.semagrow.querylog.api.QueryLogException e) {
+            logger.error("",e);
+        }
 
         logger.info("Number of parsed query logs: " + logs.size());
 

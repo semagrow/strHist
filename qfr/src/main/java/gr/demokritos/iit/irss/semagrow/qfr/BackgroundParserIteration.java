@@ -1,9 +1,9 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogParser;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import eu.semagrow.querylog.api.QueryLogException;
+import eu.semagrow.querylog.api.QueryLogHandler;
+import eu.semagrow.querylog.api.QueryLogParser;
+import eu.semagrow.querylog.api.QueryLogRecord;
 import info.aduna.iteration.IterationWrapper;
 
 import java.io.InputStream;
@@ -32,7 +32,6 @@ public class BackgroundParserIteration
         this(new org.openrdf.http.client.QueueCursor<QueryLogRecord>(10), parser, in);
     }
 
-    @Override
     public void run() {
 
         try {
@@ -43,12 +42,10 @@ public class BackgroundParserIteration
         }
     }
 
-    @Override
     public void startQueryLog() throws QueryLogException {
 
     }
 
-    @Override
     public void handleQueryRecord(QueryLogRecord queryLogRecord) throws QueryLogException {
         try {
             queue.put(queryLogRecord);
@@ -57,7 +54,7 @@ public class BackgroundParserIteration
         }
     }
 
-    @Override
+
     public void endQueryLog() throws QueryLogException {
 
     }

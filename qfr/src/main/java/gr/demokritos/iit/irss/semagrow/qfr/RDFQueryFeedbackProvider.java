@@ -1,7 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogParser;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import eu.semagrow.querylog.api.QueryLogParser;
+import eu.semagrow.querylog.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryFeedbackProvider;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.Stat;

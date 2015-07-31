@@ -1,7 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.impl.serial;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
-import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordImpl;
+import eu.semagrow.querylog.api.QueryLogRecord;
+import eu.semagrow.querylog.impl.QueryLogRecordImpl;
 import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryLanguage;

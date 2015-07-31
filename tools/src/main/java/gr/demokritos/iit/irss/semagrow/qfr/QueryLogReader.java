@@ -1,12 +1,13 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import eu.semagrow.querylog.api.QueryLogException;
+import eu.semagrow.querylog.api.QueryLogRecord;
+import eu.semagrow.querylog.QueryLogCollector;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
-import gr.demokritos.iit.irss.semagrow.impl.rdf.RDFQueryLogParser;
+import eu.semagrow.querylog.impl.rdf.RDFQueryLogParser;
+
 import gr.demokritos.iit.irss.semagrow.histogram.HistogramUtils;
-import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
+
 import org.openrdf.model.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ import java.util.concurrent.Executors;
 public class QueryLogReader {
 
     private Collection<QueryLogRecord> logCollection = new LinkedList<QueryLogRecord>();
-    private QueryLogRecordCollector handler;
+    private QueryLogCollector handler;
     private File logFile;
     private ExecutorService executor = Executors.newCachedThreadPool();
     private RDFQueryLogParser parser;
@@ -40,7 +41,7 @@ public class QueryLogReader {
     public QueryLogReader(File file) {
         this.logFile = file;
 
-        this.handler = new QueryLogRecordCollector(logCollection);
+        this.handler = new QueryLogCollector(logCollection);
         this.parser = new RDFQueryLogParser(handler);
     }
 
@@ -57,23 +58,18 @@ public class QueryLogReader {
             this.parser.parseQueryLog(inputstream);
 
         } catch (QueryLogException e) {
-            logger.error("Error in parsing "+logFile.getName());
-            LogWriterImpl.getInstance().write("Error in parsing "+logFile.getName());
+            logger.error("Error in parsing {}", logFile);
 
             throw new QueryLogException(e);
         }
-        logger.info("Parsed "+logFile.getName());
-        System.out.println("Parsed "+logFile.getName());
-
-        LogWriterImpl.getInstance().write("Parsed "+logFile.getName());
+        logger.info("Parsed {}", logFile);
     }
 
     public Collection<QueryRecord> adaption(String logDir) {
         HistogramUtils utils = new HistogramUtils(executor, logDir);
-        Collection<QueryRecord> qr = utils.adaptLogs(this.logCollection);
+        Collection<QueryRecord> qr = HistogramUtils.adaptLogs(this.logCollection);
 
         logger.info("Successful adapt of logs");
-        System.out.println("Successful adapt of logs");
 
         return qr;
     }
@@ -90,7 +86,7 @@ public class QueryLogReader {
         try {
             this.handler.endQueryLog();
         } catch (QueryLogException e) {
-            e.printStackTrace();
+            logger.warn("QueryLogException", e);
         }
 
         this.executor.shutdown();
@@ -112,7 +108,7 @@ public class QueryLogReader {
                 continue;
             }
 
-            LogWriterImpl.getInstance().write(uri.toString()+" deleted");
+            logger.info("{} deleted", uri);
         }
     }
 

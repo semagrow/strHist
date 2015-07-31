@@ -1,6 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.tools.expirementfixedprefix;
 
-import gr.demokritos.iit.irss.semagrow.impl.QueryLogInterceptor;
+import gr.demokritos.iit.irss.semagrow.sesame.QueryLogInterceptor;
 import gr.demokritos.iit.irss.semagrow.tools.Utils;
 import info.aduna.iteration.CloseableIteration;
 import joptsimple.OptionParser;

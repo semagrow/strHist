@@ -2,16 +2,16 @@ package gr.demokritos.iit.irss.semagrow.tools;
 
 import com.bigdata.rdf.sail.BigdataSail;
 import com.bigdata.rdf.sail.BigdataSailRepository;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogParser;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import eu.semagrow.querylog.api.QueryLogException;
+import eu.semagrow.querylog.api.QueryLogHandler;
+import eu.semagrow.querylog.api.QueryLogParser;
+import eu.semagrow.querylog.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
 import gr.demokritos.iit.irss.semagrow.base.range.ExplicitSetRange;
 import gr.demokritos.iit.irss.semagrow.file.FileManager;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
-import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
+import eu.semagrow.querylog.QueryLogCollector;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogParser;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryRecordAdapter;
@@ -61,7 +61,7 @@ public class Utils {
 
     public static Collection<QueryLogRecord> parseFeedbackLog(String path) {
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
-        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+        QueryLogCollector handler = new QueryLogCollector(logs);
         QueryLogParser parser = new SerialQueryLogParser();
         parser.setQueryRecordHandler(handler);
 

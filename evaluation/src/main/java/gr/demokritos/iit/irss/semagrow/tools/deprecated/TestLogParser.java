@@ -1,11 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.tools.deprecated;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogParser;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
-import gr.demokritos.iit.irss.semagrow.impl.QueryLogRecordCollector;
-import gr.demokritos.iit.irss.semagrow.impl.rdf.RDFQueryLogParser;
+import eu.semagrow.querylog.api.*;
+import eu.semagrow.querylog.QueryLogCollector;
+import eu.semagrow.querylog.impl.rdf.RDFQueryLogParser;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogFactory;
 import gr.demokritos.iit.irss.semagrow.impl.serial.SerialQueryLogParser;
 import org.slf4j.Logger;
@@ -48,7 +45,7 @@ public class TestLogParser {
 
     private static void writeSerialQueryLog() throws IOException, QueryLogException {
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
-        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+        QueryLogCollector handler = new QueryLogCollector(logs);
 
 
 
@@ -58,7 +55,7 @@ public class TestLogParser {
 
     private static void writeRDFQueryLogSerial() throws IOException, QueryLogException {
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
-        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+        QueryLogCollector handler = new QueryLogCollector(logs);
         // Load query logs using RDFQueryLogParser
         QueryLogParser parser = new RDFQueryLogParser(handler);
 
@@ -69,7 +66,7 @@ public class TestLogParser {
 
         OutputStream out = new FileOutputStream(output);
 
-        QueryLogHandler handlerSer = new SerialQueryLogFactory().getQueryRecordLogger(out);
+        QueryLogWriter handlerSer = new SerialQueryLogFactory().getQueryRecordLogger(out);
 
         handlerSer.startQueryLog();
         for (QueryLogRecord queryRecord : logs) {
@@ -81,7 +78,7 @@ public class TestLogParser {
     private static void parseRDFQueryLogSerial() throws IOException, QueryLogException {
         Collection<QueryLogRecord> logs = new LinkedList<QueryLogRecord>();
 
-        QueryLogRecordCollector handler = new QueryLogRecordCollector(logs);
+        QueryLogCollector handler = new QueryLogCollector(logs);
         QueryLogParser parser = new SerialQueryLogParser();
         parser.setQueryRecordHandler(handler);
 

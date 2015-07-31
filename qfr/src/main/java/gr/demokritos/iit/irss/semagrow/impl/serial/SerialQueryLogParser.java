@@ -1,8 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.impl.serial;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogParser;
+import eu.semagrow.querylog.api.QueryLogException;
+import eu.semagrow.querylog.api.QueryLogHandler;
+import eu.semagrow.querylog.api.QueryLogParser;
 
 import java.io.EOFException;
 import java.io.IOException;

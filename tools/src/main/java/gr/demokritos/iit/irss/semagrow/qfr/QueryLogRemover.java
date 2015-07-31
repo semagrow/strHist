@@ -1,6 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
-import gr.demokritos.iit.irss.semagrow.log.LogWriterImpl;
 import org.openrdf.model.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,21 +22,19 @@ public class QueryLogRemover {
     public void deleteQfr(File file) {
 
         if(! file.delete()) {
-            LogWriterImpl.getInstance().write("Problem in deleting file "+file.getName());
-            logger.error("Problem in deleting file "+file.getName());
+            logger.error("Problem in deleting file {}", file);
         }
-        LogWriterImpl.getInstance().write("File "+file.getName() + " deleted successfully");
+        logger.info("File {} deleted successfully", file);
     }
 
     public void deleteResults(URI filename) throws URISyntaxException {
 
         File f = new File(convertbackURI(filename));
         if(! f.delete()) {
-            LogWriterImpl.getInstance().write("Problem in deleting file "+f.getName());
-            logger.error("Problem in deleting file "+f.getName());
-        }
-        LogWriterImpl.getInstance().write("File "+f.getName() + " deleted successfully");
 
+            logger.error("Problem in deleting file {}", f);
+        }
+        logger.info("File {} deleted successfully", f);
     }
 
     private static java.net.URI convertbackURI(URI uri) throws URISyntaxException {

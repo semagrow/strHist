@@ -89,6 +89,11 @@
       </dependency>
 
 
+      <dependency>
+          <groupId>eu.semagrow</groupId>
+          <artifactId>semagrow-monitor</artifactId>
+          <version>1.4.1</version>
+      </dependency>
 
   </dependencies>
 

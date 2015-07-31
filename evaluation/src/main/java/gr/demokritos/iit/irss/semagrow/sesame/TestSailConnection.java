@@ -2,7 +2,7 @@ package gr.demokritos.iit.irss.semagrow.sesame;
 
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
+import eu.semagrow.querylog.api.QueryLogHandler;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.*;

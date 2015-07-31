@@ -1,8 +1,8 @@
 package gr.demokritos.iit.irss.semagrow.impl.serial;
 
-import gr.demokritos.iit.irss.semagrow.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogHandler;
-import gr.demokritos.iit.irss.semagrow.api.QueryLogRecord;
+import eu.semagrow.querylog.api.QueryLogException;
+import eu.semagrow.querylog.api.QueryLogRecord;
+import eu.semagrow.querylog.api.QueryLogWriter;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -11,16 +11,15 @@ import java.io.OutputStream;
 /**
  * Created by angel on 10/24/14.
  */
-public class SerialQueryLogHandler implements QueryLogHandler {
+public class SerialQueryLogWriter implements QueryLogWriter {
 
     private ObjectOutputStream oout;
     private OutputStream out;
 
-    public SerialQueryLogHandler(OutputStream out) {
+    public SerialQueryLogWriter(OutputStream out) {
         this.out = out;
     }
 
-    @Override
     public void startQueryLog() throws QueryLogException {
 
         try {
@@ -31,7 +30,6 @@ public class SerialQueryLogHandler implements QueryLogHandler {
 
     }
 
-    @Override
     public void handleQueryRecord(QueryLogRecord queryLogRecord) throws QueryLogException {
         try {
             oout.writeObject(new SerialQueryLogRecord(queryLogRecord));
@@ -40,7 +38,7 @@ public class SerialQueryLogHandler implements QueryLogHandler {
         }
     }
 
-    @Override
+
     public void endQueryLog() throws QueryLogException {
         try {
             oout.close();
