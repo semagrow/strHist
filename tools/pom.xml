@@ -35,5 +35,10 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.12</version>
         </dependency>
+        <dependency>
+            <groupId>eu.semagrow</groupId>
+            <artifactId>semagrow-monitor</artifactId>
+            <version>1.4.1</version>
+        </dependency>
     </dependencies>
 </project>

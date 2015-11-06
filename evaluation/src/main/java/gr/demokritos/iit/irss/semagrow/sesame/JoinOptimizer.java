@@ -1,9 +1,12 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import eu.semagrow.stack.modules.sails.semagrow.helpers.BPGCollector;
-import eu.semagrow.stack.modules.sails.semagrow.helpers.CombinationIterator;
-import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
-import eu.semagrow.stack.modules.sails.semagrow.optimizer.PlanCollection;
+import eu.semagrow.core.impl.planner.Cost;
+import eu.semagrow.core.impl.planner.Plan;
+import eu.semagrow.core.impl.planner.PlanCollection;
+
+
+import eu.semagrow.core.impl.util.BPGCollector;
+import eu.semagrow.core.impl.util.CombinationIterator;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.algebra.Join;
@@ -117,8 +120,8 @@ public class JoinOptimizer implements QueryOptimizer {
     }
 
     private Collection<Plan> joinPlans(Plan p1, Plan p2) {
-        Set<TupleExpr> s = new HashSet<TupleExpr>(p1.getPlanId());
-        s.addAll(p2.getPlanId());
+        Set<TupleExpr> s = new HashSet<TupleExpr>(p1.getKey());    //p1.getPlanId()
+        s.addAll(p2.getKey()); //p2.getPlanId()
 
         Collection<Plan> plans = new LinkedList<Plan>();
         plans.add(new Plan(s, new Join(p1,p2)));
@@ -160,14 +163,14 @@ public class JoinOptimizer implements QueryOptimizer {
         return p;
     }
 
-    protected void
-    updatePlan(Plan plan) {
+    protected void updatePlan(Plan plan) {
         TupleExpr innerExpr = plan.getArg();
         TupleExpr e = innerExpr.clone();
 
         // update cardinality and cost properties
-        plan.setCost(costEstimator.getCost(e));
-        plan.setCardinality(cardinalityEstimator.getCardinality(e, EmptyBindingSet.getInstance()));
+        Cost c = new Cost(costEstimator.getCost(e));
+        plan.getProperties().setCost(c);
+        plan.getProperties().setCardinality(cardinalityEstimator.getCardinality(e, EmptyBindingSet.getInstance()));
 
         // update site
 
@@ -178,7 +181,7 @@ public class JoinOptimizer implements QueryOptimizer {
     }
 
     private int comparePlan(Plan plan1, Plan plan2) {
-        return plan1.getCost() < plan2.getCost() ? -1 : 1;
+        return plan1.getProperties().getCost().getOverallCost() < plan2.getProperties().getCost().getOverallCost() ? -1 : 1;
     }
 
     private static <T> Iterable<Set<T>> subsetsOf(Set<T> s, int k) {
@@ -192,7 +195,7 @@ public class JoinOptimizer implements QueryOptimizer {
         Plan bestPlan = plans.iterator().next();
 
         for (Plan p : plans)
-            if (p.getCost() < bestPlan.getCost())
+            if (p.getProperties().getCost().getOverallCost() < bestPlan.getProperties().getCost().getOverallCost())
                 bestPlan = p;
 
         return bestPlan;

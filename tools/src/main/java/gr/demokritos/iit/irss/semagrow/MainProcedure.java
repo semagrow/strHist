@@ -1,15 +1,15 @@
 package gr.demokritos.iit.irss.semagrow;
 
+import eu.semagrow.querylog.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.config.LogConfigImpl;
 import gr.demokritos.iit.irss.semagrow.exception.IntegrationException;
-import eu.semagrow.querylog.api.QueryLogException;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogRemover;
 import gr.demokritos.iit.irss.semagrow.histogram.LoadHistogram;
+import gr.demokritos.iit.irss.semagrow.qfr.QueryLogManager;
+import gr.demokritos.iit.irss.semagrow.qfr.QueryLogRemover;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import gr.demokritos.iit.irss.semagrow.qfr.QueryLogManager;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;

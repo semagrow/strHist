@@ -24,7 +24,7 @@ public class QueryLogRemover {
         if(! file.delete()) {
             logger.error("Problem in deleting file {}", file);
         }
-        logger.info("File {} deleted successfully", file);
+    //    logger.info("File {} deleted successfully", file);
     }
 
     public void deleteResults(URI filename) throws URISyntaxException {
@@ -34,7 +34,7 @@ public class QueryLogRemover {
 
             logger.error("Problem in deleting file {}", f);
         }
-        logger.info("File {} deleted successfully", f);
+    //    logger.info("File {} deleted successfully", f);
     }
 
     private static java.net.URI convertbackURI(URI uri) throws URISyntaxException {

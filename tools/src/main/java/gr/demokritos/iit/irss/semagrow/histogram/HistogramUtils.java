@@ -19,9 +19,12 @@ import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.json.simple.parser.ParseException;
 import org.openrdf.model.URI;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.helpers.StatementPatternCollector;
+import org.openrdf.query.parser.QueryParserUtil;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
 import org.openrdf.query.resultio.TupleQueryResultWriterRegistry;
@@ -63,12 +66,13 @@ public class HistogramUtils {
     }
 
     private static boolean isSinglePattern(QueryLogRecord record) {
-        TupleExpr expr = record.getQuery();
+        TupleExpr expr = record.getExpr();
+
         Collection<StatementPattern> patterns = StatementPatternCollector.process(expr);
 
         if(patterns.size() != 1) {
             System.out.println("Only single-patterns supported");
-            logger.info("Only single-patterns supported");
+     //       logger.info("Only single-patterns supported");
             return false;
         }
 
@@ -89,11 +93,11 @@ public class HistogramUtils {
         File jsonHist = new File(logFolder + "histJSON.txt");
 
         if (!jsonHist.exists()) {
-            logger.info("Creating a new histogram.");
+     //       logger.info("Creating a new histogram.");
             System.out.println("Creating a new histogram");
         }
         else {
-            logger.info("Deserializing previous histogram.");
+    //        logger.info("Deserializing previous histogram.");
             System.out.println("Deserializing previous histogram");
         }
 
@@ -113,7 +117,11 @@ public class HistogramUtils {
     private static RDFSTHolesHistogram deserializeBackup(String logFolder) {
         RDFSTHolesHistogram rdfstHolesHistogram = null;
 
-        getBackup(logFolder, true);
+        File file1 = new File(logFolder + "histJSON.txt");
+
+        if(file1.exists())
+            getBackup(logFolder, true);
+
         try {
             rdfstHolesHistogram =  new JSONDeserializer(logFolder + "histJSON.txt").getHistogram();
         } catch (ParseException e1) {
@@ -123,22 +131,25 @@ public class HistogramUtils {
     }
 
     public static void serializeHistogram(STHolesHistogram histogram, String path) {
-        logger.info("Serializing histogram to JSON in : " + path + "histJSON.txt");
+  //      logger.info("Serializing histogram to JSON in : " + path + "histJSON.txt");
         System.out.println("Serializing histogram to JSON in : " + path + "histJSON.txt");
 
-        keepBackup(path, true);
+        File file1 = new File(path + "histJSON.txt");
+
+        if(file1.exists())
+            keepBackup(path, true);
 
         try {
             new JSONSerializer(histogram, path + "histJSON.txt");
 
         } catch (IOException e) {
-            System.err.println("Problem with JSON serialization of histogram");
+            System.err.println("Problem with JSON serialization of histogram "+e.getMessage());
             getBackup(path, true);
         }
 
         keepBackup(path, false);
 
-        logger.info("Serializing histogram to VOID in : " + path + "histVOID.ttl");
+    //    logger.info("Serializing histogram to VOID in : " + path + "histVOID.ttl");
         System.out.println("Serializing histogram to VOID in : " + path + "histVOID.ttl");
         try {
             new VoIDSerializer("application/x-turtle", path + "histVOID.ttl").serialize(histogram);
@@ -172,6 +183,7 @@ public class HistogramUtils {
             dest.transferFrom(src, 0, src.size());
 
         } catch (FileNotFoundException e) {
+            System.err.println("File not found "+e.getMessage());
             return;
         } catch (IOException e) {
             new HistogramException(e);

@@ -1,6 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
+import eu.semagrow.core.impl.planner.Plan;
 import gr.demokritos.iit.irss.semagrow.file.ResultMaterializationManager;
 import eu.semagrow.querylog.api.QueryLogHandler;
 import info.aduna.iteration.CloseableIteration;

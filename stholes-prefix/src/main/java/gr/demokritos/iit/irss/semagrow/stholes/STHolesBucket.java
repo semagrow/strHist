@@ -145,7 +145,7 @@ public class STHolesBucket<R extends Rectangle> {
     }
 
     public long getEstimate(R rec) {
-        long dvc = 1;
+        long dvc = 1;   //num of distinct values
         
         // If no argument, return myself's estimate
         if (rec == null) { rec = this.box; }

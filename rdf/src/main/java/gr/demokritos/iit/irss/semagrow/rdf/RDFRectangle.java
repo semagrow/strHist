@@ -44,6 +44,9 @@ public class RDFRectangle implements Rectangle<RDFRectangle> {
 		return subjectRange.contains(rec.subjectRange)
 				&& predicateRange.contains(rec.predicateRange)
 				&& objectRange.contains(rec.objectRange);
+        /*return rec.subjectRange.contains(subjectRange)
+                && rec.predicateRange.contains(predicateRange)
+                && rec.objectRange.contains(objectRange);*/
 	}
 
 	

@@ -1,6 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
+import eu.semagrow.core.impl.planner.Plan;
 import org.openrdf.query.algebra.*;
 import org.openrdf.query.impl.EmptyBindingSet;
 
@@ -34,7 +34,7 @@ public class CostEstimatorImpl implements CostEstimator {
     }
 
     public double getCost(Plan plan) {
-        return plan.getCost();
+        return plan.getProperties().getCost().getOverallCost();
     }
 
     public double getCost(StatementPattern pattern) {

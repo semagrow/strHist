@@ -308,7 +308,23 @@ public class Utils {
     public static long evaluateOnHistogram(RepositoryConnection conn, RDFSTHolesHistogram histogram, String query) {
         try {
             logger.info("Cardinality estimation on Histogram for query: " + query);
-            ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, query, "http://example.org/");
+            ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, query, "http://purl.org/dc/terms/");
+
+            long card = new CardinalityEstimatorImpl(histogram).
+                    getCardinality(q.getTupleExpr(), EmptyBindingSet.getInstance());
+
+            return card;
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public static long evaluateOnHistogram1(RDFSTHolesHistogram histogram, String query) {
+        try {
+            logger.info("Cardinality estimation on Histogram for query: " + query);
+            ParsedTupleQuery q = QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, query, "http://agris.fao.org/aos/records/");
 
             long card = new CardinalityEstimatorImpl(histogram).
                     getCardinality(q.getTupleExpr(), EmptyBindingSet.getInstance());

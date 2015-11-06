@@ -4,7 +4,6 @@ import eu.semagrow.querylog.api.QueryLogException;
 import eu.semagrow.querylog.api.QueryLogRecord;
 import eu.semagrow.querylog.QueryLogCollector;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
-import eu.semagrow.querylog.impl.rdf.RDFQueryLogParser;
 
 import gr.demokritos.iit.irss.semagrow.histogram.HistogramUtils;
 
@@ -62,14 +61,14 @@ public class QueryLogReader {
 
             throw new QueryLogException(e);
         }
-        logger.info("Parsed {}", logFile);
+//        logger.info("Parsed {}", logFile);
     }
 
     public Collection<QueryRecord> adaption(String logDir) {
         HistogramUtils utils = new HistogramUtils(executor, logDir);
         Collection<QueryRecord> qr = HistogramUtils.adaptLogs(this.logCollection);
 
-        logger.info("Successful adapt of logs");
+  //      logger.info("Successful adapt of logs");
 
         return qr;
     }
@@ -108,7 +107,7 @@ public class QueryLogReader {
                 continue;
             }
 
-            logger.info("{} deleted", uri);
+    //        logger.info("{} deleted", uri);
         }
     }
 

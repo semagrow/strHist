@@ -573,6 +573,9 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
 
     public boolean hasSameType(RDFLiteralRange literalRange) {
 
+        if (this.isInfinite() && literalRange.isInfinite())
+            return true;
+
         if (literalRange.ranges.size() != 1 || ranges.size() != 1) {
             logger.debug("This method cannot be called" +
                     "for RDFLiteralRange ranges with " +

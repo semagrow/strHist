@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.qfr;
 
-import eu.semagrow.stack.modules.sails.semagrow.helpers.FilterCollector;
+
+import eu.semagrow.core.impl.util.FilterCollector;
 import eu.semagrow.querylog.api.QueryLogRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
@@ -22,11 +23,16 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.algebra.*;
 import org.openrdf.query.algebra.helpers.StatementPatternCollector;
 import org.openrdf.query.algebra.helpers.VarNameCollector;
 import org.openrdf.query.impl.EmptyBindingSet;
+import org.openrdf.query.parser.QueryParserUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -34,6 +40,7 @@ import java.util.*;
  * Created by angel on 10/22/14.
  */
 public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
+    static final Logger logger = LoggerFactory.getLogger(QueryRecordAdapter.class);
 
     private QueryLogRecord queryLogRecord;
 
@@ -48,11 +55,13 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
     private ResultMaterializationManager fileManager;
 
     public QueryRecordAdapter(QueryLogRecord queryLogRecord, ResultMaterializationManager fileManager)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
         this.queryLogRecord = queryLogRecord;
         this.fileManager = fileManager;
 
-        TupleExpr expr = queryLogRecord.getQuery();
+        //String qStr = queryLogRecord.getQuery();
+        TupleExpr expr = queryLogRecord.getExpr();
+
         Collection<StatementPattern> patterns = StatementPatternCollector.process(expr);
         filters = FilterCollector.process(expr);
 
@@ -100,9 +109,15 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
     }
 
     private RDFRectangle computePatternRectangle(StatementPattern pattern, Collection<ValueExpr> filters) {
+        //String str = sVal.stringValue().substring(0,sVal.stringValue().length()-10);
+
+        //System.out.println("String value!! "+str);
+
         Value sVal = getValue(pattern.getSubjectVar());
         Value pVal = getValue(pattern.getPredicateVar());
         Value oVal = getValue(pattern.getObjectVar());
+
+
 
         RDFURIRange sRange = new RDFURIRange();
         ExplicitSetRange<URI> pRange = new ExplicitSetRange<URI>();
@@ -110,8 +125,12 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
         if (sVal != null) {
             ArrayList<String> singletonSubject = new ArrayList<String>();
+            //String str = sVal.stringValue().substring(0,sVal.stringValue().length()-10);
+
             singletonSubject.add(sVal.stringValue());
+            //singletonSubject.add(getMainSubject(sVal));
             sRange = new RDFURIRange(singletonSubject);
+
         }
 
         if (pVal != null) {
@@ -140,6 +159,25 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         return new RDFRectangle(sRange, pRange, oRange);
     }
 
+    private String getMainSubject(Value sVal) {
+        String str = sVal.stringValue();
+        int count = 0;
+
+        for(int i=0; i<str.length(); i++) {
+            if(Character.isDigit(str.charAt(i))) {
+                count++;
+
+                if(count == 5) {
+                    logger.info("Subject of rectangle "+ str.substring(0, i));
+                    return str.substring(0, i);
+                }
+            }
+        }
+       //return sVal.stringValue().substring(0,sVal.stringValue().length());
+        return str;
+
+    }
+
     private RDFRectangle computeRectangle(Value s, Value p, Value o) {
 
         RDFURIRange sRange = new RDFURIRange();
@@ -149,6 +187,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
         if (s != null) {
             ArrayList<String> subjects = new ArrayList<String>();
             subjects.add(s.stringValue());
+            //subjects.add(getMainSubject(s));
             sRange = new RDFURIRange(subjects);
         }
 
@@ -287,7 +326,7 @@ public class QueryRecordAdapter implements QueryRecord<RDFRectangle, Stat> {
 
             RDFRectangle queryRect = getRectangle();
 
-            if (!queryRect.contains(rect))
+            if (!queryRect.intersects(rect))
                 return emptyStat;
 
             CloseableIteration<BindingSet,QueryEvaluationException> iter = getResult();

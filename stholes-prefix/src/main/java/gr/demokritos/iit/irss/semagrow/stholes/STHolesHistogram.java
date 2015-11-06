@@ -5,8 +5,11 @@ import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.Resource;
 
 import java.util.*;
 
@@ -18,7 +21,7 @@ import java.util.*;
 public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,Stat> implements STHistogram<R,Stat> {
     static final Logger logger = LoggerFactory.getLogger(STHolesHistogram.class);
     private STHolesBucket<R> root;
-    public long maxBucketsNum = 1200;
+    public long maxBucketsNum = 5;
     public Double epsilon = 0.0;
     private long bucketsNum = 0;
 
@@ -26,7 +29,8 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
     public long ssMergesNum = 0;
 
     static public final int MAX_PENALTY_TYPE = 2;
-    public int PENALTY_TYPE = 1;
+    public int PENALTY_TYPE = 2;
+    static boolean moreSpecific = true;
 
     public STHolesHistogram() {
         //todo: choose a constant
@@ -123,7 +127,15 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         else
             rects.add(queryRecord.getRectangle());
 
+
+
         for (R rect : rects) {
+
+            R origRect = rect;
+
+            rect = getRectangle(rect);
+
+
             if (this.getRoot() == null) {
                 setRoot(new STHolesBucket<R>(rect, new Stat(), null, null));
                 bucketsNum += 1;
@@ -143,14 +155,29 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
                 }
             }
 
+            moreSpecific = true;
             Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(rect);
 
-            for (STHolesBucket<R> bucket : candidates) {
-                // Calculate intersection and shrink it
-                STHolesBucket<R> hole = shrink(bucket, rect, queryRecord);
+            System.out.println("origin = " + origRect.getRange(0) + " moreSpecific " + moreSpecific);
 
-                if (hole.getBox().toString().contains("GB199"))
-                    System.out.println();
+            for (STHolesBucket<R> bucket : candidates) {
+                STHolesBucket<R> hole = null;
+
+
+                if(moreSpecific) {
+                    // Calculate intersection and shrink it
+                    hole = shrink(bucket, rect, queryRecord);
+                }
+                else {
+                    // Calculate intersection and shrink it
+                    hole = shrink(bucket, origRect, queryRecord);
+                }
+
+                //hole = shrink(bucket, rect, queryRecord);
+             //   STHolesBucket<R> hole1 = shrink(bucket, rect, queryRecord);
+
+                //if (hole.getBox().toString().contains("GB199"))
+                 //   System.out.println();
 
                 // If bucket is equals to hole, just update the stats.
                 if (bucket.getBox().equals(hole.getBox())) {
@@ -160,12 +187,15 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
                     continue;
                 }
 
+
                 if (!hole.getBox().isEmpty() && isInaccurateEstimation(bucket, hole)) {
                     logger.info("Drilling");
                     logger.info("Bucket: " + bucket.getBox().toString() + " with stats " + bucket.getStatistics().toString());
                     logger.info("Hole " + hole.getBox().toString() + " with stats " + hole.getStatistics().toString());
                     drillHole(bucket, hole);
-                } else {
+                 } else {
+                    if(!moreSpecific)
+                        bucket.setStatistics(new Stat(hole.getStatistics()));
                     logger.info("Skip drilling");
                     logger.info("Bucket: " + bucket.getBox().toString() + " with stats " + bucket.getStatistics().toString());
                     logger.info("Skipped Hole " + hole.getBox().toString() + " with stats " + hole.getStatistics().toString());
@@ -177,6 +207,8 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         // Check if histogram must be compacted after refinement
         compact();
     }
+
+    protected R getRectangle(R r) { return r; }
 
     private Stat computeRootStats(Stat oldStats, Stat deltaStats) {
         long freqN = deltaStats.getFrequency() + oldStats.getFrequency();
@@ -197,6 +229,9 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
 
         Stat curStatistics = bucket.getStatistics();
         Double curDensity = curStatistics.getDensity();
+
+        System.out.println("Estimation for drilling: actual = " + actualDensity + " current = " + curDensity);
+
 
         return (Math.abs(actualDensity - curDensity) > epsilon);
     }
@@ -282,6 +317,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         return c;
     }
 
+
     /**
      * Get STHolesBuckets with the most specific nonempty intersection with a QueryRecord.
      * @param queryBox query feedback rectangle
@@ -297,13 +333,15 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         for (STHolesBucket<R> bucketChild : bucket.getChildren())
             candidates.addAll(getCandidateBuckets(bucketChild, queryBox));
 
+
         if (bucket.getBox().intersects(queryBox)) {
-            boolean moreSpecific = true;
+            //boolean moreSpecific = true;
 
             // Add a candidate only if there isn't already any more specific candidate.
             for (STHolesBucket<R> candidate : candidates)
-                if (candidate.getBox().isEnclosing(queryBox))
+                if (candidate.getBox().isEnclosing(queryBox)) {
                     moreSpecific = false;
+                }
 
             if (moreSpecific)
                 candidates.add(bucket);
@@ -360,7 +398,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
              STHolesBucket<R> bn = bestMerge.getBn();
 
             STHolesBucket.merge(b1, b2, bn, this);
-            logger.info("Best merge info: " + bestMerge.toString());
+            logger.info("Best merge info: " + bestMerge.toString() + " *bn =* "+bestMerge.getBn().toString() + " *b1 = *"+bestMerge.getB1().toString());
             logger.info("Number of PC merges: " + pcMergesNum);
             logger.info("Number of SS merges: " + ssMergesNum);
             bucketsNum -= 1;
@@ -391,6 +429,7 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
 
         STHolesBucket<R> bi, bj;
 
+        logger.info("Parent-child merge .... ");
         for (int i = 0; i < bChildren.size(); i++) {
             bi = bChildren.get(i);
             // Candidate parent-child merges
@@ -403,34 +442,37 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
                 b1 = b;
                 b2 = bi;
                 bn = candidateMergedBucket.getKey();
+                logger.info("PC: penalty = "+penalty+" b1 = "+b1.toString() + " b2= "+b2.toString()+ " bn = "+bn.toString());
             }
 
 
             // SS merges are commented out because of time complexity.
-            /*// Candidate sibling-sibling merges
+            // Candidate sibling-sibling merges
+            logger.info("Sibling merging .... ");
             for (int j = i + 1; j < bChildren.size(); j++) {
 
                 bj = bChildren.get(j);
 
                 if (bi.getBox().isMergeable(bj.getBox())) {
-
+                    logger.info(bj.toString()+" is mergeable!");
                     candidateMergedBucket = getSSMergePenalty(bi, bj);
                     penalty = candidateMergedBucket.getValue();
 
                     if (penalty <= minimumPenalty) {
-
                         minimumPenalty = penalty;
                         b1 = bi;
                         b2 = bj;
                         bn = candidateMergedBucket.getKey();
+                        logger.info("SS: penalty = "+penalty+" b1 = "+b1.toString() + " b2= "+b2.toString()+ " bn = "+bn.toString());
                     }
                 }
 
-            }*/
+            }
         }
 
         // local best merge
         bestMerge = new MergeInfo<R>(b1, b2, bn, minimumPenalty);
+        logger.info("Best Merge = "+bestMerge.toString());
 
         for (STHolesBucket<R> bc : b.getChildren()) {
             candidateMerge = findBestMerge(bc);

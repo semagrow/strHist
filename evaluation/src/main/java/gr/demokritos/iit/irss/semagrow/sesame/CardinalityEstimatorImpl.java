@@ -1,6 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import eu.semagrow.stack.modules.sails.semagrow.optimizer.Plan;
+import eu.semagrow.core.impl.planner.Plan;
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
 import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
@@ -55,7 +55,7 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
     }
 
     public long getCardinality(Plan plan, BindingSet bindings) {
-        return plan.getCardinality();
+        return plan.getProperties().getCardinality();
     }
 
     public long getCardinality(Slice slice, BindingSet bindings) {
@@ -141,6 +141,8 @@ public class CardinalityEstimatorImpl implements CardinalityEstimator {
             URI uri = (URI) oVal;
             PrefixRange pr = new PrefixRange();
             pr.getPrefixList().add(uri.stringValue());
+
+
             return new RDFValueRange(new RDFURIRange(pr.getPrefixList()),
                                      new RDFLiteralRange(Collections.<URI, RangeLength<?>>emptyMap()));
         } else if (oVal instanceof Literal) {

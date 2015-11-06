@@ -41,7 +41,7 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
         out.writeObject(queryLogRecord.getResults());
         out.writeObject(queryLogRecord.getBindings());
 
-        ParsedTupleQuery q = new ParsedTupleQuery(queryLogRecord.getQuery());
+        ParsedTupleQuery q = new ParsedTupleQuery(queryLogRecord.getExpr());
         out.writeObject(new SPARQLQueryRenderer().render(q)); // String
     }
 
@@ -61,7 +61,7 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
                                                             "http://example.org/");
         TupleExpr query = q.getTupleExpr();
 
-        this.queryLogRecord = new QueryLogRecordImpl(uuid, endpoint, query, bindings, bindingNames);
+        this.queryLogRecord = new QueryLogRecordImpl(uuid, endpoint, query.toString(), bindings, bindingNames);
         this.queryLogRecord.setCardinality(cardinality);
         this.queryLogRecord.setDuration(startTime.getTime(), endTime.getTime());
         this.queryLogRecord.setResults(results);
@@ -82,8 +82,13 @@ public class SerialQueryLogRecord implements Serializable, QueryLogRecord {
     public BindingSet getBindings() { return getQueryLogRecord().getBindings(); }
 
     @Override
-    public TupleExpr getQuery() {
+    public String getQuery() {
         return getQueryLogRecord().getQuery();
+    }
+
+    @Override
+    public TupleExpr getExpr() {
+        return getQueryLogRecord().getExpr();
     }
 
     @Override

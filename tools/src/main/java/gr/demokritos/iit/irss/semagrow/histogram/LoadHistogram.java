@@ -48,7 +48,7 @@ public class LoadHistogram {
 
     private void loadHistogram() {
         this.histogram = HistogramUtils.loadPreviousHistogram(config.getHistDir());
-        logger.info("Previous histogram loaded");
+  //      logger.info("Previous histogram loaded");
     }
 
 }
