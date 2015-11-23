@@ -35,6 +35,10 @@ public class MergeInfo<R extends Rectangle<R>> {
         return penalty;
     }
 
+    public void setPenalty(double penalty) {
+        this.penalty = penalty;
+    }
+
     public String toString() {
 
         String res;
@@ -46,4 +50,5 @@ public class MergeInfo<R extends Rectangle<R>> {
                 "with penalty " + penalty;
         return res;
     }
+
 }

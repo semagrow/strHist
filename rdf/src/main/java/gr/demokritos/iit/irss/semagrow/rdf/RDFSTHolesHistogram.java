@@ -40,6 +40,12 @@ public class RDFSTHolesHistogram extends STHolesHistogram<RDFRectangle> {
         return newR;
     }
 
+    @Override
+    protected String getSubject(RDFRectangle r) {
+
+        return r.getSubjectRange().getPrefixList().get(0);
+    }
+
     private String getMainSubject(String str) {
         //String str = sVal.stringValue();
         int count = 0;
