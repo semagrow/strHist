@@ -19,6 +19,14 @@ public class RDFStrRange implements RangeLength<URI>, Rangeable<RDFStrRange> {
         range = new CircleRange(center);
     }
 
+    public RDFStrRange(String center, double radius) {
+        range = new CircleRange(center, radius);
+    }
+
+    public RDFStrRange() {
+        range  = new CircleRange();
+    }
+
     private RDFStrRange(CircleRange range) { this.range = range; }
 
     public long getLength() { return range.getLength(); }

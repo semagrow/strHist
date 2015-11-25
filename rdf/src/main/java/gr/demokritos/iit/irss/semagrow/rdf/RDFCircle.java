@@ -230,7 +230,7 @@ public class RDFCircle implements Rectangle<RDFCircle> {
         return predicateRange;
     }
 
-    public RDFURIRange getSubjectRange() {
+    public RDFStrRange getSubjectRange() {
         return subjectRange;
     }
 }

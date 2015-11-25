@@ -15,16 +15,27 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
     private String center;
 
+    private boolean infinite = false;
+
     private long count = 1; /* how many points are within this range*/
+
+    public CircleRange() {
+        center = "";
+        radius = 0.0;
+        infinite = true;
+    }
 
     public CircleRange(String center) {
         this.center = center;
         radius = 0.0;
+
+        infinite = false;
     }
 
     public CircleRange(String center, double radius) {
         this.center = center;
         this.radius = radius;
+        infinite = false;
     }
 
     public double getRadius() { return this.radius; }
@@ -57,7 +68,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
     @Override
     public boolean includes(String elem) {
-        if (strMetric.getSimilarity(elem, center) <= radius)
+        if ((1.0 - strMetric.getSimilarity(elem, center)) <= radius)
             return true;
 
         return false;
@@ -65,7 +76,13 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
     @Override
     public boolean contains(CircleRange circleRange) {
-        double cDist = strMetric.getSimilarity(circleRange.getCenter(), this.center);
+        if (isInfinite())
+            return true;
+
+        if (this.getCenter() == null || this.getCenter().equalsIgnoreCase(""))
+            return true;
+
+        double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
 
         if (cDist + circleRange.getRadius() <= this.radius)
             return true;
@@ -75,10 +92,17 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
     @Override
     public boolean intersects(CircleRange circleRange) {
+        if (isInfinite())
+            return true;
+
         if (this.contains(circleRange))
             return true;
 
-        double cDist = strMetric.getSimilarity(circleRange.getCenter(), this.center);
+        double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+        //double cDist = strMetric.getSimilarity(circleRange.getCenter(), this.center);
+
+        if (cDist == 0.0)
+            return true;
 
         if (circleRange.getRadius() + this.radius > cDist)
             return true;
@@ -100,7 +124,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
             return this;
 
         else {
-            double cDist = strMetric.getSimilarity(circleRange.getCenter(), this.center);
+            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
             return new CircleRange("", Math.max((circleRange.getRadius() + this.radius - cDist) , 0));
         }
     }
@@ -113,7 +137,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
             return new CircleRange("", (circleRange.getRadius() - this.radius));
 
         else {
-            double cDist = strMetric.getSimilarity(circleRange.getCenter(), this.center);
+            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
             return new CircleRange("", ( this.getRadius() - Math.max((circleRange.getRadius() + this.radius - cDist) , 0)) );
         }
     }
@@ -128,7 +152,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
             return circleRange;
 
         else if (this.intersects(circleRange)) {
-            double cDist = strMetric.getSimilarity(circleRange.getCenter(), this.center);
+            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
             if (this.radius > circleRange.getRadius())
                 return new CircleRange(this.center, cDist);
             else
@@ -143,7 +167,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
         String res="";
 
-        if (center.equalsIgnoreCase(""))
+        if (center.equalsIgnoreCase("") || center == null)
             res += "{ center = null";
         else
             res += "{ center = " + center;
@@ -167,6 +191,6 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
     }
 
     public boolean isInfinite() {
-        return infinite;
+        return this.infinite;
     }
 }
