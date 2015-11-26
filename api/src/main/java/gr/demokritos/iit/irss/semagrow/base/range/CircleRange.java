@@ -19,9 +19,10 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
     private long count = 1; /* how many points are within this range*/
 
+    /* only for root */
     public CircleRange() {
         center = "";
-        radius = 0.0;
+        radius = 1.0;
         infinite = true;
     }
 
@@ -81,6 +82,9 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
         if (this.getCenter() == null || this.getCenter().equalsIgnoreCase(""))
             return true;
+
+        if (this.radius == 0.0 || circleRange.getRadius() == 0.0)
+            return false;
 
         double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
 
@@ -159,7 +163,19 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
                 return new CircleRange(circleRange.getCenter(), cDist);
         }
 
-        return null;
+        if (this.radius == 0.0 || circleRange.getRadius() == 0.0) {
+            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+
+            if (this.radius == 0.0)
+                return new CircleRange(circleRange.getCenter(), cDist);
+            else
+                return new CircleRange(this.getCenter(), cDist);
+        }
+        else {
+            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+            return new CircleRange(this.getCenter(), cDist+this.radius);
+        }
+
     }
 
     //Tested

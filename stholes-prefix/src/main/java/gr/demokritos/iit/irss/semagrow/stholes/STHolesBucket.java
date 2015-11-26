@@ -80,6 +80,18 @@ public class STHolesBucket<R extends Rectangle> {
         }
     }
 
+    public static <R extends Rectangle<R>> void merge(STHolesBucket<R> bucket1,
+                                                      STHolesBucket<R> bucket2,
+                                                      STHolesBucket<R> mergeBucket,
+                                                      STHolesCircleHistogram<R> h) {
+        if (bucket2.getParent() == bucket1) { //or equals
+            parentChildMerge(bucket1, bucket2, mergeBucket, h);
+        }
+        else if (bucket2.getParent() == bucket1.getParent()) {
+            siblingSiblingMerge(bucket1, bucket2, mergeBucket, h);
+        }
+    }
+
     public static <R extends Rectangle<R>> void parentChildMerge(STHolesBucket<R> bp,
                                                                  STHolesBucket<R> bc,
                                                                  STHolesBucket<R> bn,
@@ -110,10 +122,61 @@ public class STHolesBucket<R extends Rectangle> {
         h.setPcMergesNum(h.getPcMergesNum() + 1);
     }
 
+    public static <R extends Rectangle<R>> void parentChildMerge(STHolesBucket<R> bp,
+                                                                 STHolesBucket<R> bc,
+                                                                 STHolesBucket<R> bn,
+                                                                 STHolesCircleHistogram<R> h) {
+
+        //Merge buckets b1, b2 into bn
+        STHolesBucket<R> bpp = bp.getParent();
+
+        //Children of both buckets bc and bp
+        //become children of the new bucket
+        for (STHolesBucket<R> bi : bc.getChildren())
+            bn.addChild(bi);
+
+        for (STHolesBucket<R> bchild : bp.children) {
+            if (!bchild.equals(bc)) {
+                bn.addChild(bchild);
+            }
+        }
+
+        if (bpp == null) {
+            //bp is root
+            h.setRoot(bn);
+        } else {
+            bpp.removeChild(bp);
+            bpp.addChild(bn);
+        }
+
+        h.setPcMergesNum(h.getPcMergesNum() + 1);
+    }
+
     public static <R extends Rectangle<R>> void siblingSiblingMerge(STHolesBucket<R> b1,
                                                                     STHolesBucket<R> b2,
                                                                     STHolesBucket<R> bn,
                                                                     STHolesHistogram<R> h) {
+        //todo: throw exception if they are not siblings
+        STHolesBucket<R> newParent = b1.getParent();
+
+        // Merge buckets b1, b2 into bn
+        newParent.addChild(bn);
+        newParent.removeChild(b1);
+        newParent.removeChild(b2);
+
+        for (STHolesBucket<R> bi : bn.getChildren()) {
+
+            bi.setParent(bn);
+            newParent.removeChild(bi);
+        }
+
+        h.setSsMergesNum(h.getSsMergesNum() + 1);
+    }
+
+    public static <R extends Rectangle<R>> void siblingSiblingMerge(STHolesBucket<R> b1,
+                                                                    STHolesBucket<R> b2,
+                                                                    STHolesBucket<R> bn,
+                                                                    STHolesCircleHistogram<R> h) {
         //todo: throw exception if they are not siblings
         STHolesBucket<R> newParent = b1.getParent();
 
