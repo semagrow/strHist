@@ -31,6 +31,8 @@ public class RDFStrRange implements RangeLength<URI>, Rangeable<RDFStrRange> {
 
     public long getLength() { return range.getLength(); }
 
+    public void addLength(long count) { range.addLength(count); }
+
     public boolean isUnit() { return range.isUnit(); }
 
     public boolean isEmpty() { return range.isEmpty(); }

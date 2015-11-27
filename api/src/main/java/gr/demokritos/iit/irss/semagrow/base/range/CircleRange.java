@@ -51,6 +51,14 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
         this.center = center;
     }
 
+    public void addLength(long count) {
+        this.count = this.count + count;
+    }
+
+    public void setLength(long count) {
+        this.count = count;
+    }
+
     /* ?????????????????????? */
     @Override
     public long getLength() {
@@ -102,11 +110,15 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
         if (this.contains(circleRange))
             return true;
 
+
         double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
         //double cDist = strMetric.getSimilarity(circleRange.getCenter(), this.center);
 
         if (cDist == 0.0)
             return true;
+
+        if (this.getRadius() == 0.0 && circleRange.getRadius() == 0.0)
+            return false;
 
         if (circleRange.getRadius() + this.radius > cDist)
             return true;
@@ -116,8 +128,11 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
     @Override
     public void expand(String v) {
-        if (this.includes(v))
-            count++;
+        if (!this.includes(v)) {
+            double cDist = 1.0 - strMetric.getSimilarity(v, this.center);
+            this.radius = cDist;
+        }
+        count++;
     }
 
     @Override
@@ -157,23 +172,42 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
         else if (this.intersects(circleRange)) {
             double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
-            if (this.radius > circleRange.getRadius())
-                return new CircleRange(this.center, cDist);
-            else
-                return new CircleRange(circleRange.getCenter(), cDist);
+            if (this.radius > circleRange.getRadius()) {
+                CircleRange c = new CircleRange(this.center, cDist);
+                c.setLength(this.getLength() + circleRange.getLength());
+
+                return c;
+            }
+            else {
+                CircleRange c = new CircleRange(circleRange.getCenter(), cDist);
+                c.setLength(this.getLength() + circleRange.getLength());
+
+                return c;
+            }
         }
 
         if (this.radius == 0.0 || circleRange.getRadius() == 0.0) {
             double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
 
-            if (this.radius == 0.0)
-                return new CircleRange(circleRange.getCenter(), cDist);
-            else
-                return new CircleRange(this.getCenter(), cDist);
+            if (this.radius == 0.0) {
+                CircleRange c = new CircleRange(circleRange.getCenter(), cDist);
+                c.setLength(circleRange.getLength() + 1);
+
+                return c;
+            }
+            else {
+                CircleRange c = new CircleRange(this.getCenter(), cDist);
+                c.setLength(this.count + 1);
+
+                return c;
+            }
         }
         else {
             double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
-            return new CircleRange(this.getCenter(), cDist+this.radius);
+            CircleRange c = new CircleRange(this.getCenter(), cDist+this.radius);
+            c.setLength(this.count + circleRange.getLength());
+
+            return c;
         }
 
     }

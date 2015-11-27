@@ -41,6 +41,24 @@ public class RDFCircleSTHolesHistogram extends STHolesCircleHistogram<RDFCircle>
         return r.getSubjectRange().getCenter();
     }
 
+    @Override
+    protected double getRadius(RDFCircle r) {
+
+        return r.getSubjectRange().getRadius();
+    }
+
+    @Override
+    protected void setSubjLength(RDFCircle r, long count) {
+
+        r.getSubjectRange().addLength(count);
+
+    }
+
+    @Override
+    protected long getSubjLength(RDFCircle r) {
+        return r.getSubjectRange().getLength();
+    }
+
 
     private String getMainSubject(String str) {
         int count = 0;

@@ -21,4 +21,5 @@ public class VOID {
     public static final URI PROPERTIES = vf.createURI(VOID.NAMESPACE, "properties");
     public static final URI PROPERTY = vf.createURI(VOID.NAMESPACE, "property");
     public static final URI URIREGEXPATTERN = vf.createURI(VOID.NAMESPACE, "uriRegexPattern");
+    public static final URI RADIUS = vf.createURI(VOID.NAMESPACE, "radius");
 }

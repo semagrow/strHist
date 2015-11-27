@@ -142,9 +142,9 @@ public class HistogramCUtils {
             getBackup(path, true);
         }
 
-        //keepBackup(path, false);
+        keepBackup(path, false);
 
-        /*
+
         //    logger.info("Serializing histogram to VOID in : " + path + "histVOID.ttl");
         System.out.println("Serializing histogram to VOID in : " + path + "histVOID.ttl");
         try {
@@ -153,7 +153,7 @@ public class HistogramCUtils {
         } catch (RDFHandlerException e) {
             System.err.println("Problem with VOID serialization of histogram");
             getBackup(path, false);
-        }*/
+        }
     }
 
     /** depending on the type of a file (JSON or VOID) keep a back up before the update of the respective file.
@@ -210,12 +210,12 @@ public class HistogramCUtils {
         } else {
             System.out.println("get VOID backup");
 
-        /*    file1 = new File(path + "histVOID.ttl");
+            file1 = new File(path + "histVOID.ttl");
             file2 = new File(path + "histVOIDtemp.ttl");
 
             if(! file2.renameTo(file1)) {
                 new HistogramException("Error in getting VOID backup file");
-            }*/
+            }
 
         }
 

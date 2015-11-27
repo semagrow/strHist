@@ -18,7 +18,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
     static final Logger logger = LoggerFactory.getLogger(STHolesCircleHistogram.class);
     private STHolesBucket<R> root;
-    public long maxBucketsNum = 10;
+    public long maxBucketsNum = 8;
     public Double epsilon = 0.0;
     private long bucketsNum = 0;
 
@@ -207,11 +207,19 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         logger.info("-------------------------------------------------------------------");
     }
 
-
+    /////////////////////////////
 
     protected R getRectangle(R r) { return r; }
 
     protected String getSubject(R r) { return r.getRange(0).toString(); };
+
+    protected void setSubjLength(R r, long count) {  };
+
+    protected long getSubjLength(R r) {  return r.getRange(0).hashCode(); };
+
+    protected double getRadius(R r) { return r.getRange(0).hashCode(); }
+
+    ////////////////////////////////////
 
     private Stat computeRootStats(Stat oldStats, Stat deltaStats) {
         long freqN = deltaStats.getFrequency() + oldStats.getFrequency();
@@ -571,9 +579,13 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
                     break;
             }
 
-            MergeInfo<R> merge = SSrankList.get(i);
-            // local best merge
-            bestMerge = new MergeInfo<R>(merge.getB1(), merge.getB2(), merge.getBn(), merge.getPenalty());
+            if (i >= SSrankList.size()) {
+                bestMerge = new MergeInfo<R>(b1, b2, bn, minimumPCPenalty);
+            }
+            else {
+                MergeInfo<R> merge = SSrankList.get(i);
+                bestMerge = new MergeInfo<R>(merge.getB1(), merge.getB2(), merge.getBn(), merge.getPenalty());
+            }
         }
         logger.info("Best Merge = \n"+bestMerge.toString());
 
@@ -588,6 +600,12 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         return bestMerge;
     }
 
+    /**
+     * checks the constraints and indicates whether two buckets can be merged.
+     *
+     * @param mergeBox the box that contains the 2 merging buckets and the resulting one
+     * @return
+     */
     private boolean isMerging(MergeInfo<R> mergeBox) {
         STHolesBucket<R> b1 = mergeBox.getB1();
         STHolesBucket<R> b2 = mergeBox.getB2();
@@ -596,17 +614,76 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         Collection<STHolesBucket<R>> I = new ArrayList<STHolesBucket<R>>();
         STHolesBucket<R> bp = b1.getParent();
 
+        double currentRadius = getRadius(bn.getBox());
+        double parentRadius = getRadius(bp.getBox());
+
+        if (2 * currentRadius > parentRadius) {
+            logger.info("Cannot merge: Very large RDFCircle");
+            return false;
+        }
+
         for (STHolesBucket<R> bi : bp.getChildren() ) {
 
             if (!(bi.equals(b1) || bi.equals(b2))) {
 
                 if (bn.getBox().intersects(bi.getBox())) {
+
+                    if (bn.getBox().contains(bi.getBox())) {
+                        logger.info("HOLE?: bn = "+ bn.toString() + "  contains  bi = "+bi.toString());
+                        return constructMergingBucket(bn, bi);
+                    }
+                    if (bi.getBox().contains(bn.getBox())) {
+                        logger.info("HOLE?: bi = "+ bi.toString() + "  contains  bn = "+bn.toString());
+                        return constructMergingBucket(bi, bn);
+                    }
+
+                    logger.info("Cannot merge: bn = " + bn.toString() + " intersects with bi = "+bi.toString());
                     return false;
+
                 }
             }
         }
 
         return true;
+    }
+
+    /**
+     * Rearrangement of the suitable buckets after merging.
+     * If there is inaccurate estimation in the potential buckets, there is a need of parent child arrangement in the histogram.
+     *
+     * @param bp the potential parent
+     * @param bc the potential child
+     */
+    private boolean constructMergingBucket(STHolesBucket<R> bp, STHolesBucket<R> bc) {
+
+        if (isInaccurateEstimation(bp, bc)) {
+            STHolesBucket<R> hole = bc;
+
+            STHolesBucket<R> par = bc.getParent();
+
+            if(par != null)
+                par.removeChild(bc);
+            else
+                return false;
+
+            List<STHolesBucket> toRemove = new ArrayList<>();
+
+            for (STHolesBucket<R> bucketChild : bp.getChildren())
+                if (hole.getBox().contains(bucketChild.getBox()))
+                    toRemove.add(bucketChild);
+
+            for (STHolesBucket r : toRemove)
+                bp.removeChild(r);
+
+            bp.addChild(hole);
+
+
+        } else {
+            setSubjLength(bp.getBox(), getSubjLength(bc.getBox()));
+        }
+
+        return true;
+
     }
 
     /**

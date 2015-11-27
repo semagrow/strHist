@@ -159,6 +159,7 @@ public class VoIDCSerializer {
                     e.printStackTrace();
                 }
             }
+            model.add(bucketResource, VOID.RADIUS, createLiteral(bucket.getBox().getSubjectRange().getRadius()));
         }
 
         String predicateStr = "";
@@ -325,6 +326,10 @@ public class VoIDCSerializer {
     }
 
     private Literal createLiteral(Long l) {
+        return ValueFactoryImpl.getInstance().createLiteral(l);
+    }
+
+    private Literal createLiteral(Double l) {
         return ValueFactoryImpl.getInstance().createLiteral(l);
     }
 
