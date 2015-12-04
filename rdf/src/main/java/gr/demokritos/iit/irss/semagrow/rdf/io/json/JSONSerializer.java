@@ -11,7 +11,6 @@ import gr.demokritos.iit.irss.semagrow.rdf.RDFLiteralRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFRectangle;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFURIRange;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFValueRange;
-import gr.demokritos.iit.irss.semagrow.rdf.io.sevod.VoIDeserializer;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesBucket;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.json.simple.JSONArray;

@@ -5,6 +5,7 @@ import eu.semagrow.querylog.api.QueryLogRecord;
 import eu.semagrow.querylog.QueryLogCollector;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 
+import gr.demokritos.iit.irss.semagrow.histogram.HistogramCUtils;
 import gr.demokritos.iit.irss.semagrow.histogram.HistogramUtils;
 
 import org.openrdf.model.URI;
@@ -65,8 +66,8 @@ public class QueryLogReader {
     }
 
     public Collection<QueryRecord> adaption(String logDir) {
-        HistogramUtils utils = new HistogramUtils(executor, logDir);
-        Collection<QueryRecord> qr = HistogramUtils.adaptLogs(this.logCollection);
+        HistogramCUtils utils = new HistogramCUtils(executor, logDir);
+        Collection<QueryRecord> qr = HistogramCUtils.adaptLogs(this.logCollection);
 
   //      logger.info("Successful adapt of logs");
 

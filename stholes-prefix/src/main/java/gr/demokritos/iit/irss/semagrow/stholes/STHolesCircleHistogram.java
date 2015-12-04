@@ -18,7 +18,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
     static final Logger logger = LoggerFactory.getLogger(STHolesCircleHistogram.class);
     private STHolesBucket<R> root;
-    public long maxBucketsNum = 8;
+    public long maxBucketsNum = 10;
     public Double epsilon = 0.0;
     private long bucketsNum = 0;
 
@@ -28,6 +28,8 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
     static public final int MAX_PENALTY_TYPE = 3;
     public int PENALTY_TYPE = 3;
     static boolean moreSpecific = true;
+
+    private List<MergeInfo<R>> notMergingList = new ArrayList<>();
 
     public STHolesCircleHistogram() {
         //todo: choose a constant
@@ -345,7 +347,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             candidates.addAll(getCandidateBuckets(bucketChild, queryBox));
 
 
-        if (bucket.getBox().intersects(queryBox)) {
+        if (bucket.getBox().contains(queryBox)) {
             //boolean moreSpecific = true;
 
             // Add a candidate only if there isn't already any more specific candidate.
@@ -403,8 +405,8 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         // call merge(b1,b2,bn)
         while (bucketsNum > maxBucketsNum) {
 
-            //MergeInfo<R> bestMerge = findBestMerge(root);
-            MergeInfo<R> bestMerge = findRankMerge(root);
+            MergeInfo<R> bestMerge = findBestMergeN(root);
+            //MergeInfo<R> bestMerge = findRankMerge(root);
             STHolesBucket<R> b1 = bestMerge.getB1();
             STHolesBucket<R> b2 = bestMerge.getB2();
             STHolesBucket<R> bn = bestMerge.getBn();
@@ -497,6 +499,144 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         return bestMerge;
     }
 
+    private MergeInfo<R> findBestMergeN(STHolesBucket<R> b) {
+        List<MergeInfo<R>> SSrankList = new ArrayList<>();
+        MergeInfo<R> bestMerge;
+
+        MergeInfo<R> bestParent = findBestParentMerge(root, Double.MAX_VALUE);
+
+        findBestSiblingMerge(SSrankList, bestParent.getPenalty(), root);
+
+
+        if (SSrankList.isEmpty()) {
+            return bestParent;
+        }
+        else {
+            updateRankMerge(SSrankList);
+            int i = 0;
+            boolean flag = false;
+            for (i = 0; i < SSrankList.size(); i++) {
+
+                for (int j=0; j < notMergingList.size(); j++) {
+
+                    if (notMergingList.get(j).equals(SSrankList.get(i))) {
+                        logger.info(SSrankList.get(i).toString() + " exists in non merging list");
+                        continue;
+                    }
+                    else {
+                        if (isMerging(SSrankList.get(i))) {
+                            flag = true;
+                            break;
+                        }
+                        else {
+                            this.notMergingList.add(SSrankList.get(i));
+                            logger.info(SSrankList.get(i).toString() + " just added!");
+                        }
+                    }
+                }
+
+                if (flag)
+                    break;
+                //if (isMerging(SSrankList.get(i)))
+                 //   break;
+            }
+
+            if (i >= SSrankList.size()) {
+                return bestParent;
+            }
+            else {
+                MergeInfo<R> merge = SSrankList.get(i);
+                bestMerge = new MergeInfo<R>(merge.getB1(), merge.getB2(), merge.getBn(), merge.getPenalty());
+
+                return bestMerge;
+            }
+        }
+
+    }
+
+    private MergeInfo<R> findBestParentMerge(STHolesBucket<R> b, double minimumPCPenalty) {
+        //double minimumPCPenalty = Integer.MAX_VALUE;
+        double penalty;
+        MergeInfo<R> best = new MergeInfo<R>(b, b, b, Double.MAX_VALUE);
+        Map.Entry<STHolesBucket<R>, Double> candidateMergedBucket;
+
+        Collection<STHolesBucket<R>> bcs = b.getChildren();
+        ArrayList<STHolesBucket<R>> bChildren = new ArrayList<STHolesBucket<R>>(bcs);
+
+        STHolesBucket<R> bi;
+
+        // Initialize buckets to be merged and resulting bucket
+        STHolesBucket<R> b1 = b;
+        STHolesBucket<R> b2 = b;
+        STHolesBucket<R> bn = b;
+
+        logger.info("Parent-child merge .... ");
+        for (int i = 0; i < bChildren.size(); i++) {
+            bi = bChildren.get(i);
+            // Candidate parent-child merges
+            candidateMergedBucket = getPCMergePenalty(b, bi);
+            penalty = candidateMergedBucket.getValue();
+
+            if (penalty <= minimumPCPenalty) {
+
+                minimumPCPenalty = penalty;
+                b1 = b;
+                b2 = bi;
+                bn = candidateMergedBucket.getKey();
+
+                //set the best parent merge
+                best.setB1(b1);
+                best.setB2(b2);
+                best.setBn(bn);
+                best.setPenalty(penalty);
+                logger.info("PC: penalty = " + penalty + " b1 = " + b1.toString() + " b2= " + b2.toString() + " bn = " + bn.toString());
+            }
+            best = findBestParentMerge(bi, minimumPCPenalty);
+        }
+
+        return best;
+    }
+
+    private void findBestSiblingMerge(List<MergeInfo<R>> SSrankList, double minimumPCPenalty, STHolesBucket<R> b) {
+        Map.Entry<STHolesBucket<R>, Double> candidateMergedBucket;
+        double penalty;
+        STHolesBucket<R> bi, bj;
+
+        // Initialize buckets to be merged and resulting bucket
+        STHolesBucket<R> b1 = b;
+        STHolesBucket<R> b2 = b;
+        STHolesBucket<R> bn = b;
+
+        Collection<STHolesBucket<R>> bcs = b.getChildren();
+        ArrayList<STHolesBucket<R>> bChildren = new ArrayList<STHolesBucket<R>>(bcs);
+
+        for (int i = 0; i < bChildren.size(); i++) {
+            bi = bChildren.get(i);
+            // Candidate sibling-sibling merges
+            logger.info("Sibling merging .... ");
+            for (int j = i + 1; j < bChildren.size(); j++) {
+
+                bj = bChildren.get(j);
+
+                if (bi.getBox().isMergeable(bj.getBox())) {
+                    candidateMergedBucket = getSSMergePenalty(bi, bj);
+                    penalty = candidateMergedBucket.getValue();
+
+                    if (penalty <= minimumPCPenalty) {
+                        b1 = bi;
+                        b2 = bj;
+                        bn = candidateMergedBucket.getKey();
+                        logger.info("SS: penalty = " + penalty + " b1 = " + b1.toString() + " b2= " + b2.toString() + " bn = " + bn.toString());
+
+                        SSrankList.add(new MergeInfo<R>(b1, b2, bn, penalty));
+                    }
+                }
+                findBestSiblingMerge(SSrankList, minimumPCPenalty, bj);
+
+            }
+        }
+    }
+
     /**
      * identifies the merges with lowest SS penalties
      * and returns a list of the buckets to be merged and
@@ -577,6 +717,9 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
                 if (isMerging(SSrankList.get(i)))
                     break;
+                else {
+
+                }
             }
 
             if (i >= SSrankList.size()) {
@@ -663,8 +806,10 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
             if(par != null)
                 par.removeChild(bc);
-            else
+            else {
+                logger.info("there is no parent ... ");
                 return false;
+            }
 
             List<STHolesBucket> toRemove = new ArrayList<>();
 
@@ -677,9 +822,12 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
             bp.addChild(hole);
 
+            logger.info("Child "+hole.toString()+" is added on "+bp.toString());
+
 
         } else {
             setSubjLength(bp.getBox(), getSubjLength(bc.getBox()));
+            logger.info("augment the points of bucket : "+ bp.toString());
         }
 
         return true;
@@ -716,7 +864,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         String subj1 = getSubject(mergeBox.getB1().getBox());
         String subj2 = getSubject(mergeBox.getB2().getBox());
 
-        logger.info("JW similarity : " + (1.0 - jw.getSimilarity(subj1, subj2)));
+        //logger.info("JW similarity : " + (1.0 - jw.getSimilarity(subj1, subj2)));
         mergeBox.setPenalty((1.0 - jw.getSimilarity(subj1, subj2)) + mergeBox.getPenalty());
 
         return mergeBox;
@@ -786,7 +934,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
                 } else {
                     dd = (Math.abs(bp.getStatistics().getDensity() - bc.getStatistics().getDensity())) / (bp.getStatistics().getDensity() + bc.getStatistics().getDensity());
                 }
-                logger.info("PC! Triples : dd = "+dd);
+                //logger.info("PC! Triples : dd = "+dd);
                 double dd3 = 0.0;
              /*   Math.abs( b1.getStatistics().getDensity() - bn.getStatistics().getDensity() ) +
                 Math.abs( b2.getStatistics().getDensity() - bn.getStatistics().getDensity() );*/
@@ -794,13 +942,13 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
                     dd3 = (Math.abs(( (double)bp.getStatistics().getDistinctCount().get(i) - (double)bc.getStatistics().getDistinctCount().get(i)) )
                             / ( (double)bp.getStatistics().getDistinctCount().get(i) + (double)bc.getStatistics().getDistinctCount().get(i) ));
 
-                    logger.info("PC! Distinct "+ i +" : dd = "+dd3);
+                    //logger.info("PC! Distinct "+ i +" : dd = "+dd3);
                     dd = dd +dd3;
                 }
                 penalty = dd;
                 break;
             default:
-                throw new IllegalArgumentException( "Type must be 0..2" );
+                throw new IllegalArgumentException( "Type must be 0..3" );
         }
 
         AbstractMap.SimpleEntry<STHolesBucket<R>, Double> res = new AbstractMap.SimpleEntry<STHolesBucket<R>, Double>(bn, penalty);
@@ -936,19 +1084,19 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
                     // dd = (Math.abs(b1.getStatistics().getFrequency() - b2.getStatistics().getFrequency())) / (b1.getStatistics().getFrequency() + b2.getStatistics().getFrequency());
                 }
-                logger.info("SS! Triples : dd = "+dd);
+                //logger.info("SS! Triples : dd = "+dd);
                 double dd3 = 0.0;
                 for( int i=0; i<dim; ++i ) {
                     dd3 = (Math.abs(( (double)bn.getStatistics().getDistinctCount().get(i) - (double)b1.getStatistics().getDistinctCount().get(i)) )
                             / ( (double)bn.getStatistics().getDistinctCount().get(i) + (double)b1.getStatistics().getDistinctCount().get(i) ));
 
-                    logger.info("SS! b1 Distinct "+ i +" : dd = "+dd3);
+                    //logger.info("SS! b1 Distinct "+ i +" : dd = "+dd3);
                     dd = dd +dd3;
 
                     dd3 = (Math.abs(( (double)bn.getStatistics().getDistinctCount().get(i) - (double)b2.getStatistics().getDistinctCount().get(i)) )
                             / ( (double)bn.getStatistics().getDistinctCount().get(i) + (double)b2.getStatistics().getDistinctCount().get(i) ));
 
-                    logger.info("SS! b2 Distinct "+ i +" : dd = "+dd3);
+                    //logger.info("SS! b2 Distinct "+ i +" : dd = "+dd3);
                     dd = dd + dd3;
                 }
 
@@ -961,10 +1109,10 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             logger.info("JW similarity : "+(1 - jw.getSimilarity(subj1, subj2)));
             dd = dd + (double)(1.0 - jw.getSimilarity(subj1, subj2));*/
                 penalty = dd;
-                logger.info("TOTAL PENALTY = "+penalty);
+                //logger.info("TOTAL PENALTY = "+penalty);
                 break;
             default:
-                throw new IllegalArgumentException( "Type must be 0..2" );
+                throw new IllegalArgumentException( "Type must be 0..3" );
         }
 
         AbstractMap.SimpleEntry<STHolesBucket<R>, Double> res =

@@ -51,8 +51,8 @@ public class RDFCircle implements Rectangle<RDFCircle> {
     public boolean equals(Object obj) {
         if (this == obj) return true;
 
-        if (obj instanceof RDFRectangle) {
-            RDFRectangle rec = (RDFRectangle)obj;
+        if (obj instanceof RDFCircle) {
+            RDFCircle rec = (RDFCircle)obj;
             return this.getSubjectRange().equals(rec.getSubjectRange()) &&
                     this.getPredicateRange().equals(rec.getPredicateRange()) &&
                     this.getObjectRange().equals(rec.getObjectRange());

@@ -4,6 +4,7 @@ import gr.demokritos.iit.irss.semagrow.config.LogConfigImpl;
 import eu.semagrow.querylog.api.QueryLogException;
 import gr.demokritos.iit.irss.semagrow.qfr.QueryLogReader;
 import gr.demokritos.iit.irss.semagrow.stholes.STHistogramBase;
+import gr.demokritos.iit.irss.semagrow.stholes.STHolesCircleHistogram;
 import gr.demokritos.iit.irss.semagrow.stholes.STHolesHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,8 @@ import java.io.IOException;
  */
 public class LoadHistogram {
     //private static String histDir;
-    private STHolesHistogram histogram;
+    //private STHolesHistogram histogram;
+    private STHolesCircleHistogram histogram;
     private LogConfigImpl config;
 
     private static Logger logger = LoggerFactory.getLogger(LoadHistogram.class);
@@ -38,7 +40,7 @@ public class LoadHistogram {
 
             ((STHistogramBase) this.histogram).refine(reader.adaption(config.getLogDir()).iterator());
 
-            HistogramUtils.serializeHistogram(histogram, config.getHistDir());
+            HistogramCUtils.serializeHistogram(histogram, config.getHistDir());
         } catch (IOException e) {
             logger.warn("IO exception", e);
         } finally {
@@ -47,7 +49,7 @@ public class LoadHistogram {
     }
 
     private void loadHistogram() {
-        this.histogram = HistogramUtils.loadPreviousHistogram(config.getHistDir());
+        this.histogram = HistogramCUtils.loadPreviousHistogram(config.getHistDir());
   //      logger.info("Previous histogram loaded");
     }
 
