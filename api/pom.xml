@@ -7,9 +7,7 @@
     <groupId>gr.demokritos.iit.irss.semagrow</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <groupId>gr.demokritos.iit.irss.semagrow</groupId>
   <artifactId>sthist-api</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <name>sthist-api</name>
   <url>http://maven.apache.org</url>
   <dependencies>
@@ -19,28 +17,5 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-
-      <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-          <version>1.5.8</version>
-          <scope>test</scope>
-      </dependency>
   </dependencies>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
