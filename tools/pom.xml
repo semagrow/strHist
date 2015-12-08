@@ -40,10 +40,5 @@
             <artifactId>semagrow-monitor</artifactId>
             <version>1.4.1</version>
         </dependency>
-        <dependency>
-            <groupId>net.sourceforge</groupId>
-            <artifactId>simmetrics</artifactId>
-            <version>1.6.2</version>
-        </dependency>
     </dependencies>
 </project>
