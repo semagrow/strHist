@@ -233,7 +233,7 @@ public class STHolesBucket<R extends Rectangle> {
         if (!box.equals(that.box)) return false;
         if (children != null ? !children.equals(that.children) : that.children != null) return false;
         if (!parent.equals(that.parent)) return false;
-        if (!statistics.equals(that.statistics)) return false;
+        //if (!statistics.equals(that.statistics)) return false;
 
         return true;
     }

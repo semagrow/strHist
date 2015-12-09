@@ -410,6 +410,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         while (bucketsNum > maxBucketsNum) {
 
             MergeInfo<R> bestMerge = findBestMergeN(root);
+            //MergeInfo<R> bestMerge = findBestMerge1(root);
             //MergeInfo<R> bestMerge = findRankMerge(root);
             STHolesBucket<R> b1 = bestMerge.getB1();
             STHolesBucket<R> b2 = bestMerge.getB2();
@@ -592,7 +593,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             STHolesBucket<R> refB = mergeInfo.getB1().equals(b1) ? mergeInfo.getB2() : mergeInfo.getB1();
 
             // in case that there is an mergeinfo between (b1, b2).
-            if (refB.equals(b1))
+            if (refB.equals(b1) || refB.equals(b2))
                 continue;
 
             // compute new merge info between the merged bucket bn and the influenced bucket refB.
@@ -709,6 +710,85 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         return bestMerge;
     }
 
+
+    private MergeInfo<R> findBestMerge1(STHolesBucket<R> b) {
+        List<MergeInfo<R>> SSrankList = new ArrayList<>();
+        MergeInfo<R> bestMerge;
+
+        MergeInfo<R> bestParent = findBestParentMerge(b, Double.MAX_VALUE);
+
+        findBestSiblingMerge1(SSrankList, bestParent.getPenalty(), b);
+
+
+        if (SSrankList.isEmpty()) {
+            return bestParent;
+        }
+        else {
+            updateRankMerge(SSrankList);
+            int i = 0;
+            boolean flag = false;
+            for (i = 0; i < SSrankList.size(); i++) {
+
+                if (isMerging(SSrankList.get(i)))
+                    break;
+                //if (isMerging(SSrankList.get(i)))
+                //   break;
+            }
+
+            if (i >= SSrankList.size()) {
+                return bestParent;
+            }
+            else {
+                MergeInfo<R> merge = SSrankList.get(i);
+                bestMerge = new MergeInfo<R>(merge.getB1(), merge.getB2(), merge.getBn(), merge.getPenalty());
+
+                return bestMerge;
+            }
+        }
+
+    }
+
+    private void findBestSiblingMerge1(List<MergeInfo<R>> SSrankList, double minimumPCPenalty, STHolesBucket<R> b) {
+        Map.Entry<STHolesBucket<R>, Double> candidateMergedBucket;
+        double penalty;
+        STHolesBucket<R> bi, bj;
+
+        // Initialize buckets to be merged and resulting bucket
+        STHolesBucket<R> b1 = b;
+        STHolesBucket<R> b2 = b;
+        STHolesBucket<R> bn = b;
+
+        Collection<STHolesBucket<R>> bcs = b.getChildren();
+        ArrayList<STHolesBucket<R>> bChildren = new ArrayList<STHolesBucket<R>>(bcs);
+
+        for (int i = 0; i < bChildren.size(); i++) {
+            bi = bChildren.get(i);
+            // Candidate sibling-sibling merges
+            logger.info("Sibling merging .... ");
+            for (int j = i + 1; j < bChildren.size(); j++) {
+
+                bj = bChildren.get(j);
+
+                if (bi.getBox().isMergeable(bj.getBox())) {
+                    candidateMergedBucket = getSSMergePenalty(bi, bj);
+                    penalty = candidateMergedBucket.getValue();
+
+                    if (penalty <= minimumPCPenalty) {
+                        b1 = bi;
+                        b2 = bj;
+                        bn = candidateMergedBucket.getKey();
+                        logger.info("SS: penalty = " + penalty + " b1 = " + b1.toString() + " b2= " + b2.toString() + " bn = " + bn.toString());
+
+                        SSrankList.add(new MergeInfo<R>(b1, b2, bn, penalty));
+                    }
+                }
+                findBestSiblingMerge1(SSrankList, minimumPCPenalty, bj);
+
+            }
+        }
+    }
+
+
     private MergeInfo<R> findBestMergeN(STHolesBucket<R> b) {
         List<MergeInfo<R>> SSrankList = new ArrayList<>();
         MergeInfo<R> bestMerge;
@@ -800,8 +880,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
             List<MergeInfo<R>> tempList = (List<MergeInfo<R>>) pair.getValue();
 
-            for (int i = 0; i < tempList.size(); i++) {
-                MergeInfo<R> merge = tempList.get(i);
+            for (MergeInfo merge : tempList) {
 
                 if (SSrankList.contains(merge))
                     continue;
@@ -813,8 +892,10 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             }
 
             STHolesBucket<R> bucket = (STHolesBucket<R>) pair.getKey();
-            if (! bucket.getChildren().isEmpty())
+            if (! bucket.getChildren().isEmpty()) {
+
                 findBestSiblingMerge(SSrankList, minimumPCPenalty, bucket);
+            }
         }
 
         /////////////////////////////////////
