@@ -862,7 +862,11 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
                 best.setPenalty(penalty);
                 logger.info("PC: penalty = " + penalty + " b1 = " + b1.toString() + " b2= " + b2.toString() + " bn = " + bn.toString());
             }
-            best = findBestParentMerge(bi, minimumPCPenalty);
+            if (! bi.getChildren().isEmpty()) {
+                MergeInfo<R> temp = findBestParentMerge(bi, minimumPCPenalty);
+                if (temp.getPenalty() <= best.getPenalty())
+                    best = temp;
+            }
         }
 
         return best;
