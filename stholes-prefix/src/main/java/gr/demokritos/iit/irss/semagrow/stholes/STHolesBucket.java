@@ -241,9 +241,9 @@ public class STHolesBucket<R extends Rectangle> {
     @Override
     public int hashCode() {
         int result = box.hashCode();
-        result = 31 * result + (children != null ? children.hashCode() : 0);
+        //result = 31 * result + (children != null ? children.hashCode() : 0);
         result = 31 * result + statistics.hashCode();
-        result = 31 * result + parent.hashCode();
+        result = 31 * result + (parent != null ? parent.hashCode() : 0);
         return result;
     }
 

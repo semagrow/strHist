@@ -28,17 +28,21 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
     static public final int MAX_PENALTY_TYPE = 3;
     public int PENALTY_TYPE = 3;
     static boolean moreSpecific = true;
+    private Map<STHolesBucket<R>, Map<STHolesBucket<R>, Double>> memo = new HashMap<>();
+    private Map<STHolesBucket<R>, List<MergeInfo<R>>> memoMap;
 
     private List<MergeInfo<R>> notMergingList = new ArrayList<>();
 
     public STHolesCircleHistogram() {
         //todo: choose a constant
         root = null;
+        memoMap = new HashMap<STHolesBucket<R>, List<MergeInfo<R>>>();
         bucketsNum += bucketsNum;
     }
 
     public STHolesCircleHistogram(STHolesBucket root) {
         this.root = root;
+        memoMap = new HashMap<STHolesBucket<R>, List<MergeInfo<R>>>();
         bucketsNum++;
     }
 
@@ -419,6 +423,308 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         }
     }
 
+    private void constructMemoMap(STHolesBucket<R> b) {
+
+        Map.Entry<STHolesBucket<R>, Double> candidateMergedBucket;
+        double penalty;
+        STHolesBucket<R> bi, bj;
+
+
+        Collection<STHolesBucket<R>> bcs = b.getChildren();
+        ArrayList<STHolesBucket<R>> bChildren = new ArrayList<STHolesBucket<R>>(bcs);
+
+        for (int i = 0; i < bChildren.size(); i++) {
+            bi = bChildren.get(i);
+
+            logger.info("Construct memo map .... ");
+            for (int j = i + 1; j < bChildren.size(); j++) {
+
+                bj = bChildren.get(j);
+
+                if (bi.getBox().isMergeable(bj.getBox())) {
+                    candidateMergedBucket = getSSMergePenalty(bi, bj);
+
+                    if (candidateMergedBucket == null)
+                        continue;
+
+                    penalty = candidateMergedBucket.getValue();
+                    MergeInfo<R> merge = new MergeInfo<>(bi, bj, candidateMergedBucket.getKey(), penalty);
+
+                    if (this.memoMap.isEmpty()) {
+
+                        addMemoBuckets(merge);
+                        logger.info("Add memo map with penalty =  " + penalty + ", bi = " + bi.toString() + " bj= " + bj.toString() + " bn = ");
+                    }
+                    else {
+                        updateMemoBuckets(merge);
+                        logger.info("Update memo map with penalty =  " + penalty + ", bi = " + bi.toString() + " bj= " + bj.toString() + " bn = ");
+                    }
+
+                }
+
+
+            }
+        }
+    }
+
+    /**
+     * add the sibling buckets and its penalty to a map (graph representation) in the memory.
+     *@param merge
+     */
+    private void addMemoBuckets(MergeInfo<R> merge) {
+        /*Map<STHolesBucket<R>, Double> tempMap1 = new HashMap<>();
+        tempMap1.put(bj, penalty);
+        memo.put(bi, tempMap1);
+
+        Map<STHolesBucket<R>, Double> tempMap2 = new HashMap<>();
+        tempMap2.put(bi, penalty);
+        memo.put(bj, tempMap2);*/
+
+        List<MergeInfo<R>> list1 = new ArrayList();
+        list1.add(merge);
+
+        if (merge.getB1() == null || merge.getB2() == null) {
+            return;
+        }
+
+        this.memoMap.put(merge.getB1(), list1);
+
+        List<MergeInfo<R>> list2 = new ArrayList();
+        list2.add(merge);
+        this.memoMap.put(merge.getB2(), list2);
+    }
+
+    private void updateMemoBuckets(MergeInfo<R> merge) {
+        /*boolean flag = false;
+
+        Iterator it = memo.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+
+            if(pair.getKey().equals((STHolesBucket<R>) bi)) {
+                Map<STHolesBucket<R>, Double> temp = (Map<STHolesBucket<R>, Double>) pair.getValue();
+
+                temp.put(bj, penalty);
+                if (flag)
+                break;
+                else
+                    flag = true;
+            }
+
+            if(pair.getKey().equals((STHolesBucket<R>) bj)) {
+                Map<STHolesBucket<R>, Double> temp = (Map<STHolesBucket<R>, Double>) pair.getValue();
+
+                temp.put(bi, penalty);
+                if (flag)
+                    break;
+                else
+                    flag = true;
+            }
+
+        }*/
+
+        boolean flag1 = false, flag2 = false;
+
+        Iterator it = memoMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+
+            if (pair.getKey().equals((STHolesBucket<R>) merge.getB1())) {
+                List<MergeInfo<R>> tempList = (List) pair.getValue();
+
+                tempList.add(merge);
+                if (flag1)
+                    break;
+                else
+                    flag1 = true;
+            }
+            if (pair.getKey().equals((STHolesBucket<R>) merge.getB2())) {
+                List<MergeInfo<R>> tempList = (List) pair.getValue();
+
+                tempList.add(merge);
+                if (flag2)
+                    break;
+                else
+                    flag2 = true;
+            }
+
+            if (flag1 && flag2)
+                break;
+        }
+
+        // the key bucket doesnt exist -> add a new one in the memoMap
+        if (!flag1) {
+            List<MergeInfo<R>> list = new ArrayList();
+            list.add(merge);
+
+            this.memoMap.put(merge.getB1(), list);
+        }
+
+        if (!flag2) {
+            List<MergeInfo<R>> list = new ArrayList();
+            list.add(merge);
+
+            this.memoMap.put(merge.getB2(), list);
+        }
+
+
+    }
+
+    /**
+     * update the memoMap after a merge.
+     * @param merge the merge bucket
+     */
+    private void mergeMemoMap(MergeInfo<R> merge) {
+
+        STHolesBucket<R> b1 = merge.getB1();
+        STHolesBucket<R> b2 = merge.getB2();
+        STHolesBucket<R> bn = merge.getBn();
+
+        boolean flag = false;
+
+        List<MergeInfo<R>> list1 = null, list2 = null;
+        List<MergeInfo<R>> newList = new ArrayList<>();
+
+        /* get the lists of the merged buckets , in order to find which key-buckets need update because of the merge */
+        Iterator it = memoMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            STHolesBucket<R> key = (STHolesBucket<R>) pair.getKey();
+
+            if (key.equals(b1)) {
+                list1 = (List<MergeInfo<R>>) pair.getValue();
+
+                if (flag)
+                    break;
+                else
+                    flag = true;
+            }
+
+            if (key.equals(b2)) {
+                list2 = (List<MergeInfo<R>>) pair.getValue();
+
+                if (flag)
+                    break;
+                else
+                    flag = true;
+            }
+
+        }
+
+        STHolesBucket<R> refB;
+
+        // for every bucket that is influenced by the merge
+        // get its list of <MergeInfo>
+        // remove only the MergeInfo that contains the bucket that will be merged
+        // calculate the penalty of the merged bucket and the current one and construct a new MergeInfo
+        // add this MergeInfo to the list of the current bucket and the merged bucket
+        for (int i = 0; i < list1.size(); i++) {
+
+            if (list1.get(i).getB1().equals(b1))
+                refB = list1.get(i).getB2();
+            else
+                refB = list1.get(i).getB1();
+
+            logger.info("list1["+ i +"] = " + list1.get(i).toString());
+
+            if (! refB.equals(b2)) {
+                List<MergeInfo<R>> tempList = memoMap.get(refB);
+                List<MergeInfo<R>> refList = new ArrayList<>();     // the new list of the current key-bucket
+
+
+                for (int j = 0; j < tempList.size(); j++) {
+                    // this mergeInfo needs refinement
+                    if (tempList.get(j).getB1().equals(b1) || tempList.get(j).getB2().equals(b1)) {
+                        Map.Entry<STHolesBucket<R>, Double> candidate = getSSMergePenalty(PENALTY_TYPE, bn, refB);
+                        MergeInfo<R> bucket = new MergeInfo<>(bn, refB, (STHolesBucket<R>) candidate.getKey(), (double) candidate.getValue());
+
+                        logger.info("bn = "+ bn + " , refB = "+ refB +" to new merged bucket "+bucket.toString()+" ");
+
+                        for (int k = 0; k < tempList.size(); k++) {
+                            //if the bucket already exists in the list, do not add it again
+                            if (! tempList.get(k).getBn().equals((STHolesBucket<R>) candidate.getKey())) {
+                                refList.add(bucket);
+                                newList.add(bucket);
+                            }
+                            else {
+                                logger.info("List1: " + tempList.get(k).getBn() + " -> Already exists!");
+                            }
+                        }
+
+                    } else if (tempList.get(j).equals(list1.get(i)))
+                        continue;
+                    else
+                        refList.add(tempList.get(j));
+
+                }
+                memoMap.put(refB, refList);
+            }
+        }
+        memoMap.remove(b1);
+
+
+        for (int i = 0; i < list2.size(); i++) {
+
+            if (list2.get(i).getB1().equals(b1))
+                refB = list2.get(i).getB2();
+            else
+                refB = list2.get(i).getB1();
+
+            logger.info("list2["+ i +"] = " + list2.get(i).toString());
+
+            if (!refB.equals(b2)) {
+                List<MergeInfo<R>> tempList = memoMap.get(refB);
+                List<MergeInfo<R>> refList = new ArrayList<>();
+
+
+                if (tempList == null) {
+                    System.out.println("the templist of "+refB.toString()+ " is null!");
+                }
+
+                for (int j = 0; j < tempList.size(); j++) {
+                    // this mergeInfo needs refinement
+                    if (tempList.get(j).getB1().equals(b1) || tempList.get(j).getB2().equals(b1)) {
+                        Map.Entry<STHolesBucket<R>, Double> candidate = getSSMergePenalty(PENALTY_TYPE, bn, refB);
+                        MergeInfo<R> bucket = new MergeInfo<>(bn, refB, (STHolesBucket<R>) candidate.getKey(), (double) candidate.getValue());
+
+                        for (int k = 0; k < tempList.size(); k++) {
+                            if (! tempList.get(k).getBn().equals((STHolesBucket<R>) candidate.getKey())) {
+                                refList.add(bucket);
+                                newList.add(bucket);
+                            }
+                            else {
+                                logger.info("List2: "+ tempList.get(k).getBn() +" -> Already exists!");
+                            }
+                        }
+
+                    } else if (tempList.get(j).equals(list2.get(i)))
+                        continue;
+                    else
+                        refList.add(tempList.get(j));
+
+                }
+                memoMap.put(refB, refList);
+            }
+        }
+        memoMap.remove(b2);
+
+        // add the merged bucket to the map
+        memoMap.put(bn, newList);
+
+        //only for logs!!!!
+        it = memoMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+
+            logger.info(" key = "+pair.getKey().toString());
+
+            List<MergeInfo<R>> l = (List<MergeInfo<R>>) pair.getValue();
+
+            for (int i = 0; i< l.size(); i++)
+                logger.info(" value "+i+" = " + l.get(i).toString());
+        }
+    }
+
     /**
      * identifies the merge with lowest penalty
      * and returns the buckets to be merged and
@@ -503,9 +809,9 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         List<MergeInfo<R>> SSrankList = new ArrayList<>();
         MergeInfo<R> bestMerge;
 
-        MergeInfo<R> bestParent = findBestParentMerge(root, Double.MAX_VALUE);
+        MergeInfo<R> bestParent = findBestParentMerge(b, Double.MAX_VALUE);
 
-        findBestSiblingMerge(SSrankList, bestParent.getPenalty(), root);
+        findBestSiblingMerge(SSrankList, bestParent.getPenalty(), b);
 
 
         if (SSrankList.isEmpty()) {
@@ -513,32 +819,12 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         }
         else {
             updateRankMerge(SSrankList);
+
             int i = 0;
-            boolean flag = false;
             for (i = 0; i < SSrankList.size(); i++) {
 
-                for (int j=0; j < notMergingList.size(); j++) {
-
-                    if (notMergingList.get(j).equals(SSrankList.get(i))) {
-                        logger.info(SSrankList.get(i).toString() + " exists in non merging list");
-                        continue;
-                    }
-                    else {
-                        if (isMerging(SSrankList.get(i))) {
-                            flag = true;
-                            break;
-                        }
-                        else {
-                            this.notMergingList.add(SSrankList.get(i));
-                            logger.info(SSrankList.get(i).toString() + " just added!");
-                        }
-                    }
-                }
-
-                if (flag)
+                if (isMerging(SSrankList.get(i)))
                     break;
-                //if (isMerging(SSrankList.get(i)))
-                 //   break;
             }
 
             if (i >= SSrankList.size()) {
@@ -548,6 +834,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
                 MergeInfo<R> merge = SSrankList.get(i);
                 bestMerge = new MergeInfo<R>(merge.getB1(), merge.getB2(), merge.getBn(), merge.getPenalty());
 
+                mergeMemoMap(bestMerge);
                 return bestMerge;
             }
         }
@@ -598,18 +885,36 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
     }
 
     private void findBestSiblingMerge(List<MergeInfo<R>> SSrankList, double minimumPCPenalty, STHolesBucket<R> b) {
-        Map.Entry<STHolesBucket<R>, Double> candidateMergedBucket;
-        double penalty;
-        STHolesBucket<R> bi, bj;
 
-        // Initialize buckets to be merged and resulting bucket
-        STHolesBucket<R> b1 = b;
-        STHolesBucket<R> b2 = b;
-        STHolesBucket<R> bn = b;
+        if (memoMap.isEmpty()) {
+            constructMemoMap(b);
+        }
 
-        Collection<STHolesBucket<R>> bcs = b.getChildren();
-        ArrayList<STHolesBucket<R>> bChildren = new ArrayList<STHolesBucket<R>>(bcs);
+        Iterator it = memoMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
 
+            List<MergeInfo<R>> tempList = (List<MergeInfo<R>>) pair.getValue();
+
+            for (int i = 0; i < tempList.size(); i++) {
+                MergeInfo<R> merge = tempList.get(i);
+
+                if (SSrankList.contains(merge))
+                    continue;
+
+                if (merge.getPenalty() <= minimumPCPenalty) {
+                    SSrankList.add(merge);
+
+                }
+            }
+
+            STHolesBucket<R> bucket = (STHolesBucket<R>) pair.getKey();
+            if (! bucket.getChildren().isEmpty())
+                findBestSiblingMerge(SSrankList, minimumPCPenalty, bucket);
+        }
+
+        /////////////////////////////////////
+        /*
         for (int i = 0; i < bChildren.size(); i++) {
             bi = bChildren.get(i);
             // Candidate sibling-sibling merges
@@ -635,6 +940,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
             }
         }
+        */
     }
 
     /**
@@ -700,6 +1006,8 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
                         SSrankList.add(new MergeInfo<R>(b1, b2, bn, penalty));
                     }
+
+
                 }
 
             }
@@ -712,8 +1020,6 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             updateRankMerge(SSrankList);
             int i = 0;
             for (i = 0; i < SSrankList.size(); i++) {
-                logger.info("SSrankList[" + i + "]: penalty = " + SSrankList.get(i).getPenalty() +
-                        "\n b1 = " + SSrankList.get(i).getB1() + "\n b2 = " + SSrankList.get(i).getB2() + "\n bn = " + SSrankList.get(i).getBn());
 
                 if (isMerging(SSrankList.get(i)))
                     break;
@@ -864,7 +1170,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         String subj1 = getSubject(mergeBox.getB1().getBox());
         String subj2 = getSubject(mergeBox.getB2().getBox());
 
-        //logger.info("JW similarity : " + (1.0 - jw.getSimilarity(subj1, subj2)));
+        //logger.info("JW similarity : " + subj1 + " - " + subj2 + " = " + (1.0 - jw.getSimilarity(subj1, subj2)));
         mergeBox.setPenalty((1.0 - jw.getSimilarity(subj1, subj2)) + mergeBox.getPenalty());
 
         return mergeBox;
@@ -1038,7 +1344,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
         // Create bn
         Stat newStatistics = new Stat(newFrequency, newDistinct);
-        STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, newChildren, null);
+        STHolesBucket<R> bn = new STHolesBucket<R>(newBox, newStatistics, newChildren, bp);
 
         double penalty;
         double dd, dd2, bn_size, b1_size, b2_size;
@@ -1078,13 +1384,13 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
                 /*dd = (double) ((Math.abs(b1.getStatistics().getFrequency() - bn.getStatistics().getFrequency())) / (b1.getStatistics().getFrequency() + bn.getStatistics().getFrequency())
                     +(Math.abs(bn.getStatistics().getFrequency() - b2.getStatistics().getFrequency())) / (bn.getStatistics().getFrequency() + b2.getStatistics().getFrequency())) / 2;*/
 
-                    dd = (double) ((Math.abs( b1.getStatistics().getDensity() - bn.getStatistics().getDensity() )) /  ( b1.getStatistics().getDensity() + bn.getStatistics().getDensity())+
-                            Math.abs( b2.getStatistics().getDensity() - bn.getStatistics().getDensity() ) / (  b1.getStatistics().getDensity() + bn.getStatistics().getDensity() )) / 2;
+                    dd = (double) ((double) (Math.abs( b1.getStatistics().getDensity() - bn.getStatistics().getDensity() )) /  ( b1.getStatistics().getDensity() + bn.getStatistics().getDensity())+
+                            (double) Math.abs( b2.getStatistics().getDensity() - bn.getStatistics().getDensity() ) / (  b2.getStatistics().getDensity() + bn.getStatistics().getDensity() )) / 2;
 
 
                     // dd = (Math.abs(b1.getStatistics().getFrequency() - b2.getStatistics().getFrequency())) / (b1.getStatistics().getFrequency() + b2.getStatistics().getFrequency());
+
                 }
-                //logger.info("SS! Triples : dd = "+dd);
                 double dd3 = 0.0;
                 for( int i=0; i<dim; ++i ) {
                     dd3 = (Math.abs(( (double)bn.getStatistics().getDistinctCount().get(i) - (double)b1.getStatistics().getDistinctCount().get(i)) )
