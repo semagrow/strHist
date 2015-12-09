@@ -580,137 +580,40 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         STHolesBucket<R> b2 = merge.getB2();
         STHolesBucket<R> bn = merge.getBn();
 
-        boolean flag = false;
-
-        List<MergeInfo<R>> list1 = null, list2 = null;
         List<MergeInfo<R>> newList = new ArrayList<>();
 
         /* get the lists of the merged buckets , in order to find which key-buckets need update because of the merge */
-        Iterator it = memoMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            STHolesBucket<R> key = (STHolesBucket<R>) pair.getKey();
+        List<MergeInfo<R>> list = new LinkedList<>(memoMap.get(b1));
+        list.addAll(memoMap.get(b2));
 
-            if (key.equals(b1)) {
-                list1 = (List<MergeInfo<R>>) pair.getValue();
 
-                if (flag)
-                    break;
-                else
-                    flag = true;
-            }
+        for (MergeInfo<R> mergeInfo : list) {
 
-            if (key.equals(b2)) {
-                list2 = (List<MergeInfo<R>>) pair.getValue();
+            STHolesBucket<R> refB = mergeInfo.getB1().equals(b1) ? mergeInfo.getB2() : mergeInfo.getB1();
 
-                if (flag)
-                    break;
-                else
-                    flag = true;
-            }
+            // in case that there is an mergeinfo between (b1, b2).
+            if (refB.equals(b1))
+                continue;
 
+            // compute new merge info between the merged bucket bn and the influenced bucket refB.
+
+            Map.Entry<STHolesBucket<R>, Double> candidate = getSSMergePenalty(PENALTY_TYPE, bn, refB);
+
+            MergeInfo<R> newMergeInfo = new MergeInfo<>(bn, refB, (STHolesBucket<R>) candidate.getKey(), (double) candidate.getValue());
+
+            newList.add(newMergeInfo);
+
+            memoMap.get(refB).removeAll(list);
+            memoMap.get(refB).add(newMergeInfo);
         }
 
-        STHolesBucket<R> refB;
-
-        // for every bucket that is influenced by the merge
-        // get its list of <MergeInfo>
-        // remove only the MergeInfo that contains the bucket that will be merged
-        // calculate the penalty of the merged bucket and the current one and construct a new MergeInfo
-        // add this MergeInfo to the list of the current bucket and the merged bucket
-        for (int i = 0; i < list1.size(); i++) {
-
-            if (list1.get(i).getB1().equals(b1))
-                refB = list1.get(i).getB2();
-            else
-                refB = list1.get(i).getB1();
-
-            logger.info("list1["+ i +"] = " + list1.get(i).toString());
-
-            if (! refB.equals(b2)) {
-                List<MergeInfo<R>> tempList = memoMap.get(refB);
-                List<MergeInfo<R>> refList = new ArrayList<>();     // the new list of the current key-bucket
-
-
-                for (int j = 0; j < tempList.size(); j++) {
-                    // this mergeInfo needs refinement
-                    if (tempList.get(j).getB1().equals(b1) || tempList.get(j).getB2().equals(b1)) {
-                        Map.Entry<STHolesBucket<R>, Double> candidate = getSSMergePenalty(PENALTY_TYPE, bn, refB);
-                        MergeInfo<R> bucket = new MergeInfo<>(bn, refB, (STHolesBucket<R>) candidate.getKey(), (double) candidate.getValue());
-
-                        logger.info("bn = "+ bn + " , refB = "+ refB +" to new merged bucket "+bucket.toString()+" ");
-
-                        for (int k = 0; k < tempList.size(); k++) {
-                            //if the bucket already exists in the list, do not add it again
-                            if (! tempList.get(k).getBn().equals((STHolesBucket<R>) candidate.getKey())) {
-                                refList.add(bucket);
-                                newList.add(bucket);
-                            }
-                            else {
-                                logger.info("List1: " + tempList.get(k).getBn() + " -> Already exists!");
-                            }
-                        }
-
-                    } else if (tempList.get(j).equals(list1.get(i)))
-                        continue;
-                    else
-                        refList.add(tempList.get(j));
-
-                }
-                memoMap.put(refB, refList);
-            }
-        }
-        memoMap.remove(b1);
-
-
-        for (int i = 0; i < list2.size(); i++) {
-
-            if (list2.get(i).getB1().equals(b1))
-                refB = list2.get(i).getB2();
-            else
-                refB = list2.get(i).getB1();
-
-            logger.info("list2["+ i +"] = " + list2.get(i).toString());
-
-            if (!refB.equals(b2)) {
-                List<MergeInfo<R>> tempList = memoMap.get(refB);
-                List<MergeInfo<R>> refList = new ArrayList<>();
-
-
-                if (tempList == null) {
-                    System.out.println("the templist of "+refB.toString()+ " is null!");
-                }
-
-                for (int j = 0; j < tempList.size(); j++) {
-                    // this mergeInfo needs refinement
-                    if (tempList.get(j).getB1().equals(b1) || tempList.get(j).getB2().equals(b1)) {
-                        Map.Entry<STHolesBucket<R>, Double> candidate = getSSMergePenalty(PENALTY_TYPE, bn, refB);
-                        MergeInfo<R> bucket = new MergeInfo<>(bn, refB, (STHolesBucket<R>) candidate.getKey(), (double) candidate.getValue());
-
-                        for (int k = 0; k < tempList.size(); k++) {
-                            if (! tempList.get(k).getBn().equals((STHolesBucket<R>) candidate.getKey())) {
-                                refList.add(bucket);
-                                newList.add(bucket);
-                            }
-                            else {
-                                logger.info("List2: "+ tempList.get(k).getBn() +" -> Already exists!");
-                            }
-                        }
-
-                    } else if (tempList.get(j).equals(list2.get(i)))
-                        continue;
-                    else
-                        refList.add(tempList.get(j));
-
-                }
-                memoMap.put(refB, refList);
-            }
-        }
-        memoMap.remove(b2);
-
-        // add the merged bucket to the map
         memoMap.put(bn, newList);
 
+        memoMap.remove(b1);
+        memoMap.remove(b2);
+
+
+        /*
         //only for logs!!!!
         it = memoMap.entrySet().iterator();
         while (it.hasNext()) {
@@ -723,6 +626,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             for (int i = 0; i< l.size(); i++)
                 logger.info(" value "+i+" = " + l.get(i).toString());
         }
+        */
     }
 
     /**
