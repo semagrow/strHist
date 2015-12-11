@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
+import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 
@@ -26,6 +27,7 @@ public class PrefixRange
         this.prefixList = new ArrayList<String>();
 		infinite = true;
 	}
+
 
     //Tested
 	public boolean includes(String item) {
@@ -326,6 +328,13 @@ public class PrefixRange
             return this.infinite == range.infinite && p;
         }
 
+        return false;
+    }
+
+    public boolean intersects(Range<?> r) {
+        if (r instanceof PrefixRange) {
+            return intersects((PrefixRange)r);
+        }
         return false;
     }
 }

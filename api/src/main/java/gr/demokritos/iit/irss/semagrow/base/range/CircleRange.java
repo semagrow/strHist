@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
+import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
@@ -242,5 +243,15 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
     public boolean isInfinite() {
         return this.infinite;
+    }
+
+
+
+
+    public boolean intersects(Range<?> r) {
+        if (r instanceof CircleRange) {
+            return intersects((CircleRange)r);
+        }
+        return false;
     }
 }

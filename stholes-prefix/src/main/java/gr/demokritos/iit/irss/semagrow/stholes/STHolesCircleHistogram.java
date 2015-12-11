@@ -783,7 +783,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         for (int i = 0; i < bChildren.size(); i++) {
             bi = bChildren.get(i);
             // Candidate sibling-sibling merges
-            logger.info("Sibling merging .... ");
+            //logger.info("Sibling merging .... ");
             for (int j = i + 1; j < bChildren.size(); j++) {
 
                 bj = bChildren.get(j);
@@ -1220,8 +1220,9 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             return null;
         }
         R newBox = bp.getBox();
-        long newFreq = bp.getStatistics().getFrequency();
+        long newFreq = bp.getStatistics().getFrequency();// + bc.getStatistics().getFrequency();
         List<Long> newDistinct = bp.getStatistics().getDistinctCount();
+
         STHolesBucket<R> newParent = bp.getParent();
         Stat newStatistics = new Stat(newFreq, newDistinct);
 
@@ -1332,19 +1333,38 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         List<Long> newDistinct = new LinkedList<>(b1Distinct);
 
         for (int i = 0; i < b1Distinct.size(); i++) {
-            long a = Math.max(b1Distinct.get(i), curDistinct.get(i));
+            long a;
+
+            if(b1.getBox().getRange(i).intersects(b2.getBox().getRange(i))) {
+                a = Math.max(b1Distinct.get(i), curDistinct.get(i));
+               // logger.info("Max stats = "+a+" for b1 = "+b1.getBox().toString() +" and b2 = "+b2.getBox().toString());
+            }else {
+                a = b1Distinct.get(i) + curDistinct.get(i);
+              //  logger.info("Sum stats = "+a+" for b1 = "+b1.getBox().toString() +" and b2 = "+b2.getBox().toString());
+            }
             //long a = b1Distinct.get(i) + curDistinct.get(i);
             newDistinct.set(i, a);
         }
 
+
+
         for (STHolesBucket<R> bi : I) {
 
             curDistinct = bi.getStatistics().getDistinctCount();
-            newFrequency += bi.getStatistics().getFrequency() ;
+            //newFrequency += bi.getStatistics().getFrequency() ;
 
             for (int i = 0; i < newDistinct.size(); i++) {
                 //long a = newDistinct.get(i) + curDistinct.get(i);
-                long a = Math.max(newDistinct.get(i), curDistinct.get(i));
+                //long a = Math.max(newDistinct.get(i), curDistinct.get(i));
+                long a;
+
+                if(newBox.getRange(i).intersects(bi.getBox().getRange(i))) {
+                    a = Math.max(newDistinct.get(i), curDistinct.get(i));
+                   // logger.info("Max stats = "+a+" for bp = "+newBox.toString() +" and bc = "+bi.getBox().toString());
+                }else {
+                    a = newDistinct.get(i) + curDistinct.get(i);
+                    //logger.info("Sum stats = "+a+" for bp = "+newBox.toString() +" and bc = "+bi.getBox().toString());
+                }
                 newDistinct.set(i, a);
             }
         }

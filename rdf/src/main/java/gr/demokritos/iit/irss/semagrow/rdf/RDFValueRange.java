@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
+import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import org.openrdf.model.Literal;
@@ -165,6 +166,17 @@ public class RDFValueRange implements RangeLength<Value>, Rangeable<RDFValueRang
                    this.literalRange.equals(rdfValueRange.getLiteralRange());
         }
 
+        return false;
+    }
+
+
+
+
+
+    public boolean intersects(Range<?> r) {
+        if (r instanceof RDFValueRange) {
+            return intersects((RDFValueRange)r);
+        }
         return false;
     }
 }

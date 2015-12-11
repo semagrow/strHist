@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
+import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 
@@ -173,6 +174,14 @@ public class IntervalRange implements RangeLength<Integer>, Rangeable<IntervalRa
         if (o instanceof IntervalRange) {
             IntervalRange i = (IntervalRange)o;
             return low == i.low && high == i.high;
+        }
+        return false;
+    }
+
+
+    public boolean intersects(Range<?> r) {
+        if (r instanceof IntervalRange) {
+            return intersects((IntervalRange)r);
         }
         return false;
     }

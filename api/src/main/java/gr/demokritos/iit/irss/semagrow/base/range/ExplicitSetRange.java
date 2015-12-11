@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
+import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 
@@ -217,4 +218,12 @@ public class ExplicitSetRange<T>
         return items;
     }
 
+
+
+    public boolean intersects(Range<?> r) {
+        if (r instanceof ExplicitSetRange) {
+            return intersects((ExplicitSetRange<T>)r);
+        }
+        return false;
+    }
 }

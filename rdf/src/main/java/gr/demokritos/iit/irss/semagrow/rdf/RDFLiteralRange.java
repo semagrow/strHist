@@ -319,23 +319,32 @@ public class RDFLiteralRange implements RangeLength<Literal>, Rangeable<RDFLiter
 
                 if (literalValueType.equals(XMLSchema.INTEGER) || literalValueType.equals(XMLSchema.INT)) {
                     return  ((IntervalRange) range).contains(
-                                    (IntervalRange) literalrange);
+                            (IntervalRange) literalrange);
                 } else if (literalValueType.equals(XMLSchema.LONG)) {
 
                     return  ((IntervalRange) range).contains(
-                                    (IntervalRange) literalrange);
+                            (IntervalRange) literalrange);
                 } else if (literalValueType.equals(XMLSchema.STRING)) {
 
                     return ((PrefixRange) range).contains(
-                                    (PrefixRange) literalrange);
+                            (PrefixRange) literalrange);
                 } else if (literalValueType.equals(XMLSchema.DATETIME)) {
 
                     return ((CalendarRange) range).contains(
-                                    (CalendarRange) literalrange);
+                            (CalendarRange) literalrange);
                 }
             }
         }
 
+        return false;
+    }
+
+
+
+    public boolean intersects(Range<?> r) {
+        if (r instanceof RDFLiteralRange) {
+            return intersects((RDFLiteralRange)r);
+        }
         return false;
     }
 

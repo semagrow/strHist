@@ -1,6 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.api;
 
 import gr.demokritos.iit.irss.semagrow.api.range.Range;
+import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 
 /**
  * Rectangle is essentially a multidimensional bounding box

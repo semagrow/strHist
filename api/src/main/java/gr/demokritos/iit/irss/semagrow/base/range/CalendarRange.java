@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.base.range;
 
+import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import org.slf4j.Logger;
@@ -258,4 +259,13 @@ public class CalendarRange implements RangeLength<Date>, Rangeable<CalendarRange
 
     }
 
+
+
+
+    public boolean intersects(Range<?> r) {
+        if (r instanceof CalendarRange) {
+            return intersects((CalendarRange)r);
+        }
+        return false;
+    }
 }

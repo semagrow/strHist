@@ -12,4 +12,6 @@ public interface Range<T> {
     boolean includes(T elem);
 
     void expand(T v);
+
+    boolean intersects(Range<?> range);
 }

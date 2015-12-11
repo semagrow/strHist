@@ -1,5 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.rdf;
 
+import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
 import gr.demokritos.iit.irss.semagrow.base.range.CircleRange;
@@ -57,6 +58,14 @@ public class RDFStrRange implements RangeLength<URI>, Rangeable<RDFStrRange> {
 
     public boolean intersects(RDFStrRange rdfuriRange) {
         return range.intersects(rdfuriRange.range);
+    }
+
+
+    public boolean intersects(Range<?> r) {
+        if (r instanceof RDFStrRange) {
+            return intersects((RDFStrRange)r);
+        }
+        return false;
     }
 
     public RDFStrRange tightRange(RDFStrRange rdfuriRange) {
