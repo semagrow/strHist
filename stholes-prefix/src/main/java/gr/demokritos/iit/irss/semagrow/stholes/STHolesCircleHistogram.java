@@ -124,6 +124,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
      */
     public void refine(QueryRecord<R,Stat> queryRecord) {
         List<R> rects = new ArrayList<R>();
+        boolean flag = false;
 
         if (queryRecord.getRectangle().isInfinite())
             rects.addAll(queryRecord.getResultSet().getRectangles());
@@ -133,7 +134,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
 
         for (R rect : rects) {
-
+            flag = false;
             R origRect = rect;
 
             //rect = getRectangle(rect);
@@ -161,6 +162,12 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             moreSpecific = true;
             Iterable<STHolesBucket<R>> candidates = getCandidateBuckets(rect);
 
+            if (candidates == null) {
+                logger.info("A query that already has its own bucket... no reason for refinement");
+                flag = true;
+                continue;
+            }
+
             //System.out.println("origin = " + origRect.getRange(0) + " moreSpecific " + moreSpecific);
 
             for (STHolesBucket<R> bucket : candidates) {
@@ -178,7 +185,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
                 }*/
 
                 hole = shrink(bucket, rect, queryRecord);
-                STHolesBucket<R> hole1 = shrink(bucket, rect, queryRecord);
+                //STHolesBucket<R> hole1 = shrink(bucket, rect, queryRecord);
 
                 //if (hole.getBox().toString().contains("GB199"))
                 //   System.out.println();
@@ -209,7 +216,8 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         logger.info("Histogram refined with query: " + queryRecord.getRectangle());
 
         // Check if histogram must be compacted after refinement
-        compact();
+        if(! flag)
+            compact();
         logger.info("-------------------------------------------------------------------");
     }
 
@@ -221,9 +229,9 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
     protected void setSubjLength(R r, long count) {  };
 
-    protected long getSubjLength(R r) {  return r.getRange(0).hashCode(); };
+    protected long getSubjLength(R r) {  return 0; };
 
-    protected double getRadius(R r) { return r.getRange(0).hashCode(); }
+    protected double getRadius(R r) { return 0; }
 
     ////////////////////////////////////
 
@@ -346,9 +354,21 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
     private Collection<STHolesBucket<R>> getCandidateBuckets(STHolesBucket<R> bucket, R queryBox) {
         Collection<STHolesBucket<R>> candidates = new LinkedList<STHolesBucket<R>>();
+        Collection<STHolesBucket<R>> chCand;
 
-        for (STHolesBucket<R> bucketChild : bucket.getChildren())
-            candidates.addAll(getCandidateBuckets(bucketChild, queryBox));
+        String subj1 = getSubject(queryBox);
+        JaroWinkler jw = new JaroWinkler();
+
+        for (STHolesBucket<R> bucketChild : bucket.getChildren()) {
+            String subj2 = getSubject(bucketChild.getBox());
+
+            if (jw.getSimilarity(subj1, subj2) == 1.0)
+                return null;
+
+            chCand = getCandidateBuckets(bucketChild, queryBox);
+            if (chCand != null)
+                candidates.addAll(chCand);
+        }
 
 
         if (bucket.getBox().contains(queryBox)) {
@@ -409,8 +429,8 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         // call merge(b1,b2,bn)
         while (bucketsNum > maxBucketsNum) {
 
-            MergeInfo<R> bestMerge = findBestMergeN(root);
-            //MergeInfo<R> bestMerge = findBestMerge1(root);
+            //MergeInfo<R> bestMerge = findBestMergeN(root);
+            MergeInfo<R> bestMerge = findBestMerge1(root);
             //MergeInfo<R> bestMerge = findRankMerge(root);
             STHolesBucket<R> b1 = bestMerge.getB1();
             STHolesBucket<R> b2 = bestMerge.getB2();
@@ -496,34 +516,32 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
     }
 
     private void updateMemoBuckets(MergeInfo<R> merge) {
-        /*boolean flag = false;
 
-        Iterator it = memo.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
+        if (memoMap.containsKey(merge.getB1())) {
+            List<MergeInfo<R>> tempList = memoMap.get(merge.getB1());
+            tempList.add(merge);
+        }
+        else {
+            List<MergeInfo<R>> list = new ArrayList();
+            list.add(merge);
 
-            if(pair.getKey().equals((STHolesBucket<R>) bi)) {
-                Map<STHolesBucket<R>, Double> temp = (Map<STHolesBucket<R>, Double>) pair.getValue();
+            this.memoMap.put(merge.getB2(), list);
+        }
 
-                temp.put(bj, penalty);
-                if (flag)
-                break;
-                else
-                    flag = true;
-            }
+        if (memoMap.containsKey(merge.getB2())) {
+            List<MergeInfo<R>> tempList = memoMap.get(merge.getB2());
+            tempList.add(merge);
+        }
+        else {
+            List<MergeInfo<R>> list = new ArrayList();
+            list.add(merge);
 
-            if(pair.getKey().equals((STHolesBucket<R>) bj)) {
-                Map<STHolesBucket<R>, Double> temp = (Map<STHolesBucket<R>, Double>) pair.getValue();
+            this.memoMap.put(merge.getB1(), list);
+        }
 
-                temp.put(bi, penalty);
-                if (flag)
-                    break;
-                else
-                    flag = true;
-            }
 
-        }*/
 
+        /*
         boolean flag1 = false, flag2 = false;
 
         Iterator it = memoMap.entrySet().iterator();
@@ -567,6 +585,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
             this.memoMap.put(merge.getB2(), list);
         }
+        */
 
 
     }
@@ -771,6 +790,10 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
                 if (bi.getBox().isMergeable(bj.getBox())) {
                     candidateMergedBucket = getSSMergePenalty(bi, bj);
+
+                    if (candidateMergedBucket == null)
+                        continue;
+
                     penalty = candidateMergedBucket.getValue();
 
                     if (penalty <= minimumPCPenalty) {
@@ -846,6 +869,9 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             bi = bChildren.get(i);
             // Candidate parent-child merges
             candidateMergedBucket = getPCMergePenalty(b, bi);
+            if (candidateMergedBucket == null)
+                continue;
+
             penalty = candidateMergedBucket.getValue();
 
             if (penalty <= minimumPCPenalty) {
@@ -1307,6 +1333,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
 
         for (int i = 0; i < b1Distinct.size(); i++) {
             long a = Math.max(b1Distinct.get(i), curDistinct.get(i));
+            //long a = b1Distinct.get(i) + curDistinct.get(i);
             newDistinct.set(i, a);
         }
 
@@ -1316,8 +1343,9 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
             newFrequency += bi.getStatistics().getFrequency() ;
 
             for (int i = 0; i < newDistinct.size(); i++) {
-
-                newDistinct.set(i,  Math.max(newDistinct.get(i), curDistinct.get(i)));
+                //long a = newDistinct.get(i) + curDistinct.get(i);
+                long a = Math.max(newDistinct.get(i), curDistinct.get(i));
+                newDistinct.set(i, a);
             }
         }
 

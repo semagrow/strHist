@@ -6,6 +6,8 @@ import eu.semagrow.core.impl.planner.Plan;
 import eu.semagrow.core.impl.planner.PlanVisitorBase;
 import eu.semagrow.query.SemagrowTupleQuery;
 import eu.semagrow.repository.SemagrowRepository;
+import gr.demokritos.iit.irss.semagrow.clustering.OpticsCluster;
+import gr.demokritos.iit.irss.semagrow.rdf.RDFCircleSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.tools.AnalysisMetrics;
 import gr.demokritos.iit.irss.semagrow.tools.QueryEvaluatorStructure;
@@ -87,7 +89,7 @@ public class Evaluate {
         BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
         bw.write("Prefix, Actual, Est, AbsErr%\n\n");
 
-        RDFSTHolesHistogram histogram = loadHistogram(1);
+        RDFCircleSTHolesHistogram histogram = loadCircleHistogram(1);
 
         // Evaluate a point query on histogram and triple store.
         evaluateWithSampleTestQueries1(histogram, bw, 0.01);
@@ -112,7 +114,8 @@ public class Evaluate {
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8, options);
             bw.write("Year, Prefix, Act, Est, AbsErr%\n\n");
 
-            RDFSTHolesHistogram histogram = loadHistogram(1);
+            //RDFSTHolesHistogram histogram = loadHistogram(1);
+            RDFCircleSTHolesHistogram histogram = loadCircleHistogram(1);
 
             // Evaluate a point query on histogram and triple store.
             evaluateWithSampleTestQueries1(histogram, bw, 0.01);
@@ -134,6 +137,17 @@ public class Evaluate {
             histogram = Utils.loadPreviousHistogram(outputPath);
         else
             histogram = Utils.loadCurrentHistogram(outputPath);
+
+        return histogram;
+    }
+
+    private static RDFCircleSTHolesHistogram loadCircleHistogram(int iteration) {
+        RDFCircleSTHolesHistogram histogram;
+
+        if (iteration == 0)
+            histogram = Utils.loadPreviousCircleHistogram(outputPath);
+        else
+            histogram = Utils.loadCurrentCircleHistogram(outputPath);
 
         return histogram;
     }
@@ -170,7 +184,7 @@ public class Evaluate {
         }
     }
 
-    private void evaluateWithSampleTestQueries1(RDFSTHolesHistogram histogram,
+    private void evaluateWithSampleTestQueries1(RDFCircleSTHolesHistogram histogram,
                                                 BufferedWriter bw,
                                                 double percentage) {
 
@@ -181,7 +195,7 @@ public class Evaluate {
 
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new FileReader("/home/katerina/logs/testQ"));
+            in = new BufferedReader(new FileReader("/home/katerina/logs/testLogS"));
 
             ActualQueryExecutor actual = new ActualQueryExecutor("repository.ttl");
             actual.startConnection();
@@ -191,7 +205,7 @@ public class Evaluate {
             String line;
 
             while ((line = in.readLine()) != null) {
-                testQuery = "select ?o where { " + line + " }";
+                testQuery = "select ?o where { " + line + " <http://purl.org/dc/terms/subject> ?o . }";
 
                // System.out.println("Run normally.... ");
                 actualEval = actual.runSemagrowTest(testQuery, metrics);
@@ -201,7 +215,8 @@ public class Evaluate {
                 histEval = hist.runSemagrowTest(testQuery, metrics);
                 //System.out.println("\n -------------------------------------------------- \n");
 
-                evaluateTestQuery1(histogram, testQuery, actualEval.getResultCount(), bw);
+                //evaluateTestQuery1(histogram, testQuery, actualEval.getResultCount(), bw);
+                evaluateTestCircleQuery(histogram, testQuery, actualEval.getResultCount(), bw);
 
                 metrics.setActual_execution_time(actualEval.getTime());
                 metrics.setEstimate_execution_time(histEval.getTime());
@@ -237,7 +252,7 @@ public class Evaluate {
     private void evaluateQuery(QueryEvaluatorStructure actualEval, QueryEvaluatorStructure histEval) {
 
 
-        System.out.println("ACTUAL: \n"+actualEval.getPlan().toString());
+        System.out.println("ACTUAL: \n" + actualEval.getPlan().toString());
         System.out.println("HIST: \n"+histEval.getPlan().toString());
         if (actualEval.getPlan().equals(histEval.getPlan())) {
             //System.out.println("Equal plans ");
@@ -295,6 +310,37 @@ public class Evaluate {
 
 //        long actual = hashTable.get(prefix);
         long estimate = Utils.evaluateOnHistogram1(histogram, testQuery);
+        long error;
+
+        metrics.setEstimate_results(estimate);
+
+
+        //System.out.println("Run histogram.... Results = " + estimate);
+
+        if (actualResults == 0 && estimate == 0)
+            error = 0;
+        else
+            error = (Math.abs(actualResults - estimate) * 100) / (Math.max(actualResults, estimate));
+
+        metrics.setError(error);
+        try {
+            bw.write(prefix + ", " + actualResults + ", " + estimate + ", " + error + "%");
+            bw.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //System.out.println("\n ************************************** \n");
+
+
+    }
+
+    private void evaluateTestCircleQuery(RDFCircleSTHolesHistogram histogram,
+                                    String testQuery, long actualResults, BufferedWriter bw) {
+        String prefix = getPrefix(testQuery);
+
+//        long actual = hashTable.get(prefix);
+        long estimate = Utils.evaluateOnCircleHistogram(histogram, testQuery);
         long error;
 
         metrics.setEstimate_results(estimate);

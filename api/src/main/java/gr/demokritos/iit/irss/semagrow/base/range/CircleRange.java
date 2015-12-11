@@ -67,7 +67,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
     @Override
     public boolean isUnit() {
-        return (count == 1);
+        return (count >= 1);
     }
 
     @Override
@@ -91,13 +91,13 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
         if (this.getCenter() == null || this.getCenter().equalsIgnoreCase(""))
             return true;
 
-        if (this.radius == 0.0 || circleRange.getRadius() == 0.0)
-            return false;
-
         double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
 
         if (cDist + circleRange.getRadius() <= this.radius)
             return true;
+
+        if (this.radius == 0.0 || circleRange.getRadius() == 0.0)
+            return false;
 
         return false;
     }
