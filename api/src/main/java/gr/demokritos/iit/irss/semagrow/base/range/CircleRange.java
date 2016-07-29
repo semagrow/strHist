@@ -3,7 +3,7 @@ package gr.demokritos.iit.irss.semagrow.base.range;
 import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;
 import gr.demokritos.iit.irss.semagrow.api.range.Rangeable;
-import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
+import org.simmetrics.metrics.JaroWinkler;
 
 /**
  * Created by katerina on 20/11/2015.
@@ -78,7 +78,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
 
     @Override
     public boolean includes(String elem) {
-        if ((1.0 - strMetric.getSimilarity(elem, center)) <= radius)
+        if ((1.0 - strMetric.distance(elem, center)) <= radius)
             return true;
 
         return false;
@@ -92,7 +92,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
         if (this.getCenter() == null || this.getCenter().equalsIgnoreCase(""))
             return true;
 
-        double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+        double cDist = 1.0 - strMetric.distance(circleRange.getCenter(), this.center);
 
         if (cDist + circleRange.getRadius() <= this.radius)
             return true;
@@ -112,7 +112,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
             return true;
 
 
-        double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+        double cDist = 1.0 - strMetric.distance(circleRange.getCenter(), this.center);
         //double cDist = strMetric.getSimilarity(circleRange.getCenter(), this.center);
 
         if (cDist == 0.0)
@@ -130,7 +130,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
     @Override
     public void expand(String v) {
         if (!this.includes(v)) {
-            double cDist = 1.0 - strMetric.getSimilarity(v, this.center);
+            double cDist = 1.0 - strMetric.distance(v, this.center);
             this.radius = cDist;
         }
         count++;
@@ -144,7 +144,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
             return this;
 
         else {
-            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+            double cDist = 1.0 - strMetric.distance(circleRange.getCenter(), this.center);
             return new CircleRange("", Math.max((circleRange.getRadius() + this.radius - cDist) , 0));
         }
     }
@@ -157,7 +157,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
             return new CircleRange("", (circleRange.getRadius() - this.radius));
 
         else {
-            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+            double cDist = 1.0 - strMetric.distance(circleRange.getCenter(), this.center);
             return new CircleRange("", ( this.getRadius() - Math.max((circleRange.getRadius() + this.radius - cDist) , 0)) );
         }
     }
@@ -172,7 +172,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
             return circleRange;
 
         else if (this.intersects(circleRange)) {
-            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+            double cDist = 1.0 - strMetric.distance(circleRange.getCenter(), this.center);
             if (this.radius > circleRange.getRadius()) {
                 CircleRange c = new CircleRange(this.center, cDist);
                 c.setLength(this.getLength() + circleRange.getLength());
@@ -188,7 +188,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
         }
 
         if (this.radius == 0.0 || circleRange.getRadius() == 0.0) {
-            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+            double cDist = 1.0 - strMetric.distance(circleRange.getCenter(), this.center);
 
             if (this.radius == 0.0) {
                 CircleRange c = new CircleRange(circleRange.getCenter(), cDist);
@@ -204,7 +204,7 @@ public class CircleRange implements RangeLength<String>, Rangeable<CircleRange> 
             }
         }
         else {
-            double cDist = 1.0 - strMetric.getSimilarity(circleRange.getCenter(), this.center);
+            double cDist = 1.0 - strMetric.distance(circleRange.getCenter(), this.center);
             CircleRange c = new CircleRange(this.getCenter(), cDist+this.radius);
             c.setLength(this.count + circleRange.getLength());
 
