@@ -7,7 +7,7 @@ import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
+import org.simmetrics.metrics.JaroWinkler;
 
 import java.util.*;
 
@@ -338,7 +338,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         for (STHolesBucket<R> bucketChild : bucket.getChildren()) {
             String subj2 = getSubject(bucketChild.getBox());
 
-            if (jw.getSimilarity(subj1, subj2) == 1.0)
+            if (jw.distance(subj1, subj2) == 1.0)
                 return null;
 
             chCand = getCandidateBuckets(bucketChild, queryBox);
@@ -1130,7 +1130,7 @@ public class STHolesCircleHistogram<R extends Rectangle<R>> extends STHistogramB
         String subj1 = getSubject(mergeBox.getB1().getBox());
         String subj2 = getSubject(mergeBox.getB2().getBox());
 
-        mergeBox.setPenalty((1.0 - jw.getSimilarity(subj1, subj2)) + mergeBox.getPenalty());
+        mergeBox.setPenalty((1.0 - jw.distance(subj1, subj2)) + mergeBox.getPenalty());
 
         return mergeBox;
     }

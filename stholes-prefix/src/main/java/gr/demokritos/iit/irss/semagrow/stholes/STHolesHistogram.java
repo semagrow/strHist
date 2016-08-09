@@ -4,15 +4,10 @@ import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 import gr.demokritos.iit.irss.semagrow.api.STHistogram;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryRecord;
 import gr.demokritos.iit.irss.semagrow.api.qfr.QueryResult;
-import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.base.Stat;
-import gr.demokritos.iit.irss.semagrow.base.range.PrefixRange;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Resource;
-import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;
+import org.simmetrics.metrics.JaroWinkler;
 
 import java.util.*;
 
@@ -618,8 +613,8 @@ public class STHolesHistogram<R extends Rectangle<R>> extends STHistogramBase<R,
         String subj1 = getSubject(mergeBox.getB1().getBox());
         String subj2 = getSubject(mergeBox.getB2().getBox());
 
-        logger.info("JW similarity : " + (1.0 - jw.getSimilarity(subj1, subj2)));
-        mergeBox.setPenalty((1.0 - jw.getSimilarity(subj1, subj2)) + mergeBox.getPenalty());
+        logger.info("JW similarity : " + (1.0 - jw.distance(subj1, subj2)));
+        mergeBox.setPenalty((1.0 - jw.distance(subj1, subj2)) + mergeBox.getPenalty());
 
         return mergeBox;
     }
