@@ -12,7 +12,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <semagrow.version>1.4.1</semagrow.version>
+        <semagrow.version>1.5.2</semagrow.version>
         <sesame.version>2.7.10</sesame.version>
         <slf4j.version>1.7.12</slf4j.version>
 	</properties>
@@ -28,7 +28,10 @@
   </modules>
 
 	<repositories>
-
+	<repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	</repository>
         <repository>
             <id>maven-central</id>
             <url>http://central.maven.org/maven2</url>
@@ -51,6 +54,11 @@
       <dependency>
           <groupId>org.openrdf.sesame</groupId>
           <artifactId>sesame-runtime</artifactId>
+          <version>${sesame.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.openrdf.sesame</groupId>
+          <artifactId>sesame-sail-nativerdf</artifactId>
           <version>${sesame.version}</version>
       </dependency>
       <dependency>
@@ -82,11 +90,20 @@
       </dependency>
 
       <dependency>
-          <groupId>eu.semagrow</groupId>
+          <groupId>com.github.semagrow.semagrow</groupId>
           <artifactId>semagrow-monitor</artifactId>
           <version>${semagrow.version}</version>
       </dependency>
-
+      <dependency>
+          <groupId>com.github.semagrow.semagrow</groupId>
+          <artifactId>semagrow-core</artifactId>
+          <version>${semagrow.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>com.github.semagrow.semagrow</groupId>
+          <artifactId>semagrow-sail</artifactId>
+          <version>${semagrow.version}</version>
+      </dependency>
       <dependency>
           <groupId>com.github.mpkorstanje</groupId>
           <artifactId>simmetrics-core</artifactId>

@@ -1,11 +1,7 @@
 package gr.demokritos.iit.irss.semagrow.tools.expirementfixedprefix;
 
-import eu.semagrow.commons.utils.FileUtils;
-import eu.semagrow.config.SemagrowRepositoryConfig;
-import eu.semagrow.core.impl.planner.Plan;
-import eu.semagrow.core.impl.planner.PlanVisitorBase;
-import eu.semagrow.query.SemagrowTupleQuery;
-import eu.semagrow.repository.SemagrowRepository;
+import eu.semagrow.core.impl.plan.PlanVisitorBase;
+import eu.semagrow.core.plan.Plan;
 import gr.demokritos.iit.irss.semagrow.clustering.OpticsCluster;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFCircleSTHolesHistogram;
 import gr.demokritos.iit.irss.semagrow.rdf.RDFSTHolesHistogram;
@@ -14,23 +10,9 @@ import gr.demokritos.iit.irss.semagrow.tools.QueryEvaluatorStructure;
 import gr.demokritos.iit.irss.semagrow.tools.Utils;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.openrdf.model.Graph;
-import org.openrdf.model.impl.GraphImpl;
-import org.openrdf.query.*;
-import org.openrdf.query.algebra.*;
-import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
-import org.openrdf.query.algebra.helpers.VarNameCollector;
-import org.openrdf.query.resultio.TupleQueryResultFormat;
-import org.openrdf.query.resultio.TupleQueryResultParserRegistry;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.*;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParser;
-import org.openrdf.rio.Rio;
-import org.openrdf.rio.helpers.StatementCollector;
-import org.openrdf.sail.config.SailConfigException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -341,6 +322,7 @@ public class Evaluate {
 
 //        long actual = hashTable.get(prefix);
         long estimate = Utils.evaluateOnCircleHistogram(histogram, testQuery);
+
         long error;
 
         metrics.setEstimate_results(estimate);

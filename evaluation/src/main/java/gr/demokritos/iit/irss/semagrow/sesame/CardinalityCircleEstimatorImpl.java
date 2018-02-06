@@ -1,6 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import eu.semagrow.core.impl.planner.Plan;
+import eu.semagrow.core.plan.Plan;
 import gr.demokritos.iit.irss.semagrow.api.Histogram;
 import gr.demokritos.iit.irss.semagrow.api.range.Range;
 import gr.demokritos.iit.irss.semagrow.api.range.RangeLength;

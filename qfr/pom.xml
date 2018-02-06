@@ -22,17 +22,6 @@
           <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-          <groupId>eu.semagrow</groupId>
-          <artifactId>semagrow-core</artifactId>
-          <version>${semagrow.version}</version>
-      </dependency>
-
-      <dependency>
-          <groupId>eu.semagrow</groupId>
-          <artifactId>semagrow-sail</artifactId>
-          <version>${semagrow.version}</version>
-      </dependency>
 
   </dependencies>
 

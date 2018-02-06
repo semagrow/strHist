@@ -1,6 +1,6 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import eu.semagrow.core.impl.planner.Plan;
+import eu.semagrow.core.plan.Plan;
 import org.openrdf.query.algebra.*;
 import org.openrdf.query.impl.EmptyBindingSet;
 

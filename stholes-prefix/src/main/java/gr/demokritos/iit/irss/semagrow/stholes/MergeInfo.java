@@ -1,6 +1,5 @@
 package gr.demokritos.iit.irss.semagrow.stholes;
 
-import eu.semagrow.commons.algebra.Merge;
 import gr.demokritos.iit.irss.semagrow.api.Rectangle;
 
 /**

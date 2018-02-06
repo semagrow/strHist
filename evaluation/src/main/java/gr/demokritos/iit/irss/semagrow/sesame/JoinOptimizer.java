@@ -1,12 +1,12 @@
 package gr.demokritos.iit.irss.semagrow.sesame;
 
-import eu.semagrow.core.impl.planner.Cost;
-import eu.semagrow.core.impl.planner.Plan;
-import eu.semagrow.core.impl.planner.PlanCollection;
+import eu.semagrow.core.plan.Cost;
+import eu.semagrow.core.plan.Plan;
 
 
 import eu.semagrow.core.impl.util.BPGCollector;
 import eu.semagrow.core.impl.util.CombinationIterator;
+import eu.semagrow.core.plan.PlanCollection;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.algebra.Join;
