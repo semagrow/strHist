@@ -42,7 +42,10 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-
+	<repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	</repository>
     </repositories>
 
 
@@ -82,8 +85,8 @@
       </dependency>
 
       <dependency>
-          <groupId>eu.semagrow</groupId>
-          <artifactId>semagrow-monitor</artifactId>
+          <groupId>com.github.semagrow</groupId>
+          <artifactId>semagrow</artifactId>
           <version>${semagrow.version}</version>
       </dependency>
 
